@@ -17,20 +17,20 @@ const Product = ({ product, onAddToCart }) => {
             alt="green iguana"
           />
           <CardContent>
-            <Typography lineHeight={1} gutterBottom variant="h6" component="div" style={{marginBottom: 0}}>
-            {product.name}
+            <Typography className='titulo' lineHeight={1} gutterBottom variant="h6" fontSize={18} component="div" style={{marginBottom: 0}}>
+            {product.descripcion}
             </Typography>
-            <Typography lineHeight={1.4} variant="span" color="text.secondary">
-              <b>{product.extent}</b>
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-                Precio sin interes: <b>${product.price}</b>
+            <Typography variant='span' fontSize={14} fontStyle={'italic'}>
+             Linea <b>{product.linea}</b>
             </Typography>
             <Typography variant="body2" color="text.secondary">
-                Precio con interes: <b>${product.price * 1.3}</b>
+                Precio de negocio: <b>{product.precio_negocio}</b>
             </Typography>
             <Typography variant="body2" color="text.secondary">
-                Puntos: <b>{product.points}</b>
+                PSVP lista: <b>{product.psvp_lista}</b>
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+                puntos: <b>{product.puntos}</b>
             </Typography>
           </CardContent>
         </CardActionArea>

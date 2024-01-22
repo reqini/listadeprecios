@@ -1,38 +1,34 @@
 // App.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import Product from './products';
 import Container from '@mui/material/Container';
 import axios from 'axios';
-import numeral from 'numeral';
 import TextField from '@mui/material/TextField';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import Grid from '@mui/material/Grid';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import bancos from './bancos';
 
 const ShoppingCart = ({ cart, onClearCart }) => {
   
-  const totalPrice = cart.reduce((acc, item) => acc + item.price, 0);
-  const precioFormateado = numeral(totalPrice).format('0.0,00');
+  const totalPrice = cart.reduce((acc, item) => item.psvp_lista, 0);
+  const cuota12 = cart.reduce((acc, item) => item.cuota_ah12, 0);
+  const cuota6 = cart.reduce((acc, item) => item.cuota_ah6, 0);
 
-  const calculateInstallment = (months) => {
-    const installmentPrice = precioFormateado / months;
-    return installmentPrice.toFixed(2);
-  };
-
-  const totalPriceInt = cart.reduce((acc, item) => acc + item.price * 1.3, 0);
-  const precioFormateadoInt = numeral(totalPriceInt).format('0.0,00');
-
-  const calculateInstallmentInt = (months) => {
-    const installmentPrice = precioFormateadoInt / months;
-    return installmentPrice.toFixed(2); 
-  };
+  console.log(totalPrice);
+  console.log(bancos);
 
   return (
       <div className='fixed-menu flex-center'>
@@ -44,14 +40,14 @@ const ShoppingCart = ({ cart, onClearCart }) => {
             className='accordion'
           >
             <Typography>Carrito de Compras</Typography>
-            <Typography fontWeight={800}>Total: ${totalPrice}</Typography>
+            <Typography fontWeight={800}>Total: {totalPrice}</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Container maxWidth="lg" className='flex-center' style={{flexDirection: 'column', padding: '0px 0 20px 0'}}>
               <div>
                 <ul>
                   {cart.map((item) => (
-                    <li key={item.id}>{item.name} - ${item.price}</li>
+                    <li key={item.codigo}>{item.descripcion} - ${item.psvp_lista}</li>
                   ))}
                 </ul>
               </div>
@@ -62,16 +58,15 @@ const ShoppingCart = ({ cart, onClearCart }) => {
                 <div className='flex-between'>
                   <div>
                     <Typography fontWeight={900}>cuotas sin interes</Typography>
-                    <Typography><b>3 cuotas de</b> ${calculateInstallment(3)}</Typography>
-                    <Typography><b>6 cuotas de</b> ${calculateInstallment(6)}</Typography>
-                    <Typography><b>12 cuotas de</b> ${calculateInstallment(12)}</Typography>
+                    <Typography><b>6 cuotas de</b> {cuota6}</Typography>
+                    <Typography><b>12 cuotas de</b> {cuota12}</Typography>
                   </div>
-                  <div>
+                  {/* <div>
                     <Typography fontWeight={900}>cuotas con interes</Typography>
-                    <Typography><b>3 cuotas de</b> ${calculateInstallmentInt(3)}</Typography>
-                    <Typography><b>6 cuotas de</b> ${calculateInstallmentInt(6)}</Typography>
-                    <Typography><b>12 cuotas de</b> ${calculateInstallmentInt(12)}</Typography>
-                  </div>
+                    <Typography><b>3 cuotas de</b> {calculateInstallmentInt(3)}</Typography>
+                    <Typography><b>6 cuotas de</b> {calculateInstallmentInt(6)}</Typography>
+                    <Typography><b>12 cuotas de</b> {calculateInstallmentInt(12)}</Typography>
+                  </div> */}
                 </div>
               <div style={{marginTop: 20}}>
               <Button variant='contained' onClick={onClearCart}>Limpiar carrito</Button>
@@ -92,6 +87,7 @@ const App = () => {
   const [productosFiltrados, setProductosFiltrados] = useState([]);
   const [productos, setProductos] = useState([]);
   const [isSticky, setIsSticky] = useState(false);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -127,7 +123,7 @@ const App = () => {
 
   useEffect(() => {
     const productosFiltrados = productos.filter(producto =>
-      producto.name.toLowerCase().includes(filtro.toLowerCase())
+      producto.descripcion.toLowerCase().includes(filtro.toLowerCase())
     );
 
     setProductosFiltrados(productosFiltrados);
@@ -158,10 +154,50 @@ const App = () => {
           onChange={(e) => setFiltro(e.target.value)} 
         />
       </div>
+      <div className='flex-center' style={{padding: '20px 0'}}>        
+        <FormControl fullWidth>
+          <Grid container spacing={2}>
+            <Grid item sm={6} xs={12}>
+              <div className='w-100'>
+                <InputLabel id="demo-simple-select-label">3 cuotas</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  fullWidth
+                  style={{background: 'white'}}
+                  value={bancos.codigo}
+                  label="Hola"
+                >
+                  {bancos.map(bank => (
+                    bank.ahora3 == true ? <MenuItem value={10}>{bank.banco}</MenuItem> : null
+                  ))}
+                </Select>
+              </div>
+            </Grid>
+            <Grid item sm={6} xs={12}>
+              <div className='w-100'>
+                <InputLabel id="demo-simple-select-label">6 cuotas</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  fullWidth
+                  style={{background: 'white'}}
+                  value={bancos.codigo}
+                  label="Age"
+                >
+                  {bancos.map(bank => (
+                  bank.ahora6 == true ? <MenuItem value={10}>{bank.banco}</MenuItem> : null
+                  ))}
+                </Select>
+              </div>
+            </Grid>
+          </Grid>
+        </FormControl>
+      </div>
       <ul className='lista-prod'>
         {productosFiltrados.map(product => (
           <li className='grid-item' key={product.id}>
-            <Product key={product.id} product={product} onAddToCart={addToCart} />
+            <Product key={product.codigo} product={product} onAddToCart={addToCart} />
           </li>
         ))}
       </ul>
