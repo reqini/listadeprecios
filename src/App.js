@@ -1,5 +1,5 @@
 // App.js
-import React, { useEffect, useState, lazy, Suspense } from 'react';
+import React, { useEffect, useState } from 'react';
 import Product from './products';
 import Container from '@mui/material/Container';
 import axios from 'axios';
@@ -10,7 +10,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -169,7 +169,7 @@ const App = () => {
                   label="Hola"
                 >
                   {bancos.map(bank => (
-                    bank.ahora3 == true ? <MenuItem value={10}>{bank.banco}</MenuItem> : null
+                    bank.ahora3 === true ? <MenuItem value={10}>{bank.banco}</MenuItem> : null
                   ))}
                 </Select>
               </div>
@@ -186,7 +186,7 @@ const App = () => {
                   label="Age"
                 >
                   {bancos.map(bank => (
-                  bank.ahora6 == true ? <MenuItem value={10}>{bank.banco}</MenuItem> : null
+                  bank.ahora6 === true ? <MenuItem value={10}>{bank.banco}</MenuItem> : null
                   ))}
                 </Select>
               </div>
