@@ -81,7 +81,12 @@ li {
   padding: 10px;
   transition: background-color 0.3s ease;
 }
-
+.titulo {
+  min-height: 40px;
+}
+.w-100 {
+  width: 100%;
+}
 .header.sticky {
   position: fixed;
   top: 0;
