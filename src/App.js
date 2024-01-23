@@ -112,7 +112,7 @@ const App = () => {
     );
 
     setProductosFiltrados(productosFiltrados);
-  }, [filtro, productos]);
+  }, [filtro]);
 
   const addToCart = (productos) => {
     setCart([...cart, productos]);
