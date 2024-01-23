@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import Product from './products';
 import Container from '@mui/material/Container';
-import axios from 'axios';
 import TextField from '@mui/material/TextField';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -20,6 +19,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import bancos from './bancos';
+import productos from './listadeproductos';
 
 const ShoppingCart = ({ cart, onClearCart }) => {
   
@@ -29,6 +29,7 @@ const ShoppingCart = ({ cart, onClearCart }) => {
 
   console.log(totalPrice);
   console.log(bancos);
+  console.log(productos);
 
   return (
       <div className='fixed-menu flex-center'>
@@ -85,24 +86,8 @@ const App = () => {
   const [cart, setCart] = useState([]);
   const [filtro, setFiltro] = useState('');
   const [productosFiltrados, setProductosFiltrados] = useState([]);
-  const [productos, setProductos] = useState([]);
+
   const [isSticky, setIsSticky] = useState(false);
-
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('http://localhost:3001/api/productos');
-
-        setProductos(response.data);
-        setProductosFiltrados(response.data);
-      } catch (error) {
-        console.error('Error al obtener productos', error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
