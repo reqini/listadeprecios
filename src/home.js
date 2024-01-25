@@ -56,7 +56,7 @@ const Home = ({onLogout}) => {
       );
   
       setProductosFiltrados(productosFiltrados);
-    }, [filtro]);
+    }, [filtro, productos]);
   
     const addToCart = (productos) => {
       setCart([...cart, productos]);
