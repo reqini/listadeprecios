@@ -47,8 +47,8 @@ const ShoppingCart = ({ cart, onClearCart }) => {
                 <div className='flex-between'>
                   <div>
                     <Typography fontWeight={900}>cuotas sin interes</Typography>
-                    <Typography><b>6 cuotas de</b> {cuota6}</Typography>
-                    <Typography><b>12 cuotas de</b> {cuota12}</Typography>
+                    <Typography><b>Ahora 6</b> {cuota6}</Typography>
+                    <Typography><b>Ahora 12</b> {cuota12}</Typography>
                   </div>
                 </div>
               <div style={{marginTop: 20}}>
