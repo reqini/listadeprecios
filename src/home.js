@@ -11,7 +11,6 @@ import Grid from '@mui/material/Grid';
 
 import ShoppingCart from './cart';
 import bancos from './bancos';
-// import productos from './listadeproductos';
 import Product from './products';
 
 const Home = ({onLogout}) => {
