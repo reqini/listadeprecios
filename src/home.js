@@ -8,7 +8,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Grid from '@mui/material/Grid';
-
+import Skeleton from '@mui/material/Skeleton';
 import ShoppingCart from './cart';
 import bancos from './bancos';
 import Product from './products';
@@ -16,6 +16,7 @@ import Product from './products';
 const Home = ({onLogout}) => {
     const url = "https://backtest-production.up.railway.app"
     const [cart, setCart] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [productos, setProductos] = useState([])
     const [filtro, setFiltro] = useState('');
     const [productosFiltrados, setProductosFiltrados] = useState([]);
@@ -25,7 +26,6 @@ const Home = ({onLogout}) => {
     useEffect(()=> {
         const getData = async() => {
             const result = await axios.get(`${url}/api/productos`) 
-
             setProductos(result.data)
             setProductosFiltrados(result.data)
         }
@@ -56,6 +56,7 @@ const Home = ({onLogout}) => {
       );
   
       setProductosFiltrados(productosFiltrados);
+      setLoading(false);
     }, [filtro, productos]);
   
     const addToCart = (productos) => {
@@ -124,11 +125,14 @@ const Home = ({onLogout}) => {
             </FormControl>
             </div>
             <ul className='lista-prod'>
-            {productosFiltrados.map(product => (
-                <li className='grid-item' key={product.id}>
-                <Product key={product.codigo} product={product} onAddToCart={addToCart} />
-                </li>
-            ))}
+            {loading ? <Skeleton sx={{ height: 190 }} animation="wave" variant="rectangular" /> :
+            (
+                productosFiltrados.map(product => (
+                  product.vigencia === 'SI' ? <li className='grid-item' key={product.id}>
+                  <Product key={product.codigo} product={product} onAddToCart={addToCart} /> 
+                  </li> : null
+              ))
+            )}
             </ul>
             <ShoppingCart cart={cart} onClearCart={clearCart} />
         </Container>
