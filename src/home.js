@@ -14,7 +14,7 @@ import bancos from './bancos';
 // import productos from './listadeproductos';
 import Product from './products';
 
-const Home = () => {
+const Home = ({onLogout}) => {
     const url = "https://backtest-production.up.railway.app"
 
     const [cart, setCart] = useState([]);
