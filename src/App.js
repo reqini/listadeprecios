@@ -16,7 +16,12 @@ const url = "https://backtest-production.up.railway.app"
 
 const App = () => {
 
-  const [loggedIn, setLoggedIn] = useState(false);
+/*   const [loggedIn, setLoggedIn] = useState(false); */
+  const [loggedIn, setLoggedIn] = useState(() => {
+    // Intenta obtener el estado de autenticación desde el almacenamiento local al cargar la aplicación
+    const storedAuth = localStorage.getItem('loggedIn');
+    return storedAuth ? JSON.parse(storedAuth) : false;
+  });
 
   const handleLogin = async (username, password, navigate) => {
     const result = await axios.post(`${url}/api/login`, {
@@ -29,6 +34,7 @@ const App = () => {
 
     if (result.data && result.data.token) {
       setLoggedIn(true);
+      localStorage.setItem('loggedIn', JSON.stringify(true));
       navigate('/home');
     } else {
       alert('Usuario o contraseña incorrectos');
@@ -37,6 +43,7 @@ const App = () => {
 
   const handleLogout = () => {
     setLoggedIn(false);
+    localStorage.removeItem('loggedIn');
   };
 
   return (

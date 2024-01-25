@@ -12,8 +12,8 @@ const Product = ({ product, onAddToCart }) => {
         <CardActionArea>
           <CardMedia
             component="img"
-            height="100"
-            image="../descarga.png"
+            height="200"
+            image={product.imagen ? product.imagen : '../descarga.png'}
             alt="green iguana"
           />
           <CardContent>
