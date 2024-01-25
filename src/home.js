@@ -12,7 +12,7 @@ import bancos from './bancos';
 import productos from './listadeproductos';
 import Product from './products';
 
-const Home = () => {
+const Home = ({onLogout}) => {
 
     const [cart, setCart] = useState([]);
     const [filtro, setFiltro] = useState('');
@@ -57,6 +57,7 @@ const Home = () => {
             <div className='flex-center'>
             <h2>Catalogo de Productos y precios</h2>
             </div>
+            <button onClick={onLogout}>Logout</button>
             <div className={`header flex-center pad20 ${isSticky ? 'sticky' : ''}`}>
             <TextField 
                 style={{maxWidth: 450}}
