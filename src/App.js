@@ -12,8 +12,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
-// const url = "https://backtest-production.up.railway.app"
-const url = "http://localhost:3001"
+const url = "https://backtest-production.up.railway.app"
 
 const App = () => {
 
