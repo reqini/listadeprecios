@@ -11,14 +11,11 @@ import Grid from '@mui/material/Grid';
 
 import ShoppingCart from './cart';
 import bancos from './bancos';
-// import productos from './listadeproductos';
 import Product from './products';
 
-const Home = () => {
+const Home = ({onLogout}) => {
     const url = "https://backtest-production.up.railway.app"
-
     const [cart, setCart] = useState([]);
-
     const [productos, setProductos] = useState([])
     const [filtro, setFiltro] = useState('');
     const [productosFiltrados, setProductosFiltrados] = useState([]);
