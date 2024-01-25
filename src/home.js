@@ -55,7 +55,7 @@ const Home = ({onLogout}) => {
     return (
         <Container maxWidth="lg" className='conteiner-list'>
             <div className='flex-center'>
-            <h2>Catalogo de Productos y precios</h2>
+                <h2>Catalogo de Productos y precios</h2>
             </div>
             <button onClick={onLogout}>Logout</button>
             <div className={`header flex-center pad20 ${isSticky ? 'sticky' : ''}`}>
