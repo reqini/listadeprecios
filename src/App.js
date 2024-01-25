@@ -53,7 +53,7 @@ const App = () => {
         />
         <Route
           path="/"
-          element={<Link to="/login">Ir al Login</Link>}
+          element={<Login onLogin={handleLogin} />}
         />
       </Routes>
     </Router>
