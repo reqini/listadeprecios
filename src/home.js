@@ -1,24 +1,40 @@
 import React, { useEffect, useState } from 'react';
+import axios from "axios"
+
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
-
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import ShoppingCart from './cart';
 import Grid from '@mui/material/Grid';
+
+import ShoppingCart from './cart';
 import bancos from './bancos';
-import productos from './listadeproductos';
+// import productos from './listadeproductos';
 import Product from './products';
 
-const Home = ({onLogout}) => {
+const Home = () => {
+    const url = "https://backtest-production.up.railway.app"
 
     const [cart, setCart] = useState([]);
+
+    const [productos, setProductos] = useState([])
     const [filtro, setFiltro] = useState('');
     const [productosFiltrados, setProductosFiltrados] = useState([]);
   
     const [isSticky, setIsSticky] = useState(false);
+
+    useEffect(()=> {
+        const getData = async() => {
+            const result = await axios.get(`${url}/api/productos`) 
+
+            setProductos(result.data)
+            setProductosFiltrados(result.data)
+        }
+
+        getData()
+    }, [])
   
     useEffect(() => {
       const handleScroll = () => {
