@@ -14,8 +14,18 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6 }) => {
     return acc + priceNumber;
   }, 0);
 
-  const cuota12 = cart.reduce((acc, item) => item.cuota_ah12.replace(/[$.,]/g, ""), 0);
-  const cuota6 = cart.reduce((acc, item) => item.cuota_ah6.replace(/[$.,]/g, ""), 0);
+  const cuota12 = cart.reduce((acc, item) => {
+    const priceNumber = parseInt(item.cuota_ah12.replace(/[$.,]/g, ""), 10);
+    return acc + priceNumber;
+  }, 0);
+
+  const cuota6 = cart.reduce((acc, item) => {
+    const priceNumber = parseInt(item.cuota_ah6.replace(/[$.,]/g, ""), 10);
+    return acc + priceNumber;
+  }, 0);
+
+  const envio6 = 500
+  const envio12 = 1000
 
   return (
     <div className="fixed-menu flex-center">
@@ -51,19 +61,19 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6 }) => {
               <div className="flex-between">
                   <div className="flex-start-column">
                     <Typography>
-                      <b>Ahora 12</b> ${cuota12}
+                      <b>Ahora 12</b> ${cuota12 + envio12}
                     </Typography>
                     <Typography>
-                      <b>Ahora 6</b> ${cuota6}
+                      <b>Ahora 6</b> ${cuota6 + envio6}
                     </Typography>
                     {banco6?.ahora6 && (
                       <Typography>
-                        <b>6 cuotas sin interes</b> ${(totalPrice / 6).toFixed(2)}
+                        <b>6 cuotas sin interes</b> ${Math.round(totalPrice / 6).toFixed(0)}
                       </Typography>
                     )}
                     {banco3?.ahora3 && (
                     <Typography>
-                      <b>3 cuotas sin interes</b> ${(totalPrice / 3).toFixed(2)}
+                      <b>3 cuotas sin interes</b> ${Math.round(totalPrice / 3).toFixed(0)}
                     </Typography>
                      )}
                   </div>
