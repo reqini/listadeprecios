@@ -8,9 +8,6 @@ import Button from "@mui/material/Button";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 const ShoppingCart = ({ cart, onClearCart, banco3, banco6 }) => {
-  console.log({ banco3 });
-  console.log({ banco6 });
-
   const totalPrice = cart.reduce((acc, item) => {
     const priceNumber = parseInt(item.psvp_lista.replace(/[$.,]/g, ""), 10);
     return acc + priceNumber;
