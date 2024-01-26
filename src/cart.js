@@ -13,6 +13,9 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6 }) => {
     return acc + priceNumber;
   }, 0);
 
+  const cuota12 = cart.reduce((acc, item) => item.cuota_ah12.replace(/[$.,]/g, ""), 0);
+  const cuota6 = cart.reduce((acc, item) => item.cuota_ah6.replace(/[$.,]/g, ""), 0);
+
   return (
     <div className="fixed-menu flex-center">
       <Accordion style={{ width: "100%", maxWidth: 500 }}>
@@ -45,22 +48,28 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6 }) => {
                 <h3>Planes de Pago</h3>
               </div>
               <div className="flex-between">
-                {banco3?.ahora3 && (
-                  <div>
+                  <div className="flex-start-column">
                     <Typography fontWeight={900}>cuotas sin interes</Typography>
                     <Typography>
-                      <b>Ahora 3</b> ${(totalPrice / 3).toFixed(2)}
+                      <b>Ahora 6</b> ${cuota6}
                     </Typography>
+                    {banco6?.ahora6 && (
+                      <Typography>
+                        <b>6 cuotas sin interes</b> ${(totalPrice / 6).toFixed(2)}
+                      </Typography>
+                    )}
+                    {banco3?.ahora3 && (
+                    <Typography>
+                      <b>3 cuotas sin interes</b> ${(totalPrice / 3).toFixed(2)}
+                    </Typography>
+                     )}
                   </div>
-                )}
-                {banco6?.ahora6 && (
-                  <div>
+                  <div className="flex-start-column" >
                     <Typography fontWeight={900}>cuotas con interes</Typography>
                     <Typography>
-                      <b>Ahora 6</b> ${(totalPrice / 6).toFixed(2)}
+                      <b>Ahora 12</b> ${cuota12}
                     </Typography>
                   </div>
-                )}
               </div>
               <div style={{ marginTop: 20 }}>
                 <Button variant="contained" onClick={onClearCart}>
