@@ -46,7 +46,7 @@ const Login = ({ onLogin }) => {
                         type='password'
                         style={{color: 'black'}}
                         id="filled-required"
-                        label={'Clave'}          
+                        label={'Código de emprendedora'}          
                         defaultValue={password}
                         variant="filled"
                         onChange={(e) => setPassword(e.target.value)}
@@ -54,7 +54,6 @@ const Login = ({ onLogin }) => {
                 </label>
             </Grid>
             <Grid item xs={12} style={{margin: '10px 0'}}>
-                {/* <button type="submit">Login</button> */}
                 <Button fullWidth type="submit" variant="contained" size="large">
                     {loading ? 'Cargando' : 'Entrar'}
                 </Button>
