@@ -116,4 +116,7 @@ li {
   .fixed-menu {
     left: 0;
   }
+  .header.sticky {
+    background-color: #9DCDFF!important;
+  }
 }

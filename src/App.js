@@ -16,7 +16,6 @@ const url = "https://backtest-production.up.railway.app"
 
 const App = () => {
 
-/*   const [loggedIn, setLoggedIn] = useState(false); */
   const [loggedIn, setLoggedIn] = useState(() => {
     // Intenta obtener el estado de autenticación desde el almacenamiento local al cargar la aplicación
     const storedAuth = localStorage.getItem('loggedIn');
@@ -28,9 +27,6 @@ const App = () => {
       username,
       password
     })
-
-    // const user = usersData.find((u) => u.username === username && u.password === password);
-    // if (user) { 
 
     if (result.data && result.data.token) {
       setLoggedIn(true);

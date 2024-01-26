@@ -11,14 +11,18 @@ import productos from './listadeproductos';
 
 const ShoppingCart = ({ cart, onClearCart }) => {
 
-  const totalPrice = cart.reduce((acc, item) => item.psvp_lista, 0);
-  const cuota12 = cart.reduce((acc, item) => item.cuota_ah12, 0);
-  const cuota6 = cart.reduce((acc, item) => item.cuota_ah6, 0);
-
+  const totalPrice = cart.reduce((acc, item) => item.psvp_lista.replace(/[$.]/g,''), 0);
+  const cuota12 = cart.reduce((acc, item) => item.cuota_ah12.replace(/[$.]/g,''), 0);
+  const cuota6 = cart.reduce((acc, item) => item.cuota_ah6.replace(/[$.]/g,''), 0);
+  
   console.log(totalPrice);
   console.log(bancos);
   console.log(productos);
+  console.log(cuota12);
 
+  const subtotal = cuota12;
+  const totalConEnvio = subtotal + 1000;
+  console.log(totalConEnvio);
   return (
       <div className='fixed-menu flex-center'>
         <Accordion style={{width: '100%', maxWidth: 500}}>
@@ -47,8 +51,11 @@ const ShoppingCart = ({ cart, onClearCart }) => {
                 <div className='flex-between'>
                   <div>
                     <Typography fontWeight={900}>cuotas sin interes</Typography>
-                    <Typography><b>Ahora 6</b> {cuota6}</Typography>
-                    <Typography><b>Ahora 12</b> {cuota12}</Typography>
+                    <Typography><b>Ahora 6</b> ${cuota6}</Typography>
+                  </div>
+                  <div>
+                    <Typography fontWeight={900}>cuotas con  interes</Typography>
+                    <Typography><b>Ahora 12</b> ${cuota12}</Typography>
                   </div>
                 </div>
               <div style={{marginTop: 20}}>

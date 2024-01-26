@@ -10,10 +10,12 @@ import { Typography } from '@mui/material';
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
     onLogin(username, password, navigate);
   };
 
@@ -54,7 +56,7 @@ const Login = ({ onLogin }) => {
             <Grid item xs={12} style={{margin: '10px 0'}}>
                 {/* <button type="submit">Login</button> */}
                 <Button fullWidth type="submit" variant="contained" size="large">
-                    Entrar
+                    {loading ? 'Cargando' : 'Entrar'}
                 </Button>
             </Grid>
         </Grid>       
