@@ -24,7 +24,7 @@ const Product = ({ product, onAddToCart }) => {
              Linea <b>{product.linea}</b>
             </Typography>
             <Typography variant="body2" color="text.secondary">
-                Precio de negocio: <b>{product.precio_negocio}</b>
+                Precio de preferencial: <b>{product.precio_preferencial}</b>
             </Typography>
             <Typography variant="body2" color="text.secondary">
                 PSVP lista: <b>{product.psvp_lista}</b>

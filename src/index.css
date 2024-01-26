@@ -50,6 +50,12 @@ li {
   justify-content:space-between!important;
   align-items: center!important;
 }
+.flex-between-mobile {
+  width: 100%;
+  display: flex!important;
+  justify-content:space-between!important;
+  align-items: center!important;
+}
 .flex-start-column {
   width: 100%;
   display: flex;
@@ -124,6 +130,9 @@ li {
   .lista-prod {
     display: grid;
     grid-template-columns: auto;
+  }
+  .flex-between-mobile {
+    flex-direction: column!important;
   }
   .fixed-menu {
     left: 0;

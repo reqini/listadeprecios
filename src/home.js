@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import InputLabel from "@mui/material/InputLabel";
@@ -72,10 +72,13 @@ const Home = ({ onLogout }) => {
   };
   return (
     <Container maxWidth="lg" className="conteiner-list">
-      <div className="flex-center">
+      <div className="flex-between-mobile" style={{paddingTop: 30}}>
+        <Button variant="contained" onClick={onLogout}>
+          Cerrar Sesion
+        </Button>
         <h2>Catalogo de Productos y precios</h2>
       </div>
-      <button onClick={onLogout}>Logout</button>
+      
       <div className={`header flex-center pad20 ${isSticky ? "sticky" : ""}`}>
         <TextField
           style={{ maxWidth: 450 }}
