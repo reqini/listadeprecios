@@ -15,7 +15,18 @@ body {
   display: none!important;
 }
 .visible {
-  display: block!important;
+  display: flex!important;
+  z-index: 0!important;
+  justify-content: center;
+  align-items: center;
+  position: absolute!important;
+  width: 45px;
+  height: 45px;
+  bottom:65px;
+  right: 10px;
+}
+.visible > svg {
+  margin: 0!important;
 }
 * {
   position: relative;

@@ -8,7 +8,6 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Grid from "@mui/material/Grid";
-import Fab from '@mui/material/Fab';
 import Skeleton from "@mui/material/Skeleton";
 import ShoppingCart from "./cart";
 import bancos from "./bancos";
@@ -200,12 +199,11 @@ const Home = ({ onLogout }) => {
       <ShoppingCart
         cart={cart}
         onClearCart={clearCart}
+        className={`${mostrarBoton ? 'visible' : 'oculto'}`}
+        onClick={volverArriba}
         banco3={bancos.find((bank) => bank.codigo === selectedBank3)}
         banco6={bancos.find((bank) => bank.codigo === selectedBank6)}
       />
-      <Fab className={`oculto ${mostrarBoton ? 'visible' : ''}`} variant="extended" size="small" color="primary">
-          Volver Arriba
-      </Fab>
     </Container>
   );
 };

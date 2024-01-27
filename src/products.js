@@ -24,10 +24,10 @@ const Product = ({ product, onAddToCart }) => {
              Linea <b>{product.linea}</b>
             </Typography>
             <Typography variant="body2" color="text.secondary">
-                Precio de preferencial: <b>{product.precio_preferencial}</b>
+                Precio de preferencial: <b>{product.precio_preferencial.replace(/[,]/g, ".")}</b>
             </Typography>
             <Typography variant="body2" color="text.secondary">
-                PSVP lista: <b>{product.psvp_lista}</b>
+                PSVP lista: <b>{product.psvp_lista.replace(/[,]/g, ".")}</b>
             </Typography>
             <Typography variant="body2" color="text.secondary">
                 puntos: <b>{product.puntos}</b>

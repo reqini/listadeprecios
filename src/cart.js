@@ -5,9 +5,11 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import Fab from '@mui/material/Fab';
+import NavigationIcon from '@mui/icons-material/Navigation';
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
-const ShoppingCart = ({ cart, onClearCart, banco3, banco6 }) => {
+const ShoppingCart = ({ cart, onClearCart, banco3, banco6, onClick, className }) => {
   
   const totalPrice = cart.reduce((acc, item) => {
     const priceNumber = parseInt(item.psvp_lista.replace(/[$.,]/g, ""), 10);
@@ -28,7 +30,10 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6 }) => {
   const envio12 = 1000
 
   return (
-    <div className="fixed-menu flex-center">
+    <div className="fixed-menu flex-center" style={{position: 'relative'}}>
+      <Fab onClick={onClick} className={className} variant="extended" size="small" color="primary">
+        <NavigationIcon sx={{ mr: 1 }} />
+      </Fab>
       <Accordion style={{ width: "100%", maxWidth: 500 }}>
         <AccordionSummary
           expandIcon={<ArrowDropDownIcon />}
@@ -49,7 +54,7 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6 }) => {
               <ul>
                 {cart.map((item) => (
                   <li key={item.codigo}>
-                    {item.descripcion} - ${item.psvp_lista}
+                    {item.descripcion} - ${totalPrice}
                   </li>
                 ))}
               </ul>
