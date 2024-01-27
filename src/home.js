@@ -8,10 +8,12 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Grid from "@mui/material/Grid";
+import Fab from '@mui/material/Fab';
 import Skeleton from "@mui/material/Skeleton";
 import ShoppingCart from "./cart";
 import bancos from "./bancos";
 import Product from "./products";
+import { Typography } from "@mui/material";
 
 const Home = ({ onLogout }) => {
   const url = "https://backtest-production.up.railway.app";
@@ -21,11 +23,23 @@ const Home = ({ onLogout }) => {
   const [productos, setProductos] = useState([]);
   const [filtro, setFiltro] = useState("");
   const [productosFiltrados, setProductosFiltrados] = useState([]);
-
+  const [mostrarBoton, setMostrarBoton] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
 
   const [selectedBank3, setSelectedBank3] = useState("");
   const [selectedBank6, setSelectedBank6] = useState("");
+
+  const manejarScroll = () => {
+    // Muestra el botón si el usuario ha hecho scroll hacia abajo, ocúltalo si está en la parte superior
+    setMostrarBoton(window.scrollY > 100);
+  };
+
+  const volverArriba = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
 
   useEffect(() => {
     const getData = async () => {
@@ -35,6 +49,15 @@ const Home = ({ onLogout }) => {
     };
 
     getData();
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('scroll', manejarScroll);
+
+    // Limpia el listener del evento al desmontar el componente
+    return () => {
+      window.removeEventListener('scroll', manejarScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -73,10 +96,10 @@ const Home = ({ onLogout }) => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <div className="flex-between-mobile" style={{paddingTop: 30}}>
-        <Button variant="contained" onClick={onLogout}>
+        <h2>Catalogo de Productos y precios</h2>
+        <Button variant="contained" onClick={onLogout} color="error">
           Cerrar Sesion
         </Button>
-        <h2>Catalogo de Productos y precios</h2>
       </div>
       
       <div className={`header flex-center pad20 ${isSticky ? "sticky" : ""}`}>
@@ -93,14 +116,21 @@ const Home = ({ onLogout }) => {
       </div>
       <div className="flex-center" style={{ padding: "20px 0" }}>
         <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <div className="w-100">
+              <Typography variant="h5">Promociones con Bancos</Typography>
+            </div>
+          </Grid>
           <Grid item sm={6} xs={12}>
             <div className="w-100">
               <FormControl fullWidth>
                 <InputLabel id="demo-simple-select-label">3 cuotas</InputLabel>
                 <Select
                   labelId="demo-simple-select-label"
+                  className="select"
                   fullWidth
                   style={{ background: "white" }}
+                  label="Bancos"
                   value={selectedBank3}
                   onChange={(e, child) => {
                     e.preventDefault();
@@ -124,6 +154,7 @@ const Home = ({ onLogout }) => {
                 <InputLabel id="demo-simple-select-label">6 cuotas</InputLabel>
                 <Select
                   labelId="demo-simple-select-label"
+                  className="select"
                   fullWidth
                   style={{ background: "white" }}
                   value={selectedBank6}
@@ -172,6 +203,9 @@ const Home = ({ onLogout }) => {
         banco3={bancos.find((bank) => bank.codigo === selectedBank3)}
         banco6={bancos.find((bank) => bank.codigo === selectedBank6)}
       />
+      <Fab className={`oculto ${mostrarBoton ? 'visible' : ''}`} variant="extended" size="small" color="primary">
+          Volver Arriba
+      </Fab>
     </Container>
   );
 };
