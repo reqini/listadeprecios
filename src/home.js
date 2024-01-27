@@ -28,6 +28,7 @@ const Home = ({ onLogout }) => {
   const [selectedBank3, setSelectedBank3] = useState("");
   const [selectedBank6, setSelectedBank6] = useState("");
 
+
   const manejarScroll = () => {
     // Muestra el botón si el usuario ha hecho scroll hacia abajo, ocúltalo si está en la parte superior
     setMostrarBoton(window.scrollY > 100);
@@ -42,11 +43,13 @@ const Home = ({ onLogout }) => {
 
   useEffect(() => {
     const getData = async () => {
+      
       const result = await axios.get(`${url}/api/productos`);
+      setLoading(false);
       setProductos(result.data);
       setProductosFiltrados(result.data);
     };
-
+    
     getData();
   }, []);
 
@@ -82,7 +85,6 @@ const Home = ({ onLogout }) => {
     );
 
     setProductosFiltrados(productosFiltrados);
-    setLoading(false);
   }, [filtro, productos]);
 
   const addToCart = (productos) => {
@@ -175,13 +177,47 @@ const Home = ({ onLogout }) => {
           </Grid>
         </Grid>
       </div>
-      <ul className="lista-prod">
+      <ul className="lista-prod w-100">
         {loading ? (
-          <Skeleton
-            sx={{ height: 190 }}
-            animation="wave"
-            variant="rectangular"
-          />
+          <>
+            <Skeleton
+              sx={{ height: 300, margin: 1 }}
+              animation="wave"
+              variant="rectangular"
+              className="grid-item"
+            />
+            <Skeleton
+              sx={{ height: 300, margin: 1 }}
+              animation="wave"
+              variant="rectangular"
+              className="grid-item"
+            />
+            <Skeleton
+              sx={{ height: 300, margin: 1 }}
+              animation="wave"
+              variant="rectangular"
+              className="grid-item"
+            />
+            <Skeleton
+              sx={{ height: 300, margin: 1 }}
+              animation="wave"
+              variant="rectangular"
+              className="grid-item"
+            />
+            <Skeleton
+              sx={{ height: 300, margin: 1 }}
+              animation="wave"
+              variant="rectangular"
+              className="grid-item"
+            />
+            <Skeleton
+              sx={{ height: 300, margin: 1 }}
+              animation="wave"
+              variant="rectangular"
+              className="grid-item"
+            />
+          </>
+            
         ) : (
           productosFiltrados.map((product) =>
             product.vigencia === "SI" ? (

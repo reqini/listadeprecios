@@ -29,6 +29,24 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6, onClick, className })
   const envio6 = 1000
   const envio12 = 500
 
+  /* const compartirPorWhatsApp = () => {
+    const mensaje = `¡Hola! ¿Como estas?, el costo en cuotas de tu futuro producto Essen es de:`;
+
+    const productosEnTexto = cart.map(() => {
+      return (
+        ` ${'Ahora 6 de:'} - $${cuota6}`
+      );
+    }).join('\n');
+
+    const textoFinal = mensaje + productosEnTexto;
+
+    // Crea el enlace de WhatsApp
+    const enlaceWhatsApp = `whatsapp://send?text=${encodeURIComponent(textoFinal)}`;
+
+    // Abre el enlace en una nueva ventana
+    window.open(enlaceWhatsApp);
+  }; */
+
   return (
     <div className="fixed-menu flex-center" style={{position: 'relative'}}>
       <Fab onClick={onClick} className={className} variant="extended" size="small" color="primary">
@@ -42,7 +60,7 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6, onClick, className })
           className="accordion"
         >
           <Typography>Carrito de Compras</Typography>
-          <Typography fontWeight={800}>Total: {totalPrice}</Typography>
+          <Typography fontWeight={800}>Total: ${totalPrice}</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Container
@@ -87,6 +105,9 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6, onClick, className })
                 <Button variant="contained" onClick={onClearCart}>
                   Limpiar carrito
                 </Button>
+                {/* <Button variant="contained" onClick={compartirPorWhatsApp}>
+                  enviar info
+                </Button> */}
               </div>
             </div>
           </Container>
