@@ -26,8 +26,8 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6, onClick, className })
     return acc + priceNumber;
   }, 0);
 
-  const envio6 = 500
-  const envio12 = 1000
+  const envio6 = 1000
+  const envio12 = 500
 
   return (
     <div className="fixed-menu flex-center" style={{position: 'relative'}}>
