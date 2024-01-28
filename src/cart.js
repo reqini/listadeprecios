@@ -8,6 +8,7 @@ import Button from "@mui/material/Button";
 import Fab from '@mui/material/Fab';
 import NavigationIcon from '@mui/icons-material/Navigation';
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 const ShoppingCart = ({ cart, onClearCart, banco3, banco6, onClick, className }) => {
   
@@ -59,7 +60,10 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6, onClick, className })
           id="panel2-header"
           className="accordion"
         >
-          <Typography>Carrito de Compras</Typography>
+          <div className="flex">
+            <AddShoppingCartIcon/>
+            <Typography className="mar-l8">Carrito de Compras</Typography>
+          </div>
           <Typography fontWeight={800}>Total: ${totalPrice}</Typography>
         </AccordionSummary>
         <AccordionDetails>
