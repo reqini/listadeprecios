@@ -35,7 +35,7 @@ const Product = ({ product, onAddToCart }) => {
           </CardContent>
         </CardActionArea>
         <CardActions>
-          <Button fullWidth onClick={() => onAddToCart(product)} size="small" color="primary">
+          <Button fullWidth onClick={() => onAddToCart(product)} variant='outlined' size="medium" color="primary">
           Agregar al carrito
           </Button>
         </CardActions>
