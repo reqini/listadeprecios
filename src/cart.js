@@ -30,20 +30,16 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6, onClick, className })
   const envio6 = 1000
   const envio12 = 500
 
-  /* const compartirPorWhatsApp = () => {
-    const mensaje = `¡Hola! ¿Como estas?, el costo en cuotas de tu futuro producto Essen es de:`;
-
+/*   const compartirPorWhatsApp = () => {
+    const mensaje = `¡Hola! ¿Como estas?, el costo de tu futura Essen es de:`;
     const productosEnTexto = cart.map(() => {
       return (
-        ` ${'Ahora 6 de:'} - $${cuota6}`
+        ` ${'Precio ahora 12:'} - $${cuota12}`
       );
     }).join('\n');
-
     const textoFinal = mensaje + productosEnTexto;
-
     // Crea el enlace de WhatsApp
     const enlaceWhatsApp = `whatsapp://send?text=${encodeURIComponent(textoFinal)}`;
-
     // Abre el enlace en una nueva ventana
     window.open(enlaceWhatsApp);
   }; */
@@ -87,11 +83,13 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6, onClick, className })
               </div>
               <div className="flex-between">
                   <div className="flex-start-column">
-                    <Typography>
-                      <b>Ahora 12</b> ${cuota12 + envio12}
+                    <Typography className="flex flex-direction mar-b6">
+                      <b style={{lineHeight: '18px'}}>Ahora 12 ${cuota12 + envio12}</b>
+                      <i className="envio">ya esta sumado $500 de envio</i>
                     </Typography>
-                    <Typography>
-                      <b>Ahora 6</b> ${cuota6 + envio6}
+                    <Typography className="flex flex-direction">
+                      <b style={{lineHeight: '18px'}}>Ahora 6 ${cuota6 + envio6}</b>
+                      <i className="envio">ya esta sumado $1000 de envio</i>
                     </Typography>
                     {banco6?.ahora6 && (
                       <Typography>
@@ -106,11 +104,11 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6, onClick, className })
                   </div>
               </div>
               <div style={{ marginTop: 20 }}>
-                <Button variant="contained" onClick={onClearCart}>
+                <Button className="mar-r6" variant="contained" onClick={onClearCart}>
                   Limpiar carrito
                 </Button>
-                {/* <Button variant="contained" onClick={compartirPorWhatsApp}>
-                  enviar info
+{/*                 <Button variant="outlined" onClick={compartirPorWhatsApp}>
+                  enviar x whatsapp
                 </Button> */}
               </div>
             </div>
