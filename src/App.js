@@ -1,6 +1,8 @@
 // App.js
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
+
 import axios from "axios"
 
 import Login from './Login';
@@ -13,6 +15,21 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 const url = "https://backtest-production.up.railway.app"
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      dark: '#765471',
+      main: '#A47A9E',
+      light: '#D7AED2',
+    },
+    secondary: {
+      dark: '#E8CD91',
+      main: '#FBE5B2',
+      light: '#FFF0CC',
+    },
+  },
+});
 
 const App = () => {
 
@@ -43,22 +60,24 @@ const App = () => {
   };
 
   return (
-    <Router>
-      <Routes>
-        <Route
-          path="/login"
-          element={<Login onLogin={handleLogin} />}
-        />
-        <Route
-          path="/home"
-          element={loggedIn ? <Home onLogout={handleLogout} /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/"
-          element={<Login onLogin={handleLogin} />}
-        />
-      </Routes>
-    </Router>
+    <ThemeProvider theme={theme}>
+      <Router>
+        <Routes>
+          <Route
+            path="/login"
+            element={<Login onLogin={handleLogin} />}
+          />
+          <Route
+            path="/home"
+            element={loggedIn ? <Home onLogout={handleLogout} /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/"
+            element={<Login onLogin={handleLogin} />}
+          />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   )
 
 };

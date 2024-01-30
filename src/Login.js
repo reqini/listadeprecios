@@ -26,7 +26,7 @@ const Login = ({ onLogin }) => {
       <Container className='flex justify-center items-center flex-direction' maxWidth="sm" style={{paddingTop:100}}>
         <img src={logo} alt="logo" height="100" className='mar-b10' />
         {/* <Typography textAlign={'center'} variant='h2' style={{margin: '30px 0'}}>Red Sin limites</Typography> */}
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className='mar-t10'>
           <Grid container spacing={0} className='card'>
               <Grid item xs={12} style={{margin: '10px 0'}}>
                   <label>
