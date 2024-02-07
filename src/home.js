@@ -97,8 +97,8 @@ const Home = ({ onLogout }) => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <div className="flex-between-mobile" style={{paddingTop: 30}}>
-        <h2>Catalogo de Productos y precios</h2>
-        <Button variant="contained" onClick={onLogout} color="error">
+        <Typography variant="h5" textAlign="center" width={'100%'}>Catalogo de Productos y precios</Typography>
+        <Button variant="contained" onClick={onLogout} color="error" style={{width: '100%', maxWidth:200}}>
           Cerrar Sesion
         </Button>
       </div>

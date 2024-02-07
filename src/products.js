@@ -8,7 +8,7 @@ import { Button, CardActionArea, CardActions } from '@mui/material';
 
 const Product = ({ product, onAddToCart }) => {
   return (
-    <Card sx={{ maxWidth: 600 }}>
+    <Card sx={{ maxWidth: 600 }} className='card-product'>
         <CardActionArea>
           <CardMedia
             component="img"
