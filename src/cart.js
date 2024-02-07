@@ -17,18 +17,24 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6, onClick, className })
     return acc + priceNumber;
   }, 0);
 
-  const cuota12 = cart.reduce((acc, item) => {
+/*   const cuota12 = cart.reduce((acc, item) => {
     const priceNumber = parseInt(item.cuota_ah12.replace(/[$.,]/g, ""), 10);
     return acc + priceNumber;
-  }, 0);
+  }, 0); */
 
   const cuota6 = cart.reduce((acc, item) => {
     const priceNumber = parseInt(item.cuota_ah6.replace(/[$.,]/g, ""), 10);
     return acc + priceNumber;
   }, 0);
 
-  const envio6 = 1000
-  const envio12 = 500
+  const puntos = cart.reduce((acc, item) => {
+    const totalPuntos = parseInt(item.puntos);
+    return totalPuntos;
+  }, 0);
+
+  const envio6 = puntos <= 140 ? 0 : 1300;
+  console.log('puntos',puntos)
+  /* const envio12 = 500 */
 
 /*   const compartirPorWhatsApp = () => {
     const mensaje = `¡Hola! ¿Como estas?, el costo de tu futura Essen es de:`;
@@ -83,13 +89,13 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6, onClick, className })
               </div>
               <div className="flex-between">
                   <div className="flex-start-column">
-                    <Typography className="flex flex-direction mar-b6">
+                    {/* <Typography className="flex flex-direction mar-b6">
                       <b style={{lineHeight: '18px'}}>Ahora 12 ${cuota12 + envio12}</b>
                       <i className="envio">ya esta sumado $500 de envio</i>
-                    </Typography>
+                    </Typography> */}
                     <Typography className="flex flex-direction">
-                      <b style={{lineHeight: '18px'}}>Ahora 6 ${cuota6 + envio6}</b>
-                      <i className="envio">ya esta sumado $1000 de envio</i>
+                      <b style={{lineHeight: '18px'}}>Cuota Simple ${cuota6 + envio6}</b>
+                      <i className="envio">¡Si el producto supera los 140 puntos, <b>el envio es gratis</b>!</i>
                     </Typography>
                     {banco6?.ahora6 && (
                       <Typography>
