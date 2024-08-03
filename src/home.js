@@ -15,7 +15,7 @@ import Product from "./products";
 import { Typography } from "@mui/material";
 
 const Home = ({ onLogout }) => {
-  const url = "https://backtest-production.up.railway.app";
+  const url = "https://backtest-production-7f88.up.railway.app";
 
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,7 +28,6 @@ const Home = ({ onLogout }) => {
   const [selectedBank3, setSelectedBank3] = useState("");
   const [selectedBank6, setSelectedBank6] = useState("");
 
-
   const manejarScroll = () => {
     // Muestra el botón si el usuario ha hecho scroll hacia abajo, ocúltalo si está en la parte superior
     setMostrarBoton(window.scrollY > 100);
@@ -37,28 +36,27 @@ const Home = ({ onLogout }) => {
   const volverArriba = () => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth',
+      behavior: "smooth",
     });
   };
 
   useEffect(() => {
     const getData = async () => {
-      
       const result = await axios.get(`${url}/api/productos`);
       setLoading(false);
       setProductos(result.data);
       setProductosFiltrados(result.data);
     };
-    
+
     getData();
   }, []);
 
   useEffect(() => {
-    window.addEventListener('scroll', manejarScroll);
+    window.addEventListener("scroll", manejarScroll);
 
     // Limpia el listener del evento al desmontar el componente
     return () => {
-      window.removeEventListener('scroll', manejarScroll);
+      window.removeEventListener("scroll", manejarScroll);
     };
   }, []);
 
@@ -96,13 +94,20 @@ const Home = ({ onLogout }) => {
   };
   return (
     <Container maxWidth="lg" className="conteiner-list">
-      <div className="flex-between-mobile" style={{paddingTop: 30}}>
-        <Typography variant="h5" textAlign="center" width={'100%'}>Catalogo de Productos y precios</Typography>
-        <Button variant="contained" onClick={onLogout} color="error" style={{width: '100%', maxWidth:200}}>
+      <div className="flex-between-mobile" style={{ paddingTop: 30 }}>
+        <Typography variant="h5" textAlign="center" width={"100%"}>
+          Catalogo de Productos y precios
+        </Typography>
+        <Button
+          variant="contained"
+          onClick={onLogout}
+          color="error"
+          style={{ width: "100%", maxWidth: 200 }}
+        >
           Cerrar Sesion
         </Button>
       </div>
-      
+
       <div className={`header flex-center pad20 ${isSticky ? "sticky" : ""}`}>
         <TextField
           style={{ maxWidth: 450 }}
@@ -217,7 +222,6 @@ const Home = ({ onLogout }) => {
               className="grid-item"
             />
           </>
-            
         ) : (
           productosFiltrados.map((product) =>
             product.vigencia === "SI" ? (
@@ -235,7 +239,7 @@ const Home = ({ onLogout }) => {
       <ShoppingCart
         cart={cart}
         onClearCart={clearCart}
-        className={`${mostrarBoton ? 'visible' : 'oculto'}`}
+        className={`${mostrarBoton ? "visible" : "oculto"}`}
         onClick={volverArriba}
         banco3={bancos.find((bank) => bank.codigo === selectedBank3)}
         banco6={bancos.find((bank) => bank.codigo === selectedBank6)}
