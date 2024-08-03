@@ -10,7 +10,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
-const url = "https://backtest-production.up.railway.app"
+const url = "https://backtest-production-7f88.up.railway.app/"
 
 const theme = createTheme({
   palette: {
