@@ -10,6 +10,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import Login from "./Login";
 import Home from "./home";
+import Catalogo from "./catalogo";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
@@ -64,6 +65,7 @@ const App = () => {
       <Router>
         <Routes>
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/catalogo" element={<Catalogo />} />
           <Route
             path="/home"
             element={

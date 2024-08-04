@@ -4,9 +4,11 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
+import ShareButton from './shereButton';
 import { Button, CardActionArea, CardActions } from '@mui/material';
 
-const Product = ({ product, onAddToCart }) => {
+const Product = ({ product, onAddToCart, catalog = false, title, description }) => {
+  
   return (
     <Card sx={{ maxWidth: 600 }} className='card-product'>
         <CardActionArea>
@@ -35,9 +37,11 @@ const Product = ({ product, onAddToCart }) => {
           </CardContent>
         </CardActionArea>
         <CardActions>
-          <Button fullWidth onClick={() => onAddToCart(product)} variant='outlined' size="medium" color="primary">
+          {catalog === false ? <Button fullWidth onClick={() => onAddToCart(product)} variant='outlined' size="medium" color="primary">
           Agregar al carrito
-          </Button>
+          </Button> : 
+          <ShareButton title={product.descripcion} description={product.linea} />
+          }
         </CardActions>
       </Card>
   );
