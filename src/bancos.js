@@ -1,21 +1,21 @@
 const bancos = [
     {
       "codigo": 7,
-      "cuotas": "3 y 6",
+      "cuotas": "3 y 6 y 9 y 12 y 18",
       "ahora3": true,
       "ahora6": true,
       "banco": "BANCO DE GALICIA Y BUENOS AIRES S.A.U."
     },
     {
       "codigo": 11,
-      "cuotas": "",
+      "cuotas": "6 y 12 y 18",
       "ahora3": true,
       "ahora6": true,
       "banco": "BANCO DE LA NACION ARGENTINA"
     },
     {
       "codigo": 14,
-      "cuotas": "",
+      "cuotas": "12",
       "ahora3": false,
       "ahora6": false,
       "banco": "BANCO DE LA PROVINCIA DE BUENOS AIRES"
@@ -36,7 +36,7 @@ const bancos = [
     },
     {
       "codigo": 17,
-      "cuotas": "3",
+      "cuotas": "3 Y 6 Y 9 Y 12",
       "ahora3": true,
       "ahora6": false,
       "banco": "BANCO BBVA ARGENTINA S.A."
@@ -71,21 +71,21 @@ const bancos = [
     },
     {
       "codigo": 44,
-      "cuotas": "3 y 6",
+      "cuotas": "6 y 12",
       "ahora3": true,
       "ahora6": true,
       "banco": "BANCO HIPOTECARIO S.A."
     },
     {
       "codigo": 45,
-      "cuotas": "",
+      "cuotas": "3 y 6 y 10 y 12",
       "ahora3": false,
       "ahora6": false,
       "banco": "BANCO DE SAN JUAN S.A."
     },
     {
       "codigo": 72,
-      "cuotas": "3 y 6",
+      "cuotas": "3 y 6 y 9 y 12 y 18",
       "ahora3": true,
       "ahora6": true,
       "banco": "BANCO SANTANDER ARGENTINA S.A."
@@ -120,7 +120,7 @@ const bancos = [
     },
     {
       "codigo": 191,
-      "cuotas": "3",
+      "cuotas": "3 y 6 y 9 y 12",
       "ahora3": true,
       "ahora6": false,
       "banco": "BANCO CREDICOOP COOPERATIVO LIMITADO"
@@ -141,14 +141,14 @@ const bancos = [
     },
     {
       "codigo": 285,
-      "cuotas": "3 y 6",
+      "cuotas": "3 y 6 y 12",
       "ahora3": true,
       "ahora6": true,
       "banco": "BANCO MACRO S.A."
     },
     {
       "codigo": 299,
-      "cuotas": "3 y 6",
+      "cuotas": "3 y 6 y 12",
       "ahora3": true,
       "ahora6": true,
       "banco": "BANCO COMAFI SOCIEDAD ANONIMA"
@@ -197,7 +197,7 @@ const bancos = [
     },
     {
         "codigo": 330,
-        "cuotas": "3 y 6",
+        "cuotas": "3 y 6 Y 10 Y 12",
         "ahora3": true,
         "ahora6": true,
         "banco": "NUEVO BANCO DE SANTA FE SOCIEDAD ANONIMA"
@@ -246,10 +246,45 @@ const bancos = [
     },
     {
       "codigo": 45030,
-      "cuotas": "3",
+      "cuotas": "6 Y 9 Y 12",
       "ahora3": true,
       "ahora6": false,
-      "banco": "NARANJA DIGITAL COMPAÑÍA FINANCIERA S.A."
+      "banco": "NARANJA X, PLAN Z"
+    },
+    {
+      "codigo": 434,
+      "cuotas": "3 y 6 Y 10 Y 12",
+      "ahora3": true,
+      "ahora6": true,
+      "banco": "BANCO SANTA CRUZ"
+    },
+    {
+      "codigo": 2434,
+      "cuotas": "3 y 6 Y 10 Y 12",
+      "ahora3": true,
+      "ahora6": true,
+      "banco": "BANCO ENTRE RIOS"
+    },
+    {
+      "codigo": 22434,
+      "cuotas": "3 y 6 Y 9 Y 12",
+      "ahora3": true,
+      "ahora6": true,
+      "banco": "NUEVO BANCO DEL CHACO TUYA"
+    },
+    {
+      "codigo": 98,
+      "cuotas": "6 Y 9 Y 12",
+      "ahora3": true,
+      "ahora6": true,
+      "banco": "BANCO CORRIENTES"
+    },
+    {
+      "codigo": 989,
+      "cuotas": "3 Y 6 Y 12",
+      "ahora3": true,
+      "ahora6": true,
+      "banco": "BPN"
     }
   ]
 export default bancos  

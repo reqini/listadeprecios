@@ -12,7 +12,6 @@ import Skeleton from "@mui/material/Skeleton";
 import ShoppingCart from "./cart";
 import Product from "./products";
 import { Typography } from "@mui/material";
-import banner from './assets/banner.jpg';
 
 const Home = ({ onLogout }) => {
   const url = "https://backtest-production-7f88.up.railway.app";
@@ -142,17 +141,14 @@ const Home = ({ onLogout }) => {
       <div className="flex-center" style={{ padding: "20px 0" }}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            {/* <div className="w-100">
-              <Typography variant="h5" color="">12 cuotas sin interes con todos los bancos</Typography>
-            </div> */}
             <div className="w-100">
-              <img src={banner} width='100%' />
+              <Typography variant="h5">Promociones con Bancos</Typography>
             </div>
           </Grid>
           <Grid item sm={6} xs={12}>
             <div className="w-100">
               <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Listado de bancos</InputLabel>
+                <InputLabel id="demo-simple-select-label">Bancos con 12 cuotas sin interes</InputLabel>
                 <Select
                   labelId="demo-simple-select-label"
                   className="select"
@@ -163,11 +159,37 @@ const Home = ({ onLogout }) => {
                     e.preventDefault();
                   }}
                 >
-                   {bancosFiltrados.map((bancos) => (
+                   {bancosFiltrados.map((bancos) => bancos.doce === 'si' ? (
                       <MenuItem value={bancos.banco} key={bancos.id}>
                         {bancos.banco}
                       </MenuItem>
-                   ),
+                   ) : (null),
+                  )}
+                </Select>
+              </FormControl>
+            </div>
+          </Grid>
+          <Grid item sm={6} xs={12}>
+            <div className="w-100">
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Bancos con 3 y 6 cuotas sin interes</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  className="select"
+                  fullWidth
+                  style={{ background: "white" }}
+                  label="Bancos"
+                  value={bancosFiltrados}
+                  onChange={(e, child) => {
+                    e.preventDefault();
+                    setBancosFiltrados(e.target.value);
+                  }}
+                >
+                   {bancosFiltrados.map((bancos) => bancos.tres === 'si' && bancos.seis === 'si' ? (
+                      <MenuItem value={bancos.banco} key={bancos.id}>
+                        {bancos.banco}
+                      </MenuItem>
+                   ) : (null),
                   )}
                 </Select>
               </FormControl>
