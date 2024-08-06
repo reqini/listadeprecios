@@ -142,9 +142,6 @@ const Home = ({ onLogout }) => {
       <div className="flex-center" style={{ padding: "20px 0" }}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            {/* <div className="w-100">
-              <Typography variant="h5" color="">12 cuotas sin interes con todos los bancos</Typography>
-            </div> */}
             <div className="w-100">
               <img src={banner} width='100%' />
             </div>
