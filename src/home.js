@@ -143,7 +143,7 @@ const Home = ({ onLogout }) => {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <div className="w-100">
-              <img src={banner} width='100%' />
+              <img src={banner} alt="red sin limites essen" width='100%' />
             </div>
           </Grid>
           <Grid item sm={6} xs={12}>
