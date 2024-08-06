@@ -10,7 +10,7 @@ import NavigationIcon from '@mui/icons-material/Navigation';
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
-const ShoppingCart = ({ cart, onClearCart, banco3, banco6, onClick, className }) => {
+const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
   
   const totalPrice = cart.reduce((acc, item) => {
     const priceNumber = parseInt(item.psvp_lista.replace(/[$.,]/g, ""), 10);
@@ -22,10 +22,10 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6, onClick, className })
     return acc + priceNumber;
   }, 0); */
 
-  const cuota6 = cart.reduce((acc, item) => {
+  /* const cuota6 = cart.reduce((acc, item) => {
     const priceNumber = parseInt(item.cuota_ah6.replace(/[$.,]/g, ""), 10);
     return acc + priceNumber;
-  }, 0);
+  }, 0); */
 
   const puntos = cart.reduce((acc, item) => {
     const totalPuntos = parseInt(item.puntos);
@@ -89,24 +89,9 @@ const ShoppingCart = ({ cart, onClearCart, banco3, banco6, onClick, className })
               </div>
               <div className="flex-between">
                   <div className="flex-start-column">
-                    {/* <Typography className="flex flex-direction mar-b6">
-                      <b style={{lineHeight: '18px'}}>Ahora 12 ${cuota12 + envio12}</b>
-                      <i className="envio">ya esta sumado $500 de envio</i>
-                    </Typography> */}
                     <Typography className="flex flex-direction">
-                      <b style={{lineHeight: '18px'}}>Cuota Simple ${cuota6 + envio6}</b>
                       <i className="envio">¡Si el producto supera los 140 puntos, <b>el envio es gratis</b>!</i>
                     </Typography>
-                    {banco6?.ahora6 && (
-                      <Typography>
-                        <b>6 cuotas sin interes</b> ${Math.round(totalPrice / 6).toFixed(0)}
-                      </Typography>
-                    )}
-                    {banco3?.ahora3 && (
-                    <Typography>
-                      <b>3 cuotas sin interes</b> ${Math.round(totalPrice / 3).toFixed(0)}
-                    </Typography>
-                     )}
                   </div>
               </div>
               <div style={{ marginTop: 20 }}>

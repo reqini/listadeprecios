@@ -55,7 +55,6 @@ const Home = ({ onLogout }) => {
       const result = await axios.get(`${url}/api/bancos`);
       setBancos(result.data);
       setBancosFiltrados(result.data);
-      console.log(result.data)
     };
 
     getData();
