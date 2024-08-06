@@ -10,7 +10,7 @@ import { Button, CardActionArea, CardActions } from '@mui/material';
 const Product = ({ product, onAddToCart, catalog = false, title, description }) => {
   
   return (
-    <Card sx={{ maxWidth: 600 }} className='card-product'>
+    <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className='card-product'>
         <CardActionArea>
           <CardMedia
             component="img"
@@ -36,12 +36,15 @@ const Product = ({ product, onAddToCart, catalog = false, title, description }) 
             </Typography>
           </CardContent>
         </CardActionArea>
-        <CardActions>
-          {catalog === false ? <Button fullWidth onClick={() => onAddToCart(product)} variant='outlined' size="medium" color="primary">
+        <CardActions style={{display: 'flex', flexDirection: 'column'}}>
+          {catalog === false ? <Button fullWidth onClick={() => onAddToCart(product)} variant='contained' size="medium" color="primary" style={{marginBottom: 12}}>
           Agregar al carrito
           </Button> : 
           null
           }
+          <Button fullWidth target='_blank' href={product.ficha_tecnica} variant="outlined" size="medium" color="primary" style={{margin: 0}}>
+            Ficha técnica
+          </Button>
         </CardActions>
       </Card>
   );
