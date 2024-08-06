@@ -5,7 +5,7 @@ const app = express();
 
 app.use(cors()); // Configura CORS para permitir solicitudes desde el frontend
 
-app.get('/api/productos', (req, res) => {
+/* app.get('/api/productos', (req, res) => {
   const productos = [
     {
       "id": 1,
@@ -6041,7 +6041,7 @@ app.get('/api/productos', (req, res) => {
   ];
 
   res.json(productos);
-});
+}); */
 
 const PORT = 3001;
 app.listen(PORT, () => {

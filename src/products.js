@@ -4,7 +4,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import ShareButton from './shereButton';
+/* import ShareButton from './shereButton'; */
 import { Button, CardActionArea, CardActions } from '@mui/material';
 
 const Product = ({ product, onAddToCart, catalog = false, title, description }) => {
@@ -40,7 +40,7 @@ const Product = ({ product, onAddToCart, catalog = false, title, description }) 
           {catalog === false ? <Button fullWidth onClick={() => onAddToCart(product)} variant='outlined' size="medium" color="primary">
           Agregar al carrito
           </Button> : 
-          <ShareButton title={product.descripcion} description={product.linea} />
+          null
           }
         </CardActions>
       </Card>
