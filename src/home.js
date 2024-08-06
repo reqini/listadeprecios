@@ -218,6 +218,7 @@ const Home = ({ onLogout }) => {
                 <Product
                   key={product.codigo}
                   product={product}
+                  bancos={bancos}
                   onAddToCart={addToCart}
                 />
               </li>
