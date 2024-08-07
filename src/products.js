@@ -15,7 +15,7 @@ const Product = ({ product, onAddToCart, catalog = false, off }) => {
           {off && <div className='descuento'>{off}</div>}
           <CardMedia
             component="img"
-            height="200"
+            height="230"
             image={product.imagen ? product.imagen : '../descarga.png'}
             alt="green iguana"
           />

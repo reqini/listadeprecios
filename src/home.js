@@ -13,6 +13,9 @@ import ShoppingCart from "./cart";
 import Product from "./products";
 import { Typography } from "@mui/material";
 import banner from './assets/banner.jpg';
+import LogoutIcon from '@mui/icons-material/Logout';
+import SearchIcon from '@mui/icons-material/Search';
+import InputAdornment from '@mui/material/InputAdornment';
 
 const Home = ({ onLogout }) => {
   const url = "https://backtest-production-7f88.up.railway.app";
@@ -113,7 +116,7 @@ const Home = ({ onLogout }) => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <div className="flex-between-mobile" style={{ paddingTop: 30 }}>
-        <Typography variant="h5" textAlign="center" width={"100%"}>
+        <Typography variant="h5" textAlign="center" width={"100%"} margin={'20px 0'}>
           Catalogo de Productos y precios
         </Typography>
         <Button
@@ -121,6 +124,7 @@ const Home = ({ onLogout }) => {
           onClick={onLogout}
           color="error"
           style={{ width: "100%", maxWidth: 200 }}
+          startIcon={<LogoutIcon />}
         >
           Cerrar Sesion
         </Button>
@@ -128,13 +132,20 @@ const Home = ({ onLogout }) => {
 
       <div className={`header flex-center pad20 ${isSticky ? "sticky" : ""}`}>
         <TextField
-          style={{ maxWidth: 450 }}
+          style={{ maxWidth: 450}}
           fullWidth
           className="search"
           id="outlined-basic"
           label="Buscar Producto"
-          variant="outlined"
+          variant="filled"
           value={filtro}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
           onChange={(e) => setFiltro(e.target.value)}
         />
       </div>
