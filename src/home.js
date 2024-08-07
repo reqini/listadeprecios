@@ -132,20 +132,13 @@ const Home = ({ onLogout }) => {
 
       <div className={`header flex-center pad20 ${isSticky ? "sticky" : ""}`}>
         <TextField
-          style={{ maxWidth: 450}}
+          style={{ maxWidth: 450 }}
           fullWidth
           className="search"
           id="outlined-basic"
           label="Buscar Producto"
-          variant="filled"
+          variant="outlined"
           value={filtro}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
           onChange={(e) => setFiltro(e.target.value)}
         />
       </div>

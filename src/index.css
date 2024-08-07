@@ -43,10 +43,10 @@ ul {
 .conteiner-list {
   padding-bottom: 100px;
 }
-/* input {
+input {
   background-color: white!important;
   width: 100%!important;
-} */
+}
 li {
   list-style: none;
 }
@@ -101,9 +101,8 @@ li {
 .pad20 {
   padding: 20px;
 }
-
-.css-10x5i9n-MuiInputBase-root-MuiFilledInput-root {
-  background-color: white!important;
+.search > div, .search > div > input{
+  border-radius: 10px;
 }
 .fixed-menu {
   position: fixed!important;
@@ -118,7 +117,7 @@ li {
 }
 .header {
   color: white;
-  padding: 0px;
+  padding: 10px;
   transition: background-color 0.3s ease;
 }
 .titulo {
@@ -129,7 +128,6 @@ li {
 }
 .header.sticky {
   position: fixed;
-  padding: 10px;
   top: 0;
   left: 0;
   width: 100%;
