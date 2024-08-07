@@ -7,11 +7,12 @@ import Typography from '@mui/material/Typography';
 /* import ShareButton from './shereButton'; */
 import { Button, CardActionArea, CardActions } from '@mui/material';
 
-const Product = ({ product, onAddToCart, catalog = false}) => {
+const Product = ({ product, onAddToCart, catalog = false, off }) => {
   
   return (
     <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className='card-product'>
         <CardActionArea>
+          {off && <div className='descuento'>{off}</div>}
           <CardMedia
             component="img"
             height="200"
