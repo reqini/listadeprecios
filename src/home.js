@@ -14,8 +14,6 @@ import Product from "./products";
 import { Typography } from "@mui/material";
 import banner from './assets/banner.jpg';
 import LogoutIcon from '@mui/icons-material/Logout';
-import SearchIcon from '@mui/icons-material/Search';
-import InputAdornment from '@mui/material/InputAdornment';
 
 const Home = ({ onLogout }) => {
   const url = "https://backtest-production-7f88.up.railway.app";
