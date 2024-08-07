@@ -64,7 +64,7 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
         >
           <div className="flex">
             <AddShoppingCartIcon/>
-            <Typography className="mar-l8">Carrito de Compras</Typography>
+            <Typography className="mar-l8">Simulador de Compra</Typography>
           </div>
           <Typography fontWeight={800}>Total: ${totalPrice}</Typography>
         </AccordionSummary>
