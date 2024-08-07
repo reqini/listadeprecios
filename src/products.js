@@ -26,7 +26,7 @@ const Product = ({ bancos, product, onAddToCart, catalog = false}) => {
              Linea <b>{product.linea}</b>
             </Typography>
             {product.doce_sin_interes && <Typography variant='span' fontSize={13} fontStyle={'italic'}>
-             <b style={{color: 'green'}}>12 sin interes de: <i style={{color: 'black'}}>{product.doce_sin_interes != '' ? product.doce_sin_interes : null}</i></b>
+             <b style={{color: 'green'}}>12 sin interes de: <i style={{color: 'black'}}>{product.doce_sin_interes !== '' ? product.doce_sin_interes : null}</i></b>
             </Typography>}
             <Typography variant="body2" color="text.secondary">
                 Precio de Negocio: <b>{product.precio_negocio.replace(/[,]/g, ".")}</b>

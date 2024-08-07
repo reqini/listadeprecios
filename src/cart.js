@@ -32,8 +32,8 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
     return totalPuntos;
   }, 0);
 
-  const envio6 = puntos <= 140 ? 0 : 1300;
-  console.log('puntos',puntos)
+  /* const envio6 = puntos <= 140 ? 0 : 1300;
+  console.log('puntos',puntos) */
   /* const envio12 = 500 */
 
 /*   const compartirPorWhatsApp = () => {
