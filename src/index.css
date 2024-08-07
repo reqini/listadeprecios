@@ -102,8 +102,8 @@ li {
   padding: 20px;
 }
 
-.css-10x5i9n-MuiInputBase-root-MuiFilledInput-root:hover {
-  background-color: white;
+.css-10x5i9n-MuiInputBase-root-MuiFilledInput-root {
+  background-color: white!important;
 }
 .fixed-menu {
   position: fixed!important;
