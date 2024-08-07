@@ -147,7 +147,8 @@ const Home = ({ onLogout }) => {
               <img src={banner} alt="red sin limites essen" width='100%' />
             </div>
           </Grid>
-          <Grid item sm={6} xs={12}>
+          {/* Se oculta para luego trabajar sobre filtros de bancos y cuotas */}
+          <Grid item sm={6} xs={12} style={{display: 'none'}}> 
             <div className="w-100">
               <FormControl fullWidth>
                 <InputLabel id="demo-simple-select-label">Listado de bancos</InputLabel>
