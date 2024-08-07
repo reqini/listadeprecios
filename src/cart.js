@@ -51,7 +51,7 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
   }; */
 
   return (
-    <div className="fixed-menu flex-center" style={{position: 'relative'}}>
+    <div className="fixed-menu flex-center" style={{ position: 'relative' }}>
       <Fab onClick={onClick} className={className} variant="extended" size="small" color="primary">
         <NavigationIcon sx={{ mr: 1 }} />
       </Fab>
