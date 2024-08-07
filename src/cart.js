@@ -27,12 +27,12 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
     return acc + priceNumber;
   }, 0); */
 
-  const puntos = cart.reduce((acc, item) => {
+/*   const puntos = cart.reduce((acc, item) => {
     const totalPuntos = parseInt(item.puntos);
     return totalPuntos;
   }, 0);
 
-  /* const envio6 = puntos <= 140 ? 0 : 1300;
+  const envio6 = puntos <= 140 ? 0 : 1300;
   console.log('puntos',puntos) */
   /* const envio12 = 500 */
 
