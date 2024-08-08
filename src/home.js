@@ -117,7 +117,6 @@ const Home = ({ onLogout }) => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <div className="flex-between-mobile" style={{ paddingTop: 30, display: 'flex', justifyContent: 'space-between' }}>
-        <ResponsiveDialog />
         <Button
           variant="contained"
           onClick={onLogout}
@@ -234,6 +233,7 @@ const Home = ({ onLogout }) => {
           )
         )}
       </ul>
+      <div className="absolute-btn"><ResponsiveDialog /></div>
       <ShoppingCart
         cart={cart}
         onClearCart={clearCart}

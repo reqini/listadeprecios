@@ -36,6 +36,16 @@ const Product = ({ product, onAddToCart, catalog = false, off }) => {
                 puntos: <b>{product.puntos}</b>
             </Typography>
             <Divider style={{margin: '10px 0'}}/>
+            {product.dieciocho_sin_interes && 
+            <div className='flex-center'>
+              {product.linea !== 'Bazar' && product.linea !== 'Complementos' && product.linea !== 'Repuestos' ? (
+                <img src={cuotaSimple} alt='sin limites' height="15" />
+              ) : null}
+              <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
+                <b style={{color: 'green'}}>18 sin interes de: <i style={{color: 'black'}}>{product.dieciocho_sin_interes !== '' ? product.dieciocho_sin_interes : null}</i></b>
+              </Typography>
+            </div>
+            }
             {product.doce_sin_interes && 
             <div className='flex-center'>
               {product.linea !== 'Bazar' && product.linea !== 'Complementos' && product.linea !== 'Repuestos' ? (
@@ -43,6 +53,16 @@ const Product = ({ product, onAddToCart, catalog = false, off }) => {
               ) : null}
               <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
                 <b style={{color: 'green'}}>12 sin interes de: <i style={{color: 'black'}}>{product.doce_sin_interes !== '' ? product.doce_sin_interes : null}</i></b>
+              </Typography>
+            </div>
+            }
+            {product.diez_sin_interes && 
+            <div className='flex-center'>
+              {product.linea !== 'Bazar' && product.linea !== 'Complementos' && product.linea !== 'Repuestos' ? (
+                <img src={cuotaSimple} alt='sin limites' height="15" />
+              ) : null}
+              <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
+                <b style={{color: 'green'}}>10 sin interes de: <i style={{color: 'black'}}>{product.diez_sin_interes !== '' ? product.diez_sin_interes : null}</i></b>
               </Typography>
             </div>
             }
@@ -76,6 +96,11 @@ const Product = ({ product, onAddToCart, catalog = false, off }) => {
               </Typography>
             </div>
             }
+            {product.linea === 'Bazar' || product.linea === 'Complementos' || product.linea === 'Repuestos' ? (
+                <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
+                <i style={{color: 'red'}}>Solo con promos bancarias</i>
+                </Typography>
+            ) : null}
           </CardContent>
         </CardActionArea>
         <CardActions style={{display: 'flex', flexDirection: 'column'}}>

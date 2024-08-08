@@ -115,11 +115,12 @@ li {
   border-bottom-right-radius: 0px!important;
   bottom: 0;
   width: 100%;
+  z-index: 9;
   max-width: 1150px;
 }
-.fixed-menu > div {
+/* .fixed-menu > div {
   height: 100%;
-}
+} */
 .header {
   color: white;
   padding: 10px;
@@ -130,6 +131,11 @@ li {
 }
 .w-100 {
   width: 100%;
+}
+.absolute-btn {
+  position: fixed;
+  bottom: 60px;
+  z-index: 2;
 }
 .header.sticky {
   position: fixed;
@@ -213,6 +219,12 @@ li {
   .lista-prod {
     display: grid;
     grid-template-columns: auto auto;
+  }
+}
+@media screen and (min-width: 968px) {
+  .absolute-btn {
+    bottom: 10px;
+    z-index: 10;
   }
 }
 @media screen and (max-width:600px) {
