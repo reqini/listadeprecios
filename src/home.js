@@ -122,7 +122,7 @@ const Home = ({ onLogout }) => {
           variant="contained"
           onClick={onLogout}
           color="error"
-          style={{ width: "100%", maxWidth: 200 }}
+          style={{ width: "100%", maxWidth: 200, marginTop: 10 }}
           startIcon={<LogoutIcon />}
         >
           Cerrar Sesion

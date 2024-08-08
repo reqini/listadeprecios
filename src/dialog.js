@@ -39,7 +39,7 @@ export default function ResponsiveDialog() {
 
   return (
     <React.Fragment>
-      <Button variant="contained" onClick={handleClickOpen} style={{width: 'auto'}}> 
+      <Button variant="contained" onClick={handleClickOpen} style={{width: 'auto', marginTop: 10}}> 
         Ver promos bancarias
       </Button>
       <Dialog
