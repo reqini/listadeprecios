@@ -38,28 +38,28 @@ const Product = ({ product, onAddToCart, catalog = false, off }) => {
             <Divider style={{margin: '10px 0'}}/>
             {product.doce_sin_interes && 
             <div className='flex-center'>
-              <img src={cuotaSimple} alt='sin limites' height="15" /><Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
+              {product.linea != 'Bazar' | 'Complementos' | 'Repuestos' ? <img src={cuotaSimple} alt='sin limites' height="15" /> : null}<Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
                 <b style={{color: 'green'}}>12 sin interes de: <i style={{color: 'black'}}>{product.doce_sin_interes !== '' ? product.doce_sin_interes : null}</i></b>
               </Typography>
             </div>
             }
             {product.nueve_sin_interes && 
             <div className='flex-center'>
-              <img src={cuotaSimple} alt='sin limites' height="15" /><Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
+              {product.linea != 'Bazar' | 'Complementos' | 'Repuestos' ? <img src={cuotaSimple} alt='sin limites' height="15" /> : null}<Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
               <b style={{color: 'green'}}>9 sin interes de: <i style={{color: 'black'}}>{product.nueve_sin_interes !== '' ? product.nueve_sin_interes : null}</i></b>
               </Typography>
             </div>
             }
             {product.seis_sin_interes && 
             <div className='flex-center'>
-              <img src={cuotaSimple} alt='sin limites' height="15" /><Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
+              {product.linea != 'Bazar' | 'Complementos' | 'Repuestos' ? <img src={cuotaSimple} alt='sin limites' height="15" /> : null}<Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
               <b style={{color: 'green'}}>6 sin interes de: <i style={{color: 'black'}}>{product.seis_sin_interes !== '' ? product.seis_sin_interes : null}</i></b>
               </Typography>
             </div>
             }
             {product.tres_sin_interes && 
             <div className='flex-center'>
-              <img src={cuotaSimple} alt='sin limites' height="15" /><Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
+              {product.linea != 'Bazar' | 'Complementos' | 'Repuestos' ? <img src={cuotaSimple} alt='sin limites' height="15" /> : null}<Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
               <b style={{color: 'green'}}>3 sin interes de: <i style={{color: 'black'}}>{product.tres_sin_interes !== '' ? product.tres_sin_interes : null}</i></b>
               </Typography>
             </div>
