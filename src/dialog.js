@@ -10,7 +10,8 @@ import { useTheme } from '@mui/material/styles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import { Divider } from "@mui/material";
+import { Avatar, Divider } from "@mui/material";
+import ListItemAvatar from '@mui/material/ListItemAvatar';
 
 
 export default function ResponsiveDialog() {
@@ -56,6 +57,9 @@ export default function ResponsiveDialog() {
                 {bancosFiltrados.map((bancos) => (
                 <>
                 <ListItem>
+                    <ListItemAvatar>
+                        <Avatar src={bancos.logo} />
+                    </ListItemAvatar>
                     <ListItemText primary={bancos.banco} secondary={
                         <p style={{color: 'green'}}>
                             {`
