@@ -5,9 +5,8 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-/* import { Typography } from '@mui/material'; */
-
 import logo from './logo.png';
+import logoSinlimites from './sin-limites.png';
 
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -22,10 +21,9 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className='background-image full-width'>
+    <div className='full-width' style={{backgroundColor: '#FFEDC4'}}>
       <Container className='flex justify-center items-center flex-direction' maxWidth="sm" style={{paddingTop:100}}>
         <img src={logo} alt="logo" height="100" className='mar-b10' />
-        {/* <Typography textAlign={'center'} variant='h2' style={{margin: '30px 0'}}>Red Sin limites</Typography> */}
         <form onSubmit={handleSubmit}>
           <Grid container spacing={0} className='card'>
               <Grid item xs={12} style={{margin: '10px 0'}}>
@@ -35,7 +33,7 @@ const Login = ({ onLogin }) => {
                           fullWidth
                           style={{color: 'black'}}
                           id="filled-required"
-                          label={'username'}          
+                          label={'Nombre'}          
                           defaultValue={username}
                           variant="filled"
                           onChange={(e) => setUsername(e.target.value)}
@@ -47,7 +45,7 @@ const Login = ({ onLogin }) => {
                       <TextField
                           required
                           fullWidth
-                          type='password'
+                          type='Codigo de EIE'
                           style={{color: 'black'}}
                           id="filled-required"
                           label={'Código de emprendedora'}          
@@ -64,6 +62,7 @@ const Login = ({ onLogin }) => {
               </Grid>
           </Grid>       
         </form>
+        <img src={logoSinlimites} alt="logo" height="50" style={{marginTop: 24}} />
       </Container>
     </div>
     
