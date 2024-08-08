@@ -52,7 +52,7 @@ export default function ResponsiveDialog() {
           {"Promociones Bancarias"}
         </DialogTitle>
         <DialogContent>
-            <List sx={{ width: '100%', minWidth: 400, bgcolor: 'background.paper' }}>
+            <List sx={{ width: '100%', minWidth: 300, bgcolor: 'background.paper' }}>
                 {bancosFiltrados.map((bancos) => (
                 <>
                 <ListItem>
