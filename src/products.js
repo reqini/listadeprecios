@@ -43,7 +43,7 @@ const Product = ({ product, onAddToCart, catalog = false, off }) => {
                 <img src={cuotaSimple} alt='sin limites' height="15" />
               ) : null} */}
               <Typography variant='span' fontSize={13} fontStyle={'italic'} style={{ display: 'flex', alignItems: 'center'}}>
-                <b style={{color: 'green'}}>18 sin interes de: <i style={{color: 'black'}}>{product.dieciocho_sin_interes !== '' ? product.dieciocho_sin_interes : null}</i></b>
+                <b style={{color: 'green'}}>18 sin interes de: <i style={{color: 'black'}}>$ {product.dieciocho_sin_interes !== '' ? product.dieciocho_sin_interes : null}</i></b>
                 <Tooltip title="ver promos bancarias" placement="top"><ReportGmailerrorredIcon fontSize="small" color='primary' style={{marginLeft: 5}} /></Tooltip>
               </Typography>
             </div>
