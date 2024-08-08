@@ -22,33 +22,10 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
     return acc + priceNumber;
   }, 0); */
 
-  /* const cuota6 = cart.reduce((acc, item) => {
-    const priceNumber = parseInt(item.cuota_ah6.replace(/[$.,]/g, ""), 10);
-    return acc + priceNumber;
-  }, 0); */
-
 /*   const puntos = cart.reduce((acc, item) => {
     const totalPuntos = parseInt(item.puntos);
     return totalPuntos;
-  }, 0);
-
-  const envio6 = puntos <= 140 ? 0 : 1300;
-  console.log('puntos',puntos) */
-  /* const envio12 = 500 */
-
-/*   const compartirPorWhatsApp = () => {
-    const mensaje = `¡Hola! ¿Como estas?, el costo de tu futura Essen es de:`;
-    const productosEnTexto = cart.map(() => {
-      return (
-        ` ${'Precio ahora 12:'} - $${cuota12}`
-      );
-    }).join('\n');
-    const textoFinal = mensaje + productosEnTexto;
-    // Crea el enlace de WhatsApp
-    const enlaceWhatsApp = `whatsapp://send?text=${encodeURIComponent(textoFinal)}`;
-    // Abre el enlace en una nueva ventana
-    window.open(enlaceWhatsApp);
-  }; */
+  }, 0); */
 
   return (
     <div className="fixed-menu flex-center" style={{ position: 'relative' }}>
@@ -78,7 +55,7 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
               <ul>
                 {cart.map((item) => (
                   <li key={item.codigo}>
-                    {item.descripcion} - ${totalPrice}
+                    {item.descripcion} - ${item.psvp_lista}
                   </li>
                 ))}
               </ul>
@@ -98,9 +75,6 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
                 <Button className="mar-r6" variant="contained" onClick={onClearCart}>
                   Limpiar carrito
                 </Button>
-{/*                 <Button variant="outlined" onClick={compartirPorWhatsApp}>
-                  enviar x whatsapp
-                </Button> */}
               </div>
             </div>
           </Container>
