@@ -46,9 +46,13 @@ const Product = ({ product, onAddToCart, catalog = false, off }) => {
           </Button> : 
           null
           }
-          <Button fullWidth target='_blank' href={product.ficha_tecnica} variant="outlined" size="medium" color="primary" style={{margin: 0}}>
+          {product.ficha_tecnica ? <Button fullWidth target='_blank' href={product.ficha_tecnica} variant="outlined" size="medium" color="primary" style={{margin: 0}}>
             Ficha técnica
+          </Button> :
+          <Button fullWidth variant="disabled" size="medium" color="primary" style={{margin: 0}}>
+            Sin ficha técnica
           </Button>
+          }
         </CardActions>
       </Card>
   );
