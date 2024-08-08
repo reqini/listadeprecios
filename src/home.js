@@ -14,6 +14,7 @@ import Product from "./products";
 import { Typography } from "@mui/material";
 import banner from './assets/banner.jpg';
 import LogoutIcon from '@mui/icons-material/Logout';
+import ResponsiveDialog from "./dialog";
 
 const Home = ({ onLogout }) => {
   const url = "https://backtest-production-7f88.up.railway.app";
@@ -87,9 +88,11 @@ const Home = ({ onLogout }) => {
     };
   }, []);
 
-  useEffect(() => {
-    const productosFiltrados = productos.filter((producto) =>
-      producto.descripcion.toLowerCase().includes(filtro.toLowerCase()),
+    useEffect(() => {
+    // Filtrar productos por descripción y categoría
+    const productosFiltrados = productos.filter(
+      (producto) =>
+        producto.descripcion.toLowerCase().includes(filtro.toLowerCase())
     );
 
     setProductosFiltrados(productosFiltrados);
@@ -101,7 +104,6 @@ const Home = ({ onLogout }) => {
     );
 
     setBancosFiltrados(bancosFiltrados);
-    console.log(bancosFiltrados)
   }, [filtro, bancos]);
 
   const addToCart = (productos) => {
@@ -111,12 +113,11 @@ const Home = ({ onLogout }) => {
   const clearCart = () => {
     setCart([]);
   };
+
   return (
     <Container maxWidth="lg" className="conteiner-list">
-      <div className="flex-between-mobile" style={{ paddingTop: 30 }}>
-        <Typography variant="h5" textAlign="center" width={"100%"} margin={'20px 0'}>
-          Catalogo de Productos y precios
-        </Typography>
+      <div className="flex-between-mobile" style={{ paddingTop: 30, display: 'flex', justifyContent: 'space-between' }}>
+        <ResponsiveDialog />
         <Button
           variant="contained"
           onClick={onLogout}
@@ -127,6 +128,9 @@ const Home = ({ onLogout }) => {
           Cerrar Sesion
         </Button>
       </div>
+      <Typography variant="h5" textAlign="center" width={"100%"} margin={'20px 0'}>
+          Catalogo de Productos y precios
+      </Typography>
 
       <div className={`header flex-center pad20 ${isSticky ? "sticky" : ""}`}>
         <TextField
