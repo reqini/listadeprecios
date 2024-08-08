@@ -5,7 +5,7 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 /* import ShareButton from './shereButton'; */
-import { Button, CardActionArea, CardActions } from '@mui/material';
+import { Button, CardActionArea, CardActions, Divider } from '@mui/material';
 
 const Product = ({ product, onAddToCart, catalog = false, off }) => {
   
@@ -15,7 +15,7 @@ const Product = ({ product, onAddToCart, catalog = false, off }) => {
           {off && <div className='descuento'>{off}</div>}
           <CardMedia
             component="img"
-            height="230"
+            height="220"
             image={product.imagen ? product.imagen : '../descarga.png'}
             alt="green iguana"
           />
@@ -26,9 +26,6 @@ const Product = ({ product, onAddToCart, catalog = false, off }) => {
             <Typography variant='body2' fontSize={12} fontStyle={'italic'}>
              Linea <b>{product.linea}</b>
             </Typography>
-            {product.doce_sin_interes && <Typography variant='span' fontSize={13} fontStyle={'italic'}>
-             <b style={{color: 'green'}}>12 sin interes de: <i style={{color: 'black'}}>{product.doce_sin_interes !== '' ? product.doce_sin_interes : null}</i></b>
-            </Typography>}
             <Typography variant="body2" color="text.secondary">
                 Precio de Negocio: <b>{product.precio_negocio.replace(/[,]/g, ".")}</b>
             </Typography>
@@ -38,6 +35,19 @@ const Product = ({ product, onAddToCart, catalog = false, off }) => {
             <Typography variant="body2" color="text.secondary">
                 puntos: <b>{product.puntos}</b>
             </Typography>
+            <Divider style={{margin: '10px 0'}}/>
+            {product.doce_sin_interes && <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
+             <b style={{color: 'green'}}>12 sin interes de: <i style={{color: 'black'}}>{product.doce_sin_interes !== '' ? product.doce_sin_interes : null}</i></b>
+            </Typography>}
+            {product.nueve_sin_interes && <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
+             <b style={{color: 'green'}}>9 sin interes de: <i style={{color: 'black'}}>{product.nueve_sin_interes !== '' ? product.nueve_sin_interes : null}</i></b>
+            </Typography>}
+            {product.seis_sin_interes && <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
+             <b style={{color: 'green'}}>6 sin interes de: <i style={{color: 'black'}}>{product.seis_sin_interes !== '' ? product.seis_sin_interes : null}</i></b>
+            </Typography>}
+            {product.tres_sin_interes && <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
+             <b style={{color: 'green'}}>3 sin interes de: <i style={{color: 'black'}}>{product.tres_sin_interes !== '' ? product.tres_sin_interes : null}</i></b>
+            </Typography>}
           </CardContent>
         </CardActionArea>
         <CardActions style={{display: 'flex', flexDirection: 'column'}}>
