@@ -4,12 +4,12 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import { Button, CardActions, Divider, Tooltip } from '@mui/material';
-import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
+import { Button, CardActions, Divider } from '@mui/material';
+import AlertComponent from './alert';
 
 const cuotaSimple = require('../src/assets/cuotas-simples.webp')
-const Product = ({ product, onAddToCart, catalog = false, off }) => {
-  
+  const Product = ({ product, onAddToCart, catalog = false, off }) => {
+
   return (
     <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className='card-product'>
           {off && <div className='descuento'>{off}</div>}
@@ -43,7 +43,7 @@ const Product = ({ product, onAddToCart, catalog = false, off }) => {
               ) : null} */}
               <Typography variant='span' fontSize={13} fontStyle={'italic'} style={{ display: 'flex', alignItems: 'center'}}>
                 <b style={{color: 'green'}}>18 sin interes de: <i style={{color: 'black'}}>$ {product.dieciocho_sin_interes !== '' ? product.dieciocho_sin_interes : null}</i></b>
-                <Tooltip title="ver promos bancarias" placement="top"><ReportGmailerrorredIcon fontSize="small" color='primary' style={{marginLeft: 5}} /></Tooltip>
+                <AlertComponent />
               </Typography>
             </div>
             }
@@ -64,7 +64,7 @@ const Product = ({ product, onAddToCart, catalog = false, off }) => {
               ) : null} */}
               <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'} style={{ display: 'flex', alignItems: 'center'}}>
                 <b style={{color: 'green'}}>10 sin interes de: <i style={{color: 'black'}}>{product.diez_sin_interes !== '' ? product.diez_sin_interes : null}</i></b>
-                <Tooltip title="ver promos bancarias" placement="top"><ReportGmailerrorredIcon fontSize="small" color='primary' style={{marginLeft: 5}} /></Tooltip>
+                <AlertComponent />
               </Typography>
             </div>
             }
