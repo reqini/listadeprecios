@@ -9,7 +9,9 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Grid from "@mui/material/Grid";
 import Skeleton from "@mui/material/Skeleton";
-import ShoppingCart from "./cart";
+/* import ShoppingCart from "./cart"; */
+import Fab from '@mui/material/Fab';
+import NavigationIcon from '@mui/icons-material/Navigation';
 import Product from "./products";
 import { Typography } from "@mui/material";
 import banner from './assets/banner.jpg';
@@ -110,9 +112,9 @@ const Home = ({ onLogout }) => {
     setCart([...cart, productos]);
   };
 
-  const clearCart = () => {
+  /* const clearCart = () => {
     setCart([]);
-  };
+  }; */
 
   return (
     <Container maxWidth="lg" className="conteiner-list">
@@ -234,12 +236,15 @@ const Home = ({ onLogout }) => {
         )}
       </ul>
       <div className="absolute-btn"><ResponsiveDialog /></div>
-      <ShoppingCart
+      <Fab onClick={volverArriba} className={`${mostrarBoton ? "visible" : "oculto"}`} variant="extended" size="small" color="primary">
+        <NavigationIcon sx={{ mr: 1 }} />
+      </Fab>
+      {/* <ShoppingCart
         cart={cart}
         onClearCart={clearCart}
         className={`${mostrarBoton ? "visible" : "oculto"}`}
         onClick={volverArriba}
-      />
+      /> */}
     </Container>
   );
 };

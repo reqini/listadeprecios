@@ -5,8 +5,8 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import Fab from '@mui/material/Fab';
-import NavigationIcon from '@mui/icons-material/Navigation';
+/* import Fab from '@mui/material/Fab';
+import NavigationIcon from '@mui/icons-material/Navigation'; */
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
@@ -29,9 +29,7 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
 
   return (
     <div className="fixed-menu flex-center" style={{ position: 'relative' }}>
-      <Fab onClick={onClick} className={className} variant="extended" size="small" color="primary">
-        <NavigationIcon sx={{ mr: 1 }} />
-      </Fab>
+      
       <Accordion style={{ width: "100%", maxWidth: 500 }}>
         <AccordionSummary
           expandIcon={<ArrowDropDownIcon />}

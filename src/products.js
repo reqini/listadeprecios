@@ -4,7 +4,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import { Button, CardActionArea, CardActions, Divider, Tooltip } from '@mui/material';
+import { Button, CardActions, Divider, Tooltip } from '@mui/material';
 import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 
 const cuotaSimple = require('../src/assets/cuotas-simples.webp')
@@ -12,7 +12,6 @@ const Product = ({ product, onAddToCart, catalog = false, off }) => {
   
   return (
     <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className='card-product'>
-        <CardActionArea>
           {off && <div className='descuento'>{off}</div>}
           <CardMedia
             component="img"
@@ -105,7 +104,6 @@ const Product = ({ product, onAddToCart, catalog = false, off }) => {
                 </Typography>
             ) : null}
           </CardContent>
-        </CardActionArea>
         <CardActions style={{display: 'flex', flexDirection: 'column'}}>
           {catalog === false ? <Button fullWidth onClick={() => onAddToCart(product)} variant='contained' size="medium" color="primary" style={{marginBottom: 12}}>
           Agregar al carrito
