@@ -13,10 +13,11 @@ import Skeleton from "@mui/material/Skeleton";
 import Fab from '@mui/material/Fab';
 import NavigationIcon from '@mui/icons-material/Navigation';
 import Product from "./products";
-import { Typography } from "@mui/material";
+/* import { Typography } from "@mui/material"; */
 import banner from './assets/banner.jpg';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ResponsiveDialog from "./dialog";
+import logo from './logo.png';
 
 const Home = ({ onLogout }) => {
   const url = "https://backtest-production-7f88.up.railway.app";
@@ -129,9 +130,12 @@ const Home = ({ onLogout }) => {
           Cerrar Sesion
         </Button>
       </div>
-      <Typography variant="h5" textAlign="center" width={"100%"} margin={'20px 0'}>
-          Catalogo de Productos y precios
-      </Typography>
+      <div className="w-100 flex justify-center">
+        <img src={logo} alt="logo" height="100" className='mar-t30 mar-b20' />
+      </div>
+      {/* <Typography variant="h5" textAlign="center" width={"100%"} margin={'20px 0'}>
+      Catálogo de Productos y precios {user ? user.username : ""}
+      </Typography> */}
 
       <div className={`header flex-center pad20 ${isSticky ? "sticky" : ""}`}>
         <TextField

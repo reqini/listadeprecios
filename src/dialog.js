@@ -64,45 +64,27 @@ export default function ResponsiveDialog() {
                         <p style={{color: 'green'}}>
                             {bancos.diesiocho === 'todos los dias' ? 
                             <i> 18 sin interes<br/></i> : bancos.diesiocho === 'vigencia' ?
-                            <i>
-                                18 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/>
-                            </i>  : 
-                            null
+                            <i>18 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/></i> : null
                             }
                             {bancos.dose === 'todos los dias' ? 
                             <i> 12 sin interes<br/></i> : bancos.dose === 'vigencia' ?
-                            <i>
-                                12 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/>
-                            </i>  : 
-                            null
+                            <i>12 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/></i> : null
                             }
                             {bancos.diez === 'todos los dias' ? 
                             <i> 10 sin interes<br/></i> : bancos.diez === 'vigencia' ?
-                            <i>
-                                10 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/>
-                            </i>  : 
-                            null
+                            <i>10 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/></i> : null
                             }
                             {bancos.nueve === 'todos los dias' ? 
                             <i> 9 sin interes<br/></i> : bancos.nueve === 'vigencia' ?
-                            <i>
-                                9 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/>
-                            </i>  : 
-                            null
+                            <i>9 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/></i> : null
                             }
                             {bancos.seis === 'todos los dias' ? 
                             <i> 6 sin interes<br/></i> : bancos.seis === 'vigencia' ?
-                            <i>
-                                6 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/>
-                            </i>  : 
-                            null
+                            <i>6 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/></i> : null
                             }
                             {bancos.tres === 'todos los dias' ? 
                             <i> 3 sin interes<br/></i> : bancos.tres === 'vigencia' ?
-                            <i>
-                                3 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/>
-                            </i>  : 
-                            null
+                            <i> 3 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/></i> : null
                             }
                         </p>
                     } />

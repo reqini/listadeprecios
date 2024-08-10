@@ -219,6 +219,10 @@ li {
 .mar-b6 { margin-bottom: 6px!important; }
 .mar-b8 { margin-bottom: 8px!important; }
 .mar-b10 { margin-bottom: 10px!important; }
+.mar-b20 { margin-bottom: 20px!important; }
+.mar-b30 { margin-bottom: 30px!important; }
+
+.mar-t30 { margin-top: 30px!important; }
 
 @media screen and (max-width: 1024px) {
   .lista-prod {
