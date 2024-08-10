@@ -62,14 +62,13 @@ export default function ResponsiveDialog() {
                     </ListItemAvatar>
                     <ListItemText primary={bancos.banco} secondary={
                         <p style={{color: 'green'}}>
-                            {`
-                            ${bancos.diesiocho !== 'no' ? bancos.diesiocho + ' |' : ''} 
-                            ${bancos.dose !== 'no' ? bancos.dose + ' |' : ''}
-                            ${bancos.diez !== 'no' ? bancos.diez + ' |' : ''}
-                            ${bancos.nueve !== 'no' ? bancos.nueve + ' |' : ''}
-                            ${bancos.seis !== 'no' ? bancos.seis + ' |' : ''}
-                            ${bancos.tres !== 'no' ? bancos.tres + ' |' : ''}
-                            `}
+                            {bancos.diesiocho !== 'no' ? <i> {bancos.diesiocho}<span className="font-vigencia"> {bancos.vigencia}</span><br/></i> : null}
+                            {bancos.dose !== 'no' ? <i> {bancos.dose}<br/></i> : null}
+                            {bancos.diez !== 'no' ? <i> {bancos.diez}<br/></i> : null}
+                            {bancos.nueve !== 'no' ? <i> {bancos.nueve}<br/></i> : null}
+                            {bancos.seis !== 'no' ? <i> {bancos.seis}<br/></i> : null}
+                            {bancos.tres !== 'no' ? <i> {bancos.tres}<br/></i> : null}
+                            
                         </p>
                     } />
                 </ListItem>
