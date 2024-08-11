@@ -12,10 +12,9 @@ const cuotaSimple = require('../src/assets/cuotas-simples.webp')
     const [selectedCuota, setSelectedCuota] = useState('');
 
     const createWhatsAppLink = (product, cuota) => {
-      const message = `¡Hola!, Te envio el costo de tu próxima Essen!
+      const message = `¡Hola!, Te envio el valor de tu próxima Essen!
       Producto: ${product.descripcion}
-      Cuota: ${cuota}
-      Imagen: ${product.imagen ? product.imagen : 'No disponible'}`;
+      Cuota: ${cuota}`;
 
       return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
     };
