@@ -1,15 +1,29 @@
 // Product.js
-import React from 'react';
+import React, { useState } from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import { Button, CardActions, Divider } from '@mui/material';
+import { Button, CardActions, Divider, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import AlertComponent from './alert';
 
 const cuotaSimple = require('../src/assets/cuotas-simples.webp')
-  const Product = ({ product, onAddToCart, catalog = false, off }) => {
+  const Product = ({ product, /* onAddToCart, catalog = false, */ off }) => {
+    const [selectedCuota, setSelectedCuota] = useState('');
 
+    const createWhatsAppLink = (product, cuota) => {
+      const message = `¡Hola!, Te envio el costo de tu próxima Essen!
+      Producto: ${product.descripcion}
+      Cuota: ${cuota}
+      Imagen: ${product.imagen ? product.imagen : 'No disponible'}`;
+
+      return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+    };
+
+    // Función para manejar el cambio en la selección de cuotas
+    const handleCuotaChange = (event) => {
+      setSelectedCuota(event.target.value);
+    };
   return (
     <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className='card-product'>
           {off && <div className='descuento'>{off}</div>}
@@ -98,6 +112,42 @@ const cuotaSimple = require('../src/assets/cuotas-simples.webp')
               </Typography>
             </div>
             }
+            {/* Cuotas disponibles */}
+            <FormControl fullWidth variant="outlined" style={{ marginTop: '10px', marginBottom: '10px' }}>
+              <InputLabel>Selecciona Cuotas</InputLabel>
+              <Select value={selectedCuota} onChange={handleCuotaChange} label="Selecciona Cuotas">
+                {product.dieciocho_sin_interes && (
+                  <MenuItem value={`18 sin interés de: $${product.dieciocho_sin_interes}`}>
+                    18 sin interés de: ${product.dieciocho_sin_interes}
+                  </MenuItem>
+                )}
+                {product.doce_sin_interes && (
+                  <MenuItem value={`12 sin interés de: ${product.doce_sin_interes}`}>
+                    12 sin interés de: {product.doce_sin_interes}
+                  </MenuItem>
+                )}
+                {product.diez_sin_interes && (
+                  <MenuItem value={`10 sin interés de: ${product.diez_sin_interes}`}>
+                    10 sin interés de: {product.diez_sin_interes}
+                  </MenuItem>
+                )}
+                {product.nueve_sin_interes && (
+                  <MenuItem value={`9 sin interés de: ${product.nueve_sin_interes}`}>
+                    9 sin interés de: {product.nueve_sin_interes}
+                  </MenuItem>
+                )}
+                {product.seis_sin_interes && (
+                  <MenuItem value={`6 sin interés de: $${product.seis_sin_interes}`}>
+                    6 sin interés de: {product.seis_sin_interes}
+                  </MenuItem>
+                )}
+                {product.tres_sin_interes && (
+                  <MenuItem value={`3 sin interés de: $${product.tres_sin_interes}`}>
+                    3 sin interés de: {product.tres_sin_interes}
+                  </MenuItem>
+                )}
+              </Select>
+            </FormControl>
             {product.linea === 'Bazar' || product.linea === 'Complementos' || product.linea === 'Repuestos' ? (
                 <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
                 <i style={{color: 'red'}}>Solo con promos bancarias</i>
@@ -105,11 +155,23 @@ const cuotaSimple = require('../src/assets/cuotas-simples.webp')
             ) : null}
           </CardContent>
         <CardActions style={{display: 'flex', flexDirection: 'column'}}>
-          {catalog === false ? <Button fullWidth onClick={() => onAddToCart(product)} variant='contained' size="medium" color="primary" style={{marginBottom: 12}}>
+          {/* {catalog === false ? <Button fullWidth onClick={() => onAddToCart(product)} variant='contained' size="medium" color="primary" style={{marginBottom: 12}}>
           Agregar al carrito
           </Button> : 
           null
-          }
+          } */}
+          <Button
+          fullWidth
+          href={createWhatsAppLink(product, selectedCuota)}
+          target="_blank"
+          variant="contained"
+          size="medium"
+          color="primary"
+          style={{ margin: '10px 0' }}
+          disabled={!selectedCuota}
+        >
+          Compartir por WhatsApp
+        </Button>
           {product.ficha_tecnica ? <Button fullWidth target='_blank' href={product.ficha_tecnica} variant="outlined" size="medium" color="primary" style={{margin: 0}}>
             Ficha técnica
           </Button> :
