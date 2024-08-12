@@ -6,23 +6,53 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { Button, CardActions, Divider, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import AlertComponent from './alert';
+import imageCompression from 'browser-image-compression';
 
-const cuotaSimple = require('../src/assets/cuotas-simples.webp')
-  const Product = ({ product, /* onAddToCart, catalog = false, */ off }) => {
+  const cuotaSimple = require('../src/assets/cuotas-simples.webp')
+
+  const Product = ({ product, onAddToCart, catalog = false, off }) => {
     const [selectedCuota, setSelectedCuota] = useState('');
-
-    const createWhatsAppLink = (product, cuota) => {
-      const message = `¡Hola!, Te envio el valor de tu próxima Essen!
-      Producto: ${product.descripcion}
-      Cuota: ${cuota}`;
-
-      return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-    };
-
-    // Función para manejar el cambio en la selección de cuotas
+    const [compressedImage, setCompressedImage] = useState(product.imagen);
+  
     const handleCuotaChange = (event) => {
       setSelectedCuota(event.target.value);
     };
+  
+    const compressImage = async (imageUrl) => {
+      try {
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const file = new File([blob], 'image.jpg', { type: blob.type });
+  
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1024,
+          useWebWorker: true,
+        };
+  
+        const compressedFile = await imageCompression(file, options);
+        const compressedImageUrl = URL.createObjectURL(compressedFile);
+        setCompressedImage(compressedImageUrl);
+      } catch (error) {
+        console.error('Error compressing image:', error);
+      }
+    };
+  
+    const createWhatsAppLink = (product, cuota) => {
+      const message = `¡Hola!, Te envio el valor de tu próxima Essen!
+      Producto: ${product.descripcion}
+      Cuota: ${cuota}
+      Imagen: ${compressedImage}`;
+  
+      return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+    };
+  
+    React.useEffect(() => {
+      if (product.imagen) {
+        compressImage(product.imagen);
+      }
+    }, [product.imagen]);
+    
   return (
     <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className='card-product'>
           {off && <div className='descuento'>{off}</div>}
@@ -154,11 +184,11 @@ const cuotaSimple = require('../src/assets/cuotas-simples.webp')
             ) : null}
           </CardContent>
         <CardActions style={{display: 'flex', flexDirection: 'column'}}>
-          {/* {catalog === false ? <Button fullWidth onClick={() => onAddToCart(product)} variant='contained' size="medium" color="primary" style={{marginBottom: 12}}>
+          {catalog === false ? <Button fullWidth onClick={() => onAddToCart(product)} variant='contained' size="medium" color="primary" style={{marginBottom: 12}}>
           Agregar al carrito
           </Button> : 
           null
-          } */}
+          }
           <Button
           fullWidth
           href={createWhatsAppLink(product, selectedCuota)}
