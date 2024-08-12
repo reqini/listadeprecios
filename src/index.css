@@ -193,6 +193,7 @@ li {
 .flex { display: flex!important; }
 .flex-direction { flex-direction: column!important; }
 .justify-center { justify-content: center!important; }
+.justify-between { justify-content: space-between!important; }
 .items-center { align-items: center!important;}
 .items-self-center { align-self: center;}
 
@@ -222,6 +223,8 @@ li {
 .mar-b20 { margin-bottom: 20px!important; }
 .mar-b30 { margin-bottom: 30px!important; }
 
+.mar-t10 { margin-top: 10px!important; }
+.mar-t15 { margin-top: 15px!important; }
 .mar-t30 { margin-top: 30px!important; }
 
 @media screen and (max-width: 1024px) {

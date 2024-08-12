@@ -9,7 +9,7 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Grid from "@mui/material/Grid";
 import Skeleton from "@mui/material/Skeleton";
-/* import ShoppingCart from "./cart"; */
+import ShoppingCart from "./cart";
 import Fab from '@mui/material/Fab';
 import NavigationIcon from '@mui/icons-material/Navigation';
 import Product from "./products";
@@ -31,6 +31,18 @@ const Home = ({ onLogout }) => {
   const [bancosFiltrados, setBancosFiltrados] = useState([]);
   const [mostrarBoton, setMostrarBoton] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
+
+  const handleAddToCart = (product) => {
+    setCart([...cart, product]);
+  };
+
+  const handleCuotaChange = (codigo, cuota) => {
+    setCart(prevCart =>
+      prevCart.map(item =>
+        item.codigo === codigo ? { ...item, cuotaSeleccionada: cuota } : item
+      )
+    );
+  };
 
   const manejarScroll = () => {
     // Muestra el botón si el usuario ha hecho scroll hacia abajo, ocúltalo si está en la parte superior
@@ -109,13 +121,9 @@ const Home = ({ onLogout }) => {
     setBancosFiltrados(bancosFiltrados);
   }, [filtro, bancos]);
 
-  const addToCart = (productos) => {
-    setCart([...cart, productos]);
-  };
-
-  /* const clearCart = () => {
+  const clearCart = () => {
     setCart([]);
-  }; */
+  };
 
   return (
     <Container maxWidth="lg" className="conteiner-list">
@@ -230,9 +238,8 @@ const Home = ({ onLogout }) => {
                 <Product
                   key={product.codigo}
                   product={product}
-                  off={product.discount !== '' ? product.discount : null}
-                  bancos={bancos}
-                  onAddToCart={addToCart}
+                  onAddToCart={handleAddToCart}
+                  onCuotaChange={handleCuotaChange}
                 />
               </li>
             ) : null,
@@ -243,12 +250,12 @@ const Home = ({ onLogout }) => {
       <Fab onClick={volverArriba} className={`${mostrarBoton ? "visible" : "oculto"}`} variant="extended" size="small" color="primary">
         <NavigationIcon sx={{ mr: 1 }} />
       </Fab>
-      {/* <ShoppingCart
+      <ShoppingCart
         cart={cart}
         onClearCart={clearCart}
         className={`${mostrarBoton ? "visible" : "oculto"}`}
         onClick={volverArriba}
-      /> */}
+      />
     </Container>
   );
 };
