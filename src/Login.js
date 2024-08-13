@@ -6,7 +6,7 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import logo from './logo.png';
-import logoSinlimites from './sin-limites.png';
+/* import logoSinlimites from './sin-limites.png'; */
 
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -62,7 +62,7 @@ const Login = ({ onLogin }) => {
               </Grid>
           </Grid>       
         </form>
-        <img src={logoSinlimites} alt="logo" height="50" style={{marginTop: 24}} />
+        {/* <img src={logoSinlimites} alt="logo" height="50" style={{marginTop: 24}} /> */}
       </Container>
     </div>
     
