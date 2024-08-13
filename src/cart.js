@@ -56,8 +56,8 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
                       {item.descripcion}
                       <div>
                         {selectedCuota[item.codigo] 
-                          ? `$${selectedCuota[item.codigo]}`
-                          : `$${item.precio_negocio}`}
+                          ? `${selectedCuota[item.codigo]}`
+                          : `${item.precio_negocio}`}
                         </div>
                     </div>
                     
@@ -71,7 +71,7 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
                         label="Cuotas"
                       >
                         <MenuItem value={item.precio_negocio}>
-                          Precio Negocio: ${item.precio_negocio}
+                          Precio Negocio: {item.precio_negocio}
                         </MenuItem>
                         {item.dieciocho_sin_interes && (
                           <MenuItem value={item.dieciocho_sin_interes}>
@@ -111,9 +111,9 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
               </ul>
             </div>
             <div className="flex-center" style={{ flexDirection: "column" }}>
-              <div>
+              {/* <div>
                 <h3>Planes de Pago</h3>
-              </div>
+              </div> */}
               <div className="flex-between">
                 <div className="flex-start-column">
                   <Typography className="flex flex-direction">

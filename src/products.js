@@ -4,15 +4,16 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
+import { FaWhatsapp } from 'react-icons/fa';
 import { Button, CardActions, Divider, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import AlertComponent from './alert';
-import imageCompression from 'browser-image-compression';
+/* import imageCompression from 'browser-image-compression'; */
 
   const cuotaSimple = require('../src/assets/cuotas-simples.webp')
 
   const Product = ({ product, onAddToCart, catalog = false, off }) => {
     const [selectedCuota, setSelectedCuota] = useState('');
-    const [compressedImage, setCompressedImage] = useState(product.imagen);
+   /*  const [compressedImage, setCompressedImage] = useState(product.imagen); */
   
     const handleCuotaChange = (event) => {
       setSelectedCuota(event.target.value);
@@ -20,19 +21,19 @@ import imageCompression from 'browser-image-compression';
   
     const compressImage = async (imageUrl) => {
       try {
-        const response = await fetch(imageUrl);
-        const blob = await response.blob();
-        const file = new File([blob], 'image.jpg', { type: blob.type });
+        /* const response = await fetch(imageUrl); */
+        /* const blob = await response.blob(); */
+        /* const file = new File([blob], 'image.jpg', { type: blob.type }); */
   
-        const options = {
+        /* const options = {
           maxSizeMB: 1,
           maxWidthOrHeight: 1024,
           useWebWorker: true,
-        };
+        }; */
   
-        const compressedFile = await imageCompression(file, options);
-        const compressedImageUrl = URL.createObjectURL(compressedFile);
-        setCompressedImage(compressedImageUrl);
+        /* const compressedFile = await imageCompression(file, options); */
+        /* const compressedImageUrl = URL.createObjectURL(compressedFile); */
+        /* setCompressedImage(compressedImageUrl); */
       } catch (error) {
         console.error('Error compressing image:', error);
       }
@@ -41,8 +42,7 @@ import imageCompression from 'browser-image-compression';
     const createWhatsAppLink = (product, cuota) => {
       const message = `¡Hola!, Te envio el valor de tu próxima Essen!
       Producto: ${product.descripcion}
-      Cuota: ${cuota}
-      Imagen: ${compressedImage}`;
+      Cuota: ${cuota}`;
   
       return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
     };
@@ -55,7 +55,7 @@ import imageCompression from 'browser-image-compression';
     
   return (
     <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className='card-product'>
-          {off && <div className='descuento'>{off}</div>}
+          {product.discount && <div className='descuento'>{product.discount}</div>}
           <CardMedia
             component="img"
             height="220"
@@ -67,7 +67,7 @@ import imageCompression from 'browser-image-compression';
             {product.descripcion}
             </Typography>
             <Typography variant='body2' fontSize={12} fontStyle={'italic'}>
-             Linea <b>{product.linea}</b>
+              Línea <b>{product.linea}</b>
             </Typography>
             <Typography variant="body2" color="text.secondary">
                 Precio de Negocio: <b>{product.precio_negocio.replace(/[,]/g, ".")}</b>
@@ -76,7 +76,7 @@ import imageCompression from 'browser-image-compression';
                 PSVP lista: <b>{product.psvp_lista.replace(/[,]/g, ".")}</b>
             </Typography>
             <Typography variant="body2" color="text.secondary">
-                puntos: <b>{product.puntos}</b>
+                Puntos: <b>{product.puntos}</b>
             </Typography>
             <Divider style={{margin: '10px 0'}}/>
             {product.dieciocho_sin_interes && 
@@ -85,7 +85,7 @@ import imageCompression from 'browser-image-compression';
                 <img src={cuotaSimple} alt='sin limites' height="15" />
               ) : null} */}
               <Typography variant='span' fontSize={13} fontStyle={'italic'} style={{ display: 'flex', alignItems: 'center'}}>
-                <b style={{color: 'green'}}>18 sin interes de: <i style={{color: 'black'}}>$ {product.dieciocho_sin_interes !== '' ? product.dieciocho_sin_interes : null}</i></b>
+                <b style={{color: 'green'}}>18 sin interés de: <i style={{color: 'black'}}>$ {product.dieciocho_sin_interes !== '' ? product.dieciocho_sin_interes : null}</i></b>
                 <AlertComponent />
               </Typography>
             </div>
@@ -96,7 +96,7 @@ import imageCompression from 'browser-image-compression';
                 <img src={cuotaSimple} alt='sin limites' height="15" />
               ) : null}
               <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
-                <b style={{color: 'green'}}>12 sin interes de: <i style={{color: 'black'}}>{product.doce_sin_interes !== '' ? product.doce_sin_interes : null}</i></b>
+                <b style={{color: 'green'}}>12 sin interés de: <i style={{color: 'black'}}>{product.doce_sin_interes !== '' ? product.doce_sin_interes : null}</i></b>
               </Typography>
             </div>
             }
@@ -106,7 +106,7 @@ import imageCompression from 'browser-image-compression';
                 <img src={cuotaSimple} alt='sin limites' height="15" />
               ) : null} */}
               <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'} style={{ display: 'flex', alignItems: 'center'}}>
-                <b style={{color: 'green'}}>10 sin interes de: <i style={{color: 'black'}}>{product.diez_sin_interes !== '' ? product.diez_sin_interes : null}</i></b>
+                <b style={{color: 'green'}}>10 sin interés de: <i style={{color: 'black'}}>{product.diez_sin_interes !== '' ? product.diez_sin_interes : null}</i></b>
                 <AlertComponent />
               </Typography>
             </div>
@@ -117,7 +117,7 @@ import imageCompression from 'browser-image-compression';
                 <img src={cuotaSimple} alt='sin limites' height="15" />
               ) : null}
               <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
-              <b style={{color: 'green'}}>9 sin interes de: <i style={{color: 'black'}}>{product.nueve_sin_interes !== '' ? product.nueve_sin_interes : null}</i></b>
+              <b style={{color: 'green'}}>9 sin interés de: <i style={{color: 'black'}}>{product.nueve_sin_interes !== '' ? product.nueve_sin_interes : null}</i></b>
               </Typography>
             </div>
             }
@@ -127,7 +127,7 @@ import imageCompression from 'browser-image-compression';
                 <img src={cuotaSimple} alt='sin limites' height="15" />
               ) : null}
               <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
-              <b style={{color: 'green'}}>6 sin interes de: <i style={{color: 'black'}}>{product.seis_sin_interes !== '' ? product.seis_sin_interes : null}</i></b>
+              <b style={{color: 'green'}}>6 sin interés de: <i style={{color: 'black'}}>{product.seis_sin_interes !== '' ? product.seis_sin_interes : null}</i></b>
               </Typography>
             </div>
             }
@@ -137,7 +137,7 @@ import imageCompression from 'browser-image-compression';
                 <img src={cuotaSimple} alt='sin limites' height="15" />
               ) : null}
               <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
-              <b style={{color: 'green'}}>3 sin interes de: <i style={{color: 'black'}}>{product.tres_sin_interes !== '' ? product.tres_sin_interes : null}</i></b>
+              <b style={{color: 'green'}}>3 sin interés de: <i style={{color: 'black'}}>{product.tres_sin_interes !== '' ? product.tres_sin_interes : null}</i></b>
               </Typography>
             </div>
             }
@@ -184,23 +184,24 @@ import imageCompression from 'browser-image-compression';
             ) : null}
           </CardContent>
         <CardActions style={{display: 'flex', flexDirection: 'column'}}>
-          {catalog === false ? <Button fullWidth onClick={() => onAddToCart(product)} variant='contained' size="medium" color="primary" style={{marginBottom: 12}}>
+          {catalog === false ? <Button fullWidth onClick={() => onAddToCart(product)} variant='contained' size="medium" color="primary">
           Agregar al carrito
           </Button> : 
           null
           }
           <Button
-          fullWidth
-          href={createWhatsAppLink(product, selectedCuota)}
-          target="_blank"
-          variant="contained"
-          size="medium"
-          color="primary"
-          style={{ margin: '10px 0' }}
-          disabled={!selectedCuota}
+            fullWidth
+            href={createWhatsAppLink(product, selectedCuota)}
+            target="_blank"
+            variant="contained"
+            size="medium"
+            color="primary"
+            style={selectedCuota ? {backgroundColor: '#25D366', color: 'white', margin: '12px 0'} : {margin: '12px 0'}}
+            disabled={!selectedCuota}
+            startIcon={selectedCuota ? <FaWhatsapp /> : null}
         >
-          Compartir por WhatsApp
-        </Button>
+          Compartir
+          </Button>
           {product.ficha_tecnica ? <Button fullWidth target='_blank' href={product.ficha_tecnica} variant="outlined" size="medium" color="primary" style={{margin: 0}}>
             Ficha técnica
           </Button> :
