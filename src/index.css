@@ -138,7 +138,7 @@ li {
 }
 .absolute-btn {
   position: fixed;
-  bottom: 10px;
+  bottom: 60px;
   z-index: 2;
 }
 .header.sticky {
