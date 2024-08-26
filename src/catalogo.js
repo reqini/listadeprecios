@@ -3,7 +3,7 @@ import axios from "axios";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
-import Product from "./products";
+import ProductsCalatogo from "./productsCalatogo";
 import { Typography } from "@mui/material";
 
 const Catalogo = () => {
@@ -60,11 +60,11 @@ const Catalogo = () => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <div className="flex-between-mobile" style={{ paddingTop: 30 }}>
-        <Typography variant="h5" textAlign="center" width={"100%"}>
-          Catalogo de Productos y precios
+        <Typography variant="h5" textAlign="center" width={"100%"} margin={'15px 0'}>
+          Catalogo de Productos
         </Typography>
       </div>
-      <div className={`header flex-center pad20 ${isSticky ? "sticky" : ""}`}>
+      <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
         <TextField
           style={{ maxWidth: 450 }}
           fullWidth
@@ -120,7 +120,7 @@ const Catalogo = () => {
           productosFiltrados.map((product) =>
             product.vigencia === "SI" ? (
               <li className="grid-item" key={product.id}>
-                <Product
+                <ProductsCalatogo
                   key={product.codigo}
                   product={product}
                   catalog
