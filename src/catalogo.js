@@ -117,15 +117,16 @@ const Catalogo = () => {
           onChange={(e) => setFiltro(e.target.value)}
         />
       </div>
-      <Button 
+      {favorites.length !== 0 && <Button 
         variant="contained" 
         color="primary" 
         onClick={() => setShowFavorites(!showFavorites)}
         style={{ marginBottom: '20px' }}
+        className="btn-absolute-favorite"
         disabled={favorites.length === 0} // Deshabilitar si no hay favoritos
       >
         {showFavorites ? 'Mostrar Todos' : 'Mostrar Favoritos'}
-      </Button>
+      </Button>}
       <ul className="lista-prod w-100">
         {loading ? (
           <>
