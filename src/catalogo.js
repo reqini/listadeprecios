@@ -3,8 +3,8 @@ import axios from "axios";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
-import ProductsCalatogo from "./products";
-import { Typography } from "@mui/material";
+import ProductsCalatogo from "./productsCalatogo";
+import { Typography, Button, Snackbar, Alert } from "@mui/material";
 
 const Catalogo = () => {
   const url = "https://backtest-production-7f88.up.railway.app";
@@ -101,8 +101,8 @@ const Catalogo = () => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <div className="flex-between-mobile" style={{ paddingTop: 30 }}>
-        <Typography variant="h5" textAlign="center" width={"100%"}>
-          Catalogo de Productos y precios
+        <Typography variant="h5" textAlign="center" width={"100%"} margin={'15px 0'}>
+          Catálogo de Productos
         </Typography>
       </div>
       <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
