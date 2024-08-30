@@ -11,7 +11,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 const ProductsCalatogo = ({ product, isFavorite, onToggleFavorite }) => {
 
   const createWhatsAppLink = (product) => {
-    const message = `¡Hola!, Te envio el valor de tu próxima Essen!
+    const message = `¡Hola!, Quiero el precio de este Producto :)!
       Producto: ${product.descripcion}`;
 
     return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;

@@ -13,7 +13,7 @@ import ShoppingCart from "./cart";
 import Fab from '@mui/material/Fab';
 import NavigationIcon from '@mui/icons-material/Navigation';
 import Product from "./products";
-/* import { Typography } from "@mui/material"; */
+import Typography from "@mui/material/Typography";
 import banner from './assets/banner.jpg';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ResponsiveDialog from "./dialog";
@@ -31,6 +31,15 @@ const Home = ({ onLogout }) => {
   const [bancosFiltrados, setBancosFiltrados] = useState([]);
   const [mostrarBoton, setMostrarBoton] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
+  const [username, setUsername] = useState(''); // Estado para almacenar el nombre de usuario
+
+  useEffect(() => {
+    // Recuperar el nombre de usuario desde localStorage
+    const storedUsername = localStorage.getItem('activeSession');
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, []);
 
   const handleAddToCart = (product) => {
     setCart([...cart, product]);
@@ -103,7 +112,7 @@ const Home = ({ onLogout }) => {
     };
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     // Filtrar productos por descripción y categoría
     const productosFiltrados = productos.filter(
       (producto) =>
@@ -128,6 +137,9 @@ const Home = ({ onLogout }) => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <div className="flex-between-mobile" style={{ paddingTop: 30, display: 'flex', justifyContent: 'space-between' }}>
+        <Typography variant="h6" color="primary">
+          Hola {username}
+        </Typography>
         <Button
           variant="contained"
           onClick={onLogout}
@@ -141,9 +153,6 @@ const Home = ({ onLogout }) => {
       <div className="w-100 flex justify-center">
         <img src={logo} alt="logo" height="100" className='mar-t30 mar-b20' />
       </div>
-      {/* <Typography variant="h5" textAlign="center" width={"100%"} margin={'20px 0'}>
-      Catálogo de Productos y precios {user ? user.username : ""}
-      </Typography> */}
 
       <div className={`header flex-center pad20 ${isSticky ? "sticky" : ""}`}>
         <TextField
@@ -164,7 +173,6 @@ const Home = ({ onLogout }) => {
               <img src={banner} alt="red sin limites essen" width='100%' />
             </div>
           </Grid>
-          {/* Se oculta para luego trabajar sobre filtros de bancos y cuotas */}
           <Grid item sm={6} xs={12} style={{display: 'none'}}> 
             <div className="w-100">
               <FormControl fullWidth>
@@ -183,8 +191,7 @@ const Home = ({ onLogout }) => {
                       <MenuItem value={bancos.banco} key={bancos.id}>
                         {bancos.banco}
                       </MenuItem>
-                   ),
-                  )}
+                   ))}
                 </Select>
               </FormControl>
             </div>
