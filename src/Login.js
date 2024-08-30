@@ -17,34 +17,40 @@ const Login = ({ onLogin }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('username');
-    if (savedUser && window.location.pathname !== '/home') {
-      navigate('/home');
+    // Comprobar si ya hay una sesión activa
+    const activeSession = localStorage.getItem('activeSession');
+    if (activeSession) {
+      alert('Ya hay una sesión activa. Se cerrará la sesión anterior.');
+      localStorage.removeItem('activeSession'); // Cerrar la sesión anterior
     }
-  }, [navigate]);
+  }, []);
 
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    // Simula la autenticación
-    onLogin(username, password, navigate);
-
-    // Guarda el usuario en localStorage
-    localStorage.setItem('username', username);
-
-    // Reset loading state
-    setLoading(false);
+  
+    try {
+      // Simulación de autenticación
+      // Aquí harías la solicitud con Axios para autenticar al usuario
+      // Ejemplo: 
+      // const response = await axios.post('URL_A_TU_BACKEND', { username, password });
+  
+      // Si la autenticación es exitosa, guarda la sesión
+      localStorage.setItem('activeSession', username); // Guardar la sesión activa
+      onLogin(username, password, navigate);
+    } catch (error) {
+      console.error('Error durante la autenticación:', error.message);
+      alert('Hubo un problema al iniciar sesión. Por favor, intenta de nuevo.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e) => {
     const value = e.target.value;
-    const processedValue = value.replace(/\s+/g, '').toLowerCase();
-    setUsername(processedValue);
+    setUsername(value.replace(/\s+/g, '').toLowerCase());
   };
 
   return (
@@ -72,13 +78,13 @@ const Login = ({ onLogin }) => {
                 <TextField
                   required
                   fullWidth
-                  type={showPassword ? 'text' : 'password'} // Cambia el tipo según el estado
+                  type={showPassword ? 'text' : 'password'}
                   style={{ color: 'black', backgroundColor: 'white' }}
                   id="filled-required"
                   label="Código de emprendedora"
-                  value={password} // Usa value en lugar de defaultValue para controlar el componente
+                  value={password}
                   variant="filled"
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)}
                   InputProps={{
                     endAdornment: (
                       <IconButton
