@@ -8,6 +8,7 @@ import Button from "@mui/material/Button";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { FormControl, InputLabel, Select, MenuItem, Divider } from "@mui/material";
+import { FaWhatsapp } from 'react-icons/fa';
 
 const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
   const [selectedCuota, setSelectedCuota] = useState({});
@@ -23,9 +24,27 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
   // Calculate the total price based on the selected cuota or price_negocio
   const totalPrice = cart.reduce((acc, item) => {
     const cuota = selectedCuota[item.codigo] || item.precio_negocio;
-    const priceNumber = parseInt(cuota.replace(/[$.,]/g, ""), 10);
+    const priceNumber = parseFloat(cuota.replace(/[$,]/g, ""));  // Parse the price to a float
     return acc + priceNumber;
   }, 0);
+
+  // Crear un enlace para compartir por WhatsApp
+  const createWhatsAppLink = () => {
+    const itemsMessage = cart.map(item => {
+      const selectedOption = selectedCuota[item.codigo];
+      const cuotaText = selectedOption
+        ? `Cuota seleccionada: ${selectedOption}`
+        : `Precio en un pago: ${item.precio_negocio}`;
+      
+      return `Producto: ${item.descripcion}\n${cuotaText}\n`;
+    }).join('\n');
+
+    const totalMessage = `Total del Carrito: $${totalPrice.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`;
+
+    const message = `¡Hola!, Te envío el resumen de tu carrito:\n\n${itemsMessage}\n${totalMessage}`;
+
+    return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+  };
 
   return (
     <div className="fixed-menu flex-center" style={{ position: 'relative' }}>
@@ -40,7 +59,7 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
             <AddShoppingCartIcon />
             <Typography className="mar-l8">Simulador de Compra</Typography>
           </div>
-          <Typography fontWeight={800}>Total: ${totalPrice}</Typography>
+          <Typography fontWeight={800}>Total: ${totalPrice.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Container
@@ -57,7 +76,7 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
                       <div>
                         {selectedCuota[item.codigo] 
                           ? `${selectedCuota[item.codigo]}`
-                          : `${item.precio_negocio}`}
+                          : `Precio de Negocio: ${item.precio_negocio}`}
                         </div>
                     </div>
                     
@@ -71,35 +90,35 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
                         label="Cuotas"
                       >
                         <MenuItem value={item.precio_negocio}>
-                          Precio Negocio: {item.precio_negocio}
+                          Precio de Negocio: {item.precio_negocio}
                         </MenuItem>
                         {item.dieciocho_sin_interes && (
-                          <MenuItem value={item.dieciocho_sin_interes}>
+                          <MenuItem value={`18 sin interés de: ${item.dieciocho_sin_interes}`}>
                             18 sin interés de: {item.dieciocho_sin_interes}
                           </MenuItem>
                         )}
                         {item.doce_sin_interes && (
-                          <MenuItem value={item.doce_sin_interes}>
+                          <MenuItem value={`12 sin interés de: ${item.doce_sin_interes}`}>
                             12 sin interés de: {item.doce_sin_interes}
                           </MenuItem>
                         )}
                         {item.diez_sin_interes && (
-                          <MenuItem value={item.diez_sin_interes}>
+                          <MenuItem value={`10 sin interés de: ${item.diez_sin_interes}`}>
                             10 sin interés de: {item.diez_sin_interes}
                           </MenuItem>
                         )}
                         {item.nueve_sin_interes && (
-                          <MenuItem value={item.nueve_sin_interes}>
+                          <MenuItem value={`9 sin interés de: ${item.nueve_sin_interes}`}>
                             9 sin interés de: {item.nueve_sin_interes}
                           </MenuItem>
                         )}
                         {item.seis_sin_interes && (
-                          <MenuItem value={item.seis_sin_interes}>
+                          <MenuItem value={`6 sin interés de: ${item.seis_sin_interes}`}>
                             6 sin interés de: {item.seis_sin_interes}
                           </MenuItem>
                         )}
                         {item.tres_sin_interes && (
-                          <MenuItem value={item.tres_sin_interes}>
+                          <MenuItem value={`3 sin interés de: ${item.tres_sin_interes}`}>
                             3 sin interés de: {item.tres_sin_interes}
                           </MenuItem>
                         )}
@@ -111,21 +130,20 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
               </ul>
             </div>
             <div className="flex-center" style={{ flexDirection: "column" }}>
-              {/* <div>
-                <h3>Planes de Pago</h3>
-              </div> */}
-              <div className="flex-between">
-                <div className="flex-start-column">
-                  <Typography className="flex flex-direction">
-                    <i className="envio">
-                      ¡Si el producto supera los 140 puntos, <b>el envío es gratis</b>!
-                    </i>
-                  </Typography>
-                </div>
-              </div>
-              <div style={{ marginTop: 20 }}>
-                <Button className="mar-r6" variant="contained" onClick={onClearCart}>
+              <div className="flex-row-mobile" style={{ marginTop: 20 }}>
+                <Button fullWidth className="mar-r6" variant="contained" onClick={onClearCart}>
                   Limpiar carrito
+                </Button>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  color="primary"
+                  href={createWhatsAppLink()}
+                  target="_blank"
+                  style={{backgroundColor: '#25D366', color: 'white', margin: '12px 0'}}
+                  startIcon={<FaWhatsapp />}
+                >
+                  Compartir por WhatsApp
                 </Button>
               </div>
             </div>
