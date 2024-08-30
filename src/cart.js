@@ -21,11 +21,18 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
     }));
   };
 
+  // Extract numeric value from text, ensuring no text remains
+  const extractNumericValue = (text) => {
+    // Use regex to extract only the number, removing any text like "sin interés de:"
+    const match = text.match(/\d+([,.]\d+)?/g);
+    return match ? parseFloat(match[0].replace(',', '.')) : 0;
+  };
+
   // Calculate the total price based on the selected cuota or price_negocio
   const totalPrice = cart.reduce((acc, item) => {
     const cuota = selectedCuota[item.codigo] || item.precio_negocio;
-    const priceNumber = parseFloat(cuota.replace(/[$,]/g, ""));  // Parse the price to a float
-    return acc + priceNumber;
+    const priceNumber = extractNumericValue(cuota);
+    return acc + (isNaN(priceNumber) ? 0 : priceNumber);
   }, 0);
 
   // Crear un enlace para compartir por WhatsApp
@@ -77,7 +84,7 @@ const ShoppingCart = ({ cart, onClearCart, onClick, className }) => {
                         {selectedCuota[item.codigo] 
                           ? `${selectedCuota[item.codigo]}`
                           : `Precio de Negocio: ${item.precio_negocio}`}
-                        </div>
+                      </div>
                     </div>
                     
                     <FormControl variant="outlined" style={{ marginLeft: '10px', minWidth: 200, maxWidth: 300, width: '100%' }}>
