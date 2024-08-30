@@ -137,8 +137,8 @@ const Home = ({ onLogout }) => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <div className="flex-between-mobile" style={{ paddingTop: 30, display: 'flex', justifyContent: 'space-between' }}>
-        <Typography variant="h6" color="primary">
-          Hola {username}
+        <Typography className="margin-mobile-top" variant="body1" color="primary" fontSize={20}>
+          Hola <b>{username}</b>, Bienvenid@
         </Typography>
         <Button
           variant="contained"

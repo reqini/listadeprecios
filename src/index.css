@@ -261,6 +261,9 @@ li {
   }
 }
 @media screen and (max-width:600px) {
+  .margin-mobile-top {
+    margin-top: 10px!important;
+  }
   .btn-absolute-favorite {
     position: fixed!important;
     z-index: 2;
