@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
@@ -9,15 +8,20 @@ import logo from './logo.png';
 import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-/* import logoSinlimites from './sin-limites.png'; */
 
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const [showPassword, setShowPassword] = useState(false);
+  useEffect(() => {
+    const savedUser = localStorage.getItem('username');
+    if (savedUser) {
+      navigate('/home');
+    }
+  }, [navigate]);
 
   const handleChangePass = (e) => {
     setPassword(e.target.value);
@@ -30,17 +34,17 @@ const Login = ({ onLogin }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
+
+    // Simula la autenticación
     onLogin(username, password, navigate);
+
+    // Guarda el usuario en localStorage
+    localStorage.setItem('username', username);
   };
 
   const handleChange = (e) => {
-    // Obtener el valor del campo de texto
     const value = e.target.value;
-
-    // Eliminar espacios y convertir a minúsculas
     const processedValue = value.replace(/\s+/g, '').toLowerCase();
-
-    // Actualizar el estado con el valor procesado
     setUsername(processedValue);
   };
 
@@ -98,10 +102,8 @@ const Login = ({ onLogin }) => {
               </Grid>
           </Grid>       
         </form>
-        {/* <img src={logoSinlimites} alt="logo" height="50" style={{marginTop: 24}} /> */}
       </Container>
     </div>
-    
   );
 };
 
