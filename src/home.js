@@ -37,7 +37,9 @@ const Home = ({ onLogout }) => {
   // Función para determinar el momento del día
   const getTimeOfDay = () => {
     const currentHour = new Date().getHours();
-    if (currentHour < 12) {
+    if (currentHour >= 0 && currentHour < 5) {
+      return "¿Trabajando de madrugada? :)";
+    } else if (currentHour < 12) {
       return "Buen día";
     } else if (currentHour < 18) {
       return "Buenas tardes";
