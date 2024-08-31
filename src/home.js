@@ -32,6 +32,19 @@ const Home = ({ onLogout }) => {
   const [mostrarBoton, setMostrarBoton] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
   const [username, setUsername] = useState(''); // Estado para almacenar el nombre de usuario
+  const [timeOfDay, setTimeOfDay] = useState(""); // Estado para el saludo personalizado
+
+  // Función para determinar el momento del día
+  const getTimeOfDay = () => {
+    const currentHour = new Date().getHours();
+    if (currentHour < 12) {
+      return "Buen día";
+    } else if (currentHour < 18) {
+      return "Buenas tardes";
+    } else {
+      return "Buenas noches";
+    }
+  };
 
   useEffect(() => {
     // Recuperar el nombre de usuario desde localStorage
@@ -39,6 +52,9 @@ const Home = ({ onLogout }) => {
     if (storedUsername) {
       setUsername(storedUsername);
     }
+
+    // Establecer el saludo personalizado
+    setTimeOfDay(getTimeOfDay());
   }, []);
 
   const handleAddToCart = (product) => {
@@ -67,10 +83,15 @@ const Home = ({ onLogout }) => {
 
   useEffect(() => {
     const getData = async () => {
-      const result = await axios.get(`${url}/api/productos`);
-      setLoading(false);
-      setProductos(result.data);
-      setProductosFiltrados(result.data);
+      try {
+        const result = await axios.get(`${url}/api/productos`);
+        setProductos(result.data);
+        setProductosFiltrados(result.data);
+      } catch (error) {
+        console.error("Error al obtener productos:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     getData();
@@ -78,9 +99,13 @@ const Home = ({ onLogout }) => {
 
   useEffect(() => {
     const getData = async () => {
-      const result = await axios.get(`${url}/api/bancos`);
-      setBancos(result.data);
-      setBancosFiltrados(result.data);
+      try {
+        const result = await axios.get(`${url}/api/bancos`);
+        setBancos(result.data);
+        setBancosFiltrados(result.data);
+      } catch (error) {
+        console.error("Error al obtener bancos:", error);
+      }
     };
 
     getData();
@@ -113,7 +138,7 @@ const Home = ({ onLogout }) => {
   }, []);
 
   useEffect(() => {
-    // Filtrar productos por descripción y categoría
+    // Filtrar productos por descripción
     const productosFiltrados = productos.filter(
       (producto) =>
         producto.descripcion.toLowerCase().includes(filtro.toLowerCase())
@@ -123,8 +148,9 @@ const Home = ({ onLogout }) => {
   }, [filtro, productos]);
 
   useEffect(() => {
-    const bancosFiltrados = bancos.filter((bancos) =>
-      bancos.banco.toLowerCase().includes(filtro.toLowerCase()),
+    // Filtrar bancos por nombre
+    const bancosFiltrados = bancos.filter((banco) =>
+      banco.banco.toLowerCase().includes(filtro.toLowerCase()),
     );
 
     setBancosFiltrados(bancosFiltrados);
@@ -136,15 +162,15 @@ const Home = ({ onLogout }) => {
 
   return (
     <Container maxWidth="lg" className="conteiner-list">
-      <div className="flex-between-mobile" style={{ paddingTop: 30, display: 'flex', justifyContent: 'space-between' }}>
+      <div className="flex-between-mobile" style={{ paddingTop: 30, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
         <Typography className="margin-mobile-top" variant="body1" color="primary" fontSize={20}>
-          Hola <b>{username}</b>, Bienvenid@
+          {timeOfDay} <b>{username === 'lety' ? 'Cara de Paty' : username}</b>, Bienvenid@
         </Typography>
         <Button
           variant="contained"
           onClick={onLogout}
           color="error"
-          style={{ width: "100%", maxWidth: 200, marginTop: 10 }}
+          style={{ width: "100%", maxWidth: 200 }}
           startIcon={<LogoutIcon />}
         >
           Cerrar Sesion
@@ -173,7 +199,7 @@ const Home = ({ onLogout }) => {
               <img src={banner} alt="red sin limites essen" width='100%' />
             </div>
           </Grid>
-          <Grid item sm={6} xs={12} style={{display: 'none'}}> 
+          <Grid item sm={6} xs={12} style={{ display: 'none' }}> 
             <div className="w-100">
               <FormControl fullWidth>
                 <InputLabel id="demo-simple-select-label">Listado de bancos</InputLabel>
@@ -187,11 +213,11 @@ const Home = ({ onLogout }) => {
                     e.preventDefault();
                   }}
                 >
-                   {bancosFiltrados.map((bancos) => (
-                      <MenuItem value={bancos.banco} key={bancos.id}>
-                        {bancos.banco}
-                      </MenuItem>
-                   ))}
+                  {bancosFiltrados.map((banco) => (
+                    <MenuItem value={banco.banco} key={banco.id}>
+                      {banco.banco}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </div>
@@ -201,42 +227,15 @@ const Home = ({ onLogout }) => {
       <ul className="lista-prod w-100">
         {loading ? (
           <>
-            <Skeleton
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-            <Skeleton
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-            <Skeleton
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-            <Skeleton
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-            <Skeleton
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-            <Skeleton
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
+            {[...Array(6)].map((_, index) => (
+              <Skeleton
+                key={index}
+                sx={{ height: 300, margin: 1 }}
+                animation="wave"
+                variant="rectangular"
+                className="grid-item"
+              />
+            ))}
           </>
         ) : (
           productosFiltrados.map((product) =>
@@ -266,4 +265,5 @@ const Home = ({ onLogout }) => {
     </Container>
   );
 };
+
 export default Home;
