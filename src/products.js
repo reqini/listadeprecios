@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardMedia, Typography, Button, CardActions, Divider, MenuItem, Select, FormControl, InputLabel, Switch, FormControlLabel } from '@mui/material';
 import { FaWhatsapp } from 'react-icons/fa';
-import AlertComponent from './alert';
 
 const cuotaSimple = require('../src/assets/cuotas-simples.webp');
 
