@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
@@ -15,15 +15,6 @@ const Login = ({ onLogin }) => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Comprobar si ya hay una sesión activa
-    const activeSession = localStorage.getItem('activeSession');
-    if (activeSession) {
-      alert('Ya hay una sesión activa. Se cerrará la sesión anterior.');
-      localStorage.removeItem('activeSession'); // Cerrar la sesión anterior
-    }
-  }, []);
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
 

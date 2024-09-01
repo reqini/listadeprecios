@@ -57,6 +57,13 @@ const Home = ({ onLogout }) => {
 
     // Establecer el saludo personalizado
     setTimeOfDay(getTimeOfDay());
+
+    // Actualizar el saludo cada hora
+    const interval = setInterval(() => {
+      setTimeOfDay(getTimeOfDay());
+    }, 3600000); // 3600000 ms = 1 hora
+
+    return () => clearInterval(interval); // Limpiar el intervalo al desmontar el componente
   }, []);
 
   const handleAddToCart = (product) => {
