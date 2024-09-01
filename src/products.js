@@ -78,7 +78,7 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
             <i style={{ color: 'red' }}>Solo con promos bancarias</i>
           </Typography>
         )}
-        <FormControlLabel control={<Switch checked={planCanje} onChange={handlePlanCanjeChange} />} label="Activar Plan Canje" />
+        <FormControlLabel style={{display: 'none'}} control={<Switch checked={planCanje} onChange={handlePlanCanjeChange} />} label="Activar Plan Canje" />
       </CardContent>
       <CardActions sx={{ display: 'flex', flexDirection: 'column' }}>
         {!catalog && (
