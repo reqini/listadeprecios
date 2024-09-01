@@ -82,7 +82,7 @@ const ShoppingCart = ({ cart, onClearCart }) => {
                 color="primary"
                 href={createWhatsAppLink()}
                 target="_blank"
-                style={{ backgroundColor: '#25D366', color: 'white', margin: '12px 0', display: 'none' }}
+                style={{ backgroundColor: '#25D366', color: 'white', margin: '12px 0' }}
                 startIcon={<FaWhatsapp />}
               >
                 Compartir por WhatsApp
