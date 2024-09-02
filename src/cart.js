@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Accordion, AccordionSummary, AccordionDetails, Container, Typography, Button, FormControl, InputLabel, Select, MenuItem, Divider, Switch, FormControlLabel } from "@mui/material";
 import { FaWhatsapp } from 'react-icons/fa';
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -28,12 +28,18 @@ const ShoppingCart = ({ cart, onClearCart }) => {
     return discountedAmount > 0 ? discountedAmount : 0;
   };
 
-  const formatPrice = (price) => Math.round(price).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  const formatPrice = (price) => 
+    Math.round(price).toLocaleString('es-AR', { 
+      style: 'currency', 
+      currency: 'ARS', 
+      minimumFractionDigits: 0, 
+      maximumFractionDigits: 0 
+    });
 
-  const getDiscountedPrice = (price) => {
+  const getDiscountedPrice = useCallback((price) => {
     const parsedPrice = parsePrice(price);
     return planCanje ? applyPlanCanjeDiscount(parsedPrice) : parsedPrice;
-  };
+  }, [planCanje]);
 
   const getCuotaPrice = (psvpPrice, cuotaPrice) => {
     const parsedPSVPPrice = parsePrice(psvpPrice);
@@ -44,55 +50,45 @@ const ShoppingCart = ({ cart, onClearCart }) => {
     return formatPrice(parsedCuotaPrice > 0 ? (discountedPSVP / (parsedPSVPPrice / parsedCuotaPrice)) : 0);
   };
 
-  const calculateTotalPrice = () => {
+  const calculateTotalPrice = useCallback(() => {
     const total = cart.reduce((acc, item) => {
-      const selectedPrice = selectedCuota[item.codigo] ? parsePrice(selectedCuota[item.codigo]) : getDiscountedPrice(item.precio_negocio);
+      const selectedPrice = selectedCuota[item.codigo] 
+        ? parsePrice(selectedCuota[item.codigo]) 
+        : getDiscountedPrice(item.precio_negocio);
       return acc + selectedPrice;
     }, 0);
     setTotalPrice(total);
-  };
+  }, [cart, selectedCuota, getDiscountedPrice]);
 
   useEffect(() => {
     calculateTotalPrice();
-  }, [selectedCuota, planCanje, cart]);  // Se recalcula el total cuando se cambia el carrito, el planCanje o las cuotas seleccionadas
-
-  
+  }, [calculateTotalPrice]);
 
   const createWhatsAppLink = () => {
-    // Mapear los valores seleccionados de cuotas a números correctos
     const cuotasMap = {
-        'dieciocho_sin_interes': 18,
-        'doce_sin_interes': 12,
-        'diez_sin_interes': 10,
-        'nueve_sin_interes': 9,
-        'seis_sin_interes': 6,
-        'tres_sin_interes': 3
+      'dieciocho_sin_interes': 18,
+      'doce_sin_interes': 12,
+      'diez_sin_interes': 10,
+      'nueve_sin_interes': 9,
+      'seis_sin_interes': 6,
+      'tres_sin_interes': 3
     };
 
-    // Extraer la clave de la cuota seleccionada
     const cuotaSeleccionada = Object.keys(selectedCuota).find(key => selectedCuota[key] && cuotasMap[key]);
 
     let mensajeCuotas = '';
 
     if (cuotaSeleccionada) {
-        const numCuotas = cuotasMap[cuotaSeleccionada];
-        mensajeCuotas = `${numCuotas} cuotas sin interés de: ${formatPrice(totalPrice)}`;
+      const numCuotas = cuotasMap[cuotaSeleccionada];
+      mensajeCuotas = `${numCuotas} cuotas sin interés de: ${formatPrice(totalPrice)}`;
     } else {
-        mensajeCuotas = `si pagas de contado te quedaría: ${formatPrice(totalPrice)}`;
+      mensajeCuotas = `si pagas de contado te quedaría: ${formatPrice(totalPrice)}`;
     }
 
-    // Generar el mensaje final
-    const mensajeFinal = cuotaSeleccionada
-        ? `Te paso el valor de los productos, te quedaría en: ${mensajeCuotas}`
-        : `Te paso el valor de los productos, si pagas de contado te quedaría: ${formatPrice(totalPrice)}`;
+    const mensajeFinal = `Te paso el valor de los productos, te quedaría en: ${mensajeCuotas}`;
 
     return `https://api.whatsapp.com/send?text=${encodeURIComponent(mensajeFinal)}`;
-};
-
-
-
-
-
+  };
 
   return (
     <div className="fixed-menu flex-center" style={{ position: 'relative' }}>
