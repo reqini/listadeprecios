@@ -1,37 +1,98 @@
-import React, { useState } from "react";
-import { Accordion, AccordionSummary, AccordionDetails, Container, Typography, Button, FormControl, InputLabel, Select, MenuItem, Divider } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Accordion, AccordionSummary, AccordionDetails, Container, Typography, Button, FormControl, InputLabel, Select, MenuItem, Divider, Switch, FormControlLabel } from "@mui/material";
 import { FaWhatsapp } from 'react-icons/fa';
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 const ShoppingCart = ({ cart, onClearCart }) => {
   const [selectedCuota, setSelectedCuota] = useState({});
+  const [planCanje, setPlanCanje] = useState(false);
+  const [totalPrice, setTotalPrice] = useState(0);
 
   const handleCuotaChange = (codigo, cuota) => {
     setSelectedCuota(prev => ({ ...prev, [codigo]: cuota }));
   };
 
-  const extractNumericValue = (text) => {
-    if (!text) return 0;
-    const value = parseFloat(text.toString().replace(/[^\d.-]/g, ""));
-    return isNaN(value) ? 0 : value;
+  const handlePlanCanjeChange = (event) => {
+    setPlanCanje(event.target.checked);
   };
 
-  const totalPrice = cart.reduce((acc, item) => {
-    const cuota = selectedCuota[item.codigo] || item.precio_negocio;
-    const priceNumber = extractNumericValue(cuota);
-    return acc + priceNumber;
-  }, 0);
+  const parsePrice = (priceString) => {
+    if (!priceString || typeof priceString !== 'string') return 0;
+    const normalizedPrice = priceString.replace(/[^0-9]/g, '').trim();
+    return parseInt(normalizedPrice, 10) || 0;
+  };
+
+  const applyPlanCanjeDiscount = (amount) => {
+    const discountedAmount = amount - 30000;
+    return discountedAmount > 0 ? discountedAmount : 0;
+  };
+
+  const formatPrice = (price) => Math.round(price).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+  const getDiscountedPrice = (price) => {
+    const parsedPrice = parsePrice(price);
+    return planCanje ? applyPlanCanjeDiscount(parsedPrice) : parsedPrice;
+  };
+
+  const getCuotaPrice = (psvpPrice, cuotaPrice) => {
+    const parsedPSVPPrice = parsePrice(psvpPrice);
+    const parsedCuotaPrice = parsePrice(cuotaPrice);
+
+    const discountedPSVP = planCanje ? applyPlanCanjeDiscount(parsedPSVPPrice) : parsedPSVPPrice;
+
+    return formatPrice(parsedCuotaPrice > 0 ? (discountedPSVP / (parsedPSVPPrice / parsedCuotaPrice)) : 0);
+  };
+
+  const calculateTotalPrice = () => {
+    const total = cart.reduce((acc, item) => {
+      const selectedPrice = selectedCuota[item.codigo] ? parsePrice(selectedCuota[item.codigo]) : getDiscountedPrice(item.precio_negocio);
+      return acc + selectedPrice;
+    }, 0);
+    setTotalPrice(total);
+  };
+
+  useEffect(() => {
+    calculateTotalPrice();
+  }, [selectedCuota, planCanje, cart]);  // Se recalcula el total cuando se cambia el carrito, el planCanje o las cuotas seleccionadas
+
+  
 
   const createWhatsAppLink = () => {
-    const itemsMessage = cart.map(item => {
-      const cuotaText = selectedCuota[item.codigo] ? `Cuota seleccionada: ${selectedCuota[item.codigo]}` : `Precio en un pago: ${item.precio_negocio}`;
-      return `Producto: ${item.descripcion}\n${cuotaText}\n`;
-    }).join('\n');
+    // Mapear los valores seleccionados de cuotas a números correctos
+    const cuotasMap = {
+        'dieciocho_sin_interes': 18,
+        'doce_sin_interes': 12,
+        'diez_sin_interes': 10,
+        'nueve_sin_interes': 9,
+        'seis_sin_interes': 6,
+        'tres_sin_interes': 3
+    };
 
-    const totalMessage = `Total del Carrito: $${totalPrice.toLocaleString('es-AR', { minimumFractionDigits: 2 })}`;
-    return `https://api.whatsapp.com/send?text=${encodeURIComponent(`¡Hola!, Te envío el resumen de tu carrito:\n\n${itemsMessage}\n${totalMessage}`)}`;
-  };
+    // Extraer la clave de la cuota seleccionada
+    const cuotaSeleccionada = Object.keys(selectedCuota).find(key => selectedCuota[key] && cuotasMap[key]);
+
+    let mensajeCuotas = '';
+
+    if (cuotaSeleccionada) {
+        const numCuotas = cuotasMap[cuotaSeleccionada];
+        mensajeCuotas = `${numCuotas} cuotas sin interés de: ${formatPrice(totalPrice)}`;
+    } else {
+        mensajeCuotas = `si pagas de contado te quedaría: ${formatPrice(totalPrice)}`;
+    }
+
+    // Generar el mensaje final
+    const mensajeFinal = cuotaSeleccionada
+        ? `Te paso el valor de los productos, te quedaría en: ${mensajeCuotas}`
+        : `Te paso el valor de los productos, si pagas de contado te quedaría: ${formatPrice(totalPrice)}`;
+
+    return `https://api.whatsapp.com/send?text=${encodeURIComponent(mensajeFinal)}`;
+};
+
+
+
+
+
 
   return (
     <div className="fixed-menu flex-center" style={{ position: 'relative' }}>
@@ -41,33 +102,37 @@ const ShoppingCart = ({ cart, onClearCart }) => {
             <AddShoppingCartIcon />
             <Typography className="mar-l8">Simulador de Compra</Typography>
           </div>
-          <Typography fontWeight={800}>Total: ${totalPrice.toLocaleString('es-AR', { minimumFractionDigits: 2 })}</Typography>
+          <Typography fontWeight={800}>Total: {formatPrice(totalPrice)}</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Container maxWidth="lg" className="flex-center" style={{ flexDirection: "column", padding: "0px 0 20px 0" }}>
+            <FormControlLabel
+              control={<Switch checked={planCanje} onChange={handlePlanCanjeChange} />}
+              label="Activar Plan Canje"
+            />
             <ul className="w-100">
               {cart.map(item => (
                 <li key={item.codigo} className="w-100 flex flex-direction">
                   <div className="flex justify-between mar-t15 mar-b10">
                     {item.descripcion}
-                    <div>{selectedCuota[item.codigo] || `Precio de Negocio: ${item.precio_negocio}`}</div>
+                    <div>{selectedCuota[item.codigo] || `Precio de Negocio: ${formatPrice(getDiscountedPrice(item.precio_negocio))}`}</div>
                   </div>
                   <FormControl variant="outlined" style={{ marginLeft: '10px', minWidth: 200, maxWidth: 300, width: '100%' }}>
                     <InputLabel>Cuotas</InputLabel>
                     <Select
-                      value={selectedCuota[item.codigo] || item.precio_negocio}
+                      value={selectedCuota[item.codigo] || formatPrice(getDiscountedPrice(item.precio_negocio))}
                       onChange={e => handleCuotaChange(item.codigo, e.target.value)}
                       fullWidth
                       size="small"
                       label="Cuotas"
                     >
-                      <MenuItem value={item.precio_negocio}>Precio de Negocio: {item.precio_negocio}</MenuItem>
-                      {item.dieciocho_sin_interes && <MenuItem value={item.dieciocho_sin_interes}>18 sin interés de: {item.dieciocho_sin_interes}</MenuItem>}
-                      {item.doce_sin_interes && <MenuItem value={item.doce_sin_interes}>12 sin interés de: {item.doce_sin_interes}</MenuItem>}
-                      {item.diez_sin_interes && <MenuItem value={item.diez_sin_interes}>10 sin interés de: {item.diez_sin_interes}</MenuItem>}
-                      {item.nueve_sin_interes && <MenuItem value={item.nueve_sin_interes}>9 sin interés de: {item.nueve_sin_interes}</MenuItem>}
-                      {item.seis_sin_interes && <MenuItem value={item.seis_sin_interes}>6 sin interés de: {item.seis_sin_interes}</MenuItem>}
-                      {item.tres_sin_interes && <MenuItem value={item.tres_sin_interes}>3 sin interés de: {item.tres_sin_interes}</MenuItem>}
+                      <MenuItem value={formatPrice(getDiscountedPrice(item.precio_negocio))}>Precio de Negocio: {formatPrice(getDiscountedPrice(item.precio_negocio))}</MenuItem>
+                      {item.dieciocho_sin_interes && <MenuItem value={getCuotaPrice(item.psvp_lista, item.dieciocho_sin_interes)}>18 sin interés de: {getCuotaPrice(item.psvp_lista, item.dieciocho_sin_interes)}</MenuItem>}
+                      {item.doce_sin_interes && <MenuItem value={getCuotaPrice(item.psvp_lista, item.doce_sin_interes)}>12 sin interés de: {getCuotaPrice(item.psvp_lista, item.doce_sin_interes)}</MenuItem>}
+                      {item.diez_sin_interes && <MenuItem value={getCuotaPrice(item.psvp_lista, item.diez_sin_interes)}>10 sin interés de: {getCuotaPrice(item.psvp_lista, item.diez_sin_interes)}</MenuItem>}
+                      {item.nueve_sin_interes && <MenuItem value={getCuotaPrice(item.psvp_lista, item.nueve_sin_interes)}>9 sin interés de: {getCuotaPrice(item.psvp_lista, item.nueve_sin_interes)}</MenuItem>}
+                      {item.seis_sin_interes && <MenuItem value={getCuotaPrice(item.psvp_lista, item.seis_sin_interes)}>6 sin interés de: {getCuotaPrice(item.psvp_lista, item.seis_sin_interes)}</MenuItem>}
+                      {item.tres_sin_interes && <MenuItem value={getCuotaPrice(item.psvp_lista, item.tres_sin_interes)}>3 sin interés de: {getCuotaPrice(item.psvp_lista, item.tres_sin_interes)}</MenuItem>}
                     </Select>
                   </FormControl>
                   <Divider style={{ marginTop: 10 }} />
@@ -82,7 +147,7 @@ const ShoppingCart = ({ cart, onClearCart }) => {
                 color="primary"
                 href={createWhatsAppLink()}
                 target="_blank"
-                style={{ backgroundColor: '#25D366', color: 'white', margin: '12px 0' }}
+                style={{ backgroundColor: '#25D366', color: 'white', margin: '12px 0', display: 'none' }}
                 startIcon={<FaWhatsapp />}
               >
                 Compartir por WhatsApp
