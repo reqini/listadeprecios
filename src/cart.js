@@ -6,15 +6,15 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 const ShoppingCart = ({ cart, onClearCart }) => {
   const [selectedCuota, setSelectedCuota] = useState({});
-  const [planCanje, setPlanCanje] = useState(false);
+  const [planCanje, setPlanCanje] = useState({});
   const [totalPrice, setTotalPrice] = useState(0);
 
   const handleCuotaChange = (codigo, cuota) => {
     setSelectedCuota(prev => ({ ...prev, [codigo]: cuota }));
   };
 
-  const handlePlanCanjeChange = (event) => {
-    setPlanCanje(event.target.checked);
+  const handlePlanCanjeChange = (codigo, checked) => {
+    setPlanCanje(prev => ({ ...prev, [codigo]: checked }));
   };
 
   const parsePrice = (priceString) => {
@@ -36,16 +36,16 @@ const ShoppingCart = ({ cart, onClearCart }) => {
       maximumFractionDigits: 0 
     });
 
-  const getDiscountedPrice = useCallback((price) => {
+  const getDiscountedPrice = useCallback((price, codigo) => {
     const parsedPrice = parsePrice(price);
-    return planCanje ? applyPlanCanjeDiscount(parsedPrice) : parsedPrice;
+    return planCanje[codigo] ? applyPlanCanjeDiscount(parsedPrice) : parsedPrice;
   }, [planCanje]);
 
-  const getCuotaPrice = (psvpPrice, cuotaPrice) => {
+  const getCuotaPrice = (psvpPrice, cuotaPrice, codigo) => {
     const parsedPSVPPrice = parsePrice(psvpPrice);
     const parsedCuotaPrice = parsePrice(cuotaPrice);
 
-    const discountedPSVP = planCanje ? applyPlanCanjeDiscount(parsedPSVPPrice) : parsedPSVPPrice;
+    const discountedPSVP = planCanje[codigo] ? applyPlanCanjeDiscount(parsedPSVPPrice) : parsedPSVPPrice;
 
     return formatPrice(parsedCuotaPrice > 0 ? (discountedPSVP / (parsedPSVPPrice / parsedCuotaPrice)) : 0);
   };
@@ -54,7 +54,7 @@ const ShoppingCart = ({ cart, onClearCart }) => {
     const total = cart.reduce((acc, item) => {
       const selectedPrice = selectedCuota[item.codigo] 
         ? parsePrice(selectedCuota[item.codigo]) 
-        : getDiscountedPrice(item.precio_negocio);
+        : getDiscountedPrice(item.precio_negocio, item.codigo);
       return acc + selectedPrice;
     }, 0);
     setTotalPrice(total);
@@ -102,56 +102,62 @@ const ShoppingCart = ({ cart, onClearCart }) => {
         </AccordionSummary>
         <AccordionDetails>
           <Container maxWidth="lg" className="flex-center" style={{ flexDirection: "column", padding: "0px 0 20px 0" }}>
-            <FormControlLabel
-              control={<Switch checked={planCanje} onChange={handlePlanCanjeChange} />}
-              style={{display: 'none'}}
-              label="Activar Plan Canje"
-            />
             <ul className="w-100">
               {cart.map(item => (
                 <li key={item.codigo} className="w-100 flex flex-direction">
                   <div className="flex justify-between mar-t15 mar-b10">
                     {item.descripcion}
-                    <div>{selectedCuota[item.codigo] || `Precio de Negocio: ${formatPrice(getDiscountedPrice(item.precio_negocio))}`}</div>
+                    <div>{selectedCuota[item.codigo] || `Precio de Negocio: ${formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo))}`}</div>
                   </div>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={planCanje[item.codigo] || false}
+                        onChange={e => handlePlanCanjeChange(item.codigo, e.target.checked)}
+                      />
+                    }
+                    label="Aplicar Plan Canje"
+                  />
                   <FormControl variant="outlined" style={{ marginLeft: '10px', minWidth: 200, maxWidth: 300, width: '100%' }}>
                     <InputLabel>Cuotas</InputLabel>
                     <Select
-                      value={selectedCuota[item.codigo] || formatPrice(getDiscountedPrice(item.precio_negocio))}
+                      value={selectedCuota[item.codigo] || formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo))}
                       onChange={e => handleCuotaChange(item.codigo, e.target.value)}
                       fullWidth
                       size="small"
                       label="Cuotas"
                     >
-                      <MenuItem value={formatPrice(getDiscountedPrice(item.precio_negocio))}>Precio de Negocio: {formatPrice(getDiscountedPrice(item.precio_negocio))}</MenuItem>
+                      <MenuItem value={formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo))}>
+                        Precio de Negocio: {formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo))}
+                      </MenuItem>
                       {item.dieciocho_sin_interes && item.dieciocho_sin_interes !== 'NO' && (
-                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.dieciocho_sin_interes)}>
-                          18 sin interés de: {getCuotaPrice(item.psvp_lista, item.dieciocho_sin_interes)}
+                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.dieciocho_sin_interes, item.codigo)}>
+                          18 sin interés de: {getCuotaPrice(item.psvp_lista, item.dieciocho_sin_interes, item.codigo)}
                         </MenuItem>
                       )}
                       {item.doce_sin_interes && item.doce_sin_interes !== 'NO' && (
-                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.doce_sin_interes)}>
-                          12 sin interés de: {getCuotaPrice(item.psvp_lista, item.doce_sin_interes)}
+                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.doce_sin_interes, item.codigo)}>
+                          12 sin interés de: {getCuotaPrice(item.psvp_lista, item.doce_sin_interes, item.codigo)}
                         </MenuItem>
                       )}
                       {item.diez_sin_interes && item.diez_sin_interes !== 'NO' && (
-                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.diez_sin_interes)}>
-                          10 sin interés de: {getCuotaPrice(item.psvp_lista, item.diez_sin_interes)}
+                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.diez_sin_interes, item.codigo)}>
+                          10 sin interés de: {getCuotaPrice(item.psvp_lista, item.diez_sin_interes, item.codigo)}
                         </MenuItem>
                       )}
                       {item.nueve_sin_interes && item.nueve_sin_interes !== 'NO' && (
-                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.nueve_sin_interes)}>
-                          9 sin interés de: {getCuotaPrice(item.psvp_lista, item.nueve_sin_interes)}
+                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.nueve_sin_interes, item.codigo)}>
+                          9 sin interés de: {getCuotaPrice(item.psvp_lista, item.nueve_sin_interes, item.codigo)}
                         </MenuItem>
                       )}
                       {item.seis_sin_interes && item.seis_sin_interes !== 'NO' && (
-                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.seis_sin_interes)}>
-                          6 sin interés de: {getCuotaPrice(item.psvp_lista, item.seis_sin_interes)}
+                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.seis_sin_interes, item.codigo)}>
+                          6 sin interés de: {getCuotaPrice(item.psvp_lista, item.seis_sin_interes, item.codigo)}
                         </MenuItem>
                       )}
                       {item.tres_sin_interes && item.tres_sin_interes !== 'NO' && (
-                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.tres_sin_interes)}>
-                          3 sin interés de: {getCuotaPrice(item.psvp_lista, item.tres_sin_interes)}
+                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.tres_sin_interes, item.codigo)}>
+                          3 sin interés de: {getCuotaPrice(item.psvp_lista, item.tres_sin_interes, item.codigo)}
                         </MenuItem>
                       )}
                     </Select>
@@ -168,7 +174,7 @@ const ShoppingCart = ({ cart, onClearCart }) => {
                 color="primary"
                 href={createWhatsAppLink()}
                 target="_blank"
-                style={{ backgroundColor: '#25D366', color: 'white', margin: '12px 0', display: 'none' }}
+                style={{ backgroundColor: '#25D366', color: 'white', margin: '12px 0' }}
                 startIcon={<FaWhatsapp />}
               >
                 Compartir por WhatsApp
