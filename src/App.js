@@ -6,6 +6,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import MaintenancePage from '../src/Mantenimiento'
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import Login from "./Login";
@@ -76,7 +77,9 @@ const App = () => {
               )
             }
           />
-          <Route path="/" element={<Login onLogin={handleLogin} />} />
+          
+          <Route path="/" element={<MaintenancePage />} />
+          {/* <Route path="/" element={<Login onLogin={handleLogin} />} /> */}
         </Routes>
       </Router>
     </ThemeProvider>
