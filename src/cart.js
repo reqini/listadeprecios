@@ -104,6 +104,7 @@ const ShoppingCart = ({ cart, onClearCart }) => {
           <Container maxWidth="lg" className="flex-center" style={{ flexDirection: "column", padding: "0px 0 20px 0" }}>
             <FormControlLabel
               control={<Switch checked={planCanje} onChange={handlePlanCanjeChange} />}
+              style={{display: 'none'}}
               label="Activar Plan Canje"
             />
             <ul className="w-100">
