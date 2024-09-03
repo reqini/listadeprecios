@@ -59,6 +59,11 @@ li {
   display: grid;
   grid-template-columns: auto auto auto;
 }
+.lista-prod-catalog {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px; /* Espacio entre columnas y filas */
+}
 .grid-item {
   padding: 5px;
   font-size: 30px;
@@ -253,6 +258,9 @@ li {
     display: grid;
     grid-template-columns: auto auto;
   }
+  .lista-prod-catalog {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 @media screen and (min-width: 968px) {
   .absolute-btn {
@@ -260,7 +268,15 @@ li {
     z-index: 10;
   }
 }
+@media screen and (max-width: 968px) {
+  .lista-prod-catalog {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
 @media screen and (max-width:600px) {
+  .lista-prod-catalog {
+    grid-template-columns: repeat(1, 1fr);
+  }
   .margin-mobile-top {
     margin-top: 10px!important;
   }

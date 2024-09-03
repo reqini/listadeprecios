@@ -41,7 +41,7 @@ const Home = ({ onLogout }) => {
       return "¿Trabajando de madrugada? :)";
     } else if (currentHour < 12) {
       return "Buen día";
-    } else if (currentHour < 18) {
+    } else if (currentHour < 20) {
       return "Buenas tardes";
     } else {
       return "Buenas noches";

@@ -79,7 +79,7 @@ const App = () => {
           />
           
           <Route path="/" element={<MaintenancePage />} />
-          {/* <Route path="/" element={<Login onLogin={handleLogin} />} /> */}
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
         </Routes>
       </Router>
     </ThemeProvider>

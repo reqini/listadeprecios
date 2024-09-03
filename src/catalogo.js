@@ -127,9 +127,15 @@ const Catalogo = () => {
       >
         {showFavorites ? 'Mostrar Todos' : 'Mostrar Favoritos'}
       </Button>}
-      <ul className="lista-prod w-100">
+      <ul className="lista-prod-catalog w-100">
         {loading ? (
           <>
+            <Skeleton
+              sx={{ height: 300, margin: 1 }}
+              animation="wave"
+              variant="rectangular"
+              className="grid-item"
+            />
             <Skeleton
               sx={{ height: 300, margin: 1 }}
               animation="wave"

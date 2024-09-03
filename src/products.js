@@ -50,7 +50,7 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
         <Typography variant="body2" color="text.secondary">Puntos: <b>{product.puntos}</b></Typography>
         <Divider sx={{ my: 2 }} />
         {['dieciocho_sin_interes', 'doce_sin_interes', 'diez_sin_interes', 'nueve_sin_interes', 'seis_sin_interes', 'tres_sin_interes'].map((cuota, idx) =>
-          product[cuota] && (
+          product[cuota] && product[cuota] !== 'NO' && (
             <div className='flex-center' key={idx}>
               {product.linea !== 'Bazar' && product.linea !== 'Complementos' && product.linea !== 'Repuestos' && (
                 <img src={cuotaSimple} alt='sin limites' height="15" />
@@ -64,13 +64,13 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
         <FormControl fullWidth variant="outlined" sx={{ my: 2 }}>
           <InputLabel>Selecciona Cuotas</InputLabel>
           <Select value={selectedCuota} onChange={handleCuotaChange} label="Selecciona Cuotas">
-            {['dieciocho_sin_interes', 'doce_sin_interes', 'diez_sin_interes', 'nueve_sin_interes', 'seis_sin_interes', 'tres_sin_interes'].map((cuota, idx) =>
-              product[cuota] && (
-                <MenuItem key={idx} value={getCuotaPrice(product.psvp_lista, product[cuota])}>
-                  {`${cuota.replace(/_/g, ' ')} de: ${getCuotaPrice(product.psvp_lista, product[cuota])}`}
-                </MenuItem>
-              )
-            )}
+          {['dieciocho_sin_interes', 'doce_sin_interes', 'diez_sin_interes', 'nueve_sin_interes', 'seis_sin_interes', 'tres_sin_interes'].map((cuota, idx) =>
+            product[cuota] && product[cuota] !== 'NO' && (
+              <MenuItem key={idx} value={getCuotaPrice(product.psvp_lista, product[cuota])}>
+                {`${cuota.replace(/_/g, ' ')} de: ${getCuotaPrice(product.psvp_lista, product[cuota])}`}
+              </MenuItem>
+            )
+          )}
           </Select>
         </FormControl>
         {(product.linea === 'Bazar' || product.linea === 'Complementos' || product.linea === 'Repuestos') && (

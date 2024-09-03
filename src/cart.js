@@ -123,12 +123,36 @@ const ShoppingCart = ({ cart, onClearCart }) => {
                       label="Cuotas"
                     >
                       <MenuItem value={formatPrice(getDiscountedPrice(item.precio_negocio))}>Precio de Negocio: {formatPrice(getDiscountedPrice(item.precio_negocio))}</MenuItem>
-                      {item.dieciocho_sin_interes && <MenuItem value={getCuotaPrice(item.psvp_lista, item.dieciocho_sin_interes)}>18 sin interés de: {getCuotaPrice(item.psvp_lista, item.dieciocho_sin_interes)}</MenuItem>}
-                      {item.doce_sin_interes && <MenuItem value={getCuotaPrice(item.psvp_lista, item.doce_sin_interes)}>12 sin interés de: {getCuotaPrice(item.psvp_lista, item.doce_sin_interes)}</MenuItem>}
-                      {item.diez_sin_interes && <MenuItem value={getCuotaPrice(item.psvp_lista, item.diez_sin_interes)}>10 sin interés de: {getCuotaPrice(item.psvp_lista, item.diez_sin_interes)}</MenuItem>}
-                      {item.nueve_sin_interes && <MenuItem value={getCuotaPrice(item.psvp_lista, item.nueve_sin_interes)}>9 sin interés de: {getCuotaPrice(item.psvp_lista, item.nueve_sin_interes)}</MenuItem>}
-                      {item.seis_sin_interes && <MenuItem value={getCuotaPrice(item.psvp_lista, item.seis_sin_interes)}>6 sin interés de: {getCuotaPrice(item.psvp_lista, item.seis_sin_interes)}</MenuItem>}
-                      {item.tres_sin_interes && <MenuItem value={getCuotaPrice(item.psvp_lista, item.tres_sin_interes)}>3 sin interés de: {getCuotaPrice(item.psvp_lista, item.tres_sin_interes)}</MenuItem>}
+                      {item.dieciocho_sin_interes && item.dieciocho_sin_interes !== 'NO' && (
+                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.dieciocho_sin_interes)}>
+                          18 sin interés de: {getCuotaPrice(item.psvp_lista, item.dieciocho_sin_interes)}
+                        </MenuItem>
+                      )}
+                      {item.doce_sin_interes && item.doce_sin_interes !== 'NO' && (
+                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.doce_sin_interes)}>
+                          12 sin interés de: {getCuotaPrice(item.psvp_lista, item.doce_sin_interes)}
+                        </MenuItem>
+                      )}
+                      {item.diez_sin_interes && item.diez_sin_interes !== 'NO' && (
+                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.diez_sin_interes)}>
+                          10 sin interés de: {getCuotaPrice(item.psvp_lista, item.diez_sin_interes)}
+                        </MenuItem>
+                      )}
+                      {item.nueve_sin_interes && item.nueve_sin_interes !== 'NO' && (
+                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.nueve_sin_interes)}>
+                          9 sin interés de: {getCuotaPrice(item.psvp_lista, item.nueve_sin_interes)}
+                        </MenuItem>
+                      )}
+                      {item.seis_sin_interes && item.seis_sin_interes !== 'NO' && (
+                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.seis_sin_interes)}>
+                          6 sin interés de: {getCuotaPrice(item.psvp_lista, item.seis_sin_interes)}
+                        </MenuItem>
+                      )}
+                      {item.tres_sin_interes && item.tres_sin_interes !== 'NO' && (
+                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.tres_sin_interes)}>
+                          3 sin interés de: {getCuotaPrice(item.psvp_lista, item.tres_sin_interes)}
+                        </MenuItem>
+                      )}
                     </Select>
                   </FormControl>
                   <Divider style={{ marginTop: 10 }} />
