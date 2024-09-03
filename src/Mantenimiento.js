@@ -16,7 +16,7 @@ const MaintenancePage = () => {
         backgroundColor: '#ffffff',
       }}
     >
-      <img src={Image} alt="Estamos tranajando" />
+      <img src={Image} alt="Estamos tranajando"  style={{maxWidth: 350, width: '100%'}}/>
       <Typography variant="h4" gutterBottom>
         Estamos actualizando los datos
       </Typography>
