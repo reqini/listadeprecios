@@ -138,7 +138,6 @@ const ShoppingCart = ({ cart, onClearCart, onRemoveFromCart }) => { // Recibimos
               ))}
             </ul>
 
-            {/* Mensaje de costo de envío con ícono y texto en verde */}
             {calculateTotalPoints() > 140 && (
               <div style={{ display: 'flex', alignItems: 'center', marginTop: 20 }}>
                 <LocalShippingIcon style={{ color: 'green', marginRight: 8 }} />

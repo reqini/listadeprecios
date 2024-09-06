@@ -184,7 +184,6 @@ const Home = ({ onLogout }) => {
         onClick={volverArriba}
       />
 
-      {/* Snackbar para mostrar el mensaje cuando se agrega un producto */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}
