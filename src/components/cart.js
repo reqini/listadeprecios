@@ -138,11 +138,11 @@ const ShoppingCart = ({ cart, onClearCart, onRemoveFromCart }) => { // Recibimos
               ))}
             </ul>
 
-            {calculateTotalPoints() > 140 && (
+            {calculateTotalPoints() < 140 && (
               <div style={{ display: 'flex', alignItems: 'center', marginTop: 20 }}>
                 <LocalShippingIcon style={{ color: 'green', marginRight: 8 }} />
                 <Typography variant="body2" style={{ color: 'green' }}>
-                  Nota: Como la compra supera los 140 puntos, se agrega un costo de envío de ${SHIPPING_COST}.
+                  Nota: Si la compra no supera los 140 puntos, se agrega un costo de envío de ${SHIPPING_COST}.
                 </Typography>
               </div>
             )}
