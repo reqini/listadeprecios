@@ -1,39 +1,41 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Accordion, AccordionSummary, AccordionDetails, Container, Typography, Button, FormControl, InputLabel, Select, MenuItem, Divider, Switch, FormControlLabel } from "@mui/material";
-import { FaWhatsapp } from 'react-icons/fa';
+import { 
+  Accordion, AccordionSummary, AccordionDetails, 
+  Container, Typography, Button, FormControl, InputLabel, 
+  Select, MenuItem, Divider, Switch, FormControlLabel 
+} from "@mui/material";
+import { FaWhatsapp, FaTrashAlt } from 'react-icons/fa';  // Importamos el ícono de eliminación
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 
-const ShoppingCart = ({ cart, onClearCart }) => {
+const ShoppingCart = ({ cart, onClearCart, onRemoveFromCart }) => { // Recibimos la nueva función onRemoveFromCart
   const [selectedCuota, setSelectedCuota] = useState({});
   const [planCanje, setPlanCanje] = useState({});
   const [totalPrice, setTotalPrice] = useState(0);
+  const SHIPPING_COST = 14126; // Costo de envío fijo
 
-  const handleCuotaChange = (codigo, cuota) => {
+  const handleCuotaChange = useCallback((codigo, cuota) => {
     setSelectedCuota(prev => ({ ...prev, [codigo]: cuota }));
-  };
+  }, []);
 
-  const handlePlanCanjeChange = (codigo, checked) => {
+  const handlePlanCanjeChange = useCallback((codigo, checked) => {
     setPlanCanje(prev => ({ ...prev, [codigo]: checked }));
-  };
+  }, []);
 
   const parsePrice = (priceString) => {
     if (!priceString || typeof priceString !== 'string') return 0;
-    const normalizedPrice = priceString.replace(/[^0-9]/g, '').trim();
-    return parseInt(normalizedPrice, 10) || 0;
+    return parseInt(priceString.replace(/[^0-9]/g, '').trim(), 10) || 0;
   };
 
-  const applyPlanCanjeDiscount = (amount) => {
-    const discountedAmount = amount - 30000;
-    return discountedAmount > 0 ? discountedAmount : 0;
-  };
+  const applyPlanCanjeDiscount = (amount) => Math.max(amount - 30000, 0);
 
-  const formatPrice = (price) => 
-    Math.round(price).toLocaleString('es-AR', { 
-      style: 'currency', 
-      currency: 'ARS', 
-      minimumFractionDigits: 0, 
-      maximumFractionDigits: 0 
+  const formatPrice = (price) =>
+    Math.round(price).toLocaleString('es-AR', {
+      style: 'currency',
+      currency: 'ARS',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
     });
 
   const getDiscountedPrice = useCallback((price, codigo) => {
@@ -50,43 +52,33 @@ const ShoppingCart = ({ cart, onClearCart }) => {
     return formatPrice(parsedCuotaPrice > 0 ? (discountedPSVP / (parsedPSVPPrice / parsedCuotaPrice)) : 0);
   };
 
+  // Calcular el total de puntos del carrito
+  const calculateTotalPoints = useCallback(() => {
+    return cart.reduce((acc, item) => acc + item.puntos, 0);
+  }, [cart]);
+
   const calculateTotalPrice = useCallback(() => {
-    const total = cart.reduce((acc, item) => {
+    let total = cart.reduce((acc, item) => {
       const selectedPrice = selectedCuota[item.codigo] 
         ? parsePrice(selectedCuota[item.codigo]) 
         : getDiscountedPrice(item.precio_negocio, item.codigo);
       return acc + selectedPrice;
     }, 0);
+
+    // Si los puntos superan los 140, agregar el costo de envío automáticamente
+    if (calculateTotalPoints() > 140) {
+      total += SHIPPING_COST;
+    }
+
     setTotalPrice(total);
-  }, [cart, selectedCuota, getDiscountedPrice]);
+  }, [cart, selectedCuota, getDiscountedPrice, calculateTotalPoints]);
 
   useEffect(() => {
     calculateTotalPrice();
   }, [calculateTotalPrice]);
 
   const createWhatsAppLink = () => {
-    const cuotasMap = {
-      'dieciocho_sin_interes': 18,
-      'doce_sin_interes': 12,
-      'diez_sin_interes': 10,
-      'nueve_sin_interes': 9,
-      'seis_sin_interes': 6,
-      'tres_sin_interes': 3
-    };
-
-    const cuotaSeleccionada = Object.keys(selectedCuota).find(key => selectedCuota[key] && cuotasMap[key]);
-
-    let mensajeCuotas = '';
-
-    if (cuotaSeleccionada) {
-      const numCuotas = cuotasMap[cuotaSeleccionada];
-      mensajeCuotas = `${numCuotas} cuotas sin interés de: ${formatPrice(totalPrice)}`;
-    } else {
-      mensajeCuotas = `si pagas de contado te quedaría: ${formatPrice(totalPrice)}`;
-    }
-
-    const mensajeFinal = `Te paso el valor de los productos, te quedaría en: ${mensajeCuotas}`;
-
+    const mensajeFinal = `Te paso el valor de los productos, te quedaría en: ${formatPrice(totalPrice)}`;
     return `https://api.whatsapp.com/send?text=${encodeURIComponent(mensajeFinal)}`;
   };
 
@@ -101,13 +93,15 @@ const ShoppingCart = ({ cart, onClearCart }) => {
           <Typography fontWeight={800}>Total: {formatPrice(totalPrice)}</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Container maxWidth="lg" className="flex-center" style={{ flexDirection: "column", padding: "0px 0 20px 0" }}>
+          <Container maxWidth="lg" className="flex-center" style={{ flexDirection: "column", padding: "0px 0 0px 0" }}>
             <ul className="w-100">
               {cart.map(item => (
                 <li key={item.codigo} className="w-100 flex flex-direction">
                   <div className="flex justify-between mar-t15 mar-b10">
                     {item.descripcion}
                     <div>{selectedCuota[item.codigo] || `Precio de Negocio: ${formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo))}`}</div>
+                    {/* Botón para eliminar producto */}
+                    <FaTrashAlt onClick={() => onRemoveFromCart(item.codigo)} style={{cursor: 'pointer', color: 'red'}} />
                   </div>
                   <FormControlLabel
                     control={
@@ -130,35 +124,12 @@ const ShoppingCart = ({ cart, onClearCart }) => {
                       <MenuItem value={formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo))}>
                         Precio de Negocio: {formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo))}
                       </MenuItem>
-                      {item.dieciocho_sin_interes && item.dieciocho_sin_interes !== 'NO' && (
-                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.dieciocho_sin_interes, item.codigo)}>
-                          18 sin interés de: {getCuotaPrice(item.psvp_lista, item.dieciocho_sin_interes, item.codigo)}
-                        </MenuItem>
-                      )}
-                      {item.doce_sin_interes && item.doce_sin_interes !== 'NO' && (
-                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.doce_sin_interes, item.codigo)}>
-                          12 sin interés de: {getCuotaPrice(item.psvp_lista, item.doce_sin_interes, item.codigo)}
-                        </MenuItem>
-                      )}
-                      {item.diez_sin_interes && item.diez_sin_interes !== 'NO' && (
-                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.diez_sin_interes, item.codigo)}>
-                          10 sin interés de: {getCuotaPrice(item.psvp_lista, item.diez_sin_interes, item.codigo)}
-                        </MenuItem>
-                      )}
-                      {item.nueve_sin_interes && item.nueve_sin_interes !== 'NO' && (
-                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.nueve_sin_interes, item.codigo)}>
-                          9 sin interés de: {getCuotaPrice(item.psvp_lista, item.nueve_sin_interes, item.codigo)}
-                        </MenuItem>
-                      )}
-                      {item.seis_sin_interes && item.seis_sin_interes !== 'NO' && (
-                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.seis_sin_interes, item.codigo)}>
-                          6 sin interés de: {getCuotaPrice(item.psvp_lista, item.seis_sin_interes, item.codigo)}
-                        </MenuItem>
-                      )}
-                      {item.tres_sin_interes && item.tres_sin_interes !== 'NO' && (
-                        <MenuItem value={getCuotaPrice(item.psvp_lista, item.tres_sin_interes, item.codigo)}>
-                          3 sin interés de: {getCuotaPrice(item.psvp_lista, item.tres_sin_interes, item.codigo)}
-                        </MenuItem>
+                      {['dieciocho_sin_interes', 'doce_sin_interes', 'diez_sin_interes', 'nueve_sin_interes', 'seis_sin_interes', 'tres_sin_interes'].map((cuota) =>
+                        item[cuota] && item[cuota] !== 'NO' && (
+                          <MenuItem key={cuota} value={getCuotaPrice(item.psvp_lista, item[cuota], item.codigo)}>
+                            {`${cuota.replace(/_/g, ' ')} sin interés de: ${getCuotaPrice(item.psvp_lista, item[cuota], item.codigo)}`}
+                          </MenuItem>
+                        )
                       )}
                     </Select>
                   </FormControl>
@@ -166,6 +137,17 @@ const ShoppingCart = ({ cart, onClearCart }) => {
                 </li>
               ))}
             </ul>
+
+            {/* Mensaje de costo de envío con ícono y texto en verde */}
+            {calculateTotalPoints() > 140 && (
+              <div style={{ display: 'flex', alignItems: 'center', marginTop: 20 }}>
+                <LocalShippingIcon style={{ color: 'green', marginRight: 8 }} />
+                <Typography variant="body2" style={{ color: 'green' }}>
+                  Nota: Como la compra supera los 140 puntos, se agrega un costo de envío de ${SHIPPING_COST}.
+                </Typography>
+              </div>
+            )}
+
             <div className="flex-row-mobile" style={{ marginTop: 20 }}>
               <Button fullWidth className="mar-r6" variant="contained" onClick={onClearCart}>Limpiar carrito</Button>
               <Button

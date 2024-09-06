@@ -1,42 +1,39 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardMedia, Typography, Button, CardActions, Divider, MenuItem, Select, FormControl, InputLabel, Switch, FormControlLabel } from '@mui/material';
+import React, { useState, useCallback } from 'react';
+import {
+  Card, CardContent, CardMedia, Typography, Button, CardActions, Divider,
+  MenuItem, Select, FormControl, InputLabel, Switch, FormControlLabel
+} from '@mui/material';
 import { FaWhatsapp } from 'react-icons/fa';
 
-const cuotaSimple = require('../src/assets/cuotas-simples.webp');
+const cuotaSimple = require('../../src/assets/cuotas-simples.webp');
 
 const Product = ({ product, onAddToCart, catalog = false }) => {
   const [selectedCuota, setSelectedCuota] = useState('');
   const [planCanje, setPlanCanje] = useState(false);
 
-  const handleCuotaChange = (event) => setSelectedCuota(event.target.value);
-  const handlePlanCanjeChange = (event) => setPlanCanje(event.target.checked);
+  const handleCuotaChange = useCallback((event) => setSelectedCuota(event.target.value), []);
+  const handlePlanCanjeChange = useCallback((event) => setPlanCanje(event.target.checked), []);
 
   const parsePrice = (priceString) => {
     if (!priceString || typeof priceString !== 'string') return 0;
-    const normalizedPrice = priceString.replace(/[^0-9]/g, '').trim(); // Remueve cualquier carácter que no sea un número
-    return parseInt(normalizedPrice, 10) || 0;
+    return parseInt(priceString.replace(/[^0-9]/g, '').trim(), 10) || 0;
   };
 
-  const applyPlanCanjeDiscount = (amount) => {
-    const discountedAmount = amount - 30000;
-    return discountedAmount > 0 ? discountedAmount : 0;
-  };
+  const applyPlanCanjeDiscount = (amount) => Math.max(amount - 30000, 0);
 
-  const formatPrice = (price) => Math.round(price).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  const formatPrice = (price) =>
+    Math.round(price).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 0 });
 
   const getCuotaPrice = (psvpPrice, cuotaPrice) => {
     const parsedPSVPPrice = parsePrice(psvpPrice);
     const parsedCuotaPrice = parsePrice(cuotaPrice);
-
     const discountedPSVP = planCanje ? applyPlanCanjeDiscount(parsedPSVPPrice) : parsedPSVPPrice;
-
-    return formatPrice(parsedCuotaPrice > 0 ? (discountedPSVP / (parsedPSVPPrice / parsedCuotaPrice)) : 0);
+    return formatPrice(parsedCuotaPrice > 0 ? discountedPSVP / (parsedPSVPPrice / parsedCuotaPrice) : 0);
   };
 
-  const getDiscountedPrice = (price) => {
-    const parsedPrice = parsePrice(price);
-    return formatPrice(planCanje ? applyPlanCanjeDiscount(parsedPrice) : parsedPrice);
-  };
+  const getDiscountedPrice = (price) => formatPrice(planCanje ? applyPlanCanjeDiscount(parsePrice(price)) : parsePrice(price));
+
+  const cuotas = ['dieciocho_sin_interes', 'doce_sin_interes', 'diez_sin_interes', 'nueve_sin_interes', 'seis_sin_interes', 'tres_sin_interes'];
 
   return (
     <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className='card-product'>
@@ -49,37 +46,45 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
         <Typography variant="body2" color="text.secondary">PSVP lista: <b>{getDiscountedPrice(product.psvp_lista)}</b></Typography>
         <Typography variant="body2" color="text.secondary">Puntos: <b>{product.puntos}</b></Typography>
         <Divider sx={{ my: 2 }} />
-        {['dieciocho_sin_interes', 'doce_sin_interes', 'diez_sin_interes', 'nueve_sin_interes', 'seis_sin_interes', 'tres_sin_interes'].map((cuota, idx) =>
+
+        {cuotas.map((cuota, idx) =>
           product[cuota] && product[cuota] !== 'NO' && (
             <div className='flex-center' key={idx}>
-              {product.linea !== 'Bazar' && product.linea !== 'Complementos' && product.linea !== 'Repuestos' && (
+              {['Bazar', 'Complementos', 'Repuestos'].includes(product.linea) || (
                 <img src={cuotaSimple} alt='sin limites' height="15" />
               )}
               <Typography variant='span' fontSize={13} fontStyle={'italic'}>
-                <b style={{ color: 'green' }}>{`${cuota.replace(/_/g, ' ')} de: `}<i style={{ color: 'black' }}>{getCuotaPrice(product.psvp_lista, product[cuota])}</i></b>
+                <b style={{ color: 'green' }}>
+                  {`${cuota.replace(/_/g, ' ')} de: `}
+                  <i style={{ color: 'black' }}>{getCuotaPrice(product.psvp_lista, product[cuota])}</i>
+                </b>
               </Typography>
             </div>
           )
         )}
+
         <FormControl fullWidth variant="outlined" sx={{ my: 2 }}>
           <InputLabel>Selecciona Cuotas</InputLabel>
           <Select value={selectedCuota} onChange={handleCuotaChange} label="Selecciona Cuotas">
-          {['dieciocho_sin_interes', 'doce_sin_interes', 'diez_sin_interes', 'nueve_sin_interes', 'seis_sin_interes', 'tres_sin_interes'].map((cuota, idx) =>
-            product[cuota] && product[cuota] !== 'NO' && (
-              <MenuItem key={idx} value={getCuotaPrice(product.psvp_lista, product[cuota])}>
-                {`${cuota.replace(/_/g, ' ')} de: ${getCuotaPrice(product.psvp_lista, product[cuota])}`}
-              </MenuItem>
-            )
-          )}
+            {cuotas.map((cuota, idx) =>
+              product[cuota] && product[cuota] !== 'NO' && (
+                <MenuItem key={idx} value={getCuotaPrice(product.psvp_lista, product[cuota])}>
+                  {`${cuota.replace(/_/g, ' ')} de: ${getCuotaPrice(product.psvp_lista, product[cuota])}`}
+                </MenuItem>
+              )
+            )}
           </Select>
         </FormControl>
-        {(product.linea === 'Bazar' || product.linea === 'Complementos' || product.linea === 'Repuestos') && (
+
+        {['Bazar', 'Complementos', 'Repuestos'].includes(product.linea) && (
           <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
             <i style={{ color: 'red' }}>Solo con promos bancarias</i>
           </Typography>
         )}
-        <FormControlLabel style={{display: 'none'}} control={<Switch checked={planCanje} onChange={handlePlanCanjeChange} />} label="Activar Plan Canje" />
+
+        <FormControlLabel style={{ display: 'none' }} control={<Switch checked={planCanje} onChange={handlePlanCanjeChange} />} label="Activar Plan Canje" />
       </CardContent>
+
       <CardActions sx={{ display: 'flex', flexDirection: 'column' }}>
         {!catalog && (
           <Button fullWidth onClick={() => onAddToCart(product)} variant='contained' size="medium" color="primary">

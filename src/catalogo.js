@@ -3,7 +3,7 @@ import axios from "axios";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
-import ProductsCalatogo from "./productsCalatogo";
+import ProductsCalatogo from "./components/productsCalatogo";
 import { Typography, Button, Snackbar, Alert } from "@mui/material";
 
 const Catalogo = () => {
