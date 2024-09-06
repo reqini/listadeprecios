@@ -66,7 +66,7 @@ const ShoppingCart = ({ cart, onClearCart, onRemoveFromCart }) => { // Recibimos
     }, 0);
 
     // Si los puntos superan los 140, agregar el costo de envío automáticamente
-    if (calculateTotalPoints() > 140) {
+    if (calculateTotalPoints() < 140) {
       total += SHIPPING_COST;
     }
 

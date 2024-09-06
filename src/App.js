@@ -6,7 +6,6 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import MaintenancePage from '../src/Mantenimiento'
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import Login from "./Login";
@@ -36,7 +35,6 @@ const theme = createTheme({
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(() => {
-    // Intenta obtener el estado de autenticación desde el almacenamiento local al cargar la aplicación
     const storedAuth = localStorage.getItem("loggedIn");
     return storedAuth ? JSON.parse(storedAuth) : false;
   });
@@ -65,8 +63,15 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <Router>
         <Routes>
-          <Route path="/login" element={<Login onLogin={handleLogin} />} />
-          <Route path="/catalogo" element={<Catalogo />} />
+          {/* Si el usuario ya está autenticado, redirige desde /login a /home */}
+          <Route
+            path="/login"
+            element={
+              loggedIn ? <Navigate to="/home" /> : <Login onLogin={handleLogin} />
+            }
+          />
+
+          {/* Ruta protegida para /home */}
           <Route
             path="/home"
             element={
@@ -77,9 +82,21 @@ const App = () => {
               )
             }
           />
-          
-          <Route path="/" element={<MaintenancePage />} />
-          {/* <Route path="/" element={<Login onLogin={handleLogin} />} /> */}
+
+          {/* Ruta protegida para /catalogo */}
+          <Route
+            path="/catalogo"
+            element={
+              loggedIn ? (
+                <Catalogo />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+
+          {/* Redirección por defecto: si está autenticado, va a /home, sino a /login */}
+          <Route path="/" element={<Navigate to={loggedIn ? "/home" : "/login"} />} />
         </Routes>
       </Router>
     </ThemeProvider>
