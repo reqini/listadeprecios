@@ -166,7 +166,7 @@ const ShoppingCart = ({ cart, onClearCart, onRemoveFromCart }) => { // Recibimos
         </AccordionDetails>
       </Accordion>
     </div>
-  );
-};
+  )
+}
 
-export default ShoppingCart;
+export default ShoppingCart
