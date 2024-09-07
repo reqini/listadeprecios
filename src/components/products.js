@@ -4,6 +4,8 @@ import {
   MenuItem, Select, FormControl, InputLabel, Switch, FormControlLabel
 } from '@mui/material';
 import { FaWhatsapp } from 'react-icons/fa';
+import { parsePrice, formatPrice } from '../utils/priceUtils';
+import { applyPlanCanjeDiscount } from '../utils/cartUtils';
 
 const cuotaSimple = require('../../src/assets/cuotas-simples.webp');
 
@@ -14,24 +16,22 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
   const handleCuotaChange = useCallback((event) => setSelectedCuota(event.target.value), []);
   const handlePlanCanjeChange = useCallback((event) => setPlanCanje(event.target.checked), []);
 
-  const parsePrice = (priceString) => {
-    if (!priceString || typeof priceString !== 'string') return 0;
-    return parseInt(priceString.replace(/[^0-9]/g, '').trim(), 10) || 0;
-  };
-
-  const applyPlanCanjeDiscount = (amount) => Math.max(amount - 30000, 0);
-
-  const formatPrice = (price) =>
-    Math.round(price).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 0 });
-
   const getCuotaPrice = (psvpPrice, cuotaPrice) => {
     const parsedPSVPPrice = parsePrice(psvpPrice);
     const parsedCuotaPrice = parsePrice(cuotaPrice);
+
+    // Aplicamos el plan canje en el precio de PSVP
     const discountedPSVP = planCanje ? applyPlanCanjeDiscount(parsedPSVPPrice) : parsedPSVPPrice;
+
+    // Calculamos el precio de la cuota aplicando plan canje si corresponde
     return formatPrice(parsedCuotaPrice > 0 ? discountedPSVP / (parsedPSVPPrice / parsedCuotaPrice) : 0);
   };
 
-  const getDiscountedPrice = (price) => formatPrice(planCanje ? applyPlanCanjeDiscount(parsePrice(price)) : parsePrice(price));
+  const getDiscountedPrice = (price) => {
+    const parsedPrice = parsePrice(price);
+    // Aplicamos el descuento de plan canje en el precio de negocio
+    return formatPrice(planCanje ? applyPlanCanjeDiscount(parsedPrice) : parsedPrice);
+  };
 
   const cuotas = ['dieciocho_sin_interes', 'doce_sin_interes', 'diez_sin_interes', 'nueve_sin_interes', 'seis_sin_interes', 'tres_sin_interes'];
 
@@ -82,7 +82,7 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
           </Typography>
         )}
 
-        <FormControlLabel style={{ display: 'none' }} control={<Switch checked={planCanje} onChange={handlePlanCanjeChange} />} label="Activar Plan Canje" />
+        <FormControlLabel control={<Switch checked={planCanje} onChange={handlePlanCanjeChange} />} label="Activar Plan Canje" />
       </CardContent>
 
       <CardActions sx={{ display: 'flex', flexDirection: 'column' }}>

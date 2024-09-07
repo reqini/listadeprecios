@@ -13,8 +13,8 @@ const ShoppingCart = ({ cart, onClearCart, onRemoveFromCart }) => {
   const [selectedCuota, setSelectedCuota] = useState({});
   const [planCanje, setPlanCanje] = useState({});
   const [totalPrice, setTotalPrice] = useState(0);
-  const [includeShipping, setIncludeShipping] = useState(false); // Estado para activar/desactivar el costo de envío
-  const SHIPPING_COST = 14126; // Costo de envío fijo
+  const [includeShipping, setIncludeShipping] = useState(false); 
+  const SHIPPING_COST = 14126;
 
   const handleCuotaChange = useCallback((codigo, cuota) => {
     setSelectedCuota(prev => ({ ...prev, [codigo]: cuota }));
@@ -28,7 +28,6 @@ const ShoppingCart = ({ cart, onClearCart, onRemoveFromCart }) => {
     return cart.reduce((acc, item) => acc + item.puntos, 0);
   }, [cart]);
 
-  // Calcular el precio total
   const calculateTotalPrice = useCallback(() => {
     let total = cart.reduce((acc, item) => {
       const selectedPrice = selectedCuota[item.codigo] 
@@ -68,6 +67,7 @@ const ShoppingCart = ({ cart, onClearCart, onRemoveFromCart }) => {
                     <div className="flex justify-between mar-t15 mar-b10">
                       {item.descripcion}
                       <div>
+                        {/* Muestra el precio de negocio o el precio de cuota seleccionado */}
                         {selectedCuota[item.codigo] || `Precio de Negocio: ${formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo, planCanje, includeShipping, SHIPPING_COST))}`}
                       </div>
 
@@ -113,7 +113,6 @@ const ShoppingCart = ({ cart, onClearCart, onRemoveFromCart }) => {
               )}
             </ul>
 
-            {/* Switch para incluir o no el envío */}
             {calculateTotalPoints() < 140 && cart.length > 0 && (
               <FormControlLabel
                 control={

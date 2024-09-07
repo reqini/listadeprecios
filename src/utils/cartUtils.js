@@ -1,6 +1,6 @@
 // utils/cartUtils.js
 
-import { parsePrice } from './priceUtils';
+import { parsePrice, formatPrice } from './priceUtils';
 
 /**
  * Aplica el descuento de Plan Canje si está activo.
@@ -37,11 +37,12 @@ export const getDiscountedPrice = (price, codigo, planCanje, includeShipping, sh
  * @returns {string} - El precio final por cuota formateado.
  */
 export const getCuotaPrice = (psvpPrice, cuotaPrice, codigo, planCanje, includeShipping, shippingCost) => {
-  const parsedPSVPPrice = parsePrice(psvpPrice);
-  const parsedCuotaPrice = parsePrice(cuotaPrice);
-
-  const discountedPSVP = planCanje[codigo] ? applyPlanCanjeDiscount(parsedPSVPPrice) : parsedPSVPPrice;
-  const finalPrice = includeShipping ? discountedPSVP + shippingCost : discountedPSVP;
-
-  return parsedCuotaPrice > 0 ? (finalPrice / (discountedPSVP / parsedCuotaPrice)).toFixed(2) : 0;
-};
+    const parsedPSVPPrice = parsePrice(psvpPrice);
+    const parsedCuotaPrice = parsePrice(cuotaPrice);
+  
+    const discountedPSVP = planCanje[codigo] ? applyPlanCanjeDiscount(parsedPSVPPrice) : parsedPSVPPrice;
+    const finalPrice = includeShipping ? discountedPSVP + shippingCost : discountedPSVP;
+  
+    return parsedCuotaPrice > 0 ? (finalPrice / (parsedPSVPPrice / parsedCuotaPrice)).toFixed(0) : 0;
+  };
+  
