@@ -1,5 +1,3 @@
-// utils/cartUtils.js
-
 import { parsePrice, formatPrice } from './priceUtils';
 
 /**
@@ -21,9 +19,9 @@ export const applyPlanCanjeDiscount = (amount) => {
  * @returns {number} - El precio final con los descuentos y/o envío aplicado.
  */
 export const getDiscountedPrice = (price, codigo, planCanje, includeShipping, shippingCost) => {
-  const parsedPrice = parsePrice(price);
-  const finalPrice = planCanje[codigo] ? applyPlanCanjeDiscount(parsedPrice) : parsedPrice;
-  return includeShipping ? finalPrice + shippingCost : finalPrice;
+  const parsedPrice = parsePrice(price); // Aseguramos que el precio esté parseado correctamente
+  const finalPrice = planCanje[codigo] ? applyPlanCanjeDiscount(parsedPrice) : parsedPrice; // Aplicar plan canje si es necesario
+  return includeShipping ? finalPrice + shippingCost : finalPrice; // Agregar envío si es necesario
 };
 
 /**
@@ -37,12 +35,22 @@ export const getDiscountedPrice = (price, codigo, planCanje, includeShipping, sh
  * @returns {string} - El precio final por cuota formateado.
  */
 export const getCuotaPrice = (psvpPrice, cuotaPrice, codigo, planCanje, includeShipping, shippingCost) => {
-    const parsedPSVPPrice = parsePrice(psvpPrice);
-    const parsedCuotaPrice = parsePrice(cuotaPrice);
-  
-    const discountedPSVP = planCanje[codigo] ? applyPlanCanjeDiscount(parsedPSVPPrice) : parsedPSVPPrice;
-    const finalPrice = includeShipping ? discountedPSVP + shippingCost : discountedPSVP;
-  
-    return parsedCuotaPrice > 0 ? (finalPrice / (parsedPSVPPrice / parsedCuotaPrice)).toFixed(0) : 0;
-  };
-  
+  const parsedPSVPPrice = parsePrice(psvpPrice);
+  const parsedCuotaPrice = parsePrice(cuotaPrice);
+
+  if (parsedPSVPPrice === 0 || parsedCuotaPrice === 0) {
+    console.error(`Error: PSVP o cuota no válidos para el producto ${codigo}`);
+    return formatPrice(0);  // Retorna $0 si los valores no son válidos
+  }
+
+  // Aplicar descuento de Plan Canje si corresponde
+  const discountedPSVP = planCanje[codigo] ? applyPlanCanjeDiscount(parsedPSVPPrice) : parsedPSVPPrice;
+
+  // Aplicar el costo de envío si corresponde
+  const finalPrice = includeShipping ? discountedPSVP + shippingCost : discountedPSVP;
+
+  // Verifica que no haya división por cero y calcula el valor de la cuota
+  const cuotaFinal = parsedCuotaPrice > 0 ? (finalPrice / (parsedPSVPPrice / parsedCuotaPrice)) : 0;
+
+  return formatPrice(cuotaFinal);  // Devuelve el precio formateado
+};

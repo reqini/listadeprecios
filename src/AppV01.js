@@ -1,7 +1,7 @@
 // App.js
 import React, { useEffect, useState } from 'react';
 import Product from './products';
-import Cart from './cart';
+/* import Cart from './cart'; */
 import axios from 'axios';
 import TextField from '@mui/material/TextField';
 import '@fontsource/roboto/300.css';

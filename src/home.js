@@ -17,10 +17,11 @@ import Product from "./components/products";
 import ResponsiveDialog from "./components/dialog";
 import banner from './assets/banner.jpg';
 import logo from './assets/logo.png';
+import { handleCuotaChange } from './utils/cartHandlers';  // Usamos la misma función en Home
 
 const Home = ({ onLogout }) => {
   const url = "https://backtest-production-7f88.up.railway.app";
-  
+
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
@@ -29,9 +30,9 @@ const Home = ({ onLogout }) => {
   const [isSticky, setIsSticky] = useState(false);
   const [username, setUsername] = useState('');
   const [timeOfDay, setTimeOfDay] = useState("");
-  const [snackbarOpen, setSnackbarOpen] = useState(false); // Estado para el Snackbar
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
-  // Función para determinar el saludo basado en la hora
+  // Obtener el momento del día para el saludo
   const getTimeOfDay = useCallback(() => {
     const currentHour = new Date().getHours();
     if (currentHour >= 0 && currentHour < 5) return "¿Trabajando de madrugada? :)";
@@ -40,6 +41,7 @@ const Home = ({ onLogout }) => {
     return "Buenas noches";
   }, []);
 
+  // Manejo de la carga inicial y saludo
   useEffect(() => {
     const storedUsername = localStorage.getItem('activeSession');
     if (storedUsername) setUsername(storedUsername);
@@ -47,43 +49,49 @@ const Home = ({ onLogout }) => {
     setTimeOfDay(getTimeOfDay());
 
     const interval = setInterval(() => setTimeOfDay(getTimeOfDay()), 3600000);
-    return () => clearInterval(interval);
+
+    return () => clearInterval(interval); // Limpiar intervalo al desmontar
   }, [getTimeOfDay]);
 
+  // Manejo del agregar al carrito
   const handleAddToCart = useCallback((product) => {
     setCart((prevCart) => [...prevCart, product]);
-    setSnackbarOpen(true); // Abre el Snackbar al agregar al carrito
+    setSnackbarOpen(true);
   }, []);
 
+  // Manejo de la eliminación del carrito
   const handleRemoveFromCart = useCallback((codigo) => {
     setCart((prevCart) => prevCart.filter(item => item.codigo !== codigo));
   }, []);
 
-  const handleCuotaChange = useCallback((codigo, cuota) => {
-    setCart((prevCart) =>
-      prevCart.map(item =>
-        item.codigo === codigo ? { ...item, cuotaSeleccionada: cuota } : item
-      )
-    );
-  }, []);
+  // Usamos el handler refactorizado para manejar el cambio de cuota
+  const handleCuotaChangeWrapper = useCallback((codigo, cuota) => {
+    handleCuotaChange(codigo, cuota, setCart);
+  }, [setCart]);
 
+  // Llamada a la API para obtener productos
   const fetchData = useCallback(async (endpoint, setState) => {
     try {
-      const result = await axios.get(`${url}/api/${endpoint}`);
-      setState(result.data);
+      const { data } = await axios.get(`${url}/api/${endpoint}`);
+      setState(data);
+      setTimeout(() => {
+        setLoading(false);  // Mantener el skeleton visible al menos por un breve periodo
+      }, 500); // Garantizar que el Skeleton se muestre al menos 500ms
     } catch (error) {
       console.error(`Error al obtener ${endpoint}:`, error);
+      setLoading(false);
     }
   }, [url]);
 
   useEffect(() => {
     fetchData('productos', setProductos);
-    setLoading(false);
   }, [fetchData]);
 
+  // Manejo del scroll para el botón de navegación
   const manejarScroll = useCallback(() => {
-    setMostrarBoton(window.scrollY > 100);
-    setIsSticky(window.scrollY > 100);
+    const scrollPos = window.scrollY;
+    setMostrarBoton(scrollPos > 100);
+    setIsSticky(scrollPos > 100);
   }, []);
 
   useEffect(() => {
@@ -91,20 +99,20 @@ const Home = ({ onLogout }) => {
     return () => window.removeEventListener("scroll", manejarScroll);
   }, [manejarScroll]);
 
+  // Volver al inicio de la página
   const volverArriba = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  // Filtrado dinámico basado en el estado de `filtro`
+  // Filtrado de productos basado en la búsqueda
   const productosFiltrados = productos.filter(producto =>
     producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) && producto.vigencia === "SI"
   );
 
+  // Limpiar el carrito
   const clearCart = () => setCart([]);
 
-  // Función para cerrar el Snackbar
+  // Cierre del Snackbar
   const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
+    if (reason === 'clickaway') return;
     setSnackbarOpen(false);
   };
 
@@ -161,7 +169,7 @@ const Home = ({ onLogout }) => {
               <Product
                 product={product}
                 onAddToCart={handleAddToCart}
-                onCuotaChange={handleCuotaChange}
+                onCuotaChange={handleCuotaChangeWrapper}
               />
             </li>
           ))
@@ -178,10 +186,9 @@ const Home = ({ onLogout }) => {
 
       <ShoppingCart
         cart={cart}
+        setCart={setCart}  // Pasamos setCart como prop
         onClearCart={clearCart}
-        onRemoveFromCart={handleRemoveFromCart}  // Pasamos la función para eliminar
-        className={`${mostrarBoton ? "visible" : "oculto"}`}
-        onClick={volverArriba}
+        onRemoveFromCart={handleRemoveFromCart}
       />
 
       <Snackbar

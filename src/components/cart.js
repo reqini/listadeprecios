@@ -5,33 +5,21 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 
-// Importamos las funciones utilitarias
 import { getDiscountedPrice, getCuotaPrice } from '../utils/cartUtils';
 import { parsePrice, formatPrice } from '../utils/priceUtils';
 
-const ShoppingCart = ({ cart, onClearCart, onRemoveFromCart }) => {
+const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
   const [selectedCuota, setSelectedCuota] = useState({});
   const [planCanje, setPlanCanje] = useState({});
   const [totalPrice, setTotalPrice] = useState(0);
   const [includeShipping, setIncludeShipping] = useState(false); 
   const SHIPPING_COST = 14126;
 
-  const handleCuotaChange = useCallback((codigo, cuota) => {
-    setSelectedCuota(prev => ({ ...prev, [codigo]: cuota }));
-  }, []);
-
-  const handlePlanCanjeChange = useCallback((codigo, checked) => {
-    setPlanCanje(prev => ({ ...prev, [codigo]: checked }));
-  }, []);
-
-  const calculateTotalPoints = useCallback(() => {
-    return cart.reduce((acc, item) => acc + item.puntos, 0);
-  }, [cart]);
-
+  // Función para calcular el precio total
   const calculateTotalPrice = useCallback(() => {
     let total = cart.reduce((acc, item) => {
       const selectedPrice = selectedCuota[item.codigo] 
-        ? parsePrice(selectedCuota[item.codigo]) 
+        ? parsePrice(selectedCuota[item.codigo])
         : getDiscountedPrice(item.precio_negocio, item.codigo, planCanje, includeShipping, SHIPPING_COST);
       return acc + selectedPrice;
     }, 0);
@@ -39,10 +27,28 @@ const ShoppingCart = ({ cart, onClearCart, onRemoveFromCart }) => {
     setTotalPrice(total);
   }, [cart, selectedCuota, planCanje, includeShipping]);
 
+  // Manejo de cambio de cuota
+  const handleCuotaChange = useCallback((codigo, cuota) => {
+    setSelectedCuota(prev => ({ ...prev, [codigo]: cuota }));
+    calculateTotalPrice(); // Llamar después de actualizar la cuota
+  }, [calculateTotalPrice]);
+
+  // Manejo de cambio de Plan Canje
+  const handlePlanCanjeChange = useCallback((codigo, checked) => {
+    setPlanCanje(prev => ({ ...prev, [codigo]: checked }));
+  }, []);
+
+  // Cálculo de puntos totales
+  const calculateTotalPoints = useCallback(() => {
+    return cart.reduce((acc, item) => acc + item.puntos, 0);
+  }, [cart]);
+
+  // Efecto para recalcular el total al cambiar las dependencias
   useEffect(() => {
     calculateTotalPrice();
-  }, [calculateTotalPrice, includeShipping]);
+  }, [calculateTotalPrice, includeShipping, selectedCuota, planCanje]);
 
+  // Función para generar el link de WhatsApp
   const createWhatsAppLink = () => {
     const mensajeFinal = `Te paso el valor de los productos, te quedaría en: ${formatPrice(totalPrice)}`;
     return `https://api.whatsapp.com/send?text=${encodeURIComponent(mensajeFinal)}`;
@@ -56,7 +62,7 @@ const ShoppingCart = ({ cart, onClearCart, onRemoveFromCart }) => {
             <AddShoppingCartIcon />
             <Typography className="mar-l8">Simulador de Compra</Typography>
           </div>
-          <Typography fontWeight={800}>Total: {totalPrice ? formatPrice(totalPrice) : "Sin productos"}</Typography>
+          <Typography fontWeight={800}>Total: {formatPrice(totalPrice)}</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Container maxWidth="lg" className="flex-center" style={{ flexDirection: "column", padding: "0px 0 0px 0" }}>
@@ -67,8 +73,9 @@ const ShoppingCart = ({ cart, onClearCart, onRemoveFromCart }) => {
                     <div className="flex justify-between mar-t15 mar-b10">
                       {item.descripcion}
                       <div>
-                        {/* Muestra el precio de negocio o el precio de cuota seleccionado */}
-                        {selectedCuota[item.codigo] || `Precio de Negocio: ${formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo, planCanje, includeShipping, SHIPPING_COST))}`}
+                        {selectedCuota[item.codigo] 
+                          ? `Cuota seleccionada: ${formatPrice(selectedCuota[item.codigo])}` 
+                          : `Precio de Negocio: ${formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo, planCanje, includeShipping, SHIPPING_COST))}`}
                       </div>
 
                       <FaTrashAlt onClick={() => onRemoveFromCart(item.codigo)} style={{cursor: 'pointer', color: 'red'}} />
@@ -142,7 +149,7 @@ const ShoppingCart = ({ cart, onClearCart, onRemoveFromCart }) => {
                 color="primary"
                 href={createWhatsAppLink()}
                 target="_blank"
-                style={{ backgroundColor: '#25D366', color: 'white', margin: '12px 0', display: 'none' }}
+                style={{ backgroundColor: '#25D366', color: 'white', margin: '12px 0' }}
                 startIcon={<FaWhatsapp />}
               >
                 Compartir por WhatsApp

@@ -1,36 +1,27 @@
 import React, { useState, useCallback } from 'react';
 import {
   Card, CardContent, CardMedia, Typography, Button, CardActions, Divider,
-  MenuItem, Select, FormControl, InputLabel, Switch, FormControlLabel
+  MenuItem, Select, FormControl, InputLabel
 } from '@mui/material';
 import { FaWhatsapp } from 'react-icons/fa';
 import { parsePrice, formatPrice } from '../utils/priceUtils';
-import { applyPlanCanjeDiscount } from '../utils/cartUtils';
 
 const cuotaSimple = require('../../src/assets/cuotas-simples.webp');
 
 const Product = ({ product, onAddToCart, catalog = false }) => {
   const [selectedCuota, setSelectedCuota] = useState('');
-  const [planCanje, setPlanCanje] = useState(false);
 
   const handleCuotaChange = useCallback((event) => setSelectedCuota(event.target.value), []);
-  const handlePlanCanjeChange = useCallback((event) => setPlanCanje(event.target.checked), []);
 
   const getCuotaPrice = (psvpPrice, cuotaPrice) => {
     const parsedPSVPPrice = parsePrice(psvpPrice);
     const parsedCuotaPrice = parsePrice(cuotaPrice);
-
-    // Aplicamos el plan canje en el precio de PSVP
-    const discountedPSVP = planCanje ? applyPlanCanjeDiscount(parsedPSVPPrice) : parsedPSVPPrice;
-
-    // Calculamos el precio de la cuota aplicando plan canje si corresponde
-    return formatPrice(parsedCuotaPrice > 0 ? discountedPSVP / (parsedPSVPPrice / parsedCuotaPrice) : 0);
+    return formatPrice(parsedCuotaPrice > 0 ? parsedPSVPPrice / (parsedPSVPPrice / parsedCuotaPrice) : 0);
   };
 
   const getDiscountedPrice = (price) => {
     const parsedPrice = parsePrice(price);
-    // Aplicamos el descuento de plan canje en el precio de negocio
-    return formatPrice(planCanje ? applyPlanCanjeDiscount(parsedPrice) : parsedPrice);
+    return formatPrice(parsedPrice);
   };
 
   const cuotas = ['dieciocho_sin_interes', 'doce_sin_interes', 'diez_sin_interes', 'nueve_sin_interes', 'seis_sin_interes', 'tres_sin_interes'];
@@ -46,7 +37,6 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
         <Typography variant="body2" color="text.secondary">PSVP lista: <b>{getDiscountedPrice(product.psvp_lista)}</b></Typography>
         <Typography variant="body2" color="text.secondary">Puntos: <b>{product.puntos}</b></Typography>
         <Divider sx={{ my: 2 }} />
-
         {cuotas.map((cuota, idx) =>
           product[cuota] && product[cuota] !== 'NO' && (
             <div className='flex-center' key={idx}>
@@ -66,6 +56,9 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
         <FormControl fullWidth variant="outlined" sx={{ my: 2 }}>
           <InputLabel>Selecciona Cuotas</InputLabel>
           <Select value={selectedCuota} onChange={handleCuotaChange} label="Selecciona Cuotas">
+            <MenuItem value={getDiscountedPrice(product.precio_negocio)}>
+              {`Precio de Negocio: ${getDiscountedPrice(product.precio_negocio)}`}
+            </MenuItem>
             {cuotas.map((cuota, idx) =>
               product[cuota] && product[cuota] !== 'NO' && (
                 <MenuItem key={idx} value={getCuotaPrice(product.psvp_lista, product[cuota])}>
@@ -75,14 +68,6 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
             )}
           </Select>
         </FormControl>
-
-        {['Bazar', 'Complementos', 'Repuestos'].includes(product.linea) && (
-          <Typography variant='span' fontSize={13} fontStyle={'italic'} margin={'3px 0'}>
-            <i style={{ color: 'red' }}>Solo con promos bancarias</i>
-          </Typography>
-        )}
-
-        <FormControlLabel control={<Switch checked={planCanje} onChange={handlePlanCanjeChange} />} label="Activar Plan Canje" />
       </CardContent>
 
       <CardActions sx={{ display: 'flex', flexDirection: 'column' }}>
