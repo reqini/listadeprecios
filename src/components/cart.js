@@ -58,6 +58,29 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
   const totalPoints = calculateTotalPoints();
   const showShippingSwitch = totalPoints < 140;
 
+  // Manejo del agregar producto
+  const handleAddToCart = useCallback((product) => {
+    setCart((prevCart) => {
+      const existingProduct = prevCart.find(item => item.codigo === product.codigo);
+      if (existingProduct) {
+        return prevCart.map(item => 
+          item.codigo === product.codigo 
+          ? { ...item, cantidad: item.cantidad + 1 } 
+          : item
+        );
+      }
+      return [...prevCart, { ...product, cantidad: 1 }];
+    });
+  }, [setCart]);
+
+  // Manejo de la eliminación del producto del carrito y resetear cuotas/planCanje
+  const handleRemoveFromCart = useCallback((codigo) => {
+    setCart((prevCart) => prevCart.filter(item => item.codigo !== codigo));
+    // Reseteamos la cuota y el plan canje del producto eliminado
+    setSelectedCuota(prev => ({ ...prev, [codigo]: undefined }));
+    setPlanCanje(prev => ({ ...prev, [codigo]: undefined }));
+  }, [setCart]);
+
   return (
     <div className="fixed-menu flex-center" style={{ position: 'relative' }}>
       <Accordion style={{ width: "100%", maxWidth: 600 }}>
@@ -76,13 +99,13 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
                   <li key={item.codigo} className="w-100 flex flex-direction">
                     <div className="flex justify-between mar-t15 mar-b10">
                       {item.descripcion}
-                      <div style={{fontSize: 12, display: 'none'}}>
+                      <div style={{fontSize: 12}}>
                         {selectedCuota[item.codigo] 
                           ? `Cuota seleccionada: ${formatPrice(selectedCuota[item.codigo])}` 
                           : `Precio de Negocio: ${formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo, planCanje, includeShipping, SHIPPING_COST))}`}
                       </div>
 
-                      <FaTrashAlt onClick={() => onRemoveFromCart(item.codigo)} style={{cursor: 'pointer', color: 'red'}} />
+                      <FaTrashAlt onClick={() => handleRemoveFromCart(item.codigo)} style={{cursor: 'pointer', color: 'red'}} />
                     </div>
                     <FormControlLabel
                       control={
