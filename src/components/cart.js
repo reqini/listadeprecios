@@ -58,21 +58,6 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
   const totalPoints = calculateTotalPoints();
   const showShippingSwitch = totalPoints < 140;
 
-  // Manejo del agregar producto
-  const handleAddToCart = useCallback((product) => {
-    setCart((prevCart) => {
-      const existingProduct = prevCart.find(item => item.codigo === product.codigo);
-      if (existingProduct) {
-        return prevCart.map(item => 
-          item.codigo === product.codigo 
-          ? { ...item, cantidad: item.cantidad + 1 } 
-          : item
-        );
-      }
-      return [...prevCart, { ...product, cantidad: 1 }];
-    });
-  }, [setCart]);
-
   // Manejo de la eliminación del producto del carrito y resetear cuotas/planCanje
   const handleRemoveFromCart = useCallback((codigo) => {
     setCart((prevCart) => prevCart.filter(item => item.codigo !== codigo));
