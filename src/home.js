@@ -55,13 +55,32 @@ const Home = ({ onLogout }) => {
 
   // Manejo del agregar al carrito
   const handleAddToCart = useCallback((product) => {
-    setCart((prevCart) => [...prevCart, product]);
+    // Verificar si el producto ya está en el carrito y evitar duplicados
+    setCart((prevCart) => {
+      const existingProduct = prevCart.find(item => item.codigo === product.codigo);
+      if (existingProduct) {
+        return prevCart.map(item => 
+          item.codigo === product.codigo 
+          ? { ...item, cantidad: item.cantidad + 1 } 
+          : item
+        );
+      }
+      return [...prevCart, { ...product, cantidad: 1 }];
+    });
     setSnackbarOpen(true);
   }, []);
 
   // Manejo de la eliminación del carrito
   const handleRemoveFromCart = useCallback((codigo) => {
-    setCart((prevCart) => prevCart.filter(item => item.codigo !== codigo));
+    setCart((prevCart) => {
+      const product = prevCart.find(item => item.codigo === codigo);
+      if (product && product.cantidad > 1) {
+        return prevCart.map(item =>
+          item.codigo === codigo ? { ...item, cantidad: item.cantidad - 1 } : item
+        );
+      }
+      return prevCart.filter(item => item.codigo !== codigo);
+    });
   }, []);
 
   // Usamos el handler refactorizado para manejar el cambio de cuota
@@ -175,6 +194,10 @@ const Home = ({ onLogout }) => {
           ))
         )}
       </ul>
+
+      {productosFiltrados.length === 0 && !loading && (
+        <Typography variant="body1" color="textSecondary">No se encontraron productos.</Typography>
+      )}
 
       <div className="absolute-btn">
         <ResponsiveDialog />

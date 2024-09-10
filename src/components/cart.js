@@ -54,6 +54,10 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
     return `https://api.whatsapp.com/send?text=${encodeURIComponent(mensajeFinal)}`;
   };
 
+  // Determinar si mostrar el switch de envío
+  const totalPoints = calculateTotalPoints();
+  const showShippingSwitch = totalPoints < 140;
+
   return (
     <div className="fixed-menu flex-center" style={{ position: 'relative' }}>
       <Accordion style={{ width: "100%", maxWidth: 600 }}>
@@ -72,7 +76,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
                   <li key={item.codigo} className="w-100 flex flex-direction">
                     <div className="flex justify-between mar-t15 mar-b10">
                       {item.descripcion}
-                      <div>
+                      <div style={{fontSize: 12, display: 'none'}}>
                         {selectedCuota[item.codigo] 
                           ? `Cuota seleccionada: ${formatPrice(selectedCuota[item.codigo])}` 
                           : `Precio de Negocio: ${formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo, planCanje, includeShipping, SHIPPING_COST))}`}
@@ -120,7 +124,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
               )}
             </ul>
 
-            {calculateTotalPoints() < 140 && cart.length > 0 && (
+            {showShippingSwitch && cart.length > 0 && (
               <FormControlLabel
                 control={
                   <Switch
@@ -132,7 +136,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
               />
             )}
 
-            {calculateTotalPoints() < 140 && cart.length > 0 && (
+            {showShippingSwitch && cart.length > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', marginTop: 20 }}>
                 <LocalShippingIcon style={{ color: 'green', marginRight: 8 }} />
                 <Typography variant="body2" style={{ color: 'green' }}>
@@ -149,7 +153,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
                 color="primary"
                 href={createWhatsAppLink()}
                 target="_blank"
-                style={{ backgroundColor: '#25D366', color: 'white', margin: '12px 0' }}
+                style={{ backgroundColor: '#25D366', color: 'white', margin: '12px 0', display: 'none' }}
                 startIcon={<FaWhatsapp />}
               >
                 Compartir por WhatsApp
