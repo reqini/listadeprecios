@@ -113,7 +113,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
                         <MenuItem value={formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo, planCanje, includeShipping, SHIPPING_COST))}>
                           Precio de Negocio: {formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo, planCanje, includeShipping, SHIPPING_COST))}
                         </MenuItem>
-                        {['dieciocho_sin_interes', 'doce_sin_interes', 'diez_sin_interes', 'nueve_sin_interes', 'seis_sin_interes', 'tres_sin_interes'].map((cuota) =>
+                        {['veinte_sin_interes', 'dieciocho_sin_interes', 'doce_sin_interes', 'diez_sin_interes', 'nueve_sin_interes', 'seis_sin_interes', 'tres_sin_interes'].map((cuota) =>
                           item[cuota] && item[cuota] !== 'NO' && (
                             <MenuItem key={cuota} value={getCuotaPrice(item.psvp_lista, item[cuota], item.codigo, planCanje, includeShipping, SHIPPING_COST)}>
                               {`${cuota.replace(/_/g, ' ')} sin interés de: ${getCuotaPrice(item.psvp_lista, item[cuota], item.codigo, planCanje, includeShipping, SHIPPING_COST)}`}

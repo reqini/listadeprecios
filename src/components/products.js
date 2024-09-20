@@ -24,7 +24,7 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
     return formatPrice(parsedPrice);
   };
 
-  const cuotas = ['dieciocho_sin_interes', 'doce_sin_interes', 'diez_sin_interes', 'nueve_sin_interes', 'seis_sin_interes', 'tres_sin_interes'];
+  const cuotas = ['veinte_sin_interes', 'dieciocho_sin_interes', 'doce_sin_interes', 'diez_sin_interes', 'nueve_sin_interes', 'seis_sin_interes', 'tres_sin_interes'];
 
   return (
     <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className='card-product'>
