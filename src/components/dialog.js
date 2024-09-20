@@ -62,6 +62,10 @@ export default function ResponsiveDialog() {
                     </ListItemAvatar>
                     <ListItemText primary={bancos.banco} secondary={
                         <p style={{color: 'green'}}>
+                            {bancos.veinte === 'todos los dias' ? 
+                            <i>20 sin interes<br/></i> : bancos.veinte === 'vigencia' ?
+                            <i>20 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/></i> : null
+                            }
                             {bancos.diesiocho === 'todos los dias' ? 
                             <i>18 sin interes<br/></i> : bancos.dieciocho === 'vigencia' ?
                             <i>18 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/></i> : null
