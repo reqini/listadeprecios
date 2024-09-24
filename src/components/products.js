@@ -68,9 +68,9 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
             )}
           </Select>
         </FormControl>
-         { product.linea === 'Bazar'| 'Complementos'| 'Repuestos' ?
-          <Typography variant="body2" color="red">Solo con promos bancarias</Typography> : null
-        }
+        {['Bazar', 'Complementos', 'Repuestos'].includes(product.linea) ? (
+          <Typography variant="body2" color="red">Solo con promos bancarias</Typography>
+        ) : null}
       </CardContent>
 
       <CardActions sx={{ display: 'flex', flexDirection: 'column' }}>
