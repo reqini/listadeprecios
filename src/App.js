@@ -1,4 +1,3 @@
-// App.js
 import React, { useState } from "react";
 import {
   BrowserRouter as Router,
@@ -7,7 +6,6 @@ import {
   Navigate,
 } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-/* import MaintenancePage from './Mantenimiento' */
 import axios from "axios";
 import Login from "./Login";
 import Home from "./home";
@@ -96,9 +94,20 @@ const App = () => {
             }
           />
 
+          {/* Rutas dinámicas para los catálogos filtrados por cuotas */}
+          <Route
+            path="/catalogo/:catalogType"
+            element={
+              loggedIn ? (
+                <Catalogo />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+
           {/* Redirección por defecto: si está autenticado, va a /home, sino a /login */}
           <Route path="/" element={<Navigate to={loggedIn ? "/home" : "/login"} />} />
-          {/* <Route path="/" element={<MaintenancePage />} /> */}
         </Routes>
       </Router>
     </ThemeProvider>

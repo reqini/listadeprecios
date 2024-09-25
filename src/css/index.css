@@ -275,7 +275,7 @@ li {
 }
 @media screen and (max-width:600px) {
   .lista-prod-catalog {
-    grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: 50% 50%;
   }
   .margin-mobile-top {
     margin-top: 10px!important;

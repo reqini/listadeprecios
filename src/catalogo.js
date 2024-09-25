@@ -1,102 +1,120 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import Container from "@mui/material/Container";
-import TextField from "@mui/material/TextField";
-import Skeleton from "@mui/material/Skeleton";
-import ProductsCalatogo from "./components/productsCalatogo";
-import { Typography, Button, Snackbar, Alert } from "@mui/material";
+/* eslint-disable */
+import React, { useEffect, useState } from "react"
+import axios from "axios"
+import Container from "@mui/material/Container"
+import TextField from "@mui/material/TextField"
+import Skeleton from "@mui/material/Skeleton"
+import ProductsCalatogo from "./components/productsCalatogo"
+import { Typography, Button, Snackbar, Alert, FormControl, InputLabel, MenuItem, Select } from "@mui/material"
 
 const Catalogo = () => {
-  const url = "https://backtest-production-7f88.up.railway.app";
+  const url = "https://backtest-production-7f88.up.railway.app"
+  const [cart, setCart] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [productos, setProductos] = useState([])
+  const [filtro, setFiltro] = useState("")
+  const [productosFiltrados, setProductosFiltrados] = useState([])
+  const [isSticky, setIsSticky] = useState(false)
+  const [favorites, setFavorites] = useState([])
+  const [showFavorites, setShowFavorites] = useState(false)
+  const [selectedCuota, setSelectedCuota] = useState('12 cuotas sin interés')
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [snackbarMessage, setSnackbarMessage] = useState('')
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success')
 
-  const [cart, setCart] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [productos, setProductos] = useState([]);
-  const [filtro, setFiltro] = useState("");
-  const [productosFiltrados, setProductosFiltrados] = useState([]);
-  const [isSticky, setIsSticky] = useState(false);
-  const [favorites, setFavorites] = useState([]);
-  const [showFavorites, setShowFavorites] = useState(false); // Estado para controlar la vista de favoritos
-
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  // Declarar cuotasMap fuera del useEffect, ya que no cambia
+  const cuotasMap = {
+    "12 cuotas sin interés": 'doce_sin_interes',
+    "10 cuotas sin interés": 'diez_sin_interes',
+    "9 cuotas sin interés": 'nueve_sin_interes',
+    "6 cuotas sin interés": 'seis_sin_interes',
+    "3 cuotas sin interés": 'tres_sin_interes',
+    "18 cuotas sin interés": 'dieciocho_sin_interes'
+  };
 
   // Cargar productos desde la API
   useEffect(() => {
     const getData = async () => {
-      const result = await axios.get(`${url}/api/productos`);
-      setLoading(false);
-      setProductos(result.data);
-      setProductosFiltrados(result.data);
-    };
+      const result = await axios.get(`${url}/api/productos`)
+      setLoading(false)
+      setProductos(result.data)
+      setProductosFiltrados(result.data)
+    }
 
-    getData();
-  }, []);
+    getData()
+  }, [])
 
   // Manejar scroll para hacer sticky el header
   useEffect(() => {
     const handleScroll = () => {
-      const offset = window.scrollY;
-      setIsSticky(offset > 100);
-    };
+      const offset = window.scrollY
+      setIsSticky(offset > 100)
+    }
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll)
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
+      window.removeEventListener("scroll", handleScroll)
+    }
+  }, [])
 
-  // Filtrar productos por descripción
+  // Filtrar productos por descripción y por cuota seleccionada
   useEffect(() => {
-    const productosFiltrados = productos.filter((producto) =>
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let productosFiltrados = productos.filter((producto) =>
       producto.descripcion.toLowerCase().includes(filtro.toLowerCase())
-    );
-
-    setProductosFiltrados(productosFiltrados);
-  }, [filtro, productos]);
+    )
+  
+    if (selectedCuota && cuotasMap[selectedCuota]) {
+      const cuotaKey = cuotasMap[selectedCuota]
+      productosFiltrados = productosFiltrados.filter(
+        (producto) => producto[cuotaKey] && producto[cuotaKey] !== 'NO'
+      )
+    }
+  
+    setProductosFiltrados(productosFiltrados)
+  }, [filtro, productos, selectedCuota]) // No es necesario agregar cuotasMap como dependencia
 
   // Cargar favoritos desde localStorage al montar el componente
   useEffect(() => {
-    const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    setFavorites(storedFavorites);
-  }, []);
+    const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || []
+    setFavorites(storedFavorites)
+  }, [])
 
   // Añadir producto al carrito
   const addToCart = (product) => {
-    setCart([...cart, product]);
-  };
+    setCart([...cart, product])
+  }
 
   // Manejar el agregado y eliminación de favoritos
   const toggleFavorite = (product) => {
-    let updatedFavorites;
-    let message;
+    let updatedFavorites
+    let message
 
     if (favorites.some(fav => fav.id === product.id)) {
       // Si el producto ya está en favoritos, lo eliminamos
-      updatedFavorites = favorites.filter(fav => fav.id !== product.id);
-      message = `${product.descripcion} ha sido eliminado de tus favoritos`;
-      setSnackbarSeverity('warning');
+      updatedFavorites = favorites.filter(fav => fav.id !== product.id)
+      message = `${product.descripcion} ha sido eliminado de tus favoritos`
+      setSnackbarSeverity('warning')
     } else {
       // Si no está en favoritos, lo agregamos
-      updatedFavorites = [...favorites, product];
-      message = `${product.descripcion} ha sido agregado a tus favoritos`;
-      setSnackbarSeverity('success');
+      updatedFavorites = [...favorites, product]
+      message = `${product.descripcion} ha sido agregado a tus favoritos`
+      setSnackbarSeverity('success')
     }
 
-    setFavorites(updatedFavorites);
-    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+    setFavorites(updatedFavorites)
+    localStorage.setItem('favorites', JSON.stringify(updatedFavorites))
     
     // Mostrar el Snackbar con el mensaje
-    setSnackbarMessage(message);
-    setSnackbarOpen(true);
+    setSnackbarMessage(message)
+    setSnackbarOpen(true)
   };
 
   // Filtrar los productos que se deben mostrar
   const productosAMostrar = showFavorites 
     ? productosFiltrados.filter(product => favorites.some(fav => fav.id === product.id))
-    : productosFiltrados;
+    : productosFiltrados
 
   return (
     <Container maxWidth="lg" className="conteiner-list">
@@ -105,7 +123,25 @@ const Catalogo = () => {
           Catálogo de Productos
         </Typography>
       </div>
-      <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
+
+      {/* Selector de Cuotas */}
+      <FormControl variant="outlined" sx={{ my: 2 }} style={{backgroundColor: 'white'}}>
+        <InputLabel>Seleccionar Cuotas</InputLabel>
+        <Select
+          value={selectedCuota}
+          onChange={(e) => setSelectedCuota(e.target.value)}
+          label="Seleccionar Cuotas"
+        >
+          <MenuItem value="">Mostrar todas</MenuItem>
+          {Object.keys(cuotasMap).map((cuota, idx) => (
+            <MenuItem key={idx} value={cuota}>
+              {cuota}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <div className={`header-catalogo flex-center pad10`}>
         <TextField
           style={{ maxWidth: 450 }}
           fullWidth
@@ -117,6 +153,7 @@ const Catalogo = () => {
           onChange={(e) => setFiltro(e.target.value)}
         />
       </div>
+
       {favorites.length !== 0 && <Button 
         variant="contained" 
         color="primary" 
@@ -127,34 +164,19 @@ const Catalogo = () => {
       >
         {showFavorites ? 'Mostrar Todos' : 'Mostrar Favoritos'}
       </Button>}
+
       <ul className="lista-prod-catalog w-100">
         {loading ? (
           <>
-            <Skeleton
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-            <Skeleton
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-            <Skeleton
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-            <Skeleton
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-            {/* Renderiza más Skeletons mientras carga */}
+            {[...Array(8)].map((_, idx) => (
+              <Skeleton
+                key={idx}
+                sx={{ height: 300, margin: 1 }}
+                animation="wave"
+                variant="rectangular"
+                className="grid-item"
+              />
+            ))}
           </>
         ) : (
           productosAMostrar.map((product) =>
@@ -166,6 +188,7 @@ const Catalogo = () => {
                   onAddToCart={addToCart}
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
+                  selectedCuota={selectedCuota || '12 cuotas sin interés'} // Por defecto, mostramos 12 cuotas
                 />
               </li>
             ) : null
@@ -173,7 +196,6 @@ const Catalogo = () => {
         )}
       </ul>
 
-      {/* Snackbar para mostrar mensajes */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}
