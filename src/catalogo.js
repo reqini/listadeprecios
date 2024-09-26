@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useEffect, useState } from "react"
 import axios from "axios"
 import Container from "@mui/material/Container"
@@ -17,12 +16,11 @@ const Catalogo = () => {
   const [isSticky, setIsSticky] = useState(false)
   const [favorites, setFavorites] = useState([])
   const [showFavorites, setShowFavorites] = useState(false)
-  const [selectedCuota, setSelectedCuota] = useState('12 cuotas sin interés')
+  const [selectedCuota, setSelectedCuota] = useState('12 cuotas sin interés') // Cuota por defecto
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
   const [snackbarSeverity, setSnackbarSeverity] = useState('success')
 
-  // Declarar cuotasMap fuera del useEffect, ya que no cambia
   const cuotasMap = {
     "12 cuotas sin interés": 'doce_sin_interes',
     "10 cuotas sin interés": 'diez_sin_interes',
@@ -60,7 +58,6 @@ const Catalogo = () => {
 
   // Filtrar productos por descripción y por cuota seleccionada
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     let productosFiltrados = productos.filter((producto) =>
       producto.descripcion.toLowerCase().includes(filtro.toLowerCase())
     )
@@ -73,7 +70,7 @@ const Catalogo = () => {
     }
   
     setProductosFiltrados(productosFiltrados)
-  }, [filtro, productos, selectedCuota]) // No es necesario agregar cuotasMap como dependencia
+  }, [filtro, productos, selectedCuota])
 
   // Cargar favoritos desde localStorage al montar el componente
   useEffect(() => {
@@ -92,12 +89,10 @@ const Catalogo = () => {
     let message
 
     if (favorites.some(fav => fav.id === product.id)) {
-      // Si el producto ya está en favoritos, lo eliminamos
       updatedFavorites = favorites.filter(fav => fav.id !== product.id)
       message = `${product.descripcion} ha sido eliminado de tus favoritos`
       setSnackbarSeverity('warning')
     } else {
-      // Si no está en favoritos, lo agregamos
       updatedFavorites = [...favorites, product]
       message = `${product.descripcion} ha sido agregado a tus favoritos`
       setSnackbarSeverity('success')
@@ -105,11 +100,9 @@ const Catalogo = () => {
 
     setFavorites(updatedFavorites)
     localStorage.setItem('favorites', JSON.stringify(updatedFavorites))
-    
-    // Mostrar el Snackbar con el mensaje
     setSnackbarMessage(message)
     setSnackbarOpen(true)
-  };
+  }
 
   // Filtrar los productos que se deben mostrar
   const productosAMostrar = showFavorites 
@@ -124,24 +117,7 @@ const Catalogo = () => {
         </Typography>
       </div>
 
-      {/* Selector de Cuotas */}
-      <FormControl variant="outlined" sx={{ my: 2 }} style={{backgroundColor: 'white'}}>
-        <InputLabel>Seleccionar Cuotas</InputLabel>
-        <Select
-          value={selectedCuota}
-          onChange={(e) => setSelectedCuota(e.target.value)}
-          label="Seleccionar Cuotas"
-        >
-          <MenuItem value="">Mostrar todas</MenuItem>
-          {Object.keys(cuotasMap).map((cuota, idx) => (
-            <MenuItem key={idx} value={cuota}>
-              {cuota}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      <div className={`header-catalogo flex-center pad10`}>
+      <div className={`header-catalogo flex-center pad20 ${isSticky ? "sticky" : ""}`}>
         <TextField
           style={{ maxWidth: 450 }}
           fullWidth
@@ -153,18 +129,35 @@ const Catalogo = () => {
           onChange={(e) => setFiltro(e.target.value)}
         />
       </div>
+      <div className="flex justify-between items-center">
+        {favorites.length !== 0 && <Button 
+          variant="contained" 
+          size="large"
+          color="primary" 
+          onClick={() => setShowFavorites(!showFavorites)}
+          className="btn-absolute-favorite"
+          disabled={favorites.length === 0}
+        >
+          {showFavorites ? 'Mostrar Todos' : 'Mostrar Favoritos'}
+        </Button>}
 
-      {favorites.length !== 0 && <Button 
-        variant="contained" 
-        color="primary" 
-        onClick={() => setShowFavorites(!showFavorites)}
-        style={{ marginBottom: '20px' }}
-        className="btn-absolute-favorite"
-        disabled={favorites.length === 0} // Deshabilitar si no hay favoritos
-      >
-        {showFavorites ? 'Mostrar Todos' : 'Mostrar Favoritos'}
-      </Button>}
-
+        {/* Selector de cuotas para el usuario */}
+        <FormControl variant="outlined" sx={{ my: 2 }} style={{backgroundColor: 'white'}}>
+          <InputLabel>Cuotas</InputLabel>
+          <Select
+            value={selectedCuota}
+            onChange={(e) => setSelectedCuota(e.target.value)} // Actualizar la cuota seleccionada
+            label="Cuotas"
+          >
+            {Object.keys(cuotasMap).map((cuota, idx) => (
+              <MenuItem key={idx} value={cuota}>
+                {cuota}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </div>
+    
       <ul className="lista-prod-catalog w-100">
         {loading ? (
           <>
@@ -188,7 +181,7 @@ const Catalogo = () => {
                   onAddToCart={addToCart}
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
-                  selectedCuota={selectedCuota || '12 cuotas sin interés'} // Por defecto, mostramos 12 cuotas
+                  selectedCuota={selectedCuota || '12 cuotas sin interés'} // Si no hay seleccionada, usa la por defecto
                 />
               </li>
             ) : null

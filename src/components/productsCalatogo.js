@@ -10,7 +10,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 const ProductsCalatogo = ({ product, isFavorite, onToggleFavorite, selectedCuota }) => {
-  // Mapa de cuotas y sus respectivos campos
+
   const cuotasMap = {
     "12 cuotas sin interés": 'doce_sin_interes',
     "10 cuotas sin interés": 'diez_sin_interes',
@@ -20,11 +20,9 @@ const ProductsCalatogo = ({ product, isFavorite, onToggleFavorite, selectedCuota
     "18 cuotas sin interés": 'dieciocho_sin_interes'
   };
 
-  // Obtenemos la clave del campo que corresponde a la cuota seleccionada
   const cuotaKey = cuotasMap[selectedCuota];
-  const cuotaValue = product[cuotaKey] !== 'NO' ? product[cuotaKey] : null; // Si es "NO", no mostramos la cuota
+  const cuotaValue = product[cuotaKey] !== 'NO' ? product[cuotaKey] : null;
 
-  // Crear el link para compartir por WhatsApp
   const createWhatsAppLink = (product) => {
     const message = `¡Hola!, Quiero el precio de este Producto :)!
       Producto: ${product.descripcion}`;
@@ -35,18 +33,17 @@ const ProductsCalatogo = ({ product, isFavorite, onToggleFavorite, selectedCuota
   return (
     <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className='card-product-catalogo'>
       {product.discount && <div className='descuento'>{product.discount}</div>}
-      {/* Botón de favoritos */}
-      <IconButton onClick={onToggleFavorite} color="secondary" style={{position: 'absolute', zIndex: 2, right: 10, top: 10}}>
+
+      <IconButton onClick={onToggleFavorite} color="primary" style={{position: 'absolute', zIndex: 2, right: 10, top: 10, backgroundColor: 'rgba(0,0,0,0.1)'}}>
         {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
       </IconButton>
       <CardMedia
         component="img"
         image={product.imagen ? product.imagen : '../descarga.png'}
         sx={{
-          objectFit: 'cover', // Valor por defecto para resoluciones menores a 480px
-          height: 220,
+          objectFit: 'contain',
+          height: 200,
           '@media (max-width: 480px)': {
-            objectFit: 'contain', // Aplicar object-fit: contain a partir de 480px
             height: 100,
           },
         }}
@@ -71,7 +68,6 @@ const ProductsCalatogo = ({ product, isFavorite, onToggleFavorite, selectedCuota
          >
           {product.descripcion}
         </Typography>
-        {/* Mostrar la cuota seleccionada */}
         {cuotaValue && (
           <Typography variant="body2" color="text.secondary" style={{ marginTop: 5 }}>
             {selectedCuota}: <b>{cuotaValue}</b>
