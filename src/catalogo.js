@@ -4,7 +4,8 @@ import Container from "@mui/material/Container"
 import TextField from "@mui/material/TextField"
 import Skeleton from "@mui/material/Skeleton"
 import ProductsCalatogo from "./components/productsCalatogo"
-import { Typography, Button, Snackbar, Alert, FormControl, InputLabel, MenuItem, Select } from "@mui/material"
+import logo from './assets/logo.png'
+import { Button, Snackbar, Alert, FormControl, InputLabel, MenuItem, Select } from "@mui/material"
 
 const Catalogo = () => {
   const url = "https://backtest-production-7f88.up.railway.app"
@@ -111,13 +112,16 @@ const Catalogo = () => {
 
   return (
     <Container maxWidth="lg" className="conteiner-list">
-      <div className="flex-between-mobile" style={{ paddingTop: 30 }}>
+      {/* <div className="flex-between-mobile" style={{ paddingTop: 30 }}>
         <Typography variant="h5" textAlign="center" width={"100%"} margin={'15px 0'}>
           Catálogo de Productos
         </Typography>
+      </div> */}
+      <div className="w-100 flex justify-center">
+        <img src={logo} alt="logo" height="100" className='mar-t30 mar-b20' />
       </div>
 
-      <div className={`header-catalogo flex-center pad20 ${isSticky ? "sticky" : ""}`}>
+      <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
         <TextField
           style={{ maxWidth: 450 }}
           fullWidth

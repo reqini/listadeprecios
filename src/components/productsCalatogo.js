@@ -24,7 +24,7 @@ const ProductsCalatogo = ({ product, isFavorite, onToggleFavorite, selectedCuota
   const cuotaValue = product[cuotaKey] !== 'NO' ? product[cuotaKey] : null;
 
   const createWhatsAppLink = (product) => {
-    const message = `¡Hola!, Quiero el precio de este Producto :)!
+    const message = `¡Hola!, Quiero este Producto :)!
       Producto: ${product.descripcion}`;
 
     return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;

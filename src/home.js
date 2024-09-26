@@ -160,6 +160,7 @@ const Home = ({ onLogout }) => {
         <TextField
           style={{ maxWidth: 450 }}
           fullWidth
+          className="search"
           label="Buscar Producto"
           variant="outlined"
           value={filtro}
