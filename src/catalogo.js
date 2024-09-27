@@ -57,7 +57,7 @@ const Catalogo = () => {
     }
   }, [])
 
-  // Filtrar productos por descripción y por cuota seleccionada
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     let productosFiltrados = productos.filter((producto) =>
       producto.descripcion.toLowerCase().includes(filtro.toLowerCase())
