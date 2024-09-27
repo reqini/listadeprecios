@@ -87,13 +87,13 @@ const ProductsCalatogo = ({ product, isFavorite, onToggleFavorite, selectedCuota
         >
           Compartir
         </Button>
-        {product.ficha_tecnica ? (
-          <Button 
+        <Button 
             fullWidth 
             target='_blank' 
             href={product.ficha_tecnica} 
-            variant="outlined" 
+            variant={!product.ficha_tecnica ? 'text' : 'outlined' }
             size="medium" 
+            disabled={!product.ficha_tecnica && true}
             color="primary" 
             sx={{
               marginLeft: '0px!important',
@@ -104,11 +104,6 @@ const ProductsCalatogo = ({ product, isFavorite, onToggleFavorite, selectedCuota
           >
             Ficha técnica
           </Button>
-        ) : (
-          <Button fullWidth variant="disabled" size="medium" color="primary" style={{ margin: 0 }}>
-            Sin ficha técnica
-          </Button>
-        )}
       </CardActions>
     </Card>
   );
