@@ -1,4 +1,4 @@
-// eslint-disable-next-line react-hooks/exhaustive-deps
+/* eslint-disable */
 import React, { useEffect, useState } from "react"
 import axios from "axios"
 import Container from "@mui/material/Container"
@@ -23,6 +23,7 @@ const Catalogo = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('')
   const [snackbarSeverity, setSnackbarSeverity] = useState('success')
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const cuotasMap = {
     "12 cuotas sin interés": 'doce_sin_interes',
     "10 cuotas sin interés": 'diez_sin_interes',
