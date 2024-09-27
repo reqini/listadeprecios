@@ -71,7 +71,7 @@ const Catalogo = () => {
     }
   
     setProductosFiltrados(productosFiltrados)
-  }, [filtro, productos, selectedCuota])
+  }, [filtro, productos, selectedCuota, cuotasMap])
 
   // Cargar favoritos desde localStorage al montar el componente
   useEffect(() => {
