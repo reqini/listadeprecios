@@ -7,6 +7,14 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+html, body {
+  overflow: auto;
+  height: 100%;
+}
+
+.introjs-tooltip {
+  max-width: 90%;  /* Para evitar que el tooltip se desborde en pantallas pequeñas */
+}
 .select > fieldset, 
 .search > div > fieldset{
   border: none!important;
@@ -283,6 +291,13 @@ li {
   .btn-absolute-favorite {
     position: fixed!important;
     z-index: 2;
+    display: flex;
+    bottom: 5px;
+  }
+  .btn-absolute-tour {
+    position: fixed!important;
+    z-index: 3;
+    right: 10px;
     display: flex;
     bottom: 5px;
   }
