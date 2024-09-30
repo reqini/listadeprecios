@@ -7,6 +7,8 @@ import Skeleton from "@mui/material/Skeleton"
 import ProductsCalatogo from "./components/productsCalatogo"
 import logo from './assets/logo.png'
 import { Button, Snackbar, Alert, FormControl, InputLabel, MenuItem, Select } from "@mui/material"
+import introJs from 'intro.js';  // Importamos Intro.j
+import 'intro.js/introjs.css';  // Importamos los estilos de Intro.js
 
 const Catalogo = () => {
   const url = "https://backtest-production-7f88.up.railway.app"
@@ -22,6 +24,7 @@ const Catalogo = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
   const [snackbarSeverity, setSnackbarSeverity] = useState('success')
+  const [isMobile, setIsMobile] = useState(false)
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const cuotasMap = {
@@ -31,6 +34,32 @@ const Catalogo = () => {
     "6 cuotas sin interés": 'seis_sin_interes',
     "3 cuotas sin interés": 'tres_sin_interes',
     "18 cuotas sin interés": 'dieciocho_sin_interes'
+  };
+
+  // Iniciar el tour
+  const startTour = () => {
+    introJs().setOptions({
+      steps: [
+        {
+          element: '.header-catalogo',
+          intro: 'Aquí puedes buscar productos en el catálogo.',
+        },
+        {
+          element: '.btn-absolute-favorite',
+          intro: 'Este botón te permite ver tus favoritos.',
+        },
+        {
+          element: '.cuotas',
+          intro: 'En este desplegale podes filtrar y seleccionar con cuatas cuotas queres pagary los productos se actualizan automaticamente',
+        }
+      ],
+      scrollToElement: true,  // Forzar scroll al elemento activo
+      showProgress: true, // Muestra el progreso
+      exitOnOverlayClick: false, // Evita que el usuario cierre el tour al hacer clic en el overlay
+      nextLabel: 'Siguiente',
+      prevLabel: 'Anterior',
+      doneLabel: 'Hecho',
+    }).start();
   };
 
   // Cargar productos desde la API
@@ -81,6 +110,18 @@ const Catalogo = () => {
     setFavorites(storedFavorites)
   }, [])
 
+  // Detectar si es mobile o desktop
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 768);  // Establecemos 768px como el umbral entre mobile y desktop
+    };
+
+    checkIfMobile(); // Ejecutar cuando el componente se monta
+    window.addEventListener("resize", checkIfMobile); // Recalcular al cambiar el tamaño de la ventana
+
+    return () => window.removeEventListener("resize", checkIfMobile);  // Limpiar el event listener
+  }, []);
+
   // Añadir producto al carrito
   const addToCart = (product) => {
     setCart([...cart, product])
@@ -114,11 +155,6 @@ const Catalogo = () => {
 
   return (
     <Container maxWidth="lg" className="conteiner-list">
-      {/* <div className="flex-between-mobile" style={{ paddingTop: 30 }}>
-        <Typography variant="h5" textAlign="center" width={"100%"} margin={'15px 0'}>
-          Catálogo de Productos
-        </Typography>
-      </div> */}
       <div className="w-100 flex justify-center">
         <img src={logo} alt="logo" height="100" className='mar-t30 mar-b20' />
       </div>
@@ -144,11 +180,15 @@ const Catalogo = () => {
           className="btn-absolute-favorite"
           disabled={favorites.length === 0}
         >
-          {showFavorites ? 'Mostrar Todos' : 'Mostrar Favoritos'}
+          {showFavorites ? 'Todos' : 'Favoritos'}
         </Button>}
 
+        <Button variant="contained" color="secondary" onClick={startTour} size="large" className="btn-absolute-tour">
+          {isMobile ? "Guia tutorial" : "¿Cómo utilizar el catálogo?"}
+        </Button>
+
         {/* Selector de cuotas para el usuario */}
-        <FormControl variant="outlined" sx={{ my: 2 }} style={{backgroundColor: 'white'}}>
+        <FormControl variant="outlined" sx={{ my: 2 }} style={{backgroundColor: 'white'}} className="cuotas">
           <InputLabel>Cuotas</InputLabel>
           <Select
             value={selectedCuota}

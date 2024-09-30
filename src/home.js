@@ -88,7 +88,7 @@ const Home = ({ onLogout }) => {
     handleCuotaChange(codigo, cuota, setCart);
   }, [setCart]);
 
-  // Llamada a la API para obtener productos
+  // **Definir fetchData dentro del componente**
   const fetchData = useCallback(async (endpoint, setState) => {
     try {
       const { data } = await axios.get(`${url}/api/${endpoint}`);
@@ -102,6 +102,7 @@ const Home = ({ onLogout }) => {
     }
   }, [url]);
 
+  // Llamar a fetchData para obtener los productos
   useEffect(() => {
     fetchData('productos', setProductos);
   }, [fetchData]);
