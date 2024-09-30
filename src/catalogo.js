@@ -1,30 +1,30 @@
 /* eslint-disable */
-import React, { useEffect, useState } from "react"
-import axios from "axios"
-import Container from "@mui/material/Container"
-import TextField from "@mui/material/TextField"
-import Skeleton from "@mui/material/Skeleton"
-import ProductsCalatogo from "./components/productsCalatogo"
-import logo from './assets/logo.png'
-import { Button, Snackbar, Alert, FormControl, InputLabel, MenuItem, Select } from "@mui/material"
-import introJs from 'intro.js';  // Importamos Intro.j
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Container from "@mui/material/Container";
+import TextField from "@mui/material/TextField";
+import Skeleton from "@mui/material/Skeleton";
+import ProductsCalatogo from "./components/productsCalatogo";
+import logo from './assets/logo.png';
+import { Button, Snackbar, Alert, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import introJs from 'intro.js';  // Importamos Intro.js
 import 'intro.js/introjs.css';  // Importamos los estilos de Intro.js
 
 const Catalogo = () => {
-  const url = "https://backtest-production-7f88.up.railway.app"
-  const [cart, setCart] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [productos, setProductos] = useState([])
-  const [filtro, setFiltro] = useState("")
-  const [productosFiltrados, setProductosFiltrados] = useState([])
-  const [isSticky, setIsSticky] = useState(false)
-  const [favorites, setFavorites] = useState([])
-  const [showFavorites, setShowFavorites] = useState(false)
-  const [selectedCuota, setSelectedCuota] = useState('12 cuotas sin interés') // Cuota por defecto
-  const [snackbarOpen, setSnackbarOpen] = useState(false)
-  const [snackbarMessage, setSnackbarMessage] = useState('')
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success')
-  const [isMobile, setIsMobile] = useState(false)
+  const url = "https://backtest-production-7f88.up.railway.app";
+  const [cart, setCart] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [productos, setProductos] = useState([]);
+  const [filtro, setFiltro] = useState("");
+  const [productosFiltrados, setProductosFiltrados] = useState([]);
+  const [isSticky, setIsSticky] = useState(false);
+  const [favorites, setFavorites] = useState([]);
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [selectedCuota, setSelectedCuota] = useState('12 cuotas sin interés'); // Cuota por defecto
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [isMobile, setIsMobile] = useState(false);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const cuotasMap = {
@@ -33,7 +33,7 @@ const Catalogo = () => {
     "9 cuotas sin interés": 'nueve_sin_interes',
     "6 cuotas sin interés": 'seis_sin_interes',
     "3 cuotas sin interés": 'tres_sin_interes',
-    "18 cuotas sin interés": 'dieciocho_sin_interes'
+    "18 cuotas sin interés": 'dieciocho_sin_interes',
   };
 
   // Iniciar el tour
@@ -50,12 +50,12 @@ const Catalogo = () => {
         },
         {
           element: '.cuotas',
-          intro: 'En este desplegale podes filtrar y seleccionar con cuatas cuotas queres pagary los productos se actualizan automaticamente',
-        }
+          intro: 'En este desplegable puedes filtrar y seleccionar con cuántas cuotas quieres pagar y los productos se actualizan automáticamente.',
+        },
       ],
       scrollToElement: true,  // Forzar scroll al elemento activo
-      showProgress: true, // Muestra el progreso
-      exitOnOverlayClick: false, // Evita que el usuario cierre el tour al hacer clic en el overlay
+      showProgress: true,  // Muestra el progreso
+      exitOnOverlayClick: false,  // Evita que el usuario cierre el tour al hacer clic en el overlay
       nextLabel: 'Siguiente',
       prevLabel: 'Anterior',
       doneLabel: 'Hecho',
@@ -65,50 +65,50 @@ const Catalogo = () => {
   // Cargar productos desde la API
   useEffect(() => {
     const getData = async () => {
-      const result = await axios.get(`${url}/api/productos`)
-      setLoading(false)
-      setProductos(result.data)
-      setProductosFiltrados(result.data)
-    }
+      const result = await axios.get(`${url}/api/productos`);
+      setLoading(false);
+      setProductos(result.data);
+      setProductosFiltrados(result.data);
+    };
 
-    getData()
-  }, [])
+    getData();
+  }, []);
 
   // Manejar scroll para hacer sticky el header
   useEffect(() => {
     const handleScroll = () => {
-      const offset = window.scrollY
-      setIsSticky(offset > 100)
-    }
+      const offset = window.scrollY;
+      setIsSticky(offset > 100);
+    };
 
-    window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll)
-    }
-  }, [])
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Filtrar productos según el filtro de texto y cuotas seleccionadas
   useEffect(() => {
     let productosFiltrados = productos.filter((producto) =>
       producto.descripcion.toLowerCase().includes(filtro.toLowerCase())
-    )
-  
+    );
+
     if (selectedCuota && cuotasMap[selectedCuota]) {
-      const cuotaKey = cuotasMap[selectedCuota]
+      const cuotaKey = cuotasMap[selectedCuota];
       productosFiltrados = productosFiltrados.filter(
         (producto) => producto[cuotaKey] && producto[cuotaKey] !== 'NO'
-      )
+      );
     }
-  
-    setProductosFiltrados(productosFiltrados)
-  }, [filtro, productos, selectedCuota, cuotasMap])
+
+    setProductosFiltrados(productosFiltrados);
+  }, [filtro, productos, selectedCuota, cuotasMap]);
 
   // Cargar favoritos desde localStorage al montar el componente
   useEffect(() => {
-    const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || []
-    setFavorites(storedFavorites)
-  }, [])
+    const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    setFavorites(storedFavorites);
+  }, []);
 
   // Detectar si es mobile o desktop
   useEffect(() => {
@@ -116,42 +116,48 @@ const Catalogo = () => {
       setIsMobile(window.innerWidth <= 768);  // Establecemos 768px como el umbral entre mobile y desktop
     };
 
-    checkIfMobile(); // Ejecutar cuando el componente se monta
-    window.addEventListener("resize", checkIfMobile); // Recalcular al cambiar el tamaño de la ventana
+    checkIfMobile();  // Ejecutar cuando el componente se monta
+    window.addEventListener("resize", checkIfMobile);  // Recalcular al cambiar el tamaño de la ventana
 
     return () => window.removeEventListener("resize", checkIfMobile);  // Limpiar el event listener
   }, []);
 
   // Añadir producto al carrito
   const addToCart = (product) => {
-    setCart([...cart, product])
-  }
+    setCart([...cart, product]);
+  };
 
   // Manejar el agregado y eliminación de favoritos
   const toggleFavorite = (product) => {
-    let updatedFavorites
-    let message
+    let updatedFavorites;
+    let message;
 
     if (favorites.some(fav => fav.id === product.id)) {
-      updatedFavorites = favorites.filter(fav => fav.id !== product.id)
-      message = `${product.descripcion} ha sido eliminado de tus favoritos`
-      setSnackbarSeverity('warning')
+      updatedFavorites = favorites.filter(fav => fav.id !== product.id);
+      message = `${product.descripcion} ha sido eliminado de tus favoritos`;
+      setSnackbarSeverity('warning');
     } else {
-      updatedFavorites = [...favorites, product]
-      message = `${product.descripcion} ha sido agregado a tus favoritos`
-      setSnackbarSeverity('success')
+      updatedFavorites = [...favorites, product];
+      message = `${product.descripcion} ha sido agregado a tus favoritos`;
+      setSnackbarSeverity('success');
     }
 
-    setFavorites(updatedFavorites)
-    localStorage.setItem('favorites', JSON.stringify(updatedFavorites))
-    setSnackbarMessage(message)
-    setSnackbarOpen(true)
-  }
+    setFavorites(updatedFavorites);
+    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
 
-  // Filtrar los productos que se deben mostrar
-  const productosAMostrar = showFavorites 
+    // Si no quedan favoritos, volver a mostrar todos los productos
+    if (updatedFavorites.length === 0) {
+      setShowFavorites(false);
+      setProductosFiltrados(productos);
+    }
+  };
+
+  // Filtrar los productos que se deben mostrar (favoritos o todos)
+  const productosAMostrar = showFavorites
     ? productosFiltrados.filter(product => favorites.some(fav => fav.id === product.id))
-    : productosFiltrados
+    : productosFiltrados;
 
   return (
     <Container maxWidth="lg" className="conteiner-list">
@@ -172,27 +178,27 @@ const Catalogo = () => {
         />
       </div>
       <div className="flex justify-between items-center">
-        {favorites.length !== 0 && <Button 
-          variant="contained" 
+        <Button
+          variant="contained"
           size="large"
-          color="primary" 
+          color="primary"
           onClick={() => setShowFavorites(!showFavorites)}
           className="btn-absolute-favorite"
           disabled={favorites.length === 0}
         >
           {showFavorites ? 'Todos' : 'Favoritos'}
-        </Button>}
+        </Button>
 
         <Button variant="contained" color="secondary" onClick={startTour} size="large" className="btn-absolute-tour">
-          {isMobile ? "Guia tutorial" : "¿Cómo utilizar el catálogo?"}
+          {isMobile ? "Guía tutorial" : "¿Cómo utilizar el catálogo?"}
         </Button>
 
         {/* Selector de cuotas para el usuario */}
-        <FormControl variant="outlined" sx={{ my: 2 }} style={{backgroundColor: 'white'}} className="cuotas">
+        <FormControl variant="outlined" sx={{ my: 2 }} style={{ backgroundColor: 'white' }} className="cuotas">
           <InputLabel>Cuotas</InputLabel>
           <Select
             value={selectedCuota}
-            onChange={(e) => setSelectedCuota(e.target.value)} // Actualizar la cuota seleccionada
+            onChange={(e) => setSelectedCuota(e.target.value)}  // Actualizar la cuota seleccionada
             label="Cuotas"
           >
             {Object.keys(cuotasMap).map((cuota, idx) => (
@@ -203,7 +209,7 @@ const Catalogo = () => {
           </Select>
         </FormControl>
       </div>
-    
+
       <ul className="lista-prod-catalog w-100">
         {loading ? (
           <>
@@ -227,7 +233,7 @@ const Catalogo = () => {
                   onAddToCart={addToCart}
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
-                  selectedCuota={selectedCuota || '12 cuotas sin interés'} // Si no hay seleccionada, usa la por defecto
+                  selectedCuota={selectedCuota || '12 cuotas sin interés'}  // Si no hay seleccionada, usa la por defecto
                 />
               </li>
             ) : null
