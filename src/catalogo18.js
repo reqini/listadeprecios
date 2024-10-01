@@ -1,5 +1,5 @@
-/* eslint-disable-next-line import/no-unresolved */
-import React, { useEffect, useState } from "react";
+/* eslint-disable */
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
@@ -22,15 +22,15 @@ const Catalogo18 = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const [isMobile, setIsMobile] = useState(false);
 
-  const cuotasMap = {
+  // Memoizar cuotasMap
+  const cuotasMap = useMemo(() => ({
     "18 cuotas sin interés": 'dieciocho_sin_interes',
     "12 cuotas sin interés": 'doce_sin_interes',
     "9 cuotas sin interés": 'nueve_sin_interes',
     "6 cuotas sin interés": 'seis_sin_interes',
     "3 cuotas sin interés": 'tres_sin_interes'
-  };
+  }), []);
 
   // Cargar productos desde la API
   useEffect(() => {
@@ -78,18 +78,6 @@ const Catalogo18 = () => {
   useEffect(() => {
     const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
     setFavorites(storedFavorites);
-  }, []);
-
-  // Detectar si es mobile o desktop
-  useEffect(() => {
-    const checkIfMobile = () => {
-      setIsMobile(window.innerWidth <= 768);  // Establecemos 768px como el umbral entre mobile y desktop
-    };
-
-    checkIfMobile();  // Ejecutar cuando el componente se monta
-    window.addEventListener("resize", checkIfMobile);  // Recalcular al cambiar el tamaño de la ventana
-
-    return () => window.removeEventListener("resize", checkIfMobile);  // Limpiar el event listener
   }, []);
 
   // Añadir producto al carrito
@@ -153,7 +141,6 @@ const Catalogo18 = () => {
           size="large"
           color="primary"
           onClick={() => setShowFavorites(!showFavorites)}
-          style={{marginBottom: 16}}
           className="btn-absolute-favorite"
           disabled={favorites.length === 0}
         >
