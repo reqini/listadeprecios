@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable-next-line import/no-unresolved */
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Container from "@mui/material/Container";
@@ -7,10 +7,8 @@ import Skeleton from "@mui/material/Skeleton";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Button, Snackbar, Alert, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import introJs from 'intro.js';  // Importamos Intro.js
-import 'intro.js/introjs.css';  // Importamos los estilos de Intro.js
 
-const Catalogo = () => {
+const Catalogo18 = () => {
   const url = "https://backtest-production-7f88.up.railway.app";
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,46 +18,18 @@ const Catalogo = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
-  const [selectedCuota, setSelectedCuota] = useState('12 cuotas sin interés'); // Cuota por defecto
+  const [selectedCuota, setSelectedCuota] = useState('18 cuotas sin interés'); // Cuota por defecto
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [isMobile, setIsMobile] = useState(false);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const cuotasMap = {
     "18 cuotas sin interés": 'dieciocho_sin_interes',
     "12 cuotas sin interés": 'doce_sin_interes',
-    /* "10 cuotas sin interés": 'diez_sin_interes', */
     "9 cuotas sin interés": 'nueve_sin_interes',
     "6 cuotas sin interés": 'seis_sin_interes',
     "3 cuotas sin interés": 'tres_sin_interes'
-  };
-
-  // Iniciar el tour
-  const startTour = () => {
-    introJs().setOptions({
-      steps: [
-        {
-          element: '.header-catalogo',
-          intro: 'Aquí puedes buscar productos en el catálogo.',
-        },
-        {
-          element: '.btn-absolute-favorite',
-          intro: 'Este botón te permite ver tus favoritos.',
-        },
-        {
-          element: '.cuotas',
-          intro: 'En este desplegable puedes filtrar y seleccionar con cuántas cuotas quieres pagar y los productos se actualizan automáticamente.',
-        },
-      ],
-      scrollToElement: true,  // Forzar scroll al elemento activo
-      showProgress: true,  // Muestra el progreso
-      exitOnOverlayClick: false,  // Evita que el usuario cierre el tour al hacer clic en el overlay
-      nextLabel: 'Siguiente',
-      prevLabel: 'Anterior',
-      doneLabel: 'Hecho',
-    }).start();
   };
 
   // Cargar productos desde la API
@@ -183,18 +153,15 @@ const Catalogo = () => {
           size="large"
           color="primary"
           onClick={() => setShowFavorites(!showFavorites)}
+          style={{marginBottom: 16}}
           className="btn-absolute-favorite"
           disabled={favorites.length === 0}
         >
           {showFavorites ? 'Todos' : 'Favoritos'}
         </Button>
 
-        <Button variant="contained" color="secondary" onClick={startTour} size="large" className="btn-absolute-tour">
-          {isMobile ? "Guía tutorial" : "¿Cómo utilizar el catálogo?"}
-        </Button>
-
         {/* Selector de cuotas para el usuario */}
-        <FormControl variant="outlined" sx={{ my: 2 }} style={{ backgroundColor: 'white' }} className="cuotas">
+        <FormControl variant="outlined" sx={{ my: 2 }} style={{ backgroundColor: 'white', display: 'none' }} className="cuotas">
           <InputLabel>Cuotas</InputLabel>
           <Select
             value={selectedCuota}
@@ -233,7 +200,7 @@ const Catalogo = () => {
                   onAddToCart={addToCart}
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
-                  selectedCuota={selectedCuota || '12 cuotas sin interés'}  // Si no hay seleccionada, usa la por defecto
+                  selectedCuota={selectedCuota || '18 cuotas sin interés'}  // Si no hay seleccionada, usa la por defecto
                 />
               </li>
             ) : null
@@ -254,4 +221,4 @@ const Catalogo = () => {
   );
 };
 
-export default Catalogo;
+export default Catalogo18;
