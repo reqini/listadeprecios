@@ -10,6 +10,7 @@ import axios from "axios";
 import Login from "./Login";
 import Home from "./home";
 import Catalogo from "./catalogo";
+import Catalogo18 from "./catalogo18";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
@@ -82,29 +83,10 @@ const App = () => {
             }
           />
 
-          {/* Ruta protegida para /catalogo */}
-          <Route
-            path="/catalogo"
-            element={
-              loggedIn ? (
-                <Catalogo />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-
-          {/* Rutas dinámicas para los catálogos filtrados por cuotas */}
-          <Route
-            path="/catalogo/:catalogType"
-            element={
-              loggedIn ? (
-                <Catalogo />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
+          {/* Ruta abierta para /catalogo */}
+          <Route path="/catalogo" element={<Catalogo />} />
+          {/* Ruta abierta para /catalogo */}
+          <Route path="/catalogo18" element={<Catalogo18 />} />
 
           {/* Redirección por defecto: si está autenticado, va a /home, sino a /login */}
           <Route path="/" element={<Navigate to={loggedIn ? "/home" : "/login"} />} />
