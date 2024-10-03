@@ -9,7 +9,7 @@ import logo from './assets/logo.png';
 import { Snackbar, Alert, Typography } from "@mui/material";
 import { formatPrice } from './utils/priceUtils';
 
-const Catalogo12 = () => {
+const Catalogo6 = () => {
   const url = "https://backtest-production-7f88.up.railway.app";
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);  // Carga inicial
@@ -20,7 +20,7 @@ const Catalogo12 = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
-  const [selectedCuota, setSelectedCuota] = useState('12 cuotas sin interés'); // Cuota por defecto
+  const [selectedCuota, setSelectedCuota] = useState('6 cuotas sin interés'); // Cuota por defecto
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
@@ -30,7 +30,7 @@ const Catalogo12 = () => {
   const observer = useRef(); // Usamos un `useRef` para manejar el Intersection Observer
 
   const cuotasMap = {
-    "12 cuotas sin interés": 'doce_sin_interes'
+    "6 cuotas sin interés": 'doce_sin_interes'
   };
 
   // Cargar productos desde la API
@@ -207,7 +207,7 @@ const Catalogo12 = () => {
                     onAddToCart={addToCart}
                     isFavorite={favorites.some(fav => fav.id === product.id)}
                     onToggleFavorite={() => toggleFavorite(product)}
-                    selectedCuota={selectedCuota || '12 cuotas sin interés'}
+                    selectedCuota={selectedCuota || '6 cuotas sin interés'}
                     precio={formatPrice(product.precio)}  // Formatear el precio aquí
                   />
                 </li>
@@ -244,4 +244,4 @@ const Catalogo12 = () => {
   );
 };
 
-export default Catalogo12;
+export default Catalogo6;

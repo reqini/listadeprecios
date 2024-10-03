@@ -1,21 +1,22 @@
 /* eslint-disable */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
-import { Button, Snackbar, Alert, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { Snackbar, Alert, Typography } from "@mui/material";
 import { formatPrice } from './utils/priceUtils';
 
-const Catalogo = () => {
+const Catalogo24 = () => {
   const url = "https://backtest-production-7f88.up.railway.app";
   const [cart, setCart] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);  // Carga inicial
+  const [loadingMore, setLoadingMore] = useState(false);  // Carga incremental al hacer scroll
   const [productos, setProductos] = useState([]);
   const [filtro, setFiltro] = useState("");
-  const [productosFiltrados, setProductosFiltrados] = useState([]);
+  const [productosAgrupados, setProductosAgrupados] = useState({});
   const [isSticky, setIsSticky] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
@@ -24,27 +25,43 @@ const Catalogo = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [isMobile, setIsMobile] = useState(false);
+  const [page, setPage] = useState(1); // Controlamos la paginación o carga progresiva
+
+  const observer = useRef(); // Usamos un `useRef` para manejar el Intersection Observer
 
   const cuotasMap = {
-    "24 cuotas sin interés": 'veinticuatro_sin_interes',
-    "18 cuotas sin interés": 'dieciocho_sin_interes',
-    "12 cuotas sin interés": 'doce_sin_interes',
-    "9 cuotas sin interés": 'nueve_sin_interes',
-    "6 cuotas sin interés": 'seis_sin_interes',
-    "3 cuotas sin interés": 'tres_sin_interes'
+    "24 cuotas sin interés": 'doce_sin_interes'
   };
 
   // Cargar productos desde la API
+  const getData = async (currentPage) => {
+    const result = await axios.get(`${url}/api/productos?page=${currentPage}`);
+    return result.data;
+  };
+
   useEffect(() => {
-    const getData = async () => {
-      const result = await axios.get(`${url}/api/productos`);
+    const loadInitialData = async () => {
+      setLoading(true);
+      const productosData = await getData(1); // Cargamos la primera página
+      const productosFiltrados = productosData.filter(producto => producto.vigencia.toLowerCase() !== "no");  // Filtrar por vigencia
+      setProductos(productosFiltrados);
+      agruparProductosPorLinea(productosFiltrados);
       setLoading(false);
-      setProductos(result.data);
-      setProductosFiltrados(result.data);
     };
 
-    getData();
+    loadInitialData();
   }, []);
+
+  // Agrupar productos por línea
+  const agruparProductosPorLinea = (productos) => {
+    const productosPorLinea = productos.reduce((acc, producto) => {
+      const { linea } = producto;
+      if (!acc[linea]) acc[linea] = [];
+      acc[linea].push(producto);
+      return acc;
+    }, {});
+    setProductosAgrupados(productosPorLinea);
+  };
 
   // Manejar scroll para hacer sticky el header
   useEffect(() => {
@@ -60,7 +77,35 @@ const Catalogo = () => {
     };
   }, []);
 
-  // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir solo los que tengan línea "Repuestos"
+  // Usamos Intersection Observer para hacer lazy loading
+  const lastProductRef = (node) => {
+    if (loadingMore) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setPage((prevPage) => prevPage + 1); // Incrementamos la página
+      }
+    });
+    if (node) observer.current.observe(node);
+  };
+
+  // Cargar más productos cuando el usuario haga scroll
+  useEffect(() => {
+    if (page === 1) return; // Evitamos que cargue en la primera carga
+
+    const loadMoreProducts = async () => {
+      setLoadingMore(true);
+      const newProducts = await getData(page);
+      const productosFiltrados = newProducts.filter(producto => producto.vigencia.toLowerCase() !== "no");  // Filtrar por vigencia
+      setProductos((prev) => [...prev, ...productosFiltrados]);
+      agruparProductosPorLinea([...productos, ...productosFiltrados]);
+      setLoadingMore(false);
+    };
+
+    loadMoreProducts();
+  }, [page]);
+
+  // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir los productos con línea "Repuestos"
   useEffect(() => {
     let productosFiltrados = productos.filter((producto) =>
       producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) &&
@@ -74,26 +119,8 @@ const Catalogo = () => {
       );
     }
 
-    setProductosFiltrados(productosFiltrados);
+    agruparProductosPorLinea(productosFiltrados);
   }, [filtro, productos, selectedCuota, cuotasMap]);
-
-  // Cargar favoritos desde localStorage al montar el componente
-  useEffect(() => {
-    const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    setFavorites(storedFavorites);
-  }, []);
-
-  // Detectar si es mobile o desktop
-  useEffect(() => {
-    const checkIfMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    checkIfMobile();
-    window.addEventListener("resize", checkIfMobile);
-
-    return () => window.removeEventListener("resize", checkIfMobile);
-  }, []);
 
   // Añadir producto al carrito
   const addToCart = (product) => {
@@ -123,14 +150,22 @@ const Catalogo = () => {
     // Si no quedan favoritos, volver a mostrar todos los productos
     if (updatedFavorites.length === 0) {
       setShowFavorites(false);
-      setProductosFiltrados(productos);
+      agruparProductosPorLinea(productos);
     }
   };
 
   // Filtrar los productos que se deben mostrar (favoritos o todos)
   const productosAMostrar = showFavorites
-    ? productosFiltrados.filter(product => favorites.some(fav => fav.id === product.id))
-    : productosFiltrados;
+    ? Object.keys(productosAgrupados).reduce((acc, linea) => {
+        const productosFavoritos = productosAgrupados[linea].filter(product =>
+          favorites.some(fav => fav.id === product.id)
+        );
+        if (productosFavoritos.length) {
+          acc[linea] = productosFavoritos;
+        }
+        return acc;
+      }, {})
+    : productosAgrupados;
 
   return (
     <Container maxWidth="lg" className="conteiner-list">
@@ -150,70 +185,51 @@ const Catalogo = () => {
           onChange={(e) => setFiltro(e.target.value)}
         />
       </div>
-      <div className="flex justify-between items-center">
-        <Button
-          variant="contained"
-          size="large"
-          color="primary"
-          onClick={() => setShowFavorites(!showFavorites)}
-          className="btn-absolute-favorite"
-          disabled={favorites.length === 0}
-        >
-          {showFavorites ? 'Todos' : 'Favoritos'}
-        </Button>
 
-        <Button variant="contained" color="secondary" size="large" className="btn-absolute-tour dn">
-          {isMobile ? "Guía tutorial" : "¿Cómo utilizar el catálogo?"}
-        </Button>
+      {Object.keys(productosAMostrar).map((linea, idxLinea) => (
+        <div key={linea} className="linea-section">
+          <Typography variant="h5" gutterBottom margin="20px 0">
+            Linea: <b>{linea}</b>
+          </Typography>
+          <ul className="lista-prod-catalog w-100">
+            {productosAMostrar[linea].map((product, idxProduct) => {
+              const isLastItem = idxLinea === Object.keys(productosAMostrar).length - 1 &&
+                idxProduct === productosAMostrar[linea].length - 1;
+              return (
+                <li
+                  className="grid-item"
+                  key={product.id}
+                  ref={isLastItem ? lastProductRef : null} // Referenciamos el último producto
+                >
+                  <ProductsCalatogo
+                    key={product.codigo}
+                    product={product}
+                    onAddToCart={addToCart}
+                    isFavorite={favorites.some(fav => fav.id === product.id)}
+                    onToggleFavorite={() => toggleFavorite(product)}
+                    selectedCuota={selectedCuota || '24 cuotas sin interés'}
+                    precio={formatPrice(product.precio)}  // Formatear el precio aquí
+                  />
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
 
-        {/* Selector de cuotas para el usuario */}
-        <FormControl variant="outlined" sx={{ my: 2 }} style={{ backgroundColor: 'white', display: 'none' }} className="cuotas">
-          <InputLabel>Cuotas</InputLabel>
-          <Select
-            value={selectedCuota}
-            onChange={(e) => setSelectedCuota(e.target.value)}
-            label="Cuotas"
-          >
-            {Object.keys(cuotasMap).map((cuota, idx) => (
-              <MenuItem key={idx} value={cuota}>
-                {cuota}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </div>
-
-      <ul className="lista-prod-catalog w-100">
-        {loading ? (
-          <>
-            {[...Array(8)].map((_, idx) => (
-              <Skeleton
-                key={idx}
-                sx={{ height: 300, margin: 1 }}
-                animation="wave"
-                variant="rectangular"
-                className="grid-item"
-              />
-            ))}
-          </>
-        ) : (
-          productosAMostrar.map((product) =>
-            product.vigencia === "SI" ? (
-              <li className="grid-item" key={product.id}>
-                <ProductsCalatogo
-                  key={product.codigo}
-                  product={product}
-                  onAddToCart={addToCart}
-                  isFavorite={favorites.some(fav => fav.id === product.id)}
-                  onToggleFavorite={() => toggleFavorite(product)}
-                  selectedCuota={selectedCuota || '24 cuotas sin interés'}
-                  precio={formatPrice(product.precio)}  // Formatear el precio aquí
-                />
-              </li>
-            ) : null
-          )
-        )}
-      </ul>
+      {loading || loadingMore && (
+        <ul className="lista-prod-catalog w-100">
+          {[...Array(4)].map((_, idx) => (
+            <Skeleton
+              key={idx}
+              sx={{ height: 300, margin: 1 }}
+              animation="wave"
+              variant="rectangular"
+              className="grid-item"
+            />
+          ))}
+        </ul>
+      )}
 
       <Snackbar
         open={snackbarOpen}
@@ -228,4 +244,4 @@ const Catalogo = () => {
   );
 };
 
-export default Catalogo;
+export default Catalogo24;
