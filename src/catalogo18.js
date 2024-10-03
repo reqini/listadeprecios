@@ -26,10 +26,6 @@ const Catalogo18 = () => {
   // Memoizar cuotasMap
   const cuotasMap = useMemo(() => ({
     "18 cuotas sin interés": 'dieciocho_sin_interes',
-    "12 cuotas sin interés": 'doce_sin_interes',
-    "9 cuotas sin interés": 'nueve_sin_interes',
-    "6 cuotas sin interés": 'seis_sin_interes',
-    "3 cuotas sin interés": 'tres_sin_interes'
   }), []);
 
   // Cargar productos desde la API

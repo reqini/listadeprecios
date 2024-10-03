@@ -10,7 +10,9 @@ import axios from "axios";
 import Login from "./Login";
 import Home from "./home";
 import Catalogo from "./catalogo";
+import Catalogo12 from "./catalogo12";
 import Catalogo18 from "./catalogo18";
+import Catalogo24 from "./catalogo24";
 import MaintenancePage from "./Mantenimiento";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -86,8 +88,12 @@ const App = () => {
 
           {/* Ruta abierta para /catalogo */}
           <Route path="/catalogo" element={<Catalogo />} />
-          {/* Ruta abierta para /catalogo */}
+          {/* Ruta abierta para /catalogo12 */}
+          <Route path="/catalogo12" element={<Catalogo12 />} />
+          {/* Ruta abierta para /catalogo18 */}
           <Route path="/catalogo18" element={<Catalogo18 />} />
+          {/* Ruta abierta para /catalogo24 */}
+          <Route path="/catalogo24" element={<Catalogo24 />} />
 
           {/* Redirección por defecto: si está autenticado, va a /home, sino a /login */}
           {/* <Route path="/" element={<Navigate to={loggedIn ? "/home" : "/login"} />} /> */}

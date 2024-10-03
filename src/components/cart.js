@@ -13,7 +13,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
   const [planCanje, setPlanCanje] = useState({});
   const [totalPrice, setTotalPrice] = useState(0);
   const [includeShipping, setIncludeShipping] = useState(false); 
-  const SHIPPING_COST = 14126;
+  const SHIPPING_COST = 14833;
 
   // Función para calcular el precio total
   const calculateTotalPrice = useCallback(() => {
@@ -84,11 +84,11 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
                   <li key={item.codigo} className="w-100 flex flex-direction">
                     <div className="flex justify-between mar-t15 mar-b10">
                       {item.descripcion}
-                      <div style={{fontSize: 12}}>
+                      {/* <div style={{fontSize: 12}}>
                         {selectedCuota[item.codigo] 
                           ? `Cuota seleccionada: ${formatPrice(selectedCuota[item.codigo])}` 
                           : `Precio de Negocio: ${formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo, planCanje, includeShipping, SHIPPING_COST))}`}
-                      </div>
+                      </div> */}
 
                       <FaTrashAlt onClick={() => handleRemoveFromCart(item.codigo)} style={{cursor: 'pointer', color: 'red'}} />
                     </div>
@@ -113,7 +113,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
                         <MenuItem value={formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo, planCanje, includeShipping, SHIPPING_COST))}>
                           Precio de Negocio: {formatPrice(getDiscountedPrice(item.precio_negocio, item.codigo, planCanje, includeShipping, SHIPPING_COST))}
                         </MenuItem>
-                        {['veinte_sin_interes', 'dieciocho_sin_interes', 'doce_sin_interes', 'diez_sin_interes', 'nueve_sin_interes', 'seis_sin_interes', 'tres_sin_interes'].map((cuota) =>
+                        {['veinticuatro_sin_interes', 'veinte_sin_interes', 'dieciocho_sin_interes', 'doce_sin_interes', 'diez_sin_interes', 'nueve_sin_interes', 'seis_sin_interes', 'tres_sin_interes'].map((cuota) =>
                           item[cuota] && item[cuota] !== 'NO' && (
                             <MenuItem key={cuota} value={getCuotaPrice(item.psvp_lista, item[cuota], item.codigo, planCanje, includeShipping, SHIPPING_COST)}>
                               {`${cuota.replace(/_/g, ' ')} sin interés de: ${getCuotaPrice(item.psvp_lista, item[cuota], item.codigo, planCanje, includeShipping, SHIPPING_COST)}`}
