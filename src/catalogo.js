@@ -7,7 +7,7 @@ import Skeleton from "@mui/material/Skeleton";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Button, Snackbar, Alert, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import { formatPrice } from './utils/priceUtils'
+import { formatPrice } from './utils/priceUtils';
 
 const Catalogo = () => {
   const url = "https://backtest-production-7f88.up.railway.app";
@@ -32,32 +32,6 @@ const Catalogo = () => {
     "9 cuotas sin interés": 'nueve_sin_interes',
     "6 cuotas sin interés": 'seis_sin_interes',
     "3 cuotas sin interés": 'tres_sin_interes'
-  };
-
-  // Iniciar el tour
-  const startTour = () => {
-    introJs().setOptions({
-      steps: [
-        {
-          element: '.header-catalogo',
-          intro: 'Aquí puedes buscar productos en el catálogo.',
-        },
-        {
-          element: '.btn-absolute-favorite',
-          intro: 'Este botón te permite ver tus favoritos.',
-        },
-        {
-          element: '.cuotas',
-          intro: 'En este desplegable puedes filtrar y seleccionar con cuántas cuotas quieres pagar y los productos se actualizan automáticamente.',
-        },
-      ],
-      scrollToElement: true,
-      showProgress: true,
-      exitOnOverlayClick: false,
-      nextLabel: 'Siguiente',
-      prevLabel: 'Anterior',
-      doneLabel: 'Hecho',
-    }).start();
   };
 
   // Cargar productos desde la API
@@ -86,10 +60,11 @@ const Catalogo = () => {
     };
   }, []);
 
-  // Filtrar productos según el filtro de texto y cuotas seleccionadas
+  // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir solo los que tengan línea "Repuestos"
   useEffect(() => {
     let productosFiltrados = productos.filter((producto) =>
-      producto.descripcion.toLowerCase().includes(filtro.toLowerCase())
+      producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) &&
+      producto.linea.toLowerCase() !== 'repuestos'  // Excluir los productos con línea "Repuestos"
     );
 
     if (selectedCuota && cuotasMap[selectedCuota]) {
@@ -187,7 +162,7 @@ const Catalogo = () => {
           {showFavorites ? 'Todos' : 'Favoritos'}
         </Button>
 
-        <Button variant="contained" color="secondary" onClick={startTour} size="large" className="btn-absolute-tour">
+        <Button variant="contained" color="secondary" size="large" className="btn-absolute-tour">
           {isMobile ? "Guía tutorial" : "¿Cómo utilizar el catálogo?"}
         </Button>
 

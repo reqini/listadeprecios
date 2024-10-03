@@ -261,6 +261,10 @@ li {
 .mar-t15 { margin-top: 15px!important; }
 .mar-t30 { margin-top: 30px!important; }
 
+.dn {
+  display: none!important;
+}
+
 @media screen and (max-width: 1024px) {
   .lista-prod {
     display: grid;

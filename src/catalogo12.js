@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
@@ -7,8 +7,9 @@ import Skeleton from "@mui/material/Skeleton";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Button, Snackbar, Alert, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { formatPrice } from './utils/priceUtils';
 
-const Catalogo12 = () => {
+const Catalogo = () => {
   const url = "https://backtest-production-7f88.up.railway.app";
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,11 +23,16 @@ const Catalogo12 = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Memoizar cuotasMap
-  const cuotasMap = useMemo(() => ({
-    "12 cuotas sin interés": 'dieciocho_sin_interes',
-  }), []);
+  const cuotasMap = {
+    "24 cuotas sin interés": 'veinticuatro_sin_interes',
+    "18 cuotas sin interés": 'dieciocho_sin_interes',
+    "12 cuotas sin interés": 'doce_sin_interes',
+    "9 cuotas sin interés": 'nueve_sin_interes',
+    "6 cuotas sin interés": 'seis_sin_interes',
+    "3 cuotas sin interés": 'tres_sin_interes'
+  };
 
   // Cargar productos desde la API
   useEffect(() => {
@@ -54,10 +60,11 @@ const Catalogo12 = () => {
     };
   }, []);
 
-  // Filtrar productos según el filtro de texto y cuotas seleccionadas
+  // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir solo los que tengan línea "Repuestos"
   useEffect(() => {
     let productosFiltrados = productos.filter((producto) =>
-      producto.descripcion.toLowerCase().includes(filtro.toLowerCase())
+      producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) &&
+      producto.linea.toLowerCase() !== 'repuestos'  // Excluir los productos con línea "Repuestos"
     );
 
     if (selectedCuota && cuotasMap[selectedCuota]) {
@@ -74,6 +81,18 @@ const Catalogo12 = () => {
   useEffect(() => {
     const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
     setFavorites(storedFavorites);
+  }, []);
+
+  // Detectar si es mobile o desktop
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkIfMobile();
+    window.addEventListener("resize", checkIfMobile);
+
+    return () => window.removeEventListener("resize", checkIfMobile);
   }, []);
 
   // Añadir producto al carrito
@@ -143,12 +162,16 @@ const Catalogo12 = () => {
           {showFavorites ? 'Todos' : 'Favoritos'}
         </Button>
 
+        <Button variant="contained" color="secondary" size="large" className="btn-absolute-tour dn">
+          {isMobile ? "Guía tutorial" : "¿Cómo utilizar el catálogo?"}
+        </Button>
+
         {/* Selector de cuotas para el usuario */}
         <FormControl variant="outlined" sx={{ my: 2 }} style={{ backgroundColor: 'white', display: 'none' }} className="cuotas">
           <InputLabel>Cuotas</InputLabel>
           <Select
             value={selectedCuota}
-            onChange={(e) => setSelectedCuota(e.target.value)}  // Actualizar la cuota seleccionada
+            onChange={(e) => setSelectedCuota(e.target.value)}
             label="Cuotas"
           >
             {Object.keys(cuotasMap).map((cuota, idx) => (
@@ -183,7 +206,8 @@ const Catalogo12 = () => {
                   onAddToCart={addToCart}
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
-                  selectedCuota={selectedCuota || '2 cuotas sin interés'}  // Si no hay seleccionada, usa la por defecto
+                  selectedCuota={selectedCuota || '12 cuotas sin interés'}
+                  precio={formatPrice(product.precio)}  // Formatear el precio aquí
                 />
               </li>
             ) : null
@@ -204,4 +228,4 @@ const Catalogo12 = () => {
   );
 };
 
-export default Catalogo12;
+export default Catalogo;
