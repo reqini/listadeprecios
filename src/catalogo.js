@@ -8,6 +8,8 @@ import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Button, Snackbar, Alert, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { formatPrice } from './utils/priceUtils';
+import introJs from 'intro.js'; 
+import 'intro.js/introjs.css';
 
 const Catalogo = () => {
   const url = "https://backtest-production-7f88.up.railway.app";
@@ -32,6 +34,31 @@ const Catalogo = () => {
     "9 cuotas sin interés": 'nueve_sin_interes',
     "6 cuotas sin interés": 'seis_sin_interes',
     "3 cuotas sin interés": 'tres_sin_interes'
+  };
+
+  // Iniciar el tour
+  const startTour = () => {
+    introJs().setOptions({
+      steps: [
+        {
+          element: '.search',
+          intro: 'Aquí puedes buscar productos en el catálogo.',
+        },
+        {
+          element: '.btn-absolute-favorite',
+          intro: 'Este botón te permite ver tus favoritos.',
+        },
+        {
+          element: '.cuotas',
+          intro: 'Aquí puedes seleccionar las cuotas para pagar.',
+        },
+      ],
+      showProgress: true,
+      exitOnOverlayClick: false,
+      nextLabel: 'Siguiente',
+      prevLabel: 'Anterior',
+      doneLabel: 'Hecho',
+    }).start();
   };
 
   // Cargar productos desde la API
@@ -162,11 +189,16 @@ const Catalogo = () => {
           {showFavorites ? 'Todos' : 'Favoritos'}
         </Button>
 
-        <Button variant="contained" color="secondary" size="large" className="btn-absolute-tour">
+        <Button 
+          variant="contained" 
+          color="secondary" 
+          size="large" 
+          className="btn-absolute-tour"
+          onClick={startTour}
+        >
           {isMobile ? "Guía tutorial" : "¿Cómo utilizar el catálogo?"}
         </Button>
 
-        {/* Selector de cuotas para el usuario */}
         <FormControl variant="outlined" sx={{ my: 2 }} style={{ backgroundColor: 'white' }} className="cuotas">
           <InputLabel>Cuotas</InputLabel>
           <Select
