@@ -5,13 +5,12 @@ import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
 import { Helmet } from "react-helmet";
-import CircularProgress from "@mui/material/CircularProgress"; // Importar CircularProgress
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Snackbar, Alert, Typography } from "@mui/material";
 import { formatPrice } from './utils/priceUtils';
 
-const Catalogo6 = () => {
+const Catalogo9 = () => {
   const url = "https://backtest-production-7f88.up.railway.app";
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);  // Carga inicial
@@ -22,7 +21,7 @@ const Catalogo6 = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
-  const [selectedCuota, setSelectedCuota] = useState('6 cuotas sin interés'); // Cuota por defecto
+  const [selectedCuota, setSelectedCuota] = useState('9 cuotas sin interés'); // Cuota por defecto
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
@@ -32,7 +31,7 @@ const Catalogo6 = () => {
   const observer = useRef(); // Usamos un `useRef` para manejar el Intersection Observer
 
   const cuotasMap = {
-    "6 cuotas sin interés": 'doce_sin_interes'
+    "9 cuotas sin interés": 'doce_sin_interes'
   };
 
   // Eliminar productos duplicados por código o ID
@@ -204,10 +203,9 @@ const Catalogo6 = () => {
         />
       </div>
 
-      {/* Skeleton para la carga inicial */}
-      {loading && (
+      {loading || loadingMore && (
         <ul className="lista-prod-catalog w-100">
-          {[...Array(8)].map((_, idx) => (
+          {[...Array(4)].map((_, idx) => (
             <Skeleton
               key={idx}
               sx={{ height: 300, margin: 1 }}
@@ -219,7 +217,6 @@ const Catalogo6 = () => {
         </ul>
       )}
 
-      {/* Productos cargados */}
       {Object.keys(productosAMostrar).map((linea, idxLinea) => (
         <div key={linea} className="linea-section">
           <Typography variant="h5" gutterBottom margin="20px 0">
@@ -241,7 +238,7 @@ const Catalogo6 = () => {
                     onAddToCart={addToCart}
                     isFavorite={favorites.some(fav => fav.id === product.id)}
                     onToggleFavorite={() => toggleFavorite(product)}
-                    selectedCuota={selectedCuota || '6 cuotas sin interés'}
+                    selectedCuota={selectedCuota || '9 cuotas sin interés'}
                     precio={formatPrice(product.precio)}  // Formatear el precio aquí
                   />
                 </li>
@@ -250,13 +247,6 @@ const Catalogo6 = () => {
           </ul>
         </div>
       ))}
-
-      {/* Spinner al hacer scroll para cargar más productos */}
-      {loadingMore && (
-        <div className="flex justify-center mar-t20">
-          <CircularProgress />
-        </div>
-      )}
 
       <Snackbar
         open={snackbarOpen}
@@ -271,4 +261,4 @@ const Catalogo6 = () => {
   );
 };
 
-export default Catalogo6;
+export default Catalogo9;
