@@ -10,7 +10,9 @@ import axios from "axios";
 import Login from "./Login";
 import Home from "./home";
 import Catalogo from "./catalogo";
+import Catalogo3 from "./catalogo3";
 import Catalogo6 from "./catalogo6";
+import Catalogo9 from "./catalogo9";
 import Catalogo12 from "./catalogo12";
 import Catalogo18 from "./catalogo18";
 import Catalogo24 from "./catalogo24";
@@ -89,8 +91,12 @@ const App = () => {
 
           {/* Ruta abierta para /catalogo */}
           <Route path="/catalogo" element={<Catalogo />} />
+          {/* Ruta abierta para /catalogo3 */}
+          <Route path="/catalogo3" element={<Catalogo3 />} />
           {/* Ruta abierta para /catalogo6 */}
           <Route path="/catalogo6" element={<Catalogo6 />} />
+          {/* Ruta abierta para /catalogo9 */}
+          <Route path="/catalogo9" element={<Catalogo9 />} />
           {/* Ruta abierta para /catalogo12 */}
           <Route path="/catalogo12" element={<Catalogo12 />} />
           {/* Ruta abierta para /catalogo18 */}
