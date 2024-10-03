@@ -14,7 +14,7 @@ import Catalogo6 from "./catalogo6";
 import Catalogo12 from "./catalogo12";
 import Catalogo18 from "./catalogo18";
 import Catalogo24 from "./catalogo24";
-import MaintenancePage from "./Mantenimiento";
+/* import MaintenancePage from "./Mantenimiento"; */
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
@@ -99,8 +99,8 @@ const App = () => {
           <Route path="/catalogo24" element={<Catalogo24 />} />
 
           {/* Redirección por defecto: si está autenticado, va a /home, sino a /login */}
-          {/* <Route path="/" element={<Navigate to={loggedIn ? "/home" : "/login"} />} /> */}
-          <Route path="/" element={<MaintenancePage />} />
+          <Route path="/" element={<Navigate to={loggedIn ? "/home" : "/login"} />} />
+          {/* <Route path="/" element={<MaintenancePage />} /> */}
         </Routes>
       </Router>
     </ThemeProvider>
