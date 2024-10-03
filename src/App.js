@@ -21,6 +21,7 @@ import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
+import useFavicon from "./utils/useFavicon"; // Importa el hook personalizado
 
 const url = "https://backtest-production-7f88.up.railway.app";
 
@@ -68,6 +69,8 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <Router>
+        {/* Coloca el hook dentro del contexto del Router */}
+        <FaviconUpdater />
         <Routes>
           {/* Si el usuario ya está autenticado, redirige desde /login a /home */}
           <Route
@@ -111,6 +114,11 @@ const App = () => {
       </Router>
     </ThemeProvider>
   );
+};
+
+const FaviconUpdater = () => {
+  useFavicon(); // Aquí dentro del Router
+  return null; // Este componente solo ejecuta el hook
 };
 
 export default App;
