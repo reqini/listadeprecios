@@ -4,7 +4,7 @@ import {
   Button,
   Container,
   TextField,
-  Grid,
+/*   Grid, */
   Skeleton,
   Fab,
   Typography,
@@ -15,7 +15,7 @@ import { Navigation as NavigationIcon, Logout as LogoutIcon } from '@mui/icons-m
 import ShoppingCart from "./components/cart";
 import Product from "./components/products";
 import ResponsiveDialog from "./components/dialog";
-import banner from './assets/banner.jpg';
+/* import banner from './assets/banner.jpg'; */
 import logo from './assets/logo.png';
 import { handleCuotaChange } from './utils/cartHandlers';  // Usamos la misma función en Home
 
