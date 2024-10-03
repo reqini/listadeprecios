@@ -139,8 +139,8 @@ const Home = ({ onLogout }) => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <div className="flex-between-mobile" style={{ paddingTop: 30, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-        <Typography variant="body1" color="primary" fontSize={20}>
-          {timeOfDay} <b>{username === 'lety' ? 'Cara de Paty' : username}</b>, Bienvenid@
+        <Typography variant="body1" color="primary" fontSize={18}>
+          {timeOfDay} <b>{username === 'lety' ? 'Cara de Paty' : username}</b>, Te damos la Bienvenida
         </Typography>
         <Button
           variant="contained"
@@ -157,7 +157,7 @@ const Home = ({ onLogout }) => {
         <img src={logo} alt="logo" height="100" className='mar-t30 mar-b20' />
       </div>
 
-      <div className={`header flex-center pad20 ${isSticky ? "sticky" : ""}`}>
+      <div className={`header mar-b30 flex-center pad20 ${isSticky ? "sticky" : ""}`}>
         <TextField
           style={{ maxWidth: 450 }}
           fullWidth
@@ -169,7 +169,7 @@ const Home = ({ onLogout }) => {
         />
       </div>
 
-      <div className="flex-center" style={{ padding: "20px 0" }}>
+      {/* <div className="flex-center" style={{ padding: "20px 0" }}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <div className="w-100">
@@ -177,7 +177,7 @@ const Home = ({ onLogout }) => {
             </div>
           </Grid>
         </Grid>
-      </div>
+      </div> */}
 
       <ul className="lista-prod w-100">
         {loading ? (
