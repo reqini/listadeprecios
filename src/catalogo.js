@@ -7,8 +7,7 @@ import Skeleton from "@mui/material/Skeleton";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Button, Snackbar, Alert, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import introJs from 'intro.js';  // Importamos Intro.js
-import 'intro.js/introjs.css';  // Importamos los estilos de Intro.js
+import { formatPrice } from './utils/priceUtils'
 
 const Catalogo = () => {
   const url = "https://backtest-production-7f88.up.railway.app";
@@ -26,11 +25,9 @@ const Catalogo = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [isMobile, setIsMobile] = useState(false);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const cuotasMap = {
     "18 cuotas sin interés": 'dieciocho_sin_interes',
     "12 cuotas sin interés": 'doce_sin_interes',
-    /* "10 cuotas sin interés": 'diez_sin_interes', */
     "9 cuotas sin interés": 'nueve_sin_interes',
     "6 cuotas sin interés": 'seis_sin_interes',
     "3 cuotas sin interés": 'tres_sin_interes'
@@ -53,9 +50,9 @@ const Catalogo = () => {
           intro: 'En este desplegable puedes filtrar y seleccionar con cuántas cuotas quieres pagar y los productos se actualizan automáticamente.',
         },
       ],
-      scrollToElement: true,  // Forzar scroll al elemento activo
-      showProgress: true,  // Muestra el progreso
-      exitOnOverlayClick: false,  // Evita que el usuario cierre el tour al hacer clic en el overlay
+      scrollToElement: true,
+      showProgress: true,
+      exitOnOverlayClick: false,
       nextLabel: 'Siguiente',
       prevLabel: 'Anterior',
       doneLabel: 'Hecho',
@@ -113,13 +110,13 @@ const Catalogo = () => {
   // Detectar si es mobile o desktop
   useEffect(() => {
     const checkIfMobile = () => {
-      setIsMobile(window.innerWidth <= 768);  // Establecemos 768px como el umbral entre mobile y desktop
+      setIsMobile(window.innerWidth <= 768);
     };
 
-    checkIfMobile();  // Ejecutar cuando el componente se monta
-    window.addEventListener("resize", checkIfMobile);  // Recalcular al cambiar el tamaño de la ventana
+    checkIfMobile();
+    window.addEventListener("resize", checkIfMobile);
 
-    return () => window.removeEventListener("resize", checkIfMobile);  // Limpiar el event listener
+    return () => window.removeEventListener("resize", checkIfMobile);
   }, []);
 
   // Añadir producto al carrito
@@ -198,7 +195,7 @@ const Catalogo = () => {
           <InputLabel>Cuotas</InputLabel>
           <Select
             value={selectedCuota}
-            onChange={(e) => setSelectedCuota(e.target.value)}  // Actualizar la cuota seleccionada
+            onChange={(e) => setSelectedCuota(e.target.value)}
             label="Cuotas"
           >
             {Object.keys(cuotasMap).map((cuota, idx) => (
@@ -233,7 +230,8 @@ const Catalogo = () => {
                   onAddToCart={addToCart}
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
-                  selectedCuota={selectedCuota || '12 cuotas sin interés'}  // Si no hay seleccionada, usa la por defecto
+                  selectedCuota={selectedCuota || '12 cuotas sin interés'}
+                  precio={formatPrice(product.precio)}  // Formatear el precio aquí
                 />
               </li>
             ) : null
