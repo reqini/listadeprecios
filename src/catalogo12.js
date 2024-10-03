@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
@@ -7,9 +7,8 @@ import Skeleton from "@mui/material/Skeleton";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Button, Snackbar, Alert, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
-import { formatPrice } from './utils/priceUtils'
 
-const Catalogo = () => {
+const Catalogo12 = () => {
   const url = "https://backtest-production-7f88.up.railway.app";
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,42 +22,11 @@ const Catalogo = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const [isMobile, setIsMobile] = useState(false);
 
-  const cuotasMap = {
-    "24 cuotas sin interés": 'veinticuatro_sin_interes',
-    "18 cuotas sin interés": 'dieciocho_sin_interes',
-    "12 cuotas sin interés": 'doce_sin_interes',
-    "9 cuotas sin interés": 'nueve_sin_interes',
-    "6 cuotas sin interés": 'seis_sin_interes',
-    "3 cuotas sin interés": 'tres_sin_interes'
-  };
-
-  // Iniciar el tour
-  const startTour = () => {
-    introJs().setOptions({
-      steps: [
-        {
-          element: '.header-catalogo',
-          intro: 'Aquí puedes buscar productos en el catálogo.',
-        },
-        {
-          element: '.btn-absolute-favorite',
-          intro: 'Este botón te permite ver tus favoritos.',
-        },
-        {
-          element: '.cuotas',
-          intro: 'En este desplegable puedes filtrar y seleccionar con cuántas cuotas quieres pagar y los productos se actualizan automáticamente.',
-        },
-      ],
-      scrollToElement: true,
-      showProgress: true,
-      exitOnOverlayClick: false,
-      nextLabel: 'Siguiente',
-      prevLabel: 'Anterior',
-      doneLabel: 'Hecho',
-    }).start();
-  };
+  // Memoizar cuotasMap
+  const cuotasMap = useMemo(() => ({
+    "12 cuotas sin interés": 'dieciocho_sin_interes',
+  }), []);
 
   // Cargar productos desde la API
   useEffect(() => {
@@ -106,18 +74,6 @@ const Catalogo = () => {
   useEffect(() => {
     const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
     setFavorites(storedFavorites);
-  }, []);
-
-  // Detectar si es mobile o desktop
-  useEffect(() => {
-    const checkIfMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    checkIfMobile();
-    window.addEventListener("resize", checkIfMobile);
-
-    return () => window.removeEventListener("resize", checkIfMobile);
   }, []);
 
   // Añadir producto al carrito
@@ -187,16 +143,12 @@ const Catalogo = () => {
           {showFavorites ? 'Todos' : 'Favoritos'}
         </Button>
 
-        <Button variant="contained" color="secondary" onClick={startTour} size="large" className="btn-absolute-tour">
-          {isMobile ? "Guía tutorial" : "¿Cómo utilizar el catálogo?"}
-        </Button>
-
         {/* Selector de cuotas para el usuario */}
-        <FormControl variant="outlined" sx={{ my: 2 }} style={{ backgroundColor: 'white' }} className="cuotas">
+        <FormControl variant="outlined" sx={{ my: 2 }} style={{ backgroundColor: 'white', display: 'none' }} className="cuotas">
           <InputLabel>Cuotas</InputLabel>
           <Select
             value={selectedCuota}
-            onChange={(e) => setSelectedCuota(e.target.value)}
+            onChange={(e) => setSelectedCuota(e.target.value)}  // Actualizar la cuota seleccionada
             label="Cuotas"
           >
             {Object.keys(cuotasMap).map((cuota, idx) => (
@@ -231,8 +183,7 @@ const Catalogo = () => {
                   onAddToCart={addToCart}
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
-                  selectedCuota={selectedCuota || '12 cuotas sin interés'}
-                  precio={formatPrice(product.precio)}  // Formatear el precio aquí
+                  selectedCuota={selectedCuota || '2 cuotas sin interés'}  // Si no hay seleccionada, usa la por defecto
                 />
               </li>
             ) : null
@@ -253,4 +204,4 @@ const Catalogo = () => {
   );
 };
 
-export default Catalogo;
+export default Catalogo12;

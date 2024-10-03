@@ -12,6 +12,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 const ProductsCalatogo = ({ product, isFavorite, onToggleFavorite, selectedCuota }) => {
 
   const cuotasMap = {
+    "24 cuotas sin interés": 'veinticuatro_sin_interes',
     "12 cuotas sin interés": 'doce_sin_interes',
     "10 cuotas sin interés": 'diez_sin_interes',
     "9 cuotas sin interés": 'nueve_sin_interes',
