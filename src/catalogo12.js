@@ -5,6 +5,7 @@ import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
 /* import Button from "@mui/material/Button"; */
+import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Snackbar, Alert, Typography } from "@mui/material";
@@ -172,6 +173,9 @@ const Catalogo12 = () => {
 
   return (
     <Container maxWidth="lg" className="conteiner-list">
+      <Helmet>
+        <title>Red SinLimites - Catálogo</title>
+      </Helmet>
       <div className="w-100 flex justify-center">
         <img src={logo} alt="logo" height="100" className='mar-t30 mar-b20' />
       </div>

@@ -4,7 +4,7 @@ import axios from "axios";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
-/* import Button from "@mui/material/Button"; */
+import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Snackbar, Alert, Typography } from "@mui/material";
@@ -170,6 +170,9 @@ const Catalogo6 = () => {
 
   return (
     <Container maxWidth="lg" className="conteiner-list">
+      <Helmet>
+        <title>Red SinLimites - Catálogo</title>
+      </Helmet>
       <div className="w-100 flex justify-center">
         <img src={logo} alt="logo" height="100" className='mar-t30 mar-b20' />
       </div>
@@ -187,18 +190,19 @@ const Catalogo6 = () => {
         />
       </div>
 
-      {/* <div className="flex justify-between items-center">
-        <Button
-          variant="contained"
-          size="large"
-          color="primary"
-          onClick={() => setShowFavorites(!showFavorites)}
-          className="btn-absolute-favorite"
-          disabled={favorites.length === 0}
-        >
-          {showFavorites ? 'Todos' : 'Favoritos'}
-        </Button>
-      </div> */}
+      {loading || loadingMore && (
+        <ul className="lista-prod-catalog w-100">
+          {[...Array(4)].map((_, idx) => (
+            <Skeleton
+              key={idx}
+              sx={{ height: 300, margin: 1 }}
+              animation="wave"
+              variant="rectangular"
+              className="grid-item"
+            />
+          ))}
+        </ul>
+      )}
 
       {Object.keys(productosAMostrar).map((linea, idxLinea) => (
         <div key={linea} className="linea-section">
@@ -230,20 +234,6 @@ const Catalogo6 = () => {
           </ul>
         </div>
       ))}
-
-      {loading || loadingMore && (
-        <ul className="lista-prod-catalog w-100">
-          {[...Array(4)].map((_, idx) => (
-            <Skeleton
-              key={idx}
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-          ))}
-        </ul>
-      )}
 
       <Snackbar
         open={snackbarOpen}
