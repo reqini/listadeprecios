@@ -4,6 +4,7 @@ import axios from "axios";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
+/* import Button from "@mui/material/Button"; */
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Snackbar, Alert, Typography } from "@mui/material";
@@ -185,6 +186,19 @@ const Catalogo18 = () => {
           onChange={(e) => setFiltro(e.target.value)}
         />
       </div>
+
+      {/* <div className="flex justify-between items-center">
+        <Button
+          variant="contained"
+          size="large"
+          color="primary"
+          onClick={() => setShowFavorites(!showFavorites)}
+          className="btn-absolute-favorite"
+          disabled={favorites.length === 0}
+        >
+          {showFavorites ? 'Todos' : 'Favoritos'}
+        </Button>
+      </div> */}
 
       {Object.keys(productosAMostrar).map((linea, idxLinea) => (
         <div key={linea} className="linea-section">
