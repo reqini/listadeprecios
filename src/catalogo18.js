@@ -4,7 +4,6 @@ import axios from "axios";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
-/* import Button from "@mui/material/Button"; */
 import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
@@ -22,7 +21,7 @@ const Catalogo18 = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
-  const [selectedCuota, setSelectedCuota] = useState('18 cuotas sin interés'); // Cuota por defecto
+  const [selectedCuota, setSelectedCuota] = useState('6 cuotas sin interés'); // Cuota por defecto
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
@@ -33,6 +32,17 @@ const Catalogo18 = () => {
 
   const cuotasMap = {
     "18 cuotas sin interés": 'doce_sin_interes'
+  };
+
+  // Eliminar productos duplicados por código o ID
+  const eliminarDuplicados = (productos) => {
+    const productosUnicos = productos.reduce((acc, producto) => {
+      if (!acc.some(item => item.codigo === producto.codigo)) {
+        acc.push(producto);
+      }
+      return acc;
+    }, []);
+    return productosUnicos;
   };
 
   // Cargar productos desde la API
@@ -46,8 +56,9 @@ const Catalogo18 = () => {
       setLoading(true);
       const productosData = await getData(1); // Cargamos la primera página
       const productosFiltrados = productosData.filter(producto => producto.vigencia.toLowerCase() !== "no");  // Filtrar por vigencia
-      setProductos(productosFiltrados);
-      agruparProductosPorLinea(productosFiltrados);
+      const productosUnicos = eliminarDuplicados(productosFiltrados);  // Eliminar duplicados
+      setProductos(productosUnicos);
+      agruparProductosPorLinea(productosUnicos);
       setLoading(false);
     };
 
@@ -99,8 +110,9 @@ const Catalogo18 = () => {
       setLoadingMore(true);
       const newProducts = await getData(page);
       const productosFiltrados = newProducts.filter(producto => producto.vigencia.toLowerCase() !== "no");  // Filtrar por vigencia
-      setProductos((prev) => [...prev, ...productosFiltrados]);
-      agruparProductosPorLinea([...productos, ...productosFiltrados]);
+      const productosUnicos = eliminarDuplicados([...productos, ...productosFiltrados]);  // Eliminar duplicados
+      setProductos(productosUnicos);
+      agruparProductosPorLinea(productosUnicos);
       setLoadingMore(false);
     };
 
@@ -191,18 +203,19 @@ const Catalogo18 = () => {
         />
       </div>
 
-      {/* <div className="flex justify-between items-center">
-        <Button
-          variant="contained"
-          size="large"
-          color="primary"
-          onClick={() => setShowFavorites(!showFavorites)}
-          className="btn-absolute-favorite"
-          disabled={favorites.length === 0}
-        >
-          {showFavorites ? 'Todos' : 'Favoritos'}
-        </Button>
-      </div> */}
+      {loading || loadingMore && (
+        <ul className="lista-prod-catalog w-100">
+          {[...Array(4)].map((_, idx) => (
+            <Skeleton
+              key={idx}
+              sx={{ height: 300, margin: 1 }}
+              animation="wave"
+              variant="rectangular"
+              className="grid-item"
+            />
+          ))}
+        </ul>
+      )}
 
       {Object.keys(productosAMostrar).map((linea, idxLinea) => (
         <div key={linea} className="linea-section">
@@ -234,20 +247,6 @@ const Catalogo18 = () => {
           </ul>
         </div>
       ))}
-
-      {loading || loadingMore && (
-        <ul className="lista-prod-catalog w-100">
-          {[...Array(4)].map((_, idx) => (
-            <Skeleton
-              key={idx}
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-          ))}
-        </ul>
-      )}
 
       <Snackbar
         open={snackbarOpen}

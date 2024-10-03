@@ -34,6 +34,17 @@ const Catalogo6 = () => {
     "6 cuotas sin interés": 'doce_sin_interes'
   };
 
+  // Eliminar productos duplicados por código o ID
+  const eliminarDuplicados = (productos) => {
+    const productosUnicos = productos.reduce((acc, producto) => {
+      if (!acc.some(item => item.codigo === producto.codigo)) {
+        acc.push(producto);
+      }
+      return acc;
+    }, []);
+    return productosUnicos;
+  };
+
   // Cargar productos desde la API
   const getData = async (currentPage) => {
     const result = await axios.get(`${url}/api/productos?page=${currentPage}`);
@@ -45,8 +56,9 @@ const Catalogo6 = () => {
       setLoading(true);
       const productosData = await getData(1); // Cargamos la primera página
       const productosFiltrados = productosData.filter(producto => producto.vigencia.toLowerCase() !== "no");  // Filtrar por vigencia
-      setProductos(productosFiltrados);
-      agruparProductosPorLinea(productosFiltrados);
+      const productosUnicos = eliminarDuplicados(productosFiltrados);  // Eliminar duplicados
+      setProductos(productosUnicos);
+      agruparProductosPorLinea(productosUnicos);
       setLoading(false);
     };
 
@@ -98,8 +110,9 @@ const Catalogo6 = () => {
       setLoadingMore(true);
       const newProducts = await getData(page);
       const productosFiltrados = newProducts.filter(producto => producto.vigencia.toLowerCase() !== "no");  // Filtrar por vigencia
-      setProductos((prev) => [...prev, ...productosFiltrados]);
-      agruparProductosPorLinea([...productos, ...productosFiltrados]);
+      const productosUnicos = eliminarDuplicados([...productos, ...productosFiltrados]);  // Eliminar duplicados
+      setProductos(productosUnicos);
+      agruparProductosPorLinea(productosUnicos);
       setLoadingMore(false);
     };
 
