@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -8,6 +7,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { Button, CardActions, IconButton } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { formatPrice } from '../utils/priceUtils';  // Importamos la función de formateo
 
 const ProductsCalatogo = ({ product, isFavorite, onToggleFavorite, selectedCuota }) => {
 
@@ -22,7 +22,13 @@ const ProductsCalatogo = ({ product, isFavorite, onToggleFavorite, selectedCuota
   };
 
   const cuotaKey = cuotasMap[selectedCuota];
-  const cuotaValue = product[cuotaKey] !== 'NO' ? product[cuotaKey] : null;
+  let cuotaValue = product[cuotaKey] !== 'NO' ? product[cuotaKey] : null;
+
+  // Asegurarse de que cuotaValue es un string que contiene un número y convertirlo correctamente
+  if (cuotaValue) {
+    // Eliminar caracteres no numéricos y convertir a número
+    cuotaValue = parseFloat(cuotaValue.replace(/[^\d.-]/g, ''));
+  }
 
   const createWhatsAppLink = (product) => {
     const message = `¡Hola!, Quiero este Producto :)!
@@ -69,9 +75,11 @@ const ProductsCalatogo = ({ product, isFavorite, onToggleFavorite, selectedCuota
          >
           {product.descripcion}
         </Typography>
+
+        {/* Mostrar el valor de la cuota correctamente formateado */}
         {cuotaValue && (
           <Typography variant="body2" color="text.secondary" style={{ marginTop: 5 }}>
-            {selectedCuota}: <b>{cuotaValue}</b>
+            {selectedCuota}: <b>{formatPrice(cuotaValue)}</b>
           </Typography>
         )}
       </CardContent>
