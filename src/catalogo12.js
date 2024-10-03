@@ -21,7 +21,7 @@ const Catalogo12 = () => {
   const [isSticky, setIsSticky] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
-  const [selectedCuota, setSelectedCuota] = useState('6 cuotas sin interés'); // Cuota por defecto
+  const [selectedCuota, setSelectedCuota] = useState('12 cuotas sin interés'); // Cuota por defecto
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
