@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
@@ -14,25 +14,15 @@ const Catalogo24 = () => {
   const url = "https://backtest-production-7f88.up.railway.app";
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);  // Carga inicial
-  const [loadingMore, setLoadingMore] = useState(false);  // Carga incremental al hacer scroll
   const [productos, setProductos] = useState([]);
   const [filtro, setFiltro] = useState("");
   const [productosAgrupados, setProductosAgrupados] = useState({});
   const [isSticky, setIsSticky] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
-  const [selectedCuota, setSelectedCuota] = useState('24 cuotas sin interés'); // Cuota por defecto
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const [isMobile, setIsMobile] = useState(false);
-  const [page, setPage] = useState(1); // Controlamos la paginación o carga progresiva
-
-  const observer = useRef(); // Usamos un `useRef` para manejar el Intersection Observer
-
-  const cuotasMap = {
-    "24 cuotas sin interés": 'doce_sin_interes'
-  };
 
   // Eliminar productos duplicados por código o ID
   const eliminarDuplicados = (productos) => {
@@ -45,21 +35,21 @@ const Catalogo24 = () => {
     return productosUnicos;
   };
 
-  // Cargar productos desde la API
-  const getData = async (currentPage) => {
-    const result = await axios.get(`${url}/api/productos?page=${currentPage}`);
+  // Cargar productos desde la API (sin paginación ni scroll)
+  const getData = async () => {
+    const result = await axios.get(`${url}/api/productos`);
     return result.data;
   };
 
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
-      const productosData = await getData(1); // Cargamos la primera página
+      const productosData = await getData();  // Cargar todos los productos de una vez
       const productosFiltrados = productosData.filter(producto => producto.vigencia.toLowerCase() !== "no");  // Filtrar por vigencia
       const productosUnicos = eliminarDuplicados(productosFiltrados);  // Eliminar duplicados
       setProductos(productosUnicos);
       agruparProductosPorLinea(productosUnicos);
-      setLoading(false);
+      setLoading(false);  // Terminar la carga cuando los productos están completamente cargados
     };
 
     loadInitialData();
@@ -90,34 +80,10 @@ const Catalogo24 = () => {
     };
   }, []);
 
-  // Usamos Intersection Observer para hacer lazy loading
-  const lastProductRef = (node) => {
-    if (loadingMore) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        setPage((prevPage) => prevPage + 1); // Incrementamos la página
-      }
-    });
-    if (node) observer.current.observe(node);
-  };
-
-  // Cargar más productos cuando el usuario haga scroll
-  useEffect(() => {
-    if (page === 1) return; // Evitamos que cargue en la primera carga
-
-    const loadMoreProducts = async () => {
-      setLoadingMore(true);
-      const newProducts = await getData(page);
-      const productosFiltrados = newProducts.filter(producto => producto.vigencia.toLowerCase() !== "no");  // Filtrar por vigencia
-      const productosUnicos = eliminarDuplicados([...productos, ...productosFiltrados]);  // Eliminar duplicados
-      setProductos(productosUnicos);
-      agruparProductosPorLinea(productosUnicos);
-      setLoadingMore(false);
-    };
-
-    loadMoreProducts();
-  }, [page]);
+  // Uso de useMemo para mantener cuotasMap sin cambios en cada render
+  const cuotasMap = useMemo(() => ({
+    "24 cuotas sin interés": 'doce_sin_interes',
+  }), []);
 
   // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir los productos con línea "Repuestos"
   useEffect(() => {
@@ -126,15 +92,15 @@ const Catalogo24 = () => {
       producto.linea.toLowerCase() !== 'repuestos'  // Excluir los productos con línea "Repuestos"
     );
 
-    if (selectedCuota && cuotasMap[selectedCuota]) {
-      const cuotaKey = cuotasMap[selectedCuota];
+    if (cuotasMap["24 cuotas sin interés"]) {
+      const cuotaKey = cuotasMap["24 cuotas sin interés"];
       productosFiltrados = productosFiltrados.filter(
         (producto) => producto[cuotaKey] && producto[cuotaKey] !== 'NO'
       );
     }
 
     agruparProductosPorLinea(productosFiltrados);
-  }, [filtro, productos, selectedCuota, cuotasMap]);
+  }, [filtro, productos, cuotasMap]);
 
   // Añadir producto al carrito
   const addToCart = (product) => {
@@ -203,9 +169,10 @@ const Catalogo24 = () => {
         />
       </div>
 
-      {loading || loadingMore && (
+      {/* Skeleton para la carga inicial */}
+      {loading && (
         <ul className="lista-prod-catalog w-100">
-          {[...Array(4)].map((_, idx) => (
+          {[...Array(8)].map((_, idx) => (
             <Skeleton
               key={idx}
               sx={{ height: 300, margin: 1 }}
@@ -217,33 +184,26 @@ const Catalogo24 = () => {
         </ul>
       )}
 
-      {Object.keys(productosAMostrar).map((linea, idxLinea) => (
+      {/* Productos cargados */}
+      {Object.keys(productosAMostrar).map((linea) => (
         <div key={linea} className="linea-section">
           <Typography variant="h5" gutterBottom margin="20px 0">
             Linea: <b>{linea}</b>
           </Typography>
           <ul className="lista-prod-catalog w-100">
-            {productosAMostrar[linea].map((product, idxProduct) => {
-              const isLastItem = idxLinea === Object.keys(productosAMostrar).length - 1 &&
-                idxProduct === productosAMostrar[linea].length - 1;
-              return (
-                <li
-                  className="grid-item"
-                  key={product.id}
-                  ref={isLastItem ? lastProductRef : null} // Referenciamos el último producto
-                >
-                  <ProductsCalatogo
-                    key={product.codigo}
-                    product={product}
-                    onAddToCart={addToCart}
-                    isFavorite={favorites.some(fav => fav.id === product.id)}
-                    onToggleFavorite={() => toggleFavorite(product)}
-                    selectedCuota={selectedCuota || '24 cuotas sin interés'}
-                    precio={formatPrice(product.precio)}  // Formatear el precio aquí
-                  />
-                </li>
-              );
-            })}
+            {productosAMostrar[linea].map((product) => (
+              <li className="grid-item" key={product.id}>
+                <ProductsCalatogo
+                  key={product.codigo}
+                  product={product}
+                  onAddToCart={addToCart}
+                  isFavorite={favorites.some(fav => fav.id === product.id)}
+                  onToggleFavorite={() => toggleFavorite(product)}
+                  selectedCuota={'24 cuotas sin interés'}
+                  precio={formatPrice(product.precio)}  // Formatear el precio aquí
+                />
+              </li>
+            ))}
           </ul>
         </div>
       ))}
