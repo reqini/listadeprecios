@@ -15,6 +15,7 @@ import Catalogo6 from "./catalogo6";
 import Catalogo9 from "./catalogo9";
 import Catalogo12 from "./catalogo12";
 import Catalogo18 from "./catalogo18";
+import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
 /* import MaintenancePage from "./Mantenimiento"; */
 import "@fontsource/roboto/300.css";
@@ -104,6 +105,8 @@ const App = () => {
           <Route path="/catalogo12" element={<Catalogo12 />} />
           {/* Ruta abierta para /catalogo18 */}
           <Route path="/catalogo18" element={<Catalogo18 />} />
+          {/* Ruta abierta para /catalogo20 */}
+          <Route path="/catalogo20" element={<Catalogo20 />} />
           {/* Ruta abierta para /catalogo24 */}
           <Route path="/catalogo24" element={<Catalogo24 />} />
 

@@ -13,12 +13,13 @@ const ProductsCalatogo = ({ product, isFavorite, onToggleFavorite, selectedCuota
 
   const cuotasMap = {
     "24 cuotas sin interés": 'veinticuatro_sin_interes',
+    "20 cuotas sin interés": 'veinte_sin_interes',
+    "18 cuotas sin interés": 'dieciocho_sin_interes',
     "12 cuotas sin interés": 'doce_sin_interes',
     "10 cuotas sin interés": 'diez_sin_interes',
     "9 cuotas sin interés": 'nueve_sin_interes',
     "6 cuotas sin interés": 'seis_sin_interes',
     "3 cuotas sin interés": 'tres_sin_interes',
-    "18 cuotas sin interés": 'dieciocho_sin_interes'
   };
 
   const cuotaKey = cuotasMap[selectedCuota];
