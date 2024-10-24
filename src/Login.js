@@ -7,9 +7,13 @@ import logo from './assets/logo.png';
 import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import axios from 'axios'; // Importamos axios para hacer solicitudes
+import axios from 'axios'; 
 
-const url = "http://localhost:4000"; // Asegúrate de que esta es la URL correcta de tu backend
+// Detectar si estamos en producción o en desarrollo
+const url =
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:4000' // URL local para desarrollo
+    : 'https://backtest-production-7f88.up.railway.app'; // URL de producción
 
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -34,7 +38,7 @@ const Login = ({ onLogin }) => {
       if (response.data.token) {
         // Guarda el token y el username en el localStorage
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('activeSession', response.data.username);
+        localStorage.setItem('activeSession', response.data.username);  // Cambiado a activeSession
   
         // Aquí realizamos la redirección de manera más explícita
         window.location.href = "/home";  // Redirige manualmente a la página de home
@@ -48,7 +52,6 @@ const Login = ({ onLogin }) => {
       setLoading(false);
     }
   };
-  
 
   const handleChange = (e) => {
     const value = e.target.value;
