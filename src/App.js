@@ -6,6 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Register from "./Registro";
 import Login from "./Login";
 import Home from "./home"; 
 import Catalogo from "./catalogo";
@@ -16,14 +17,13 @@ import Catalogo12 from "./catalogo12";
 import Catalogo18 from "./catalogo18";
 import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
-import Register from "./Register"; 
 import { AuthProvider, useAuth } from './AuthContext';
 import axios from 'axios';
 
 // Detectar si estamos en producción o en desarrollo
 const url =
   process.env.NODE_ENV === 'development'
-    ? 'http://localhost:4000' // URL local para desarrollo
+    ? 'http://localhost:8080' // URL local para desarrollo
     : 'https://backtest-production-7f88.up.railway.app'; // URL de producción
 
 const theme = createTheme({
@@ -79,7 +79,7 @@ const App = () => {
         <Router>
           <Routes>
             <Route path="/login" element={<LoginRoute handleLogin={handleLogin} />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/registro" element={<Register />} />
             <Route path="/home" element={<PrivateRoute component={Home} handleLogout={handleLogout} />} />
             <Route path="/catalogo" element={<PrivateRoute component={Catalogo} />} />
             <Route path="/catalogo3" element={<PrivateRoute component={Catalogo3} />} />

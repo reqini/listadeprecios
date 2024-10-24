@@ -7,12 +7,12 @@ import logo from './assets/logo.png';
 import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import axios from 'axios'; 
+import axios from 'axios';
 
 // Detectar si estamos en producción o en desarrollo
 const url =
   process.env.NODE_ENV === 'development'
-    ? 'http://localhost:4000' // URL local para desarrollo
+    ? 'http://localhost:8080' // URL local para desarrollo
     : 'https://backtest-production-7f88.up.railway.app'; // URL de producción
 
 const Login = ({ onLogin }) => {
