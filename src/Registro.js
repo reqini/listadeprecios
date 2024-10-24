@@ -10,7 +10,7 @@ const Register = () => {
     setLoading(true);
   
     try {
-      const response = await fetch("https://script.google.com/macros/s/AKfycbwC55WPsHzAoabUdvfLVc-K5_EhPyWWK9MDJYzox9JFSzI82t7rv6x1MwQ3ecTX0wGdlQ/exec", {
+      const response = await fetch("https://script.google.com/macros/s/AKfycbxCJDtRtuoN_4dsySbQRJcCHcmILiIFPJ08LsByGtSXwYj-aNj3C1C9DTGah3TrAC734w/exec", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
