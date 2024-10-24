@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Login from "./Login";
-import Home from "./home"; // El botón de logout está en Home
+import Home from "./home"; 
 import Catalogo from "./catalogo";
 import Catalogo3 from "./catalogo3";
 import Catalogo6 from "./catalogo6";
@@ -16,9 +16,15 @@ import Catalogo12 from "./catalogo12";
 import Catalogo18 from "./catalogo18";
 import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
-import Register from "./Register";
+import Register from "./Register"; 
 import { AuthProvider, useAuth } from './AuthContext';
 import axios from 'axios';
+
+// Detectar si estamos en producción o en desarrollo
+const url =
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:4000' // URL local para desarrollo
+    : 'https://backtest-production-7f88.up.railway.app'; // URL de producción
 
 const theme = createTheme({
   palette: {
@@ -35,8 +41,6 @@ const theme = createTheme({
   },
 });
 
-const url = "http://localhost:4000"; // URL del backend
-
 const App = () => {
   const [auth, setAuth] = useState({
     token: localStorage.getItem("token") || null,
@@ -51,7 +55,7 @@ const App = () => {
         localStorage.setItem("token", result.data.token);
         localStorage.setItem("username", result.data.username);  // Guarda el username autenticado
         setAuth({ token: result.data.token });
-        window.location.href = "/home";
+        window.location.href = "/home"; // Redirige a home
       } else {
         alert("Usuario o contraseña incorrectos");
       }
@@ -64,6 +68,7 @@ const App = () => {
   // Función para manejar el logout
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("username"); // Elimina el nombre de usuario del localStorage
     setAuth({ token: null });
     window.location.href = "/login"; // Redirige al login después del logout
   };
@@ -100,8 +105,7 @@ const PrivateRoute = ({ component: Component, handleLogout }) => {
     return <Navigate to="/login" />;
   }
 
-  // Pasamos `handleLogout` a `Home` para que el botón de logout funcione
-  return <Component onLogout={handleLogout} />;
+  return <Component handleLogout={handleLogout} />; // Pasamos `handleLogout` a `Home`
 };
 
 // Componente para manejar la redirección del login si ya está autenticado
