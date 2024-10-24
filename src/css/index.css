@@ -197,6 +197,16 @@ li {
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
 }
 
+.card-register {
+  position: relative;
+  background: #A47A9E;
+  box-sizing: border-box;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
 .card-product {
   border-radius: 8px!important;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);

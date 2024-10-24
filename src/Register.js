@@ -8,11 +8,16 @@ import logo from './assets/logo.png';
 import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import axios from 'axios'; // Importamos axios para hacer solicitudes
+import axios from 'axios';
+import { Typography } from '@mui/material';
 
-const url = "http://localhost:4000"; // Asegúrate de que esta es la URL correcta de tu backend
+// Detectar si estamos en producción o en desarrollo
+const url =
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:4000' // URL local para desarrollo
+    : 'https://backtest-production-7f88.up.railway.app'; // URL de producción
 
-const Login = ({ onLogin }) => {
+const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,33 +29,25 @@ const Login = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
+
     try {
-      const response = await axios.post(`${url}/api/login`, {
+      const response = await axios.post(`${url}/api/register`, {
         username,
         password,
       });
-  
-      console.log("Respuesta del backend:", response.data);
-  
-      if (response.data.token) {
-        // Guarda el token y el username en el localStorage
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('activeSession', response.data.username);
-  
-        // Aquí realizamos la redirección de manera más explícita
-        window.location.href = "/home";  // Redirige manualmente a la página de home
-      } else {
-        alert('Usuario o contraseña incorrectos');
+
+      if (response.data.success) {
+        // Registro exitoso, redirigir al login
+        alert('Registro exitoso, ahora puedes iniciar sesión.');
+        navigate('/login');
       }
     } catch (error) {
-      console.error('Error durante la autenticación:', error.message);
-      alert('Hubo un problema al iniciar sesión. Por favor, intenta de nuevo.');
+      console.error('Error durante el registro:', error.message);
+      alert('Hubo un problema al registrarte. Por favor, intenta de nuevo.');
     } finally {
       setLoading(false);
     }
   };
-  
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -58,23 +55,26 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className='full-width' style={{ backgroundColor: '#FFEDC4' }}>
+    <div className='full-width' style={{ backgroundColor: '#FFFFFF' }}>
       <Container className='flex justify-center items-center flex-direction' maxWidth="sm" style={{ paddingTop: 100 }}>
         <img src={logo} alt="logo" height="100" className='mar-b10' />
         <form onSubmit={handleSubmit}>
-          <Grid container spacing={0} className='card'>
+          <Grid container spacing={0} className='card-register'>
+            <Grid item xs={12} style={{ margin: '10px 0' }}>
+              <Typography variant='h6' textAlign='center' color='#ffffff' fontWeight={700}>Registro de Usuarios</Typography>
+            </Grid>
             <Grid item xs={12} style={{ margin: '10px 0' }}>
               <label>
                 <TextField
-                  required
-                  fullWidth
-                  style={{ color: 'black', backgroundColor: 'white' }}
-                  id="filled-required-name"
-                  label={'Nombre'}
-                  value={username}
-                  variant="filled"
-                  onChange={handleChange}
-                />
+                    required
+                    fullWidth
+                    style={{ color: 'black', backgroundColor: 'white' }}
+                    id="nombre-input"  // Asegúrate de que el id es único
+                    label={'Ingresa tu Nombre'}
+                    value={username}
+                    variant="filled"
+                    onChange={handleChange}
+                    />
               </label>
             </Grid>
             <Grid item xs={12} style={{ margin: '10px 0' }}>
@@ -84,8 +84,8 @@ const Login = ({ onLogin }) => {
                   fullWidth
                   type={showPassword ? 'text' : 'password'}
                   style={{ color: 'black', backgroundColor: 'white' }}
-                  id="filled-required-code"
-                  label="Código de emprendedora"
+                  id="filled-required"  // <--- Este id está repetido en otro lugar
+                  label="Ingresa tu clave"
                   value={password}
                   variant="filled"
                   onChange={(e) => setPassword(e.target.value)}
@@ -105,8 +105,8 @@ const Login = ({ onLogin }) => {
               </label>
             </Grid>
             <Grid item xs={12} style={{ margin: '10px 0' }}>
-              <Button fullWidth type="submit" variant="contained" size="large">
-                {loading ? 'Cargando...' : 'Entrar'}
+              <Button fullWidth color='secondary' type="submit" variant="contained" size="large">
+                {loading ? 'Registrando...' : 'Registrarse'}
               </Button>
             </Grid>
           </Grid>
@@ -116,4 +116,4 @@ const Login = ({ onLogin }) => {
   );
 };
 
-export default Login;
+export default Register;

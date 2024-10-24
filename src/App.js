@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react"; 
 import {
   BrowserRouter as Router,
   Routes,
@@ -6,9 +6,8 @@ import {
   Navigate,
 } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import axios from "axios";
 import Login from "./Login";
-import Home from "./home";
+import Home from "./home"; // El botón de logout está en Home
 import Catalogo from "./catalogo";
 import Catalogo3 from "./catalogo3";
 import Catalogo6 from "./catalogo6";
@@ -17,14 +16,9 @@ import Catalogo12 from "./catalogo12";
 import Catalogo18 from "./catalogo18";
 import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
-/* import MaintenancePage from "./Mantenimiento"; */
-import "@fontsource/roboto/300.css";
-import "@fontsource/roboto/400.css";
-import "@fontsource/roboto/500.css";
-import "@fontsource/roboto/700.css";
-import useFavicon from "./utils/useFavicon"; // Importa el hook personalizado
-
-const url = "https://backtest-production-7f88.up.railway.app";
+import Register from "./Register";
+import { AuthProvider, useAuth } from './AuthContext';
+import axios from 'axios';
 
 const theme = createTheme({
   palette: {
@@ -41,87 +35,84 @@ const theme = createTheme({
   },
 });
 
+const url = "http://localhost:4000"; // URL del backend
+
 const App = () => {
-  const [loggedIn, setLoggedIn] = useState(() => {
-    const storedAuth = localStorage.getItem("loggedIn");
-    return storedAuth ? JSON.parse(storedAuth) : false;
+  const [auth, setAuth] = useState({
+    token: localStorage.getItem("token") || null,
   });
 
-  const handleLogin = async (username, password, navigate) => {
-    const result = await axios.post(`${url}/api/login`, {
-      username,
-      password,
-    });
+  // Función para manejar el login
+  const handleLogin = async (username, password) => {
+    try {
+      const result = await axios.post(`${url}/api/login`, { username, password });
 
-    if (result.data && result.data.token) {
-      setLoggedIn(true);
-      localStorage.setItem("loggedIn", JSON.stringify(true));
-      navigate("/home");
-    } else {
-      alert("Usuario o contraseña incorrectos");
+      if (result.data.token) {
+        localStorage.setItem("token", result.data.token);
+        localStorage.setItem("username", result.data.username);  // Guarda el username autenticado
+        setAuth({ token: result.data.token });
+        window.location.href = "/home";
+      } else {
+        alert("Usuario o contraseña incorrectos");
+      }
+    } catch (error) {
+      console.error("Error durante la autenticación:", error);
+      alert("Hubo un problema al iniciar sesión. Por favor, intenta de nuevo.");
     }
   };
 
+  // Función para manejar el logout
   const handleLogout = () => {
-    setLoggedIn(false);
-    localStorage.removeItem("loggedIn");
+    localStorage.removeItem("token");
+    setAuth({ token: null });
+    window.location.href = "/login"; // Redirige al login después del logout
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <Router>
-        {/* Coloca el hook dentro del contexto del Router */}
-        <FaviconUpdater />
-        <Routes>
-          {/* Si el usuario ya está autenticado, redirige desde /login a /home */}
-          <Route
-            path="/login"
-            element={
-              loggedIn ? <Navigate to="/home" /> : <Login onLogin={handleLogin} />
-            }
-          />
-
-          {/* Ruta protegida para /home */}
-          <Route
-            path="/home"
-            element={
-              loggedIn ? (
-                <Home onLogout={handleLogout} />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-
-          {/* Ruta abierta para /catalogo */}
-          <Route path="/catalogo" element={<Catalogo />} />
-          {/* Ruta abierta para /catalogo3 */}
-          <Route path="/catalogo3" element={<Catalogo3 />} />
-          {/* Ruta abierta para /catalogo6 */}
-          <Route path="/catalogo6" element={<Catalogo6 />} />
-          {/* Ruta abierta para /catalogo9 */}
-          <Route path="/catalogo9" element={<Catalogo9 />} />
-          {/* Ruta abierta para /catalogo12 */}
-          <Route path="/catalogo12" element={<Catalogo12 />} />
-          {/* Ruta abierta para /catalogo18 */}
-          <Route path="/catalogo18" element={<Catalogo18 />} />
-          {/* Ruta abierta para /catalogo20 */}
-          <Route path="/catalogo20" element={<Catalogo20 />} />
-          {/* Ruta abierta para /catalogo24 */}
-          <Route path="/catalogo24" element={<Catalogo24 />} />
-
-          {/* Redirección por defecto: si está autenticado, va a /home, sino a /login */}
-          <Route path="/" element={<Navigate to={loggedIn ? "/home" : "/login"} />} />
-          {/* <Route path="/" element={<MaintenancePage />} /> */}
-        </Routes>
-      </Router>
+      <AuthProvider value={{ auth, setAuth }}>
+        <Router>
+          <Routes>
+            <Route path="/login" element={<LoginRoute handleLogin={handleLogin} />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/home" element={<PrivateRoute component={Home} handleLogout={handleLogout} />} />
+            <Route path="/catalogo" element={<PrivateRoute component={Catalogo} />} />
+            <Route path="/catalogo3" element={<PrivateRoute component={Catalogo3} />} />
+            <Route path="/catalogo6" element={<PrivateRoute component={Catalogo6} />} />
+            <Route path="/catalogo9" element={<PrivateRoute component={Catalogo9} />} />
+            <Route path="/catalogo12" element={<PrivateRoute component={Catalogo12} />} />
+            <Route path="/catalogo18" element={<PrivateRoute component={Catalogo18} />} />
+            <Route path="/catalogo20" element={<PrivateRoute component={Catalogo20} />} />
+            <Route path="/catalogo24" element={<PrivateRoute component={Catalogo24} />} />
+            <Route path="/" element={<Navigate to="/login" />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 };
 
-const FaviconUpdater = () => {
-  useFavicon(); // Aquí dentro del Router
-  return null; // Este componente solo ejecuta el hook
+// Componente para manejar rutas privadas
+const PrivateRoute = ({ component: Component, handleLogout }) => {
+  const { auth } = useAuth();
+
+  if (!auth || !auth.token) {
+    return <Navigate to="/login" />;
+  }
+
+  // Pasamos `handleLogout` a `Home` para que el botón de logout funcione
+  return <Component onLogout={handleLogout} />;
+};
+
+// Componente para manejar la redirección del login si ya está autenticado
+const LoginRoute = ({ handleLogin }) => {
+  const { auth } = useAuth();
+
+  if (auth && auth.token) {
+    return <Navigate to="/home" />;
+  }
+
+  return <Login onLogin={handleLogin} />;
 };
 
 export default App;

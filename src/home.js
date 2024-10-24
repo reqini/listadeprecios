@@ -4,7 +4,6 @@ import {
   Button,
   Container,
   TextField,
-/*   Grid, */
   Skeleton,
   Fab,
   Typography,
@@ -15,7 +14,6 @@ import { Navigation as NavigationIcon, Logout as LogoutIcon } from '@mui/icons-m
 import ShoppingCart from "./components/cart";
 import Product from "./components/products";
 import ResponsiveDialog from "./components/dialog";
-/* import banner from './assets/banner.jpg'; */
 import logo from './assets/logo.png';
 import { handleCuotaChange } from './utils/cartHandlers';  // Usamos la misma función en Home
 
@@ -55,7 +53,6 @@ const Home = ({ onLogout }) => {
 
   // Manejo del agregar al carrito
   const handleAddToCart = useCallback((product) => {
-    // Verificar si el producto ya está en el carrito y evitar duplicados
     setCart((prevCart) => {
       const existingProduct = prevCart.find(item => item.codigo === product.codigo);
       if (existingProduct) {
@@ -144,7 +141,7 @@ const Home = ({ onLogout }) => {
         </Typography>
         <Button
           variant="contained"
-          onClick={onLogout}
+          onClick={onLogout}  // Se usa onLogout que viene de props
           color="error"
           style={{ width: "100%", maxWidth: 200 }}
           startIcon={<LogoutIcon />}
@@ -168,16 +165,6 @@ const Home = ({ onLogout }) => {
           onChange={(e) => setFiltro(e.target.value)}
         />
       </div>
-
-      {/* <div className="flex-center" style={{ padding: "20px 0" }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <div className="w-100">
-              <img src={banner} alt="red sin limites essen" width='100%' />
-            </div>
-          </Grid>
-        </Grid>
-      </div> */}
 
       <ul className="lista-prod w-100">
         {loading ? (
