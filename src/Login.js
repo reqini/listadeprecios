@@ -15,19 +15,28 @@ const url =
     ? 'http://localhost:8080' // URL local para desarrollo
     : 'https://backtest-production-7f88.up.railway.app'; // URL de producción
 
-const Login = ({ onLogin }) => {
+const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  // Toggle para mostrar u ocultar la contraseña
   const handleClickShowPassword = () => setShowPassword(!showPassword);
 
+  // Controlar el cambio del nombre de usuario
+  const handleChangeUsername = (e) => {
+    const value = e.target.value;
+    setUsername(value.replace(/\s+/g, '').toLowerCase());
+  };
+
+  // Enviar el formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
   
     try {
+      // Hacemos una solicitud POST al backend para autenticar
       const response = await axios.post(`${url}/api/login`, {
         username,
         password,
@@ -36,13 +45,14 @@ const Login = ({ onLogin }) => {
       console.log("Respuesta del backend:", response.data);
   
       if (response.data.token) {
-        // Guarda el token y el username en el localStorage
+        // Guardar el token y el nombre de usuario en localStorage para mantener la sesión
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('activeSession', response.data.username);  // Cambiado a activeSession
-  
-        // Aquí realizamos la redirección de manera más explícita
-        window.location.href = "/home";  // Redirige manualmente a la página de home
+        localStorage.setItem('activeSession', response.data.username); // Guardamos el username con activeSession
+
+        // Redirigir al home después de un login exitoso
+        window.location.href = "/home";  
       } else {
+        // Mostrar error si el usuario o la contraseña son incorrectos
         alert('Usuario o contraseña incorrectos');
       }
     } catch (error) {
@@ -51,11 +61,6 @@ const Login = ({ onLogin }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setUsername(value.replace(/\s+/g, '').toLowerCase());
   };
 
   return (
@@ -74,7 +79,7 @@ const Login = ({ onLogin }) => {
                   label={'Nombre'}
                   value={username}
                   variant="filled"
-                  onChange={handleChange}
+                  onChange={handleChangeUsername}
                 />
               </label>
             </Grid>
@@ -95,7 +100,7 @@ const Login = ({ onLogin }) => {
                       <IconButton
                         aria-label="toggle password visibility"
                         onClick={handleClickShowPassword}
-                        edge="start"
+                        edge="end"
                         style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
@@ -106,7 +111,7 @@ const Login = ({ onLogin }) => {
               </label>
             </Grid>
             <Grid item xs={12} style={{ margin: '10px 0' }}>
-              <Button fullWidth type="submit" variant="contained" size="large">
+              <Button fullWidth type="submit" variant="contained" size="large" disabled={loading}>
                 {loading ? 'Cargando...' : 'Entrar'}
               </Button>
             </Grid>

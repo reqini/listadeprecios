@@ -1,14 +1,9 @@
-import React, { useState } from "react"; 
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Register from "./Registro";
 import Login from "./Login";
-import Home from "./home"; 
+import Home from "./home";
 import Catalogo from "./catalogo";
 import Catalogo3 from "./catalogo3";
 import Catalogo6 from "./catalogo6";
@@ -42,45 +37,14 @@ const theme = createTheme({
 });
 
 const App = () => {
-  const [auth, setAuth] = useState({
-    token: localStorage.getItem("token") || null,
-  });
-
-  // Función para manejar el login
-  const handleLogin = async (username, password) => {
-    try {
-      const result = await axios.post(`${url}/api/login`, { username, password });
-
-      if (result.data.token) {
-        localStorage.setItem("token", result.data.token);
-        localStorage.setItem("username", result.data.username);  // Guarda el username autenticado
-        setAuth({ token: result.data.token });
-        window.location.href = "/home"; // Redirige a home
-      } else {
-        alert("Usuario o contraseña incorrectos");
-      }
-    } catch (error) {
-      console.error("Error durante la autenticación:", error);
-      alert("Hubo un problema al iniciar sesión. Por favor, intenta de nuevo.");
-    }
-  };
-
-  // Función para manejar el logout
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("username"); // Elimina el nombre de usuario del localStorage
-    setAuth({ token: null });
-    window.location.href = "/login"; // Redirige al login después del logout
-  };
-
   return (
     <ThemeProvider theme={theme}>
-      <AuthProvider value={{ auth, setAuth }}>
+      <AuthProvider>
         <Router>
           <Routes>
-            <Route path="/login" element={<LoginRoute handleLogin={handleLogin} />} />
+            <Route path="/login" element={<LoginRoute />} />
             <Route path="/registro" element={<Register />} />
-            <Route path="/home" element={<PrivateRoute component={Home} handleLogout={handleLogout} />} />
+            <Route path="/home" element={<PrivateRoute component={Home} />} />
             <Route path="/catalogo" element={<PrivateRoute component={Catalogo} />} />
             <Route path="/catalogo3" element={<PrivateRoute component={Catalogo3} />} />
             <Route path="/catalogo6" element={<PrivateRoute component={Catalogo6} />} />
@@ -97,26 +61,26 @@ const App = () => {
   );
 };
 
-// Componente para manejar rutas privadas
-const PrivateRoute = ({ component: Component, handleLogout }) => {
+// Ruta privada que solo permite el acceso si el usuario está autenticado
+const PrivateRoute = ({ component: Component }) => {
   const { auth } = useAuth();
 
   if (!auth || !auth.token) {
     return <Navigate to="/login" />;
   }
 
-  return <Component handleLogout={handleLogout} />; // Pasamos `handleLogout` a `Home`
+  return <Component />;
 };
 
-// Componente para manejar la redirección del login si ya está autenticado
-const LoginRoute = ({ handleLogin }) => {
+// Ruta de login que redirige al usuario a "home" si ya está autenticado
+const LoginRoute = () => {
   const { auth } = useAuth();
 
   if (auth && auth.token) {
     return <Navigate to="/home" />;
   }
 
-  return <Login onLogin={handleLogin} />;
+  return <Login />;
 };
 
 export default App;
