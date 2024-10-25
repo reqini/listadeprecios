@@ -13,13 +13,6 @@ import Catalogo18 from "./catalogo18";
 import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
 import { AuthProvider, useAuth } from './AuthContext';
-import axios from 'axios';
-
-// Detectar si estamos en producción o en desarrollo
-const url =
-  process.env.NODE_ENV === 'development'
-    ? 'http://localhost:8080' // URL local para desarrollo
-    : 'https://backtest-production-7f88.up.railway.app'; // URL de producción
 
 const theme = createTheme({
   palette: {
