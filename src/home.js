@@ -10,15 +10,17 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import { Navigation as NavigationIcon, Logout as LogoutIcon } from '@mui/icons-material';
+import { Navigation as NavigationIcon, Logout as LogoutIcon } from "@mui/icons-material";
 import ShoppingCart from "./components/cart";
 import Product from "./components/products";
 import ResponsiveDialog from "./components/dialog";
-import logo from './assets/logo.png';
-import { handleCuotaChange } from './utils/cartHandlers';  // Usamos la misma función en Home
+import logo from "./assets/logo.png";
+import { handleCuotaChange } from "./utils/cartHandlers";
+import { useAuth } from "./AuthContext"; // Importamos useAuth
 
-const Home = ({ onLogout }) => {
+const Home = () => {
   const url = "https://backtest-production-7f88.up.railway.app";
+  const { logout } = useAuth(); // Obtenemos el logout desde useAuth
 
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +28,7 @@ const Home = ({ onLogout }) => {
   const [filtro, setFiltro] = useState("");
   const [mostrarBoton, setMostrarBoton] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState("");
   const [timeOfDay, setTimeOfDay] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
@@ -41,7 +43,7 @@ const Home = ({ onLogout }) => {
 
   // Manejo de la carga inicial y saludo
   useEffect(() => {
-    const storedUsername = localStorage.getItem('activeSession');
+    const storedUsername = localStorage.getItem("activeSession");
     if (storedUsername) setUsername(storedUsername);
 
     setTimeOfDay(getTimeOfDay());
@@ -54,12 +56,10 @@ const Home = ({ onLogout }) => {
   // Manejo del agregar al carrito
   const handleAddToCart = useCallback((product) => {
     setCart((prevCart) => {
-      const existingProduct = prevCart.find(item => item.codigo === product.codigo);
+      const existingProduct = prevCart.find((item) => item.codigo === product.codigo);
       if (existingProduct) {
-        return prevCart.map(item => 
-          item.codigo === product.codigo 
-          ? { ...item, cantidad: item.cantidad + 1 } 
-          : item
+        return prevCart.map((item) =>
+          item.codigo === product.codigo ? { ...item, cantidad: item.cantidad + 1 } : item
         );
       }
       return [...prevCart, { ...product, cantidad: 1 }];
@@ -70,28 +70,28 @@ const Home = ({ onLogout }) => {
   // Manejo de la eliminación del carrito
   const handleRemoveFromCart = useCallback((codigo) => {
     setCart((prevCart) => {
-      const product = prevCart.find(item => item.codigo === codigo);
+      const product = prevCart.find((item) => item.codigo === codigo);
       if (product && product.cantidad > 1) {
-        return prevCart.map(item =>
+        return prevCart.map((item) =>
           item.codigo === codigo ? { ...item, cantidad: item.cantidad - 1 } : item
         );
       }
-      return prevCart.filter(item => item.codigo !== codigo);
+      return prevCart.filter((item) => item.codigo !== codigo);
     });
   }, []);
 
   // Usamos el handler refactorizado para manejar el cambio de cuota
   const handleCuotaChangeWrapper = useCallback((codigo, cuota) => {
     handleCuotaChange(codigo, cuota, setCart);
-  }, [setCart]);
+  }, []);
 
-  // **Definir fetchData dentro del componente**
+  // Definir fetchData dentro del componente
   const fetchData = useCallback(async (endpoint, setState) => {
     try {
       const { data } = await axios.get(`${url}/api/${endpoint}`);
       setState(data);
       setTimeout(() => {
-        setLoading(false);  // Mantener el skeleton visible al menos por un breve periodo
+        setLoading(false); // Mantener el skeleton visible al menos por un breve periodo
       }, 500); // Garantizar que el Skeleton se muestre al menos 500ms
     } catch (error) {
       console.error(`Error al obtener ${endpoint}:`, error);
@@ -101,7 +101,7 @@ const Home = ({ onLogout }) => {
 
   // Llamar a fetchData para obtener los productos
   useEffect(() => {
-    fetchData('productos', setProductos);
+    fetchData("productos", setProductos);
   }, [fetchData]);
 
   // Manejo del scroll para el botón de navegación
@@ -120,8 +120,10 @@ const Home = ({ onLogout }) => {
   const volverArriba = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   // Filtrado de productos basado en la búsqueda
-  const productosFiltrados = productos.filter(producto =>
-    producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) && producto.vigencia === "SI"
+  const productosFiltrados = productos.filter(
+    (producto) =>
+      producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) &&
+      producto.vigencia === "SI"
   );
 
   // Limpiar el carrito
@@ -129,29 +131,39 @@ const Home = ({ onLogout }) => {
 
   // Cierre del Snackbar
   const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') return;
+    if (reason === "clickaway") return;
     setSnackbarOpen(false);
   };
 
   return (
     <Container maxWidth="lg" className="conteiner-list">
-      <div className="flex-between-mobile" style={{ paddingTop: 30, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+      <div
+        className="flex-between-mobile"
+        style={{
+          paddingTop: 30,
+          display: "flex",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "10px",
+        }}
+      >
         <Typography variant="body1" color="primary" fontSize={18}>
-          {timeOfDay} <b>{username === 'lety' ? 'Cara de Paty' : username}</b>, Te damos la Bienvenida
+          {timeOfDay} <b>{username === "lety" ? "Cara de Paty" : username}</b>, Te damos la
+          Bienvenida
         </Typography>
         <Button
           variant="contained"
-          onClick={onLogout}  // Se usa onLogout que viene de props
+          onClick={logout} // Usamos el método logout del contexto
           color="error"
           style={{ width: "100%", maxWidth: 200 }}
           startIcon={<LogoutIcon />}
         >
-          Cerrar Sesion
+          Cerrar Sesión
         </Button>
       </div>
 
       <div className="w-100 flex justify-center">
-        <img src={logo} alt="logo" height="100" className='mar-t30 mar-b20' />
+        <img src={logo} alt="logo" height="100" className="mar-t30 mar-b20" />
       </div>
 
       <div className={`header mar-b30 flex-center pad20 ${isSticky ? "sticky" : ""}`}>
@@ -169,10 +181,16 @@ const Home = ({ onLogout }) => {
       <ul className="lista-prod w-100">
         {loading ? (
           [...Array(6)].map((_, index) => (
-            <Skeleton key={index} sx={{ height: 300, margin: 1 }} animation="wave" variant="rectangular" className="grid-item" />
+            <Skeleton
+              key={index}
+              sx={{ height: 300, margin: 1 }}
+              animation="wave"
+              variant="rectangular"
+              className="grid-item"
+            />
           ))
         ) : (
-          productosFiltrados.map(product => (
+          productosFiltrados.map((product) => (
             <li className="grid-item" key={product.id}>
               <Product
                 product={product}
@@ -185,30 +203,34 @@ const Home = ({ onLogout }) => {
       </ul>
 
       {productosFiltrados.length === 0 && !loading && (
-        <Typography variant="body1" color="textSecondary">No se encontraron productos.</Typography>
+        <Typography variant="body1" color="textSecondary">
+          No se encontraron productos.
+        </Typography>
       )}
 
       <div className="absolute-btn">
         <ResponsiveDialog />
       </div>
 
-      <Fab onClick={volverArriba} className={`${mostrarBoton ? "visible" : "oculto"}`} variant="extended" size="small" color="primary">
+      <Fab
+        onClick={volverArriba}
+        className={`${mostrarBoton ? "visible" : "oculto"}`}
+        variant="extended"
+        size="small"
+        color="primary"
+      >
         <NavigationIcon sx={{ mr: 1 }} />
       </Fab>
 
       <ShoppingCart
         cart={cart}
-        setCart={setCart}  // Pasamos setCart como prop
+        setCart={setCart}
         onClearCart={clearCart}
         onRemoveFromCart={handleRemoveFromCart}
       />
 
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-      >
-        <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+      <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: "100%" }}>
           Producto agregado al carrito
         </Alert>
       </Snackbar>
