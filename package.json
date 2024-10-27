@@ -29,7 +29,6 @@
     "react-scripts": "^3.0.1",
     "styled-components": "^6.1.8",
     "web-vitals": "^2.1.4",
-    "webpack": "^5.95.0",
     "xlsx": "^0.18.5"
   },
   "scripts": {

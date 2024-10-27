@@ -37,6 +37,7 @@ const App = () => {
           <Routes>
             <Route path="/login" element={<LoginRoute />} />
             <Route path="/registro" element={<Register />} />
+<<<<<<< Updated upstream
             <Route path="/home" element={<PrivateRoute component={Home} />} />
             <Route path="/catalogo" element={<PrivateRoute component={Catalogo} />} />
             <Route path="/catalogo3" element={<PrivateRoute component={Catalogo3} />} />
@@ -46,6 +47,17 @@ const App = () => {
             <Route path="/catalogo18" element={<PrivateRoute component={Catalogo18} />} />
             <Route path="/catalogo20" element={<PrivateRoute component={Catalogo20} />} />
             <Route path="/catalogo24" element={<PrivateRoute component={Catalogo24} />} />
+=======
+            <Route path="/home" element={<PrivateRoute component={Home} handleLogout={handleLogout} />} />
+            <Route path="/catalogo" element={<Catalogo />} />  {/* Ruta libre */}
+            <Route path="/catalogo3" element={<Catalogo3 />} />  {/* Ruta libre */}
+            <Route path="/catalogo6" element={<Catalogo6 />} />  {/* Ruta libre */}
+            <Route path="/catalogo9" element={<Catalogo9 />} />  {/* Ruta libre */}
+            <Route path="/catalogo12" element={<Catalogo12 />} />  {/* Ruta libre */}
+            <Route path="/catalogo18" element={<Catalogo18 />} />  {/* Ruta libre */}
+            <Route path="/catalogo20" element={<Catalogo20 />} />  {/* Ruta libre */}
+            <Route path="/catalogo24" element={<Catalogo24 />} />  {/* Ruta libre */}
+>>>>>>> Stashed changes
             <Route path="/" element={<Navigate to="/login" />} />
           </Routes>
         </Router>
@@ -62,7 +74,11 @@ const PrivateRoute = ({ component: Component }) => {
     return <Navigate to="/login" />;
   }
 
+<<<<<<< Updated upstream
   return <Component />;
+=======
+  return <Component handleLogout={handleLogout} />;
+>>>>>>> Stashed changes
 };
 
 // Ruta de login que redirige al usuario a "home" si ya está autenticado
