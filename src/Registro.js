@@ -105,6 +105,7 @@ const Register = () => {
                   }}
                 />
               </label>
+              
             </Grid>
             <Grid item xs={12} style={{ margin: '10px 0' }}>
               <Button fullWidth type="submit" variant="contained" size="large" disabled={loading}>
