@@ -2,7 +2,8 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Login from "./Login";
-import Home from "./home";
+/* import Home from "./home"; */
+import Mantenimiento from "./Mantenimiento";
 import Catalogo from "./catalogo";
 import Catalogo3 from "./catalogo3";
 import Catalogo6 from "./catalogo6";
@@ -35,7 +36,9 @@ const App = () => {
         <Router>
           <Routes>
             <Route path="/login" element={<LoginRoute />} />
-            <Route path="/home" element={<PrivateRoute component={Home} />} />
+            
+            <Route path="/home" element={<PrivateRoute component={Mantenimiento} />} />
+            {/* <Route path="/home" element={<PrivateRoute component={Home} />} /> */}
             <Route path="/catalogo" element={<Catalogo />} />  {/* Ruta libre */}
             <Route path="/catalogo3" element={<Catalogo3 />} />  {/* Ruta libre */}
             <Route path="/catalogo6" element={<Catalogo6 />} />  {/* Ruta libre */}
