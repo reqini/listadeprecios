@@ -37,7 +37,7 @@ const App = () => {
           <Routes>
             <Route path="/login" element={<LoginRoute />} />
             
-            <Route path="/home" element={<PrivateRoute component={Mantenimiento} />} />
+            {/* <Route path="/home" element={<PrivateRoute component={Mantenimiento} />} /> */}
             {/* <Route path="/home" element={<PrivateRoute component={Home} />} /> */}
             <Route path="/catalogo" element={<Catalogo />} />  {/* Ruta libre */}
             <Route path="/catalogo3" element={<Catalogo3 />} />  {/* Ruta libre */}
@@ -47,7 +47,8 @@ const App = () => {
             <Route path="/catalogo18" element={<Catalogo18 />} />  {/* Ruta libre */}
             <Route path="/catalogo20" element={<Catalogo20 />} />  {/* Ruta libre */}
             <Route path="/catalogo24" element={<Catalogo24 />} />  {/* Ruta libre */}
-            <Route path="/" element={<Navigate to="/login" />} />
+            {/* <Route path="/" element={<Navigate to="/login" />} /> */}
+            <Route path="/" element={<Mantenimiento />} />  {/* Ruta libre */}
           </Routes>
         </Router>
       </AuthProvider>
