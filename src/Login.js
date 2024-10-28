@@ -14,7 +14,7 @@ const url =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:8080' // URL local para desarrollo
     : 'https://backtest-production-7f88.up.railway.app'; // URL de producción
-    
+
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -31,6 +31,7 @@ const Login = () => {
     setUsername(value.replace(/\s+/g, '').toLowerCase());
   };
 
+  
   // Enviar el formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
