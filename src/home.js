@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import axios from "axios";
+import axios from "./utils/axios";
 import {
   Button,
   Container,
@@ -19,7 +19,6 @@ import { handleCuotaChange } from "./utils/cartHandlers";
 import { useAuth } from "./AuthContext"; // Importamos useAuth
 
 const Home = () => {
-  const url = "https://backtest-production-7f88.up.railway.app";
   const { logout } = useAuth(); // Obtenemos el logout desde useAuth
 
   const [cart, setCart] = useState([]);
@@ -88,7 +87,7 @@ const Home = () => {
   // Definir fetchData dentro del componente
   const fetchData = useCallback(async (endpoint, setState) => {
     try {
-      const { data } = await axios.get(`${url}/api/${endpoint}`);
+      const { data } = await axios.get(`/api/${endpoint}`);
       setState(data);
       setTimeout(() => {
         setLoading(false); // Mantener el skeleton visible al menos por un breve periodo
@@ -97,7 +96,7 @@ const Home = () => {
       console.error(`Error al obtener ${endpoint}:`, error);
       setLoading(false);
     }
-  }, [url]);
+  }, []);
 
   // Llamar a fetchData para obtener los productos
   useEffect(() => {
