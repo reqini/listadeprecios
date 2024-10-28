@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "./utils/axios";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
@@ -12,7 +12,6 @@ import introJs from 'intro.js';
 import 'intro.js/introjs.css';
 
 const Catalogo = () => {
-  const url = "https://backtest-production-7f88.up.railway.app";
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
@@ -64,7 +63,7 @@ const Catalogo = () => {
   // Cargar productos desde la API
   useEffect(() => {
     const getData = async () => {
-      const result = await axios.get(`${url}/api/productos`);
+      const result = await axios.get(`/api/productos`);
       setLoading(false);
       setProductos(result.data);
       setProductosFiltrados(result.data);

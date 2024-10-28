@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios from "../utils/axios";
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -15,7 +15,6 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 
 
 export default function ResponsiveDialog() {
-    const url = "https://backtest-production-7f88.up.railway.app";
     const [open, setOpen] = React.useState(false);
     const [bancosFiltrados, setBancosFiltrados] = useState([]);
     const theme = useTheme();
@@ -29,14 +28,14 @@ export default function ResponsiveDialog() {
     setOpen(false);
   };
 
-  useEffect(() => {
-    const getData = async () => {
-      const result = await axios.get(`${url}/api/bancos`);
-      setBancosFiltrados(result.data);
-    };
+  // useEffect(() => {
+  //   const getData = async () => {
+  //     const result = await axios.get(`/api/bancos`);
+  //     setBancosFiltrados(result.data);
+  //   };
 
-    getData();
-  }, []);
+  //   getData();
+  // }, []);
 
   return (
     <React.Fragment>

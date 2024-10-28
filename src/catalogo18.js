@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import axios from "./utils/axios";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
@@ -11,7 +11,6 @@ import { Snackbar, Alert, Typography } from "@mui/material";
 import { formatPrice } from './utils/priceUtils';
 
 const Catalogo18 = () => {
-  const url = "https://backtest-production-7f88.up.railway.app";
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);  // Carga inicial
   const [productos, setProductos] = useState([]);
@@ -37,7 +36,7 @@ const Catalogo18 = () => {
 
   // Cargar productos desde la API (sin paginación ni scroll)
   const getData = async () => {
-    const result = await axios.get(`${url}/api/productos`);
+    const result = await axios.get(`/api/productos`);
     return result.data;
   };
 

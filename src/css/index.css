@@ -230,7 +230,7 @@ li {
   color: green;
 }
 .background-image {
-  background-image: url(../../public/background.jpeg);
+  background-image: url(../assets/background.jpeg);
   background-size: cover;
 }
 
