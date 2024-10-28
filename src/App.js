@@ -57,7 +57,7 @@ const App = () => {
 };
 
 // Ruta privada que solo permite el acceso si el usuario está autenticado
-const PrivateRoute = ({ component: Component }) => {
+/* const PrivateRoute = ({ component: Component }) => {
   const { auth } = useAuth();
 
   if (!auth || !auth.token) {
@@ -65,7 +65,7 @@ const PrivateRoute = ({ component: Component }) => {
   }
 
   return <Component />;
-};
+}; */
 
 // Ruta de login que redirige al usuario a "home" si ya está autenticado
 const LoginRoute = () => {
