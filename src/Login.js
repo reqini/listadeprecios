@@ -71,7 +71,7 @@ const Login = () => {
                   fullWidth
                   style={{ color: 'black', backgroundColor: 'white' }}
                   id="filled-required-name"
-                  label={'Nombre'}
+                  label={'Usuario'}
                   value={username}
                   variant="filled"
                   onChange={handleChangeUsername}
@@ -86,7 +86,7 @@ const Login = () => {
                   type={showPassword ? 'text' : 'password'}
                   style={{ color: 'black', backgroundColor: 'white' }}
                   id="filled-required-code"
-                  label="Código de emprendedora"
+                  label="Contraseña"
                   value={password}
                   variant="filled"
                   onChange={(e) => setPassword(e.target.value)}
