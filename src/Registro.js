@@ -3,11 +3,12 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import logo from './assets/logo.png';
+/* import logo from './assets/logo.png'; */
 import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axios from "./utils/axios";
+import { Typography } from '@mui/material';
 
 // Detectar si estamos en producción o en desarrollo
 const Register = () => {
@@ -55,9 +56,10 @@ const Register = () => {
   };
 
   return (
-    <div className='full-width' style={{ backgroundColor: '#FFEDC4' }}>
+    <div className='full-width' style={{ backgroundColor: '#A47A9E' }}>
       <Container className='flex justify-center items-center flex-direction' maxWidth="sm" style={{ paddingTop: 100 }}>
-        <img src={logo} alt="logo" height="100" className='mar-b10' />
+        {/* <img src={logo} alt="logo" height="100" className='mar-b10' /> */}
+        <Typography variant='h5' color='white' marginBottom='20px'>Registro de uruarios nuevos</Typography>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={0} className='card'>
             <Grid item xs={12} style={{ margin: '10px 0' }}>

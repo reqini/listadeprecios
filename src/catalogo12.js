@@ -149,7 +149,7 @@ const Catalogo12 = () => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <Helmet>
-        <title>Red SinLimites - Catálogo</title>
+      <title>Catalogo Simple - Catálogo</title>
       </Helmet>
       <div className="w-100 flex justify-center">
         <img src={logo} alt="logo" height="100" className='mar-t30 mar-b20' />
