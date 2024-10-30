@@ -199,7 +199,7 @@ const Catalogo24 = () => {
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
                   selectedCuota={'24 cuotas sin interés'}
-                  precio={formatPrice(product.precio)}  // Formatear el precio aquí
+                  precio={formatPrice(product.precio || 0)}  // Se usa 0 como valor por defecto si el precio es undefined
                 />
               </li>
             ))}

@@ -12,7 +12,7 @@ import { formatPrice } from './utils/priceUtils';
 
 const Catalogo6 = () => {
   const [cart, setCart] = useState([]);
-  const [loading, setLoading] = useState(true);  // Carga inicial
+  const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
   const [filtro, setFiltro] = useState("");
   const [productosAgrupados, setProductosAgrupados] = useState({});
@@ -23,7 +23,6 @@ const Catalogo6 = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
-  // Eliminar productos duplicados por código o ID
   const eliminarDuplicados = (productos) => {
     const productosUnicos = productos.reduce((acc, producto) => {
       if (!acc.some(item => item.codigo === producto.codigo)) {
@@ -34,7 +33,6 @@ const Catalogo6 = () => {
     return productosUnicos;
   };
 
-  // Cargar productos desde la API (sin carga incremental)
   const getData = async () => {
     const result = await axios.get(`/api/productos`);
     return result.data;
@@ -43,18 +41,17 @@ const Catalogo6 = () => {
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
-      const productosData = await getData(); // Cargar todos los productos de una vez
-      const productosFiltrados = productosData.filter(producto => producto.vigencia.toLowerCase() !== "no");  // Filtrar por vigencia
-      const productosUnicos = eliminarDuplicados(productosFiltrados);  // Eliminar duplicados
+      const productosData = await getData();
+      const productosFiltrados = productosData.filter(producto => producto.vigencia.toLowerCase() !== "no");
+      const productosUnicos = eliminarDuplicados(productosFiltrados);
       setProductos(productosUnicos);
       agruparProductosPorLinea(productosUnicos);
-      setLoading(false);  // Detener el estado de carga cuando los productos se hayan cargado completamente
+      setLoading(false);
     };
 
     loadInitialData();
   }, []);
 
-  // Agrupar productos por línea
   const agruparProductosPorLinea = (productos) => {
     const productosPorLinea = productos.reduce((acc, producto) => {
       const { linea } = producto;
@@ -65,7 +62,6 @@ const Catalogo6 = () => {
     setProductosAgrupados(productosPorLinea);
   };
 
-  // Manejar scroll para hacer sticky el header
   useEffect(() => {
     const handleScroll = () => {
       const offset = window.scrollY;
@@ -79,16 +75,14 @@ const Catalogo6 = () => {
     };
   }, []);
 
-  // Uso de useMemo para mantener cuotasMap sin cambios en cada render
   const cuotasMap = useMemo(() => ({
     "6 cuotas sin interés": 'doce_sin_interes',
   }), []);
 
-  // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir los productos con línea "Repuestos"
   useEffect(() => {
     let productosFiltrados = productos.filter((producto) =>
       producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) &&
-      producto.linea.toLowerCase() !== 'repuestos'  // Excluir los productos con línea "Repuestos"
+      producto.linea.toLowerCase() !== 'repuestos'
     );
 
     if (cuotasMap["6 cuotas sin interés"]) {
@@ -101,12 +95,10 @@ const Catalogo6 = () => {
     agruparProductosPorLinea(productosFiltrados);
   }, [filtro, productos, cuotasMap]);
 
-  // Añadir producto al carrito
   const addToCart = (product) => {
     setCart([...cart, product]);
   };
 
-  // Manejar el agregado y eliminación de favoritos
   const toggleFavorite = (product) => {
     let updatedFavorites;
     let message;
@@ -126,14 +118,12 @@ const Catalogo6 = () => {
     setSnackbarMessage(message);
     setSnackbarOpen(true);
 
-    // Si no quedan favoritos, volver a mostrar todos los productos
     if (updatedFavorites.length === 0) {
       setShowFavorites(false);
       agruparProductosPorLinea(productos);
     }
   };
 
-  // Filtrar los productos que se deben mostrar (favoritos o todos)
   const productosAMostrar = showFavorites
     ? Object.keys(productosAgrupados).reduce((acc, linea) => {
         const productosFavoritos = productosAgrupados[linea].filter(product =>
@@ -168,7 +158,6 @@ const Catalogo6 = () => {
         />
       </div>
 
-      {/* Skeleton para la carga inicial */}
       {loading && (
         <ul className="lista-prod-catalog w-100">
           {[...Array(8)].map((_, idx) => (
@@ -183,7 +172,6 @@ const Catalogo6 = () => {
         </ul>
       )}
 
-      {/* Productos cargados */}
       {Object.keys(productosAMostrar).map((linea) => (
         <div key={linea} className="linea-section">
           <Typography variant="h5" gutterBottom margin="20px 0">
@@ -199,7 +187,7 @@ const Catalogo6 = () => {
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
                   selectedCuota={'6 cuotas sin interés'}
-                  precio={formatPrice(product.precio)}  // Formatear el precio aquí
+                  precio={formatPrice(product.precio || 0)}  // Se usa 0 como valor por defecto si el precio es undefined
                 />
               </li>
             ))}

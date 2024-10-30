@@ -35,7 +35,6 @@ const Catalogo = () => {
     "3 cuotas sin interés": 'tres_sin_interes'
   };
 
-  // Iniciar el tour
   const startTour = () => {
     introJs().setOptions({
       steps: [
@@ -60,7 +59,6 @@ const Catalogo = () => {
     }).start();
   };
 
-  // Cargar productos desde la API
   useEffect(() => {
     const getData = async () => {
       const result = await axios.get(`/api/productos`);
@@ -72,7 +70,6 @@ const Catalogo = () => {
     getData();
   }, []);
 
-  // Manejar scroll para hacer sticky el header
   useEffect(() => {
     const handleScroll = () => {
       const offset = window.scrollY;
@@ -86,11 +83,10 @@ const Catalogo = () => {
     };
   }, []);
 
-  // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir solo los que tengan línea "Repuestos"
   useEffect(() => {
     let productosFiltrados = productos.filter((producto) =>
       producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) &&
-      producto.linea.toLowerCase() !== 'repuestos'  // Excluir los productos con línea "Repuestos"
+      producto.linea.toLowerCase() !== 'repuestos'
     );
 
     if (selectedCuota && cuotasMap[selectedCuota]) {
@@ -103,13 +99,11 @@ const Catalogo = () => {
     setProductosFiltrados(productosFiltrados);
   }, [filtro, productos, selectedCuota, cuotasMap]);
 
-  // Cargar favoritos desde localStorage al montar el componente
   useEffect(() => {
     const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
     setFavorites(storedFavorites);
   }, []);
 
-  // Detectar si es mobile o desktop
   useEffect(() => {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -121,12 +115,10 @@ const Catalogo = () => {
     return () => window.removeEventListener("resize", checkIfMobile);
   }, []);
 
-  // Añadir producto al carrito
   const addToCart = (product) => {
     setCart([...cart, product]);
   };
 
-  // Manejar el agregado y eliminación de favoritos
   const toggleFavorite = (product) => {
     let updatedFavorites;
     let message;
@@ -146,14 +138,12 @@ const Catalogo = () => {
     setSnackbarMessage(message);
     setSnackbarOpen(true);
 
-    // Si no quedan favoritos, volver a mostrar todos los productos
     if (updatedFavorites.length === 0) {
       setShowFavorites(false);
       setProductosFiltrados(productos);
     }
   };
 
-  // Filtrar los productos que se deben mostrar (favoritos o todos)
   const productosAMostrar = showFavorites
     ? productosFiltrados.filter(product => favorites.some(fav => fav.id === product.id))
     : productosFiltrados;
@@ -238,7 +228,7 @@ const Catalogo = () => {
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
                   selectedCuota={selectedCuota || '12 cuotas sin interés'}
-                  precio={formatPrice(product.precio)}  // Formatear el precio aquí
+                  precio={formatPrice(product.precio || 0)}  // Se usa 0 como valor por defecto si el precio es undefined
                 />
               </li>
             ) : null
