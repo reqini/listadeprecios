@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import axios from "../utils/axios";
+import React, { useState } from "react";
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -16,7 +15,7 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 
 export default function ResponsiveDialog() {
     const [open, setOpen] = React.useState(false);
-    const [bancosFiltrados, setBancosFiltrados] = useState([]);
+    const [bancosFiltrados] = useState([]);
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
