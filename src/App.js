@@ -2,8 +2,8 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Login from "./Login";
-/* import Home from "./home"; */
-import Mantenimiento from "./Mantenimiento";
+import Home from "./home";
+import Registro from "./Registro";
 import Catalogo from "./catalogo";
 import Catalogo3 from "./catalogo3";
 import Catalogo6 from "./catalogo6";
@@ -13,7 +13,6 @@ import Catalogo18 from "./catalogo18";
 import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
 import { AuthProvider, useAuth } from './AuthContext';
-
 
 const theme = createTheme({
   palette: {
@@ -30,45 +29,16 @@ const theme = createTheme({
   },
 });
 
-const App = () => {
-  return (
-    <ThemeProvider theme={theme}>
-      <AuthProvider>
-        <Router>
-          <Routes>
-            <Route path="/login" element={<LoginRoute />} />
-            
-            {/* <Route path="/home" element={<PrivateRoute component={Mantenimiento} />} /> */}
-            {/* <Route path="/home" element={<PrivateRoute component={Home} />} /> */}
-            <Route path="/catalogo" element={<Catalogo />} />  {/* Ruta libre */}
-            <Route path="/catalogo3" element={<Catalogo3 />} />  {/* Ruta libre */}
-            <Route path="/catalogo6" element={<Catalogo6 />} />  {/* Ruta libre */}
-            <Route path="/catalogo9" element={<Catalogo9 />} />  {/* Ruta libre */}
-            <Route path="/catalogo12" element={<Catalogo12 />} />  {/* Ruta libre */}
-            <Route path="/catalogo18" element={<Catalogo18 />} />  {/* Ruta libre */}
-            <Route path="/catalogo20" element={<Catalogo20 />} />  {/* Ruta libre */}
-            <Route path="/catalogo24" element={<Catalogo24 />} />  {/* Ruta libre */}
-            {/* <Route path="/" element={<Navigate to="/login" />} /> */}
-            <Route path="/" element={<Mantenimiento />} />  {/* Ruta libre */}
-          </Routes>
-        </Router>
-      </AuthProvider>
-    </ThemeProvider>
-  );
-};
-
-// Ruta privada que solo permite el acceso si el usuario está autenticado
-/* const PrivateRoute = ({ component: Component }) => {
+const PrivateRoute = ({ children }) => {
   const { auth } = useAuth();
 
   if (!auth || !auth.token) {
     return <Navigate to="/login" />;
   }
 
-  return <Component />;
-}; */
+  return children;
+};
 
-// Ruta de login que redirige al usuario a "home" si ya está autenticado
 const LoginRoute = () => {
   const { auth } = useAuth();
 
@@ -77,6 +47,31 @@ const LoginRoute = () => {
   }
 
   return <Login />;
+};
+
+const App = () => {
+  return (
+    <ThemeProvider theme={theme}>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/login" element={<LoginRoute />} />
+            <Route path="/registro" element={<Registro />} />
+            <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
+            <Route path="/catalogo" element={<Catalogo />} />
+            <Route path="/catalogo3" element={<Catalogo3 />} />
+            <Route path="/catalogo6" element={<Catalogo6 />} />
+            <Route path="/catalogo9" element={<Catalogo9 />} />
+            <Route path="/catalogo12" element={<Catalogo12 />} />
+            <Route path="/catalogo18" element={<Catalogo18 />} />
+            <Route path="/catalogo20" element={<Catalogo20 />} />
+            <Route path="/catalogo24" element={<Catalogo24 />} />
+            <Route path="/" element={<Navigate to="/login" />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
+  );
 };
 
 export default App;
