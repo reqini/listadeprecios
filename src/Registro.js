@@ -59,7 +59,7 @@ const Register = () => {
     <div className='full-width' style={{ backgroundColor: '#A47A9E' }}>
       <Container className='flex justify-center items-center flex-direction' maxWidth="sm" style={{ paddingTop: 100 }}>
         {/* <img src={logo} alt="logo" height="100" className='mar-b10' /> */}
-        <Typography variant='h5' color='white' marginBottom='20px'>Registro de uruarios nuevos</Typography>
+        <Typography variant='h5' color='white' marginBottom='20px'>Registro de usuarios nuevos</Typography>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={0} className='card'>
             <Grid item xs={12} style={{ margin: '10px 0' }}>
@@ -69,7 +69,7 @@ const Register = () => {
                   fullWidth
                   style={{ color: 'black', backgroundColor: 'white' }}
                   id="filled-required-name"
-                  label={'Nombre'}
+                  label={'crear usuario'}
                   value={username}
                   variant="filled"
                   onChange={handleChangeUsername}
@@ -84,7 +84,7 @@ const Register = () => {
                   type={showPassword ? 'text' : 'password'}
                   style={{ color: 'black', backgroundColor: 'white' }}
                   id="filled-required-code"
-                  label="Código de emprendedora"
+                  label="crear contraseña"
                   value={password}
                   variant="filled"
                   onChange={(e) => setPassword(e.target.value)}
