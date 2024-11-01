@@ -1,23 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "../utils/axios";
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTheme } from '@mui/material/styles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import { Avatar, Divider } from "@mui/material";
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 
-
-export default function ResponsiveDialog() {
-    const [open, setOpen] = React.useState(false);
-    const [bancosFiltrados] = useState([]);
-    const theme = useTheme();
-    const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+export default function BancosDialog() {
+  const [open, setOpen] = useState(false);
+  const [bancos, setBancos] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -27,79 +24,59 @@ export default function ResponsiveDialog() {
     setOpen(false);
   };
 
-  // useEffect(() => {
-  //   const getData = async () => {
-  //     const result = await axios.get(`/api/bancos`);
-  //     setBancosFiltrados(result.data);
-  //   };
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const result = await axios.get(`/api/bancos`);
+        setBancos(result.data);
+      } catch (error) {
+        console.error("Error fetching bancos data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  //   getData();
-  // }, []);
+    getData();
+  }, []);
+
+  if (loading) return <p>Cargando...</p>;
 
   return (
     <React.Fragment>
-      <Button variant="contained" color="secondary" onClick={handleClickOpen} style={{width: 'auto'}}> 
-      Promociones Bancarias
+      <Button variant="contained" color="secondary" onClick={handleClickOpen} style={{ width: 'auto' }}>
+        Promociones Bancarias
       </Button>
       <Dialog
-        fullScreen={fullScreen}
         open={open}
         onClose={handleClose}
-        aria-labelledby="responsive-dialog-title"
+        aria-labelledby="bancos-dialog-title"
       >
-        <DialogTitle id="responsive-dialog-title">
-          {"Promociones Bancarias"}
+        <DialogTitle id="bancos-dialog-title">
+          Promociones Bancarias
         </DialogTitle>
         <DialogContent>
-            <List sx={{ width: '100%', minWidth: 300, bgcolor: 'background.paper' }}>
-                {bancosFiltrados.map((bancos) => (
-                <>
+          <List sx={{ width: '100%', minWidth: 300, bgcolor: 'background.paper' }}>
+            {bancos.map((banco, index) => (
+              <React.Fragment key={index}>
                 <ListItem>
-                    <ListItemAvatar>
-                        <Avatar src={bancos.logo} />
-                    </ListItemAvatar>
-                    <ListItemText primary={bancos.banco} secondary={
-                        <p style={{color: 'green'}}>
-                            {bancos.veinte === 'todos los dias' ? 
-                            <i>24 sin interes<br/></i> : bancos.veinticuatro === 'vigencia' ?
-                            <i>24 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/></i> : null
-                            }
-                            {bancos.veinte === 'todos los dias' ? 
-                            <i>20 sin interes<br/></i> : bancos.veinte === 'vigencia' ?
-                            <i>20 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/></i> : null
-                            }
-                            {bancos.diesiocho === 'todos los dias' ? 
-                            <i>18 sin interes<br/></i> : bancos.dieciocho === 'vigencia' ?
-                            <i>18 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/></i> : null
-                            }
-                            {bancos.dose === 'todos los dias' ? 
-                            <i> 12 sin interes<br/></i> : bancos.doce === 'vigencia' ?
-                            <i>12 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/></i> : null
-                            }
-                            {bancos.diez === 'todos los dias' ? 
-                            <i> 10 sin interes<br/></i> : bancos.diez === 'vigencia' ?
-                            <i>10 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/></i> : null
-                            }
-                            {bancos.nueve === 'todos los dias' ? 
-                            <i> 9 sin interes<br/></i> : bancos.nueve === 'vigencia' ?
-                            <i>9 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/></i> : null
-                            }
-                            {bancos.seis === 'todos los dias' ? 
-                            <i> 6 sin interes<br/></i> : bancos.seis === 'vigencia' ?
-                            <i>6 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/></i> : null
-                            }
-                            {bancos.tres === 'todos los dias' ? 
-                            <i> 3 sin interes<br/></i> : bancos.tres === 'vigencia' ?
-                            <i> 3 sin interes <span className="font-vigencia">{bancos.vigencia}</span><br/></i> : null
-                            }
-                        </p>
-                    } />
+                  <ListItemAvatar>
+                    <Avatar src={banco.logo} alt={banco.nombre} />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={banco.nombre}
+                    secondary={
+                      <p style={{ color: 'green' }}>
+                        {banco.promocion} {/* Asume que 'promocion' es un campo en los datos */}
+                        <br />
+                        {banco.vigencia && <span>Vigencia: {banco.vigencia}</span>}
+                      </p>
+                    }
+                  />
                 </ListItem>
                 <Divider />
-                </>
-                   ),
-                )}
-            </List>
+              </React.Fragment>
+            ))}
+          </List>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} autoFocus>
