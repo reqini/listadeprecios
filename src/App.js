@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Login from "./Login";
 import Home from "./home";
-import Mantenimiento from "./Mantenimiento";
 import Registro from "./Registro";
 import Catalogo from "./catalogo";
 import Catalogo3 from "./catalogo3";
@@ -56,11 +55,9 @@ const App = () => {
       <AuthProvider>
         <Router>
           <Routes>
-            <Route path="/" element={<Mantenimiento />} />
             <Route path="/login" element={<LoginRoute />} />
             <Route path="/registro" element={<Registro />} />
-            {/* <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} /> */}
-            <Route path="/home" element={<Mantenimiento />} />
+            <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
             <Route path="/catalogo" element={<Catalogo />} />
             <Route path="/catalogo3" element={<Catalogo3 />} />
             <Route path="/catalogo6" element={<Catalogo6 />} />
@@ -69,7 +66,7 @@ const App = () => {
             <Route path="/catalogo18" element={<Catalogo18 />} />
             <Route path="/catalogo20" element={<Catalogo20 />} />
             <Route path="/catalogo24" element={<Catalogo24 />} />
-            {/* <Route path="/" element={<Navigate to="/login" />} /> */}
+            <Route path="/" element={<Navigate to="/login" />} />
           </Routes>
         </Router>
       </AuthProvider>
