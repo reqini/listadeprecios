@@ -72,6 +72,11 @@ li {
   grid-template-columns: repeat(4, 1fr);
   gap: 4px; /* Espacio entre columnas y filas */
 }
+.lista-prod-placas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px; /* Espacio entre columnas y filas */
+}
 .grid-item {
   padding: 5px;
   font-size: 30px;

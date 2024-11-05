@@ -3,7 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Login from "./Login";
 import Home from "./home";
-/* import Mantenimiento from "./Mantenimiento"; */
+import Placas from "./placas";
+import CanvaEditor from "./components/CanvaEditor";
+import Mantenimiento from "./Mantenimiento";
 import Registro from "./Registro";
 import Catalogo from "./catalogo";
 import Catalogo3 from "./catalogo3";
@@ -56,9 +58,11 @@ const App = () => {
       <AuthProvider>
         <Router>
           <Routes>
-            {/* <Route path="/" element={<Mantenimiento />} /> */}
+            <Route path="/mantenimiento" element={<Mantenimiento />} />
+            <Route path="/canva" element={<CanvaEditor />} />
             <Route path="/login" element={<LoginRoute />} />
             <Route path="/registro" element={<Registro />} />
+            <Route path="/placas" element={<Placas />} />
             <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
             <Route path="/catalogo" element={<Catalogo />} />
             <Route path="/catalogo3" element={<Catalogo3 />} />
