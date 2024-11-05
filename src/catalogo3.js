@@ -184,7 +184,7 @@ const Catalogo3 = () => {
             {productosAMostrar[linea].map((product) => (
               <li className="grid-item" key={product.id}>
                 <ProductsCalatogo
-                  key={product.codigo}
+                  /* key={product.codigo} */
                   product={product}
                   onAddToCart={addToCart}
                   isFavorite={favorites.some(fav => fav.id === product.id)}

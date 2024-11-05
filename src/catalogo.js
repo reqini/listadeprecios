@@ -222,7 +222,6 @@ const Catalogo = () => {
             product.vigencia === "SI" ? (
               <li className="grid-item" key={product.id}>
                 <ProductsCalatogo
-                  key={product.codigo}
                   product={product}
                   onAddToCart={addToCart}
                   isFavorite={favorites.some(fav => fav.id === product.id)}
