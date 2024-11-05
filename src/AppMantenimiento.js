@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Mantenimiento from "./Mantenimiento";
+import Home from "./home";
 import { AuthProvider } from './AuthContext';
 
 const theme = createTheme({
@@ -26,6 +27,7 @@ const AppMantenimiento = () => {
         <Router>
           <Routes>
             <Route path="/" element={<Mantenimiento />} />
+            <Route path="/pruebas" element={<Home />} />
             <Route path="/home" element={<Mantenimiento />} />
           </Routes>
         </Router>
