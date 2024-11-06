@@ -28,6 +28,7 @@ export default function BancosDialog() {
     const getData = async () => {
       try {
         const result = await axios.get(`/api/bancos`);
+        console.log(result.data); // Verificar los datos que se reciben
         setBancos(result.data);
       } catch (error) {
         console.error("Error fetching bancos data:", error);
@@ -63,13 +64,41 @@ export default function BancosDialog() {
                     <Avatar src={banco.logo} alt={banco.nombre} />
                   </ListItemAvatar>
                   <ListItemText
-                    primary={banco.nombre}
+                    primary={banco.banco}
                     secondary={
-                      <p style={{ color: 'green' }}>
-                        {banco.promocion} {/* Asume que 'promocion' es un campo en los datos */}
-                        <br />
-                        {banco.vigencia && <span>Vigencia: {banco.vigencia}</span>}
-                      </p>
+                      <div style={{ color: 'green' }}>
+                        {banco.promocion && <p>{banco.promocion}</p>}
+                        <ul>
+                          {Object.entries({
+                            tres: "3",
+                            seis: "6",
+                            nueve: "9",
+                            doce: "12",
+                            dieciocho: "18",
+                            veinte: "20",
+                            veinticuatro: "24"
+                          }).map(([key, value]) => {
+                            if (banco[key] === "SI" || banco[key] === "TLD") {
+                              // Muestra las cuotas que tienen "SI" o "TLD"
+                              return (
+                                <li key={key}>
+                                  {`${value} cuotas`}
+                                </li>
+                              );
+                            } else if (banco[key] === "VIGENCIA" && banco.vigencia) {
+                              // Muestra las cuotas que tienen "VIGENCIA" con el texto adicional
+                              return (
+                                <li key={key}>
+                                  <span style={{ color: 'green' }}>{`${value} cuotas:`}</span>
+                                  <span style={{ color: 'black' }}> {banco.vigencia}</span>
+                                </li>
+                              );
+                            } else {
+                              return null; // No mostrar si no es "SI", "TLD", o "VIGENCIA"
+                            }
+                          })}
+                        </ul>
+                      </div>
                     }
                   />
                 </ListItem>
