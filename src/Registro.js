@@ -3,36 +3,30 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-/* import logo from './assets/logo.png'; */
 import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axios from "./utils/axios";
 import { Typography } from '@mui/material';
 
-// Detectar si estamos en producción o en desarrollo
 const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Toggle para mostrar u ocultar la contraseña
   const handleClickShowPassword = () => setShowPassword(!showPassword);
 
-  // Controlar el cambio del nombre de usuario
   const handleChangeUsername = (e) => {
     const value = e.target.value;
     setUsername(value.replace(/\s+/g, '').toLowerCase());
   };
 
-  // Enviar el formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
   
     try {
-      // Hacemos una solicitud POST al backend para registrar
       const response = await axios.post(`/api/register`, {
         username,
         password,
@@ -41,9 +35,9 @@ const Register = () => {
       console.log("Respuesta del backend:", response.data);
   
       if (response.data.success) {
-        // Mostrar mensaje de éxito y redirigir al login
-        alert('Usuario registrado con éxito. Ahora puedes iniciar sesión.');
-        window.location.href = "/login";  // Redirige manualmente a la página de login
+        // Mostrar mensaje de éxito y redirigir al link de suscripción
+        alert('Usuario registrado con éxito. Ahora serás redirigido al plan de suscripción.');
+        window.location.href = "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808492e620a40192e8bb0f0400ed";
       } else {
         alert('Hubo un problema durante el registro. Intenta nuevamente.');
       }
@@ -58,7 +52,6 @@ const Register = () => {
   return (
     <div className='full-width' style={{ backgroundColor: '#A47A9E' }}>
       <Container className='flex justify-center items-center flex-direction' maxWidth="sm" style={{ paddingTop: 100 }}>
-        {/* <img src={logo} alt="logo" height="100" className='mar-b10' /> */}
         <Typography variant='h5' color='white' marginBottom='20px'>Registro de usuarios nuevos</Typography>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={0} className='card'>
@@ -102,7 +95,6 @@ const Register = () => {
                   }}
                 />
               </label>
-              
             </Grid>
             <Grid item xs={12} style={{ margin: '10px 0' }}>
               <Button fullWidth type="submit" variant="contained" size="large" disabled={loading}>
