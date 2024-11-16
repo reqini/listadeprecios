@@ -1,7 +1,7 @@
 [build]
-  command = "yarn build"  # Cambia a "npm run build" si usas npm
-  publish = "build"       # Carpeta donde están los archivos listos para despliegue
-  environment = { NODE_ENV = "production" }
+  command = "npm run build"
+  publish = "build"
+  environment = { NODE_ENV = "development" }
 
 [[redirects]]
   from = "/*"
