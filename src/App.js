@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Login from "./Login";
@@ -12,8 +12,9 @@ import Catalogo12 from "./catalogo12";
 import Catalogo18 from "./catalogo18";
 import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
-import { AuthProvider, useAuth } from './AuthContext';
+import { AuthProvider, useAuth } from "./AuthContext";
 
+// Tema personalizado
 const theme = createTheme({
   palette: {
     primary: {
@@ -29,6 +30,7 @@ const theme = createTheme({
   },
 });
 
+// Ruta privada
 const PrivateRoute = ({ children }) => {
   const { auth } = useAuth();
 
@@ -39,6 +41,7 @@ const PrivateRoute = ({ children }) => {
   return children;
 };
 
+// Ruta para login
 const LoginRoute = () => {
   const { auth } = useAuth();
 
@@ -50,6 +53,43 @@ const LoginRoute = () => {
 };
 
 const App = () => {
+  useEffect(() => {
+    // Limpieza automática de datos almacenados
+    try {
+      const authData = localStorage.getItem("auth");
+      if (!authData || typeof authData !== "string") {
+        localStorage.clear();
+        sessionStorage.clear();
+      }
+    } catch (error) {
+      console.error("Error limpiando datos almacenados:", error);
+      localStorage.clear();
+      sessionStorage.clear();
+    }
+  }, []);
+
+  useEffect(() => {
+    // Detectar nuevas versiones del Service Worker
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistration().then((registration) => {
+        if (registration) {
+          registration.onupdatefound = () => {
+            const installingWorker = registration.installing;
+            if (installingWorker) {
+              installingWorker.onstatechange = () => {
+                if (installingWorker.state === "installed" && navigator.serviceWorker.controller) {
+                  // Mostrar alerta para actualizar
+                  alert("Hay una nueva versión disponible. La aplicación se actualizará automáticamente.");
+                  window.location.reload(); // Recarga la aplicación
+                }
+              };
+            }
+          };
+        }
+      });
+    }
+  }, []);
+
   return (
     <ThemeProvider theme={theme}>
       <AuthProvider>
