@@ -4,12 +4,10 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { FaWhatsapp } from 'react-icons/fa';
-import { Button, CardActions, IconButton } from '@mui/material';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { Button, CardActions } from '@mui/material';
 import { formatPrice } from '../utils/priceUtils';  // Importamos la función de formateo
 
-const ProductsCalatogo = ({ product, isFavorite, onToggleFavorite, selectedCuota }) => {
+const ProductsCalatogo = ({ product, selectedCuota }) => {
 
   const cuotasMap = {
     "24 cuotas sin interés": 'veinticuatro_sin_interes',
@@ -41,10 +39,6 @@ const ProductsCalatogo = ({ product, isFavorite, onToggleFavorite, selectedCuota
   return (
     <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className='card-product-catalogo'>
       {product.discount && <div className='descuento'>{product.discount}</div>}
-
-      <IconButton onClick={onToggleFavorite} color="primary" style={{position: 'absolute', zIndex: 2, right: 10, top: 10, backgroundColor: 'rgba(0,0,0,0.1)'}}>
-        {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-      </IconButton>
       <CardMedia
         component="img"
         image={product.imagen ? product.imagen : '../descarga.png'}
