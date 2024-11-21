@@ -96,7 +96,7 @@ const Login = () => {
                         aria-label="toggle password visibility"
                         onClick={handleClickShowPassword}
                         edge="end"
-                        style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}
+                        style={{ position: 'absolute', right: 15, top: '50%', transform: 'translateY(-50%)' }}
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
