@@ -80,18 +80,32 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
           </Button>
         )}
         <Button
-          fullWidth
-          href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`¡Hola!, Te envío el valor de tu próxima Essen!\nProducto: ${product.descripcion}\nCuota: ${selectedCuota}`)}`}
-          target="_blank"
-          variant="contained"
-          size="medium"
-          color="primary"
-          sx={{ my: 1, backgroundColor: '#25D366', color: 'white' }}
-          disabled={!selectedCuota}
-          startIcon={selectedCuota ? <FaWhatsapp /> : null}
-        >
-          Compartir
-        </Button>
+            fullWidth
+              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`¡Hola! Te envío el valor de tu próxima Essen:
+                Producto: ${product.descripcion}
+                Cuota: ${
+                  selectedCuota
+                    ? selectedCuota === getDiscountedPrice(product.precio_negocio)
+                      ? `${selectedCuota} en 1 cuota`
+                      : `${selectedCuota} en ${
+                          cuotas.find(cuota => 
+                            product[cuota] && 
+                            getCuotaPrice(product.psvp_lista, product[cuota]) === selectedCuota
+                          ).match(/\d+/)[0]
+                        } sin interés`
+                    : 'N/A'
+                }`)}`}
+                  target="_blank"
+                  variant="contained"
+                  size="medium"
+                  color="primary"
+                  sx={{ my: 1, backgroundColor: '#25D366', color: 'white' }}
+                  disabled={!selectedCuota}
+                  startIcon={selectedCuota ? <FaWhatsapp /> : null}
+                >
+                  Compartir
+                </Button>
+
         {product.ficha_tecnica ? (
           <Button fullWidth target='_blank' href={product.ficha_tecnica} variant="outlined" size="medium" color="primary">
             Ficha técnica
