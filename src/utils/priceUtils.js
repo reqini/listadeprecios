@@ -4,23 +4,27 @@
  * @returns {number} - El precio convertido a número.
  */
 export const parsePrice = (priceString) => {
-  if (!priceString || typeof priceString !== 'string') return 0;
+  if (!priceString || typeof priceString !== 'string') {
+    console.warn('Advertencia: El precio no es un string válido:', priceString);
+    return 0;
+  }
 
   try {
-    // Remover el símbolo de moneda ($) y cualquier otro carácter no numérico
+    // Remover caracteres no numéricos y espacios
     const parsed = parseInt(priceString.replace(/[^\d]/g, '').trim(), 10);
-    
+
     if (isNaN(parsed)) {
       console.error('Error: El precio no es un número válido:', priceString);
       return 0;
     }
-    
+
     return parsed;
   } catch (error) {
     console.error('Error al parsear el precio:', error, priceString);
     return 0;
   }
 };
+
 
 /**
  * Convierte un número a un string con formato de moneda.
