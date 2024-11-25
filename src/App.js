@@ -34,8 +34,9 @@ const theme = createTheme({
 const PrivateRoute = ({ children }) => {
   const { auth } = useAuth();
 
+  // Verificar si el token está presente en el contexto de autenticación
   if (!auth || !auth.token) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;
@@ -45,8 +46,9 @@ const PrivateRoute = ({ children }) => {
 const LoginRoute = () => {
   const { auth } = useAuth();
 
+  // Redirigir a la home si ya hay un token activo
   if (auth && auth.token) {
-    return <Navigate to="/home" />;
+    return <Navigate to="/home" replace />;
   }
 
   return <Login />;
@@ -56,7 +58,7 @@ const App = () => {
   useEffect(() => {
     // Limpieza automática de datos almacenados
     try {
-      const authData = localStorage.getItem("auth");
+      const authData = localStorage.getItem("token");
       if (!authData || typeof authData !== "string") {
         localStorage.clear();
         sessionStorage.clear();
@@ -98,15 +100,15 @@ const App = () => {
             <Route path="/login" element={<LoginRoute />} />
             <Route path="/registro" element={<Registro />} />
             <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
-            <Route path="/catalogo" element={<Catalogo />} />
-            <Route path="/catalogo3" element={<Catalogo3 />} />
-            <Route path="/catalogo6" element={<Catalogo6 />} />
-            <Route path="/catalogo9" element={<Catalogo9 />} />
-            <Route path="/catalogo12" element={<Catalogo12 />} />
-            <Route path="/catalogo18" element={<Catalogo18 />} />
-            <Route path="/catalogo20" element={<Catalogo20 />} />
-            <Route path="/catalogo24" element={<Catalogo24 />} />
-            <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="/catalogo" element={<PrivateRoute><Catalogo /></PrivateRoute>} />
+            <Route path="/catalogo3" element={<PrivateRoute><Catalogo3 /></PrivateRoute>} />
+            <Route path="/catalogo6" element={<PrivateRoute><Catalogo6 /></PrivateRoute>} />
+            <Route path="/catalogo9" element={<PrivateRoute><Catalogo9 /></PrivateRoute>} />
+            <Route path="/catalogo12" element={<PrivateRoute><Catalogo12 /></PrivateRoute>} />
+            <Route path="/catalogo18" element={<PrivateRoute><Catalogo18 /></PrivateRoute>} />
+            <Route path="/catalogo20" element={<PrivateRoute><Catalogo20 /></PrivateRoute>} />
+            <Route path="/catalogo24" element={<PrivateRoute><Catalogo24 /></PrivateRoute>} />
+            <Route path="/" element={<Navigate to="/login" replace />} />
           </Routes>
         </Router>
       </AuthProvider>
