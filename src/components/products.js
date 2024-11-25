@@ -13,6 +13,39 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
 
   const handleCuotaChange = useCallback((event) => setSelectedCuota(event.target.value), []);
 
+  // Función para mapear los nombres de las cuotas a números
+  const parseCuotaString = (cuotaString) => {
+    const stringToNumberMap = {
+      uno: 1,
+      dos: 2,
+      tres: 3,
+      cuatro: 4,
+      cinco: 5,
+      seis: 6,
+      siete: 7,
+      ocho: 8,
+      nueve: 9,
+      diez: 10,
+      once: 11,
+      doce: 12,
+      trece: 13,
+      catorce: 14,
+      quince: 15,
+      dieciseis: 16,
+      diecisiete: 17,
+      dieciocho: 18,
+      diecinueve: 19,
+      veinte: 20,
+      veintiuno: 21,
+      veintidos: 22,
+      veintitres: 23,
+      veinticuatro: 24,
+    };
+
+    const match = cuotaString?.match(/^[a-z]+/i); // Encuentra la parte inicial del string
+    return match ? stringToNumberMap[match[0].toLowerCase()] || null : null;
+  };
+
   const getCuotaPrice = (psvpPrice, cuotaPrice) => {
     const parsedPSVPPrice = parsePrice(psvpPrice);
     const parsedCuotaPrice = parsePrice(cuotaPrice);
@@ -38,36 +71,35 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
         <Typography variant="body2" color="text.secondary">Puntos: <b>{product.puntos}</b></Typography>
         <Divider sx={{ my: 2 }} />
         {cuotas.map((cuota, idx) => {
-  const cuotaValue = product[cuota];
+          const cuotaValue = product[cuota];
 
-  // Validar que cuotaValue sea válida
-  const isValidCuota = 
-    cuotaValue && // Verifica que no sea null o undefined
-    cuotaValue !== 'NO' &&
-    cuotaValue !== '$0' &&
-    cuotaValue !== '0' &&
-    cuotaValue !== 0 &&
-    !isNaN(parseFloat(cuotaValue.replace(/[^\d.]/g, ''))); // Asegura que sea un número válido
+          // Validar que cuotaValue sea válida
+          const isValidCuota =
+            cuotaValue &&
+            cuotaValue !== 'NO' &&
+            cuotaValue !== '$0' &&
+            cuotaValue !== '0' &&
+            cuotaValue !== 0 &&
+            !isNaN(parseFloat(cuotaValue.replace(/[^\d.]/g, '')));
 
-  if (isValidCuota) {
-    return (
-      <div className='flex-center' key={idx}>
-        {!['Bazar', 'Complementos', 'Repuestos'].includes(product.linea) && (
-          <img src={cuotaSimple} alt='sin limites' height="15" />
-        )}
-        <Typography variant='span' fontSize={13} fontStyle={'italic'}>
-          <b style={{ color: 'green' }}>
-            {`${cuota.replace(/_/g, ' ')} de: `}
-            <i style={{ color: 'black' }}>{getCuotaPrice(product.psvp_lista, product[cuota])}</i>
-          </b>
-        </Typography>
-      </div>
-    );
-  }
+          if (isValidCuota) {
+            return (
+              <div className='flex-center' key={idx}>
+                {!['Bazar', 'Complementos', 'Repuestos'].includes(product.linea) && (
+                  <img src={cuotaSimple} alt='sin limites' height="15" />
+                )}
+                <Typography variant='span' fontSize={13} fontStyle={'italic'}>
+                  <b style={{ color: 'green' }}>
+                    {`${cuota.replace(/_/g, ' ')} de: `}
+                    <i style={{ color: 'black' }}>{getCuotaPrice(product.psvp_lista, product[cuota])}</i>
+                  </b>
+                </Typography>
+              </div>
+            );
+          }
 
-  // Si no es válido, no renderizar nada
-  return null;
-})}
+          return null;
+        })}
 
         <FormControl fullWidth variant="outlined" sx={{ my: 2 }}>
           <InputLabel>Selecciona Cuotas</InputLabel>
@@ -104,30 +136,33 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
                 ? selectedCuota === getDiscountedPrice(product.precio_negocio)
                   ? `${selectedCuota} en 1 cuota`
                   : `${selectedCuota} en ${
-                      cuotas.find(cuota => {
-                        const cuotaPrice = product[cuota];
-                        const isValidCuota = 
-                          cuotaPrice &&
-                          cuotaPrice !== 'NO' &&
-                          cuotaPrice !== '$0' &&
-                          cuotaPrice !== 0 &&
-                          !isNaN(parseFloat(cuotaPrice.replace(/[^\d.]/g, '')));
-                          
-                        // Validar que la cuota coincida con la seleccionada
-                        return (
+                      cuotas.reduce((match, cuota) => {
+                        const cuotaValue = product[cuota];
+
+                        // Validar que la cuota sea válida
+                        const isValidCuota =
+                          cuotaValue &&
+                          cuotaValue !== "NO" &&
+                          cuotaValue !== "$0" &&
+                          cuotaValue !== 0 &&
+                          !isNaN(parseFloat(cuotaValue.replace(/[^\d.]/g, "")));
+
+                        if (
                           isValidCuota &&
-                          getCuotaPrice(product.psvp_lista, cuotaPrice) === selectedCuota
-                        );
-                      })
-                      ?.match(/\d+/)?.[0] || 'N/A' // Si no hay match válido, retorna 'N/A'
+                          getCuotaPrice(product.psvp_lista, cuotaValue) === selectedCuota
+                        ) {
+                          return parseCuotaString(cuota) || "sin coincidencia"; // Convertir el nombre a número
+                        }
+                        return match;
+                      }, "sin coincidencia")
                     } sin interés`
-                : 'N/A'
+                : "Cuota no seleccionada"
             }`)}`}
           target="_blank"
           variant="contained"
           size="medium"
           color="primary"
-          sx={{ my: 1, backgroundColor: '#25D366', color: 'white' }}
+          sx={{ my: 1, backgroundColor: "#25D366", color: "white" }}
           disabled={!selectedCuota}
           startIcon={selectedCuota ? <FaWhatsapp /> : null}
         >
