@@ -14,13 +14,15 @@ import { Navigation as NavigationIcon, Logout as LogoutIcon } from "@mui/icons-m
 import ShoppingCart from "./components/cart";
 import Product from "./components/products";
 import ResponsiveDialog from "./components/dialog";
-import logo from "./assets/logo.png";
+/* import logo from "./assets/logo.png"; */
+import logo from "./assets/logo-navidad.png";
 import { handleCuotaChange } from "./utils/cartHandlers";
 import { useAuth } from "./AuthContext"; // Importamos useAuth
 
 const Home = () => {
   const { logout } = useAuth(); // Obtenemos el logout desde useAuth
-
+  const [extras, setExtras] = useState(null); // Estado para extras
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
@@ -66,6 +68,12 @@ const Home = () => {
     setSnackbarOpen(true);
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Manejo de la eliminación del carrito
   const handleRemoveFromCart = useCallback((codigo) => {
     setCart((prevCart) => {
@@ -101,6 +109,7 @@ const Home = () => {
   // Llamar a fetchData para obtener los productos
   useEffect(() => {
     fetchData("productos", setProductos);
+    fetchData("extras", setExtras); // Obtener extras
   }, [fetchData]);
 
   // Manejo del scroll para el botón de navegación
@@ -117,7 +126,7 @@ const Home = () => {
 
   // Volver al inicio de la página
   const volverArriba = () => window.scrollTo({ top: 0, behavior: "smooth" });
-
+  console.log(extras)
   // Filtrado de productos basado en la búsqueda
   const productosFiltrados = productos.filter(
     (producto) =>
@@ -162,7 +171,7 @@ const Home = () => {
       </div>
 
       <div className="w-100 flex justify-center">
-        <img src={logo} alt="logo" height="100" className="mar-t30 mar-b20" />
+        <img src={logo} alt="logo" height="150" className="mar-t30 mar-b20" />
       </div>
 
       <div className={`header mar-b30 flex-center pad20 ${isSticky ? "sticky" : ""}`}>
@@ -176,6 +185,19 @@ const Home = () => {
           onChange={(e) => setFiltro(e.target.value)}
         />
       </div>
+      {extras?.[0]?.banner && (
+        <div className="banner card-product mar-b30">
+          <img
+            src={
+              windowWidth <= 460
+                ? extras[0]?.banner_mobile
+                : extras[0]?.banner
+            }
+            alt="Banner"
+            style={{ width: "100%" }}
+          />
+        </div>
+      )}
 
       <ul className="lista-prod w-100">
         {loading ? (
