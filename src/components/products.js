@@ -96,39 +96,43 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
           </Button>
         )}
         <Button
-  fullWidth
-  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`¡Hola! Te envío el valor de tu próxima Essen:
-    Producto: ${product.descripcion}
-    Cuota: ${
-      selectedCuota
-        ? selectedCuota === getDiscountedPrice(product.precio_negocio)
-          ? `${selectedCuota} en 1 cuota`
-          : `${selectedCuota} en ${
-              cuotas.find(cuota => {
-                const cuotaPrice = product[cuota];
-                const isValidCuota = 
-                  cuotaPrice && 
-                  !isNaN(parseFloat(cuotaPrice.replace(/[^\d.]/g, ''))) && 
-                  getCuotaPrice(product.psvp_lista, cuotaPrice) === selectedCuota;
-                
-                return isValidCuota;
-              })
-              ?.match(/\d+/)?.[0] || 'N/A' // Si no hay match válido, retorna 'N/A'
-            } sin interés`
-        : 'N/A'
-    }`)}`}
-  target="_blank"
-  variant="contained"
-  size="medium"
-  color="primary"
-  sx={{ my: 1, backgroundColor: '#25D366', color: 'white' }}
-  disabled={!selectedCuota}
-  startIcon={selectedCuota ? <FaWhatsapp /> : null}
->
-  Compartir
-</Button>
-
-
+          fullWidth
+          href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`¡Hola! Te envío el valor de tu próxima Essen:
+            Producto: ${product.descripcion}
+            Cuota: ${
+              selectedCuota
+                ? selectedCuota === getDiscountedPrice(product.precio_negocio)
+                  ? `${selectedCuota} en 1 cuota`
+                  : `${selectedCuota} en ${
+                      cuotas.find(cuota => {
+                        const cuotaPrice = product[cuota];
+                        const isValidCuota = 
+                          cuotaPrice &&
+                          cuotaPrice !== 'NO' &&
+                          cuotaPrice !== '$0' &&
+                          cuotaPrice !== 0 &&
+                          !isNaN(parseFloat(cuotaPrice.replace(/[^\d.]/g, '')));
+                          
+                        // Validar que la cuota coincida con la seleccionada
+                        return (
+                          isValidCuota &&
+                          getCuotaPrice(product.psvp_lista, cuotaPrice) === selectedCuota
+                        );
+                      })
+                      ?.match(/\d+/)?.[0] || 'N/A' // Si no hay match válido, retorna 'N/A'
+                    } sin interés`
+                : 'N/A'
+            }`)}`}
+          target="_blank"
+          variant="contained"
+          size="medium"
+          color="primary"
+          sx={{ my: 1, backgroundColor: '#25D366', color: 'white' }}
+          disabled={!selectedCuota}
+          startIcon={selectedCuota ? <FaWhatsapp /> : null}
+        >
+          Compartir
+        </Button>
         {product.ficha_tecnica ? (
           <Button fullWidth target='_blank' href={product.ficha_tecnica} variant="outlined" size="medium" color="primary">
             Ficha técnica
