@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
     } else if (!auth) {
       setAuth({ token }); // Si el estado está vacío, restaurar la sesión
     }
-  }, []);
+  }, [auth]);
 
   return (
     <AuthContext.Provider value={{ auth, login, logout }}>
