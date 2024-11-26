@@ -39,6 +39,7 @@ const ProductsCalatogo = ({ product, selectedCuota }) => {
   return (
     <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className='card-product-catalogo'>
       {product.discount && <div className='descuento'>{product.discount}</div>}
+      {product.event && <div className='descuento-black'>{product.event}</div>}
       <CardMedia
         component="img"
         image={product.imagen ? product.imagen : '../descarga.png'}
