@@ -39,13 +39,13 @@ const ProductsCalatogo = ({ product, selectedCuota }) => {
   return (
     <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className='card-product-catalogo'>
       {product.discount && <div className='descuento'>{product.discount}</div>}
-      {product.event && <div className='descuento-black'>{product.event}</div>}
       <CardMedia
         component="img"
         image={product.imagen ? product.imagen : '../descarga.png'}
         sx={{
           objectFit: 'contain',
           height: 200,
+          position: 'relative',
           '@media (max-width: 480px)': {
             height: 100,
           },
@@ -53,6 +53,7 @@ const ProductsCalatogo = ({ product, selectedCuota }) => {
         alt="product"
       />
       <CardContent style={{ display: 'flex', flexDirection: 'column', padding: '6px 16px 0 16px' }}>
+        {product.event && <div className='descuento-black mar-b10'>{product.event}</div>}
         <Typography variant='body2' fontSize={12} fontStyle={'italic'} style={{ marginBottom: 5 }}>
           Línea <b>{product.linea}</b>
         </Typography>
