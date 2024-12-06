@@ -123,7 +123,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
   };
 
   // Determinar si mostrar el switch de envío
-  const totalPoints = calculateTotalPoints();
+/*   const totalPoints = calculateTotalPoints(); */
   /* const showShippingSwitch = totalPoints < 140; */ // Ahora depende exclusivamente de los puntos totales
 
   // Manejo de la eliminación del producto del carrito y resetear cuotas/planCanje
