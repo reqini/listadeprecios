@@ -297,7 +297,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
               />
             )}
 
-            {showShippingSwitch && cart.length > 0 && (
+            {/* {showShippingSwitch && cart.length > 0 && (
               <div
                 style={{
                   display: "flex",
@@ -316,7 +316,26 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
                   costo de envío de ${SHIPPING_COST}.
                 </Typography>
               </div>
-            )}
+            )} */}
+
+<div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginTop: 20,
+                }}
+              >
+                <LocalShippingIcon
+                  style={{ color: "green", marginRight: 8 }}
+                />
+                <Typography
+                  variant="body2"
+                  style={{ color: "green" }}
+                >
+                  Nota: Si la compra no supera los 140 puntos, se agrega un
+                  costo de envío de ${SHIPPING_COST}.
+                </Typography>
+              </div>
 
             <div className="flex flex-row items-center" style={{ marginTop: 20 }}>
               <Button
