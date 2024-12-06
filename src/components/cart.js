@@ -22,7 +22,7 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { getDiscountedPrice, getCuotaPrice } from "../utils/cartUtils";
 import { parsePrice, formatPrice } from "../utils/priceUtils";
 
-const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
+const ShoppingCart = ({ cart, onClearCart, setCart, /* onRemoveFromCart */ }) => {
   const [selectedCuota, setSelectedCuota] = useState({});
   const [planCanje, setPlanCanje] = useState({});
   const [totalPrice, setTotalPrice] = useState(0);
@@ -62,9 +62,9 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
   }, []);
 
   // Cálculo de puntos totales
-  const calculateTotalPoints = useCallback(() => {
+/*   const calculateTotalPoints = useCallback(() => {
     return cart.reduce((acc, item) => acc + (item.puntos || 0), 0); // Asegura que siempre haya un número
-  }, [cart]);
+  }, [cart]); */
 
   // Efecto para recalcular el total al cambiar las dependencias
   useEffect(() => {
