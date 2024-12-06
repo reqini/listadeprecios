@@ -63,7 +63,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
 
   // Cálculo de puntos totales
   const calculateTotalPoints = useCallback(() => {
-    return cart.reduce((acc, item) => acc + item.puntos, 0);
+    return cart.reduce((acc, item) => acc + (item.puntos || 0), 0); // Asegura que siempre haya un número
   }, [cart]);
 
   // Efecto para recalcular el total al cambiar las dependencias
@@ -124,13 +124,12 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
 
   // Determinar si mostrar el switch de envío
   const totalPoints = calculateTotalPoints();
-  const showShippingSwitch = totalPoints < 140;
+  const showShippingSwitch = totalPoints < 140; // Ahora depende exclusivamente de los puntos totales
 
   // Manejo de la eliminación del producto del carrito y resetear cuotas/planCanje
   const handleRemoveFromCart = useCallback(
     (codigo) => {
       setCart((prevCart) => prevCart.filter((item) => item.codigo !== codigo));
-      // Reseteamos la cuota y el plan canje del producto eliminado
       setSelectedCuota((prev) => ({ ...prev, [codigo]: undefined }));
       setPlanCanje((prev) => ({ ...prev, [codigo]: undefined }));
     },
@@ -285,7 +284,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
               )}
             </ul>
 
-            {showShippingSwitch && cart.length > 0 && (
+            {/* {showShippingSwitch && (
               <FormControlLabel
                 control={
                   <Switch
@@ -295,9 +294,17 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
                 }
                 label="Incluir envío"
               />
-            )}
-
-            {/* {showShippingSwitch && cart.length > 0 && (
+            )} */}
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={includeShipping}
+                    onChange={(e) => setIncludeShipping(e.target.checked)}
+                  />
+                }
+                label="Incluir envío"
+              />
+            {/* {showShippingSwitch && (
               <div
                 style={{
                   display: "flex",
@@ -308,17 +315,13 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
                 <LocalShippingIcon
                   style={{ color: "green", marginRight: 8 }}
                 />
-                <Typography
-                  variant="body2"
-                  style={{ color: "green" }}
-                >
+                <Typography variant="body2" style={{ color: "green" }}>
                   Nota: Si la compra no supera los 140 puntos, se agrega un
                   costo de envío de ${SHIPPING_COST}.
                 </Typography>
               </div>
             )} */}
-
-<div
+              <div
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -328,15 +331,11 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
                 <LocalShippingIcon
                   style={{ color: "green", marginRight: 8 }}
                 />
-                <Typography
-                  variant="body2"
-                  style={{ color: "green" }}
-                >
+                <Typography variant="body2" style={{ color: "green" }}>
                   Nota: Si la compra no supera los 140 puntos, se agrega un
                   costo de envío de ${SHIPPING_COST}.
                 </Typography>
               </div>
-
             <div className="flex flex-row items-center" style={{ marginTop: 20 }}>
               <Button
                 variant="contained"
@@ -356,7 +355,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, onRemoveFromCart }) => {
               <Button
                 fullWidth
                 className="mar-l6"
-                style={{height: 38}}
+                style={{ height: 38 }}
                 variant="contained"
                 onClick={onClearCart}
               >
