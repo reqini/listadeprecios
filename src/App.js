@@ -70,6 +70,7 @@ const App = () => {
     }
   }, []);
 
+  
   useEffect(() => {
     // Detectar nuevas versiones del Service Worker
     if ("serviceWorker" in navigator) {
