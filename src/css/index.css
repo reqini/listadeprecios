@@ -158,13 +158,12 @@ li {
   z-index: 2;
 }
 .header.sticky {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
+  position: fixed; /* Fija el elemento */
+  top: 0; /* Lo coloca en la parte superior */
+  left: 0; /* Asegura que esté alineado a la izquierda */
+  width: 100%; /* Ocupa todo el ancho */
   background-color: #A47A9E; /* Color de fondo al hacer scroll */
-  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra para destacar */
 }
 .header-catalogo.sticky {
   position: fixed;
