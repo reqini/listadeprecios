@@ -13,6 +13,7 @@ import Catalogo18 from "./catalogo18";
 import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
 import { AuthProvider, useAuth } from "./AuthContext";
+import axios from "./utils/axios";
 
 // Tema personalizado
 const theme = createTheme({
@@ -32,7 +33,29 @@ const theme = createTheme({
 
 // Ruta privada
 const PrivateRoute = ({ children }) => {
-  const { auth } = useAuth();
+  const { auth, logout } = useAuth();
+
+  useEffect(() => {
+    const checkSessionValidity = async () => {
+      if (auth && auth.token) {
+        try {
+          const response = await axios.get(`/api/validate-session`, {
+            headers: { Authorization: `Bearer ${auth.token}` },
+          });
+
+          if (!response.data.valid) {
+            alert("Tu sesión fue cerrada porque se inició desde otro dispositivo.");
+            logout();
+          }
+        } catch (error) {
+          console.error("Error validando la sesión:", error);
+          logout();
+        }
+      }
+    };
+
+    checkSessionValidity();
+  }, [auth, logout]);
 
   // Verificar si el token está presente en el contexto de autenticación
   if (!auth || !auth.token) {
@@ -41,6 +64,7 @@ const PrivateRoute = ({ children }) => {
 
   return children;
 };
+
 
 // Ruta para login
 const LoginRoute = () => {

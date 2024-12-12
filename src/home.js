@@ -115,10 +115,11 @@ const Home = () => {
   // Manejo del scroll para el botón de navegación
   const manejarScroll = useCallback(() => {
     const scrollPos = window.scrollY;
+    console.log("Scroll position:", scrollPos); // Verificar posición de scroll
     setMostrarBoton(scrollPos > 100);
-    setIsSticky(scrollPos > 100);
+    setIsSticky(scrollPos > 50); // Cambiar a 50px o el valor deseado
   }, []);
-
+  
   useEffect(() => {
     window.addEventListener("scroll", manejarScroll);
     return () => window.removeEventListener("scroll", manejarScroll);
@@ -174,7 +175,7 @@ const Home = () => {
         <img src={logo} alt="logo" height="150" className="mar-t30 mar-b20" />
       </div>
 
-      <div className={`header mar-b30 flex-center pad20 ${isSticky ? "sticky" : ""}`}>
+      <div className={`header ${isSticky ? "sticky" : ""} mar-b30 flex-center pad20`}>
         <TextField
           style={{ maxWidth: 450 }}
           fullWidth
