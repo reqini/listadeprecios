@@ -40,19 +40,12 @@ const Login = () => {
       console.log("Respuesta del backend:", response.data);
   
       if (response.data.token) {
-        // Guardar el token en localStorage
-        const existingSession = localStorage.getItem('activeSession');
-        
-        if (existingSession && existingSession !== username) {
-          // Si hay otra sesión activa, cerrarla
-          alert('Ya hay una sesión activa en otro dispositivo. Se cerrará esa sesión.');
-        }
-  
+        // Guardar el token y el nombre de usuario en localStorage para mantener la sesión
         localStorage.setItem('token', response.data.token);
-        localStorage.setItem('activeSession', username);
-  
+        localStorage.setItem('activeSession', response.data.username); // Guardamos el username con activeSession
+
         // Redirigir al home después de un login exitoso
-        window.location.href = "/home";
+        window.location.href = "/home";  
       } else {
         // Mostrar error si el usuario o la contraseña son incorrectos
         alert('Usuario o contraseña incorrectos');
@@ -64,7 +57,6 @@ const Login = () => {
       setLoading(false);
     }
   };
-  
 
   return (
     <div className='full-width' style={{ backgroundColor: '#FFEDC4' }}>
