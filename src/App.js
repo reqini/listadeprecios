@@ -65,7 +65,6 @@ const PrivateRoute = ({ children }) => {
   return children;
 };
 
-
 // Ruta para login
 const LoginRoute = () => {
   const { auth } = useAuth();
@@ -124,6 +123,8 @@ const App = () => {
             <Route path="/login" element={<LoginRoute />} />
             <Route path="/registro" element={<Registro />} />
             <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
+
+            {/* Rutas públicas para catálogos */}
             <Route path="/catalogo" element={<Catalogo />} />
             <Route path="/catalogo3" element={<Catalogo3 />} />
             <Route path="/catalogo6" element={<Catalogo6 />} />
@@ -132,6 +133,8 @@ const App = () => {
             <Route path="/catalogo18" element={<Catalogo18 />} />
             <Route path="/catalogo20" element={<Catalogo20 />} />
             <Route path="/catalogo24" element={<Catalogo24 />} />
+
+            {/* Redirigir al login por defecto */}
             <Route path="/" element={<Navigate to="/login" replace />} />
           </Routes>
         </Router>
