@@ -13,6 +13,7 @@ import Catalogo18 from "./catalogo18";
 import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
 import { AuthProvider, useAuth } from "./AuthContext";
+import axios from "./utils/axios";
 
 // Tema personalizado
 const theme = createTheme({
@@ -32,7 +33,29 @@ const theme = createTheme({
 
 // Ruta privada
 const PrivateRoute = ({ children }) => {
-  const { auth } = useAuth();
+  const { auth, logout } = useAuth();
+
+  useEffect(() => {
+    const checkSessionValidity = async () => {
+      if (auth && auth.token) {
+        try {
+          const response = await axios.get(`/api/validate-session`, {
+            headers: { Authorization: `Bearer ${auth.token}` },
+          });
+
+          if (!response.data.valid) {
+            alert("Tu sesión fue cerrada porque se inició desde otro dispositivo.");
+            logout();
+          }
+        } catch (error) {
+          console.error("Error validando la sesión:", error);
+          logout();
+        }
+      }
+    };
+
+    checkSessionValidity();
+  }, [auth, logout]);
 
   // Verificar si el token está presente en el contexto de autenticación
   if (!auth || !auth.token) {
@@ -101,6 +124,8 @@ const App = () => {
             <Route path="/login" element={<LoginRoute />} />
             <Route path="/registro" element={<Registro />} />
             <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
+
+            {/* Rutas públicas para catálogos */}
             <Route path="/catalogo" element={<Catalogo />} />
             <Route path="/catalogo3" element={<Catalogo3 />} />
             <Route path="/catalogo6" element={<Catalogo6 />} />
@@ -109,6 +134,8 @@ const App = () => {
             <Route path="/catalogo18" element={<Catalogo18 />} />
             <Route path="/catalogo20" element={<Catalogo20 />} />
             <Route path="/catalogo24" element={<Catalogo24 />} />
+
+            {/* Redirigir al login por defecto */}
             <Route path="/" element={<Navigate to="/login" replace />} />
           </Routes>
         </Router>
