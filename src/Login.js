@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
@@ -8,12 +8,26 @@ import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axios from "./utils/axios";
+import { v4 as uuidv4 } from 'uuid'; // Importamos uuid para generar el deviceId
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [deviceId, setDeviceId] = useState('');
+
+  useEffect(() => {
+    // Generar un deviceId único y guardarlo en localStorage
+    const storedDeviceId = localStorage.getItem('deviceId');
+    if (!storedDeviceId) {
+      const newDeviceId = uuidv4();
+      localStorage.setItem('deviceId', newDeviceId);
+      setDeviceId(newDeviceId);
+    } else {
+      setDeviceId(storedDeviceId);
+    }
+  }, []);
 
   // Toggle para mostrar u ocultar la contraseña
   const handleClickShowPassword = () => setShowPassword(!showPassword);
@@ -24,28 +38,28 @@ const Login = () => {
     setUsername(value.replace(/\s+/g, '').toLowerCase());
   };
 
-  
   // Enviar el formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
+
     try {
       // Hacemos una solicitud POST al backend para autenticar
       const response = await axios.post(`/api/login`, {
         username,
         password,
+        deviceId, // Enviamos el deviceId
       });
-  
+
       console.log("Respuesta del backend:", response.data);
-  
+
       if (response.data.token) {
         // Guardar el token y el nombre de usuario en localStorage para mantener la sesión
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('activeSession', response.data.username); // Guardamos el username con activeSession
 
         // Redirigir al home después de un login exitoso
-        window.location.href = "/home";  
+        window.location.href = "/home";
       } else {
         // Mostrar error si el usuario o la contraseña son incorrectos
         alert('Usuario o contraseña incorrectos');
