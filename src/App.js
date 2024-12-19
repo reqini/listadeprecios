@@ -12,6 +12,7 @@ import Catalogo12 from "./catalogo12";
 import Catalogo18 from "./catalogo18";
 import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
+import Contado from "./contado";
 import { AuthProvider, useAuth } from "./AuthContext";
 
 // Tema personalizado
@@ -108,6 +109,7 @@ const App = () => {
             <Route path="/catalogo18" element={<Catalogo18 />} />
             <Route path="/catalogo20" element={<Catalogo20 />} />
             <Route path="/catalogo24" element={<Catalogo24 />} />
+            <Route path="/contado" element={<Contado />} />
             <Route path="/" element={<Navigate to="/login" replace />} />
           </Routes>
         </Router>

@@ -5,10 +5,9 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { FaWhatsapp } from 'react-icons/fa';
 import { Button, CardActions } from '@mui/material';
-import { formatPrice } from '../utils/priceUtils';  // Importamos la función de formateo
+import { formatPrice } from '../utils/priceUtils'; // Importamos la función de formateo
 
-const ProductsCalatogo = ({ product, selectedCuota }) => {
-
+const ProductsCalatogo = ({ product, selectedCuota, showPriceOnly = false }) => {
   const cuotasMap = {
     "24 cuotas sin interés": 'veinticuatro_sin_interes',
     "20 cuotas sin interés": 'veinte_sin_interes',
@@ -23,12 +22,12 @@ const ProductsCalatogo = ({ product, selectedCuota }) => {
   const cuotaKey = cuotasMap[selectedCuota];
   let cuotaValue = product[cuotaKey] !== 'NO' ? product[cuotaKey] : null;
 
-  // Asegurarse de que cuotaValue es un string que contiene un número y convertirlo correctamente
   if (cuotaValue) {
     // Eliminar caracteres no numéricos y convertir a número
     cuotaValue = parseFloat(cuotaValue.replace(/[^\d.-]/g, ''));
   }
 
+  // Crear enlace de WhatsApp
   const createWhatsAppLink = (product) => {
     const message = `¡Hola!, Quiero este Producto :)!
       Producto: ${product.descripcion}`;
@@ -37,8 +36,8 @@ const ProductsCalatogo = ({ product, selectedCuota }) => {
   };
 
   return (
-    <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className='card-product-catalogo'>
-      {product.discount && <div className='descuento'>{product.discount}</div>}
+    <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className="card-product-catalogo">
+      {product.discount && <div className="descuento">{product.discount}</div>}
       <CardMedia
         component="img"
         image={product.imagen ? product.imagen : '../descarga.png'}
@@ -53,28 +52,35 @@ const ProductsCalatogo = ({ product, selectedCuota }) => {
         alt="product"
       />
       <CardContent style={{ display: 'flex', flexDirection: 'column', padding: '6px 16px 0 16px' }}>
-        {product.event && <div className='descuento-black mar-b10'>{product.event}</div>}
-        <Typography variant='body2' fontSize={12} fontStyle={'italic'} style={{ marginBottom: 5 }}>
+        {product.event && <div className="descuento-black mar-b10">{product.event}</div>}
+        <Typography variant="body2" fontSize={12} fontStyle="italic" style={{ marginBottom: 5 }}>
           Línea <b>{product.linea}</b>
         </Typography>
         <Typography
-         className='titulo' 
-         lineHeight={1} 
-         gutterBottom 
-         variant="h6" 
-         sx={{
-          fontSize: 18,
-          '@media (max-width: 480px)': {
-            fontSize: '12px!important',
-            minHeight: '20px!important'
-          },
-        }}
-         >
+          className="titulo"
+          lineHeight={1}
+          gutterBottom
+          variant="h6"
+          sx={{
+            fontSize: 18,
+            '@media (max-width: 480px)': {
+              fontSize: '12px!important',
+              minHeight: '20px!important',
+            },
+          }}
+        >
           {product.descripcion}
         </Typography>
 
-        {/* Mostrar el valor de la cuota correctamente formateado */}
-        {cuotaValue && (
+        {/* Mostrar precio de lista si showPriceOnly es true */}
+        {showPriceOnly && product.psvp_lista && (
+          <Typography variant="body2" color="text.secondary" style={{ marginTop: 5 }}>
+            Precio de Contado: <b>{formatPrice(parseFloat(product.psvp_lista.replace(/[^\d.-]/g, '')) || 0)}</b>
+          </Typography>
+        )}
+
+        {/* Mostrar el valor de la cuota si showPriceOnly es false */}
+        {!showPriceOnly && cuotaValue && (
           <Typography variant="body2" color="text.secondary" style={{ marginTop: 5 }}>
             {selectedCuota}: <b>{formatPrice(cuotaValue)}</b>
           </Typography>
@@ -93,23 +99,23 @@ const ProductsCalatogo = ({ product, selectedCuota }) => {
         >
           Compartir
         </Button>
-        <Button 
-            fullWidth 
-            target='_blank' 
-            href={product.ficha_tecnica} 
-            variant={!product.ficha_tecnica ? 'text' : 'outlined' }
-            size="medium" 
-            disabled={!product.ficha_tecnica && true}
-            color="primary" 
-            sx={{
-              marginLeft: '0px!important',
-              '@media (max-width: 480px)': {
-                fontSize: '12px!important',
-              },
-            }}
-          >
-            Ficha técnica
-          </Button>
+        <Button
+          fullWidth
+          target="_blank"
+          href={product.ficha_tecnica}
+          variant={!product.ficha_tecnica ? 'text' : 'outlined'}
+          size="medium"
+          disabled={!product.ficha_tecnica}
+          color="primary"
+          sx={{
+            marginLeft: '0px!important',
+            '@media (max-width: 480px)': {
+              fontSize: '12px!important',
+            },
+          }}
+        >
+          Ficha técnica
+        </Button>
       </CardActions>
     </Card>
   );
