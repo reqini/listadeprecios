@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
+import axios from "./utils/axios"; // Importación de axios
 
 const AuthContext = createContext();
 
@@ -9,37 +9,41 @@ export const AuthProvider = ({ children }) => {
     return token ? { token } : null; // Inicializar con el token si existe
   });
 
-  const login = (token) => {
+  const login = (token, deviceId) => {
     setAuth({ token });
     localStorage.setItem("token", token); // Guardar el token en localStorage
+    localStorage.setItem("deviceId", deviceId); // Guardar deviceId en localStorage
   };
 
   const logout = () => {
     setAuth(null);
     localStorage.removeItem("token"); // Eliminar el token de localStorage
+    localStorage.removeItem("deviceId"); // Eliminar el deviceId de localStorage
   };
 
   // Validar token y detectar si fue deslogueado desde otro dispositivo
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const interval = setInterval(() => {
+    const validateSession = async () => {
+      const token = localStorage.getItem("token");
+      const currentDeviceId = localStorage.getItem("deviceId");
+
       if (token) {
         try {
-          const decoded = jwtDecode(token);
-          const currentDeviceId = localStorage.getItem("deviceId");
-          if (decoded.deviceId !== currentDeviceId) {
-            // Si el token no coincide con el deviceId actual, cerrar sesión
+          const response = await axios.post("/api/validate-session", { token, deviceId: currentDeviceId });
+          if (!response.data.valid) {
             logout();
             alert("Fuiste deslogueado porque tu sesión se inició en otro dispositivo.");
           }
         } catch (error) {
-          console.error("Error al decodificar el token:", error.message);
-          logout(); // Si hay un error, cerramos sesión por seguridad
+          console.error("Error al validar la sesión:", error.message);
+          logout();
         }
       }
-    }, 5000); // Verificar cada 5 segundos
+    };
 
-    return () => clearInterval(interval); // Limpiar intervalo al desmontar
+    const interval = setInterval(validateSession, 5000); // Validar cada 5 segundos
+
+    return () => clearInterval(interval);
   }, [auth]);
 
   return (

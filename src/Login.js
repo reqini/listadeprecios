@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import logo from './assets/logo.png';
-import IconButton from '@mui/material/IconButton';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import React, { useState, useEffect } from "react";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import logo from "./assets/logo.png";
+import IconButton from "@mui/material/IconButton";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import axios from "./utils/axios";
-import { v4 as uuidv4 } from 'uuid'; // Importamos uuid para generar el deviceId
+import { v4 as uuidv4 } from "uuid"; // Importamos uuid para generar el deviceId
 
 const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [deviceId, setDeviceId] = useState('');
+  const [deviceId, setDeviceId] = useState("");
 
   useEffect(() => {
     // Generar un deviceId único y guardarlo en localStorage
-    const storedDeviceId = localStorage.getItem('deviceId');
+    const storedDeviceId = localStorage.getItem("deviceId");
     if (!storedDeviceId) {
       const newDeviceId = uuidv4();
-      localStorage.setItem('deviceId', newDeviceId);
+      localStorage.setItem("deviceId", newDeviceId);
       setDeviceId(newDeviceId);
     } else {
       setDeviceId(storedDeviceId);
@@ -35,7 +35,7 @@ const Login = () => {
   // Controlar el cambio del nombre de usuario
   const handleChangeUsername = (e) => {
     const value = e.target.value;
-    setUsername(value.replace(/\s+/g, '').toLowerCase());
+    setUsername(value.replace(/\s+/g, "").toLowerCase());
   };
 
   // Enviar el formulario
@@ -51,77 +51,86 @@ const Login = () => {
         deviceId, // Enviamos el deviceId
       });
 
-      console.log("Respuesta del backend:", response.data);
-
       if (response.data.token) {
         // Guardar el token y el nombre de usuario en localStorage para mantener la sesión
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('activeSession', response.data.username); // Guardamos el username con activeSession
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("activeSession", response.data.username);
 
         // Redirigir al home después de un login exitoso
         window.location.href = "/home";
       } else {
         // Mostrar error si el usuario o la contraseña son incorrectos
-        alert('Usuario o contraseña incorrectos');
+        alert("Usuario o contraseña incorrectos");
       }
     } catch (error) {
-      console.error('Error durante la autenticación:', error.message);
-      alert('Hubo un problema al iniciar sesión. Por favor, intenta de nuevo.');
+      console.error("Error durante la autenticación:", error.message);
+      alert("Hubo un problema al iniciar sesión. Por favor, intenta de nuevo.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className='full-width' style={{ backgroundColor: '#FFEDC4' }}>
-      <Container className='flex justify-center items-center flex-direction' maxWidth="sm" style={{ paddingTop: 100 }}>
-        <img src={logo} alt="logo" height="100" className='mar-b10' />
+    <div className="full-width" style={{ backgroundColor: "#FFEDC4" }}>
+      <Container
+        className="flex justify-center items-center flex-direction"
+        maxWidth="sm"
+        style={{ paddingTop: 100 }}
+      >
+        <img src={logo} alt="logo" height="100" className="mar-b10" />
         <form onSubmit={handleSubmit}>
-          <Grid container spacing={0} className='card'>
-            <Grid item xs={12} style={{ margin: '10px 0' }}>
-              <label>
-                <TextField
-                  required
-                  fullWidth
-                  style={{ color: 'black', backgroundColor: 'white' }}
-                  id="filled-required-name"
-                  label={'Usuario'}
-                  value={username}
-                  variant="filled"
-                  onChange={handleChangeUsername}
-                />
-              </label>
+          <Grid container spacing={0} className="card">
+            <Grid item xs={12} style={{ margin: "10px 0" }}>
+              <TextField
+                required
+                fullWidth
+                style={{ color: "black", backgroundColor: "white" }}
+                id="filled-required-name"
+                label={"Usuario"}
+                value={username}
+                variant="filled"
+                onChange={handleChangeUsername}
+              />
             </Grid>
-            <Grid item xs={12} style={{ margin: '10px 0' }}>
-              <label>
-                <TextField
-                  required
-                  fullWidth
-                  type={showPassword ? 'text' : 'password'}
-                  style={{ color: 'black', backgroundColor: 'white' }}
-                  id="filled-required-code"
-                  label="Contraseña"
-                  value={password}
-                  variant="filled"
-                  onChange={(e) => setPassword(e.target.value)}
-                  InputProps={{
-                    endAdornment: (
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword}
-                        edge="end"
-                        style={{ position: 'absolute', right: 15, top: '50%', transform: 'translateY(-50%)' }}
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    ),
-                  }}
-                />
-              </label>
+            <Grid item xs={12} style={{ margin: "10px 0" }}>
+              <TextField
+                required
+                fullWidth
+                type={showPassword ? "text" : "password"}
+                style={{ color: "black", backgroundColor: "white" }}
+                id="filled-required-code"
+                label="Contraseña"
+                value={password}
+                variant="filled"
+                onChange={(e) => setPassword(e.target.value)}
+                InputProps={{
+                  endAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                      style={{
+                        position: "absolute",
+                        right: 15,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                      }}
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  ),
+                }}
+              />
             </Grid>
-            <Grid item xs={12} style={{ margin: '10px 0' }}>
-              <Button fullWidth type="submit" variant="contained" size="large" disabled={loading}>
-                {loading ? 'Cargando...' : 'Entrar'}
+            <Grid item xs={12} style={{ margin: "10px 0" }}>
+              <Button
+                fullWidth
+                type="submit"
+                variant="contained"
+                size="large"
+                disabled={loading}
+              >
+                {loading ? "Cargando..." : "Entrar"}
               </Button>
             </Grid>
           </Grid>
