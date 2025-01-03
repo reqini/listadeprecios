@@ -29,7 +29,7 @@ const ProductsCalatogo = ({ product, selectedCuota, showPriceOnly = false }) => 
 
   // Crear enlace de WhatsApp
   const createWhatsAppLink = (product) => {
-    const message = `¡Hola!, Quiero este Producto :)!
+    const message = `¡Quiero este Producto :)!
       Producto: ${product.descripcion}`;
 
     return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;

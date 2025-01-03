@@ -129,7 +129,7 @@ const Product = ({ product, onAddToCart, catalog = false }) => {
         )}
         <Button
           fullWidth
-          href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`¡Hola! Te envío el valor de tu próxima Essen:
+          href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`¡Te envío el valor de tu próxima Essen:
             Producto: ${product.descripcion}
             Cuota: ${
               selectedCuota
