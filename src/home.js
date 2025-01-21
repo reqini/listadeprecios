@@ -9,6 +9,8 @@ import {
   Typography,
   Skeleton,
   Fab,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import { Logout as LogoutIcon, Navigation as NavigationIcon } from "@mui/icons-material";
 import Product from "./components/products";
@@ -30,6 +32,12 @@ const Home = () => {
   const [rango, setRango] = useState("");
   const [cart, setCart] = useState([]);
   const [mostrarBoton, setMostrarBoton] = useState(false);
+  const [cuotaType, setCuotaType] = useState("sin_interes");
+
+  const onAddToCart = (product) => {
+    setCart((prevCart) => [...prevCart, product]);
+    console.log(`${product.descripcion} agregado al carrito`);
+  };
 
   const clearCart = () => setCart([]);
 
@@ -37,7 +45,12 @@ const Home = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Obtener el momento del día para el saludo
+  const handleCuotaTypeChange = (event, newType) => {
+    if (newType !== null) {
+      setCuotaType(newType);
+    }
+  };
+
   const getTimeOfDay = useCallback(() => {
     const currentHour = new Date().getHours();
     if (currentHour >= 0 && currentHour < 5) return "¿Trabajando de madrugada? :)";
@@ -46,7 +59,6 @@ const Home = () => {
     return "Buenas noches";
   }, []);
 
-  // Cargar username y rango desde el backend
   useEffect(() => {
     const fetchUserData = async () => {
       const storedUsername = localStorage.getItem("activeSession");
@@ -58,7 +70,7 @@ const Home = () => {
         const { data: usuarios } = await axios.get(`/api/usuarios`);
         const user = usuarios.find((user) => user.username === storedUsername);
         if (user) {
-          setRango(user.rango); // Asignar rango desde el Google Sheet
+          setRango(user.rango);
         }
       } catch (error) {
         console.error("Error al obtener los datos del usuario:", error.message);
@@ -209,6 +221,22 @@ const Home = () => {
         />
       </div>
 
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
+        <ToggleButtonGroup
+          value={cuotaType}
+          exclusive
+          onChange={handleCuotaTypeChange}
+          aria-label="Tipo de cuotas"
+        >
+          <ToggleButton value="sin_interes" aria-label="Cuotas sin interés">
+            Cuotas sin interés
+          </ToggleButton>
+          <ToggleButton value="con_interes" aria-label="Cuotas con interés">
+            Cuotas con interés
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </div>
+
       {getBannerForRango()}
 
       <ul className="lista-prod w-100">
@@ -225,7 +253,11 @@ const Home = () => {
         ) : (
           productosFiltrados.map((product) => (
             <li className="grid-item" key={product.id}>
-              <Product product={product} />
+              <Product
+                product={product}
+                cuotaType={cuotaType}
+                onAddToCart={onAddToCart} // Pasa la función al componente Product
+              />
             </li>
           ))
         )}
