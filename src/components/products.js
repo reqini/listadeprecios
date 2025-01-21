@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React from "react";
 import {
   Card,
   CardContent,
@@ -14,13 +14,6 @@ import { parsePrice, formatPrice } from "../utils/priceUtils";
 const cuotaSimple = require("../../src/assets/cuotas-simples.webp");
 
 const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
-  /* const [selectedCuota, setSelectedCuota] = useState("");
-
-  const handleCuotaChange = useCallback(
-    (event) => setSelectedCuota(event.target.value),
-    []
-  ); */
-
   const cuotasConInteres = ["tres_con_interes", "seis_con_interes"];
   const cuotasSinInteres = [
     "veinticuatro_sin_interes",
@@ -35,9 +28,12 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
 
   const cuotas = cuotaType === "con_interes" ? cuotasConInteres : cuotasSinInteres;
 
-  const getCuotaPrice = (cuotaPrice) => {
+  const getCuotaPrice = (psvpPrice, cuotaPrice) => {
+    const parsedPSVPPrice = parsePrice(psvpPrice);
     const parsedCuotaPrice = parsePrice(cuotaPrice);
-    return formatPrice(parsedCuotaPrice > 0 ? parsedCuotaPrice : 0); // Usar valor directo
+    return parsedCuotaPrice > 0
+      ? formatPrice(parsedPSVPPrice / (parsedPSVPPrice / parsedCuotaPrice))
+      : formatPrice(0);
   };
 
   const getAdjustedCuotaLabel = (cuota) => {
@@ -79,7 +75,6 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
         </Typography>
         <Divider sx={{ my: 2 }} />
 
-        {/* Mostrar cuotas */}
         {cuotas.map((cuota, idx) => {
           const cuotaValue = product[cuota];
           const isValidCuota =
@@ -100,7 +95,7 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
                   <b style={{ color: "green" }}>
                     {`${getAdjustedCuotaLabel(cuota)} de: `}
                     <i style={{ color: "black" }}>
-                      {getCuotaPrice(cuotaValue)}
+                      {getCuotaPrice(product.psvp_lista, cuotaValue)}
                     </i>
                   </b>
                 </Typography>
