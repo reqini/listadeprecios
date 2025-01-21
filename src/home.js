@@ -10,9 +10,12 @@ import {
   ToggleButtonGroup,
   Typography,
   Skeleton,
+  Fab,
 } from "@mui/material";
-import { Logout as LogoutIcon } from "@mui/icons-material";
+import { Logout as LogoutIcon, Navigation as NavigationIcon } from "@mui/icons-material";
 import Product from "./components/products";
+import ResponsiveDialog from "./components/dialog";
+import ShoppingCart from "./components/ShoppingCart";
 import logo from "./assets/logo.png";
 import { useAuth } from "./AuthContext";
 
@@ -27,7 +30,15 @@ const Home = () => {
   const [timeOfDay, setTimeOfDay] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [cuotaType, setCuotaType] = useState("sin_interes");
-  const [rango, setRango] = useState(""); // Estado para rango del usuario
+  const [rango, setRango] = useState("");
+  const [cart, setCart] = useState([]);
+  const [mostrarBoton, setMostrarBoton] = useState(false);
+
+  const clearCart = () => setCart([]);
+
+  const volverArriba = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // Obtener el momento del día para el saludo
   const getTimeOfDay = useCallback(() => {
@@ -70,6 +81,14 @@ const Home = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setMostrarBoton(window.scrollY > 200);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const fetchData = useCallback(async (endpoint, setState) => {
     try {
       const { data } = await axios.get(`/api/${endpoint}`);
@@ -105,69 +124,57 @@ const Home = () => {
     setSnackbarOpen(false);
   };
 
-// Función para verificar el rango y mostrar el banner correspondiente
-const getBannerForRango = () => {
-  const rangosGrupo1 = [
-    "Demostrador/a",
-    "Demostrador/a plata",
-    "Demostrador/a oro",
-    "Coordinador/a",
-    "Coordinador/a diamante",
-  ];
-  const rangosGrupo2 = [
-    "Ejecutivo/a",
-    "Ejecutivo/a senior",
-    "Ejecutivo/a máster",
-    "Ejecutivo/a premium",
-    "Empresario/a",
-    "Empresario/a VIP",
-  ];
+  const getBannerForRango = () => {
+    const rangosGrupo1 = [
+      "Demostrador/a",
+      "Demostrador/a plata",
+      "Demostrador/a oro",
+      "Coordinador/a",
+      "Coordinador/a diamante",
+    ];
+    const rangosGrupo2 = [
+      "Ejecutivo/a",
+      "Ejecutivo/a senior",
+      "Ejecutivo/a máster",
+      "Ejecutivo/a premium",
+      "Empresario/a",
+      "Empresario/a VIP",
+    ];
 
-  // Verificar si extras y extras[0] existen
-  if (!extras || !extras[0]) {
-    console.warn("Extras no disponibles o vacíos.");
-    return null;
-  }
+    if (!extras || !extras[0]) {
+      console.warn("Extras no disponibles o vacíos.");
+      return null;
+    }
 
-  if (!rango || rango.trim() === "" || rangosGrupo1.includes(rango)) {
-    // Tratar a los usuarios sin rango como parte de rangosGrupo1
-    return (
-      <div className="banner card-product mar-b30">
-        <img
-          src={
-            windowWidth <= 460
-              ? extras[0]?.banner_mobile
-              : extras[0]?.banner
-          }
-          alt="Banner Grupo 1"
-          style={{ width: "100%" }}
-        />
-      </div>
-    );
-  } else if (rangosGrupo2.includes(rango)) {
-    return (
-      <div className="banner card-product mar-b30">
-        <a
-          href="https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808493147926019315fc5d760034"
-          target="_blank"
-          rel="noreferrer"
-        >
+    if (!rango || rango.trim() === "" || rangosGrupo1.includes(rango)) {
+      return (
+        <div className="banner card-product mar-b30">
           <img
-            src={
-              windowWidth <= 460
-                ? extras[0]?.banner_super_mobile
-                : extras[0]?.banner_super
-            }
-            alt="Banner Grupo 2"
+            src={windowWidth <= 460 ? extras[0]?.banner_mobile : extras[0]?.banner}
+            alt="Banner Grupo 1"
             style={{ width: "100%" }}
           />
-        </a>
-      </div>
-    );
-  }
-  return null;
-};
-
+        </div>
+      );
+    } else if (rangosGrupo2.includes(rango)) {
+      return (
+        <div className="banner card-product mar-b30">
+          <a
+            href="https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808493147926019315fc5d760034"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <img
+              src={windowWidth <= 460 ? extras[0]?.banner_super_mobile : extras[0]?.banner_super}
+              alt="Banner Grupo 2"
+              style={{ width: "100%" }}
+            />
+          </a>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <Container maxWidth="lg" className="conteiner-list">
@@ -272,7 +279,24 @@ const getBannerForRango = () => {
           No se encontraron productos.
         </Typography>
       )}
-
+      <div className="absolute-btn">
+        <ResponsiveDialog />
+      </div>
+      <Fab
+        onClick={volverArriba}
+        className={`${mostrarBoton ? "visible" : "oculto"}`}
+        variant="extended"
+        size="small"
+        color="primary"
+      >
+        <NavigationIcon sx={{ mr: 1 }} />
+      </Fab>
+      <ShoppingCart
+        cart={cart}
+        setCart={setCart}
+        onClearCart={clearCart}
+        onRemoveFromCart={(product) => setCart(cart.filter((item) => item.id !== product.id))}
+      />
       <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
         <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: "100%" }}>
           Producto agregado al carrito

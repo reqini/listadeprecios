@@ -304,23 +304,6 @@ const ShoppingCart = ({ cart, onClearCart, setCart, /* onRemoveFromCart */ }) =>
                 }
                 label="Incluir envío"
               />
-            {/* {showShippingSwitch && (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginTop: 20,
-                }}
-              >
-                <LocalShippingIcon
-                  style={{ color: "green", marginRight: 8 }}
-                />
-                <Typography variant="body2" style={{ color: "green" }}>
-                  Nota: Si la compra no supera los 140 puntos, se agrega un
-                  costo de envío de ${SHIPPING_COST}.
-                </Typography>
-              </div>
-            )} */}
               <div
                 style={{
                   display: "flex",

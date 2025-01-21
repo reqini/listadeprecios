@@ -25,7 +25,6 @@ export const parsePrice = (priceString) => {
   }
 };
 
-
 /**
  * Convierte un número a un string con formato de moneda.
  * @param {number} price - El precio a formatear.

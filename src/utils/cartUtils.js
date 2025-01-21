@@ -45,10 +45,8 @@ export const getCuotaPrice = (psvpPrice, cuotaPrice, codigo, planCanje, includeS
 
   // Aplicar descuento de Plan Canje si corresponde
   const discountedPSVP = planCanje[codigo] ? applyPlanCanjeDiscount(parsedPSVPPrice) : parsedPSVPPrice;
-
   // Aplicar el costo de envío si corresponde
   const finalPrice = includeShipping ? discountedPSVP + shippingCost : discountedPSVP;
-
   // Verifica que no haya división por cero y calcula el valor de la cuota
   const cuotaFinal = parsedCuotaPrice > 0 ? (finalPrice / (parsedPSVPPrice / parsedCuotaPrice)) : 0;
 
