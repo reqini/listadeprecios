@@ -35,7 +35,7 @@ const Register = () => {
     "Ejecutivo/a máster",
     "Ejecutivo/a premium",
     "Empresario/a",
-    "Empresario/a vip",
+    "Empresario/a VIP",
   ];
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
