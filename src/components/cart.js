@@ -27,7 +27,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, /* onRemoveFromCart */ }) =>
   const [planCanje, setPlanCanje] = useState({});
   const [totalPrice, setTotalPrice] = useState(0);
   const [includeShipping, setIncludeShipping] = useState(false);
-  const SHIPPING_COST = 15889;
+  const SHIPPING_COST = 16365;
 
   // Función para calcular el precio total
   const calculateTotalPrice = useCallback(() => {
@@ -304,23 +304,6 @@ const ShoppingCart = ({ cart, onClearCart, setCart, /* onRemoveFromCart */ }) =>
                 }
                 label="Incluir envío"
               />
-            {/* {showShippingSwitch && (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginTop: 20,
-                }}
-              >
-                <LocalShippingIcon
-                  style={{ color: "green", marginRight: 8 }}
-                />
-                <Typography variant="body2" style={{ color: "green" }}>
-                  Nota: Si la compra no supera los 140 puntos, se agrega un
-                  costo de envío de ${SHIPPING_COST}.
-                </Typography>
-              </div>
-            )} */}
               <div
                 style={{
                   display: "flex",
