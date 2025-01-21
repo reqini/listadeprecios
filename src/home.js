@@ -6,8 +6,6 @@ import {
   TextField,
   Snackbar,
   Alert,
-/*   ToggleButton,
-  ToggleButtonGroup, */
   Typography,
   Skeleton,
   Fab,
@@ -29,7 +27,6 @@ const Home = () => {
   const [username, setUsername] = useState("");
   const [timeOfDay, setTimeOfDay] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [cuotaType, setCuotaType] = useState("sin_interes");
   const [rango, setRango] = useState("");
   const [cart, setCart] = useState([]);
   const [mostrarBoton, setMostrarBoton] = useState(false);
@@ -112,12 +109,6 @@ const Home = () => {
       producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) &&
       producto.vigencia === "SI"
   );
-
-  /* const handleCuotaTypeChange = (event, newType) => {
-    if (newType !== null) {
-      setCuotaType(newType);
-    }
-  }; */
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") return;
@@ -218,40 +209,6 @@ const Home = () => {
         />
       </div>
 
-      {/* <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
-        <ToggleButtonGroup
-          value={cuotaType}
-          exclusive
-          onChange={handleCuotaTypeChange}
-          aria-label="Tipo de cuotas"
-        >
-          <ToggleButton
-            value="sin_interes"
-            aria-label="Cuotas sin interés"
-            style={{
-              backgroundColor: cuotaType === "sin_interes" ? "#A47A9E" : "#fff",
-              color: cuotaType === "sin_interes" ? "#fff" : "#673ab7",
-              border: "1px solid #A47A9E",
-              borderRadius: "20px 0 0 20px",
-            }}
-          >
-            Cuotas sin interés
-          </ToggleButton>
-          <ToggleButton
-            value="con_interes"
-            aria-label="Cuotas con interés"
-            style={{
-              backgroundColor: cuotaType === "con_interes" ? "#A47A9E" : "#fff",
-              color: cuotaType === "con_interes" ? "#fff" : "#673ab7",
-              border: "1px solid #A47A9E",
-              borderRadius: "0 20px 20px 0",
-            }}
-          >
-            Cuotas con interés
-          </ToggleButton>
-        </ToggleButtonGroup>
-      </div> */}
-
       {getBannerForRango()}
 
       <ul className="lista-prod w-100">
@@ -268,7 +225,7 @@ const Home = () => {
         ) : (
           productosFiltrados.map((product) => (
             <li className="grid-item" key={product.id}>
-              <Product product={product} cuotaType={cuotaType} />
+              <Product product={product} />
             </li>
           ))
         )}
