@@ -9,6 +9,7 @@ import { parsePrice, formatPrice } from '../utils/priceUtils';
 const cuotaSimple = require('../../src/assets/cuotas-simples.webp');
 
 const Product = ({ product, onAddToCart, catalog = false }) => {
+  
   const [selectedCuota, setSelectedCuota] = useState('');
 
   const handleCuotaChange = useCallback((event) => setSelectedCuota(event.target.value), []);

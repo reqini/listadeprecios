@@ -14,8 +14,7 @@ import { Navigation as NavigationIcon, Logout as LogoutIcon } from "@mui/icons-m
 import ShoppingCart from "./components/cart";
 import Product from "./components/products";
 import ResponsiveDialog from "./components/dialog";
-/* import logo from "./assets/logo.png"; */
-import logo from "./assets/logo-navidad.png";
+import logo from "./assets/logo.png";
 import { handleCuotaChange } from "./utils/cartHandlers";
 import { useAuth } from "./AuthContext"; // Importamos useAuth
 
@@ -229,11 +228,9 @@ const Home = () => {
           No se encontraron productos.
         </Typography>
       )}
-
       <div className="absolute-btn">
         <ResponsiveDialog />
       </div>
-
       <Fab
         onClick={volverArriba}
         className={`${mostrarBoton ? "visible" : "oculto"}`}
@@ -243,14 +240,12 @@ const Home = () => {
       >
         <NavigationIcon sx={{ mr: 1 }} />
       </Fab>
-
       <ShoppingCart
         cart={cart}
         setCart={setCart}
         onClearCart={clearCart}
         onRemoveFromCart={handleRemoveFromCart}
       />
-
       <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
         <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: "100%" }}>
           Producto agregado al carrito
