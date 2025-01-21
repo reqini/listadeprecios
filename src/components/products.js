@@ -14,12 +14,12 @@ import { parsePrice, formatPrice } from "../utils/priceUtils";
 const cuotaSimple = require("../../src/assets/cuotas-simples.webp");
 
 const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
-  const [selectedCuota, setSelectedCuota] = useState("");
+  /* const [selectedCuota, setSelectedCuota] = useState("");
 
   const handleCuotaChange = useCallback(
     (event) => setSelectedCuota(event.target.value),
     []
-  );
+  ); */
 
   const cuotasConInteres = ["tres_con_interes", "seis_con_interes"];
   const cuotasSinInteres = [
