@@ -6,8 +6,8 @@ import {
   TextField,
   Snackbar,
   Alert,
-  ToggleButton,
-  ToggleButtonGroup,
+/*   ToggleButton,
+  ToggleButtonGroup, */
   Typography,
   Skeleton,
   Fab,
@@ -113,11 +113,11 @@ const Home = () => {
       producto.vigencia === "SI"
   );
 
-  const handleCuotaTypeChange = (event, newType) => {
+  /* const handleCuotaTypeChange = (event, newType) => {
     if (newType !== null) {
       setCuotaType(newType);
     }
-  };
+  }; */
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") return;
