@@ -4,33 +4,41 @@ import {
   Button,
   Container,
   TextField,
-  Skeleton,
-  Fab,
-  Typography,
   Snackbar,
   Alert,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+  Skeleton,
+  Fab,
 } from "@mui/material";
-import { Navigation as NavigationIcon, Logout as LogoutIcon } from "@mui/icons-material";
-import ShoppingCart from "./components/cart";
+import { Logout as LogoutIcon, Navigation as NavigationIcon } from "@mui/icons-material";
 import Product from "./components/products";
 import ResponsiveDialog from "./components/dialog";
+import ShoppingCart from "./components/ShoppingCart";
 import logo from "./assets/logo.png";
-import { handleCuotaChange } from "./utils/cartHandlers";
-import { useAuth } from "./AuthContext"; // Importamos useAuth
+import { useAuth } from "./AuthContext";
 
 const Home = () => {
-  const { logout } = useAuth(); // Obtenemos el logout desde useAuth
-  const [extras, setExtras] = useState(null); // Estado para extras
+  const { logout } = useAuth();
+  const [extras, setExtras] = useState(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
   const [filtro, setFiltro] = useState("");
-  const [mostrarBoton, setMostrarBoton] = useState(false);
-  const [isSticky, setIsSticky] = useState(false);
   const [username, setUsername] = useState("");
   const [timeOfDay, setTimeOfDay] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [cuotaType, setCuotaType] = useState("sin_interes");
+  const [rango, setRango] = useState("");
+  const [cart, setCart] = useState([]);
+  const [mostrarBoton, setMostrarBoton] = useState(false);
+
+  const clearCart = () => setCart([]);
+
+  const volverArriba = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // Obtener el momento del día para el saludo
   const getTimeOfDay = useCallback(() => {
@@ -41,31 +49,31 @@ const Home = () => {
     return "Buenas noches";
   }, []);
 
-  // Manejo de la carga inicial y saludo
+  // Cargar username y rango desde el backend
   useEffect(() => {
-    const storedUsername = localStorage.getItem("activeSession");
-    if (storedUsername) setUsername(storedUsername);
+    const fetchUserData = async () => {
+      const storedUsername = localStorage.getItem("activeSession");
+      if (!storedUsername) return;
 
+      setUsername(storedUsername);
+
+      try {
+        const { data: usuarios } = await axios.get(`/api/usuarios`);
+        const user = usuarios.find((user) => user.username === storedUsername);
+        if (user) {
+          setRango(user.rango); // Asignar rango desde el Google Sheet
+        }
+      } catch (error) {
+        console.error("Error al obtener los datos del usuario:", error.message);
+      }
+    };
+
+    fetchUserData();
     setTimeOfDay(getTimeOfDay());
-
     const interval = setInterval(() => setTimeOfDay(getTimeOfDay()), 3600000);
 
-    return () => clearInterval(interval); // Limpiar intervalo al desmontar
+    return () => clearInterval(interval);
   }, [getTimeOfDay]);
-
-  // Manejo del agregar al carrito
-  const handleAddToCart = useCallback((product) => {
-    setCart((prevCart) => {
-      const existingProduct = prevCart.find((item) => item.codigo === product.codigo);
-      if (existingProduct) {
-        return prevCart.map((item) =>
-          item.codigo === product.codigo ? { ...item, cantidad: item.cantidad + 1 } : item
-        );
-      }
-      return [...prevCart, { ...product, cantidad: 1 }];
-    });
-    setSnackbarOpen(true);
-  }, []);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -73,74 +81,99 @@ const Home = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Manejo de la eliminación del carrito
-  const handleRemoveFromCart = useCallback((codigo) => {
-    setCart((prevCart) => {
-      const product = prevCart.find((item) => item.codigo === codigo);
-      if (product && product.cantidad > 1) {
-        return prevCart.map((item) =>
-          item.codigo === codigo ? { ...item, cantidad: item.cantidad - 1 } : item
-        );
-      }
-      return prevCart.filter((item) => item.codigo !== codigo);
-    });
+  useEffect(() => {
+    const handleScroll = () => {
+      setMostrarBoton(window.scrollY > 200);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Usamos el handler refactorizado para manejar el cambio de cuota
-  const handleCuotaChangeWrapper = useCallback((codigo, cuota) => {
-    handleCuotaChange(codigo, cuota, setCart);
-  }, []);
-
-  // Definir fetchData dentro del componente
   const fetchData = useCallback(async (endpoint, setState) => {
     try {
       const { data } = await axios.get(`/api/${endpoint}`);
       setState(data);
       setTimeout(() => {
-        setLoading(false); // Mantener el skeleton visible al menos por un breve periodo
-      }, 500); // Garantizar que el Skeleton se muestre al menos 500ms
+        setLoading(false);
+      }, 500);
     } catch (error) {
       console.error(`Error al obtener ${endpoint}:`, error);
       setLoading(false);
     }
   }, []);
 
-  // Llamar a fetchData para obtener los productos
   useEffect(() => {
     fetchData("productos", setProductos);
-    fetchData("extras", setExtras); // Obtener extras
+    fetchData("extras", setExtras);
   }, [fetchData]);
 
-  // Manejo del scroll para el botón de navegación
-  const manejarScroll = useCallback(() => {
-    const scrollPos = window.scrollY;
-    console.log("Scroll position:", scrollPos); // Verificar posición de scroll
-    setMostrarBoton(scrollPos > 100);
-    setIsSticky(scrollPos > 50); // Cambiar a 50px o el valor deseado
-  }, []);
-  
-  useEffect(() => {
-    window.addEventListener("scroll", manejarScroll);
-    return () => window.removeEventListener("scroll", manejarScroll);
-  }, [manejarScroll]);
-
-  // Volver al inicio de la página
-  const volverArriba = () => window.scrollTo({ top: 0, behavior: "smooth" });
-  console.log(extras)
-  // Filtrado de productos basado en la búsqueda
   const productosFiltrados = productos.filter(
     (producto) =>
       producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) &&
       producto.vigencia === "SI"
   );
 
-  // Limpiar el carrito
-  const clearCart = () => setCart([]);
+  const handleCuotaTypeChange = (event, newType) => {
+    if (newType !== null) {
+      setCuotaType(newType);
+    }
+  };
 
-  // Cierre del Snackbar
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") return;
     setSnackbarOpen(false);
+  };
+
+  const getBannerForRango = () => {
+    const rangosGrupo1 = [
+      "Demostrador/a",
+      "Demostrador/a plata",
+      "Demostrador/a oro",
+      "Coordinador/a",
+      "Coordinador/a diamante",
+    ];
+    const rangosGrupo2 = [
+      "Ejecutivo/a",
+      "Ejecutivo/a senior",
+      "Ejecutivo/a máster",
+      "Ejecutivo/a premium",
+      "Empresario/a",
+      "Empresario/a VIP",
+    ];
+
+    if (!extras || !extras[0]) {
+      console.warn("Extras no disponibles o vacíos.");
+      return null;
+    }
+
+    if (!rango || rango.trim() === "" || rangosGrupo1.includes(rango)) {
+      return (
+        <div className="banner card-product mar-b30">
+          <img
+            src={windowWidth <= 460 ? extras[0]?.banner_mobile : extras[0]?.banner}
+            alt="Banner Grupo 1"
+            style={{ width: "100%" }}
+          />
+        </div>
+      );
+    } else if (rangosGrupo2.includes(rango)) {
+      return (
+        <div className="banner card-product mar-b30">
+          <a
+            href="https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808493147926019315fc5d760034"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <img
+              src={windowWidth <= 460 ? extras[0]?.banner_super_mobile : extras[0]?.banner_super}
+              alt="Banner Grupo 2"
+              style={{ width: "100%" }}
+            />
+          </a>
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
@@ -156,12 +189,11 @@ const Home = () => {
         }}
       >
         <Typography variant="body1" color="primary" fontSize={18}>
-          {timeOfDay} <b>{username === "lety" ? "Cara de Paty" : username}</b>, Te damos la
-          Bienvenida
+          {timeOfDay} <b>{username || "Usuario"}</b>, Te damos la Bienvenida
         </Typography>
         <Button
           variant="contained"
-          onClick={logout} // Usamos el método logout del contexto
+          onClick={logout}
           color="error"
           style={{ width: "100%", maxWidth: 200 }}
           startIcon={<LogoutIcon />}
@@ -174,7 +206,7 @@ const Home = () => {
         <img src={logo} alt="logo" height="150" className="mar-t30 mar-b20" />
       </div>
 
-      <div className={`header ${isSticky ? "sticky" : ""} mar-b30 flex-center pad20`}>
+      <div className="header mar-b30 flex-center pad20">
         <TextField
           style={{ maxWidth: 450 }}
           fullWidth
@@ -185,19 +217,42 @@ const Home = () => {
           onChange={(e) => setFiltro(e.target.value)}
         />
       </div>
-      {extras?.[0]?.banner && (
-        <div className="banner card-product mar-b30">
-          <img
-            src={
-              windowWidth <= 460
-                ? extras[0]?.banner_mobile
-                : extras[0]?.banner
-            }
-            alt="Banner"
-            style={{ width: "100%" }}
-          />
-        </div>
-      )}
+
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
+        <ToggleButtonGroup
+          value={cuotaType}
+          exclusive
+          onChange={handleCuotaTypeChange}
+          aria-label="Tipo de cuotas"
+        >
+          <ToggleButton
+            value="sin_interes"
+            aria-label="Cuotas sin interés"
+            style={{
+              backgroundColor: cuotaType === "sin_interes" ? "#A47A9E" : "#fff",
+              color: cuotaType === "sin_interes" ? "#fff" : "#673ab7",
+              border: "1px solid #A47A9E",
+              borderRadius: "20px 0 0 20px",
+            }}
+          >
+            Cuotas sin interés
+          </ToggleButton>
+          <ToggleButton
+            value="con_interes"
+            aria-label="Cuotas con interés"
+            style={{
+              backgroundColor: cuotaType === "con_interes" ? "#A47A9E" : "#fff",
+              color: cuotaType === "con_interes" ? "#fff" : "#673ab7",
+              border: "1px solid #A47A9E",
+              borderRadius: "0 20px 20px 0",
+            }}
+          >
+            Cuotas con interés
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </div>
+
+      {getBannerForRango()}
 
       <ul className="lista-prod w-100">
         {loading ? (
@@ -213,11 +268,7 @@ const Home = () => {
         ) : (
           productosFiltrados.map((product) => (
             <li className="grid-item" key={product.id}>
-              <Product
-                product={product}
-                onAddToCart={handleAddToCart}
-                onCuotaChange={handleCuotaChangeWrapper}
-              />
+              <Product product={product} cuotaType={cuotaType} />
             </li>
           ))
         )}
@@ -244,7 +295,7 @@ const Home = () => {
         cart={cart}
         setCart={setCart}
         onClearCart={clearCart}
-        onRemoveFromCart={handleRemoveFromCart}
+        onRemoveFromCart={(product) => setCart(cart.filter((item) => item.id !== product.id))}
       />
       <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
         <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: "100%" }}>
