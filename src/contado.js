@@ -193,7 +193,7 @@ const Contado = () => {
           </Typography>
           <ul className="lista-prod-catalog w-100">
             {productosAMostrar[linea].map((product) => {
-              const precioLimpio = cleanPrice(product.psvp_lista || "0");
+              const precioLimpio = cleanPrice(product.precio_negocio || "0");
               return (
                 <li className="grid-item" key={product.id}>
                   <ProductsCalatogo
