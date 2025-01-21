@@ -14,8 +14,7 @@ import { Navigation as NavigationIcon, Logout as LogoutIcon } from "@mui/icons-m
 import ShoppingCart from "./components/cart";
 import Product from "./components/products";
 import ResponsiveDialog from "./components/dialog";
-/* import logo from "./assets/logo.png"; */
-import logo from "./assets/logo-navidad.png";
+import logo from "./assets/logo.png";
 import { handleCuotaChange } from "./utils/cartHandlers";
 import { useAuth } from "./AuthContext"; // Importamos useAuth
 
