@@ -85,6 +85,37 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
         </Typography>
         <Divider sx={{ my: 2 }} />
 
+        {/* Mostrar cuotas */}
+        {cuotas.map((cuota, idx) => {
+          const cuotaValue = product[cuota];
+          const isValidCuota =
+            cuotaValue &&
+            cuotaValue !== "NO" &&
+            cuotaValue !== "$0" &&
+            cuotaValue !== "0" &&
+            cuotaValue !== 0 &&
+            !isNaN(parseFloat(cuotaValue.replace(/[^\d.]/g, "")));
+
+          if (isValidCuota) {
+            return (
+              <div className="flex-center" key={idx}>
+                {cuotaType !== "con_interes" && (
+                  <img src={cuotaSimple} alt="Cuota sin interés" height="15" />
+                )}
+                <Typography variant="body2" fontSize={13} fontStyle="italic">
+                  <b style={{ color: "green" }}>
+                    {`${getAdjustedCuotaLabel(cuota)} de: `}
+                    <i style={{ color: "black" }}>
+                      {getCuotaPrice(product.psvp_lista, cuotaValue)}
+                    </i>
+                  </b>
+                </Typography>
+              </div>
+            );
+          }
+          return null;
+        })}
+
         {/* Combo de selección de cuotas */}
         <FormControl fullWidth sx={{ my: 2 }}>
           <InputLabel>Selecciona una cuota</InputLabel>
