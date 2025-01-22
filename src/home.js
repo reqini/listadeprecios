@@ -11,6 +11,7 @@ import {
   Fab,
   ToggleButton,
   ToggleButtonGroup,
+  Tooltip,
 } from "@mui/material";
 import { Logout as LogoutIcon, Navigation as NavigationIcon } from "@mui/icons-material";
 import Product from "./components/products";
@@ -231,9 +232,11 @@ const Home = () => {
           <ToggleButton value="sin_interes" aria-label="Cuotas sin interés">
             Cuotas sin interés
           </ToggleButton>
-          <ToggleButton value="con_interes" aria-label="Cuotas con interés">
-            Cuotas con interés
-          </ToggleButton>
+          <Tooltip title="Disponible a la brevedad">
+            <ToggleButton value="con_interes" disabled aria-label="Cuotas con interés">
+              Cuotas con interés
+            </ToggleButton>
+          </Tooltip>
         </ToggleButtonGroup>
       </div>
 
