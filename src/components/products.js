@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardContent,
@@ -7,6 +7,10 @@ import {
   Button,
   CardActions,
   Divider,
+  FormControl,
+  Select,
+  MenuItem,
+  InputLabel,
 } from "@mui/material";
 import { FaWhatsapp } from "react-icons/fa";
 import { parsePrice, formatPrice } from "../utils/priceUtils";
@@ -14,6 +18,8 @@ import { parsePrice, formatPrice } from "../utils/priceUtils";
 const cuotaSimple = require("../../src/assets/cuotas-simples.webp");
 
 const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
+  const [selectedCuota, setSelectedCuota] = useState("");
+
   const cuotasConInteres = ["tres_con_interes", "seis_con_interes"];
   const cuotasSinInteres = [
     "veinticuatro_sin_interes",
@@ -46,6 +52,10 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
     return cuota.replace(/_/g, " ");
   };
 
+  const handleCuotaChange = (event) => {
+    setSelectedCuota(event.target.value);
+  };
+
   return (
     <Card sx={{ maxWidth: 600, paddingBottom: "12px" }} className="card-product">
       {cuotaType !== "con_interes" && product.discount && (
@@ -75,35 +85,38 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
         </Typography>
         <Divider sx={{ my: 2 }} />
 
-        {cuotas.map((cuota, idx) => {
-          const cuotaValue = product[cuota];
-          const isValidCuota =
-            cuotaValue &&
-            cuotaValue !== "NO" &&
-            cuotaValue !== "$0" &&
-            cuotaValue !== "0" &&
-            cuotaValue !== 0 &&
-            !isNaN(parseFloat(cuotaValue.replace(/[^\d.]/g, "")));
+        {/* Combo de selección de cuotas */}
+        <FormControl fullWidth sx={{ my: 2 }}>
+          <InputLabel>Selecciona una cuota</InputLabel>
+          <Select
+            value={selectedCuota}
+            onChange={handleCuotaChange}
+            label="Selecciona una cuota"
+          >
+            {cuotas.map((cuota, idx) => {
+              const cuotaValue = product[cuota];
+              const isValidCuota =
+                cuotaValue &&
+                cuotaValue !== "NO" &&
+                cuotaValue !== "$0" &&
+                cuotaValue !== "0" &&
+                cuotaValue !== 0 &&
+                !isNaN(parseFloat(cuotaValue.replace(/[^\d.]/g, "")));
 
-          if (isValidCuota) {
-            return (
-              <div className="flex-center" key={idx}>
-                {cuotaType !== "con_interes" && (
-                  <img src={cuotaSimple} alt="sin limites" height="15" />
-                )}
-                <Typography variant="body2" fontSize={13} fontStyle="italic">
-                  <b style={{ color: "green" }}>
-                    {`${getAdjustedCuotaLabel(cuota)} de: `}
-                    <i style={{ color: "black" }}>
-                      {getCuotaPrice(product.psvp_lista, cuotaValue)}
-                    </i>
-                  </b>
-                </Typography>
-              </div>
-            );
-          }
-          return null;
-        })}
+              if (isValidCuota) {
+                return (
+                  <MenuItem key={idx} value={getCuotaPrice(product.psvp_lista, cuotaValue)}>
+                    {`${getAdjustedCuotaLabel(cuota)} de ${getCuotaPrice(
+                      product.psvp_lista,
+                      cuotaValue
+                    )}`}
+                  </MenuItem>
+                );
+              }
+              return null;
+            })}
+          </Select>
+        </FormControl>
       </CardContent>
 
       <CardActions sx={{ display: "flex", flexDirection: "column" }}>
