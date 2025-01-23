@@ -65,10 +65,11 @@ const Register = () => {
     setLoading(true);
 
     try {
+      // Enviar los datos al backend
       const response = await axios.post(`/api/register`, {
         username,
         password,
-        rango,
+        rango, // Se asegura que el rango se envíe correctamente
       });
 
       if (response.data.success) {
