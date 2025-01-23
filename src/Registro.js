@@ -51,43 +51,50 @@ const Register = () => {
   const isFormValid =
     username && password && confirmPassword && rango && password === confirmPassword;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
-      return;
-    }
-    if (!rango) {
-      setError('Por favor selecciona un rango.');
-      return;
-    }
-    setLoading(true);
-
-    try {
-      // Enviar los datos al backend
-      const response = await axios.post(`/api/register`, {
-        username,
-        password,
-        rango, // Se asegura que el rango se envíe correctamente
-      });
-
-      if (response.data.success) {
-        alert(
-          'Usuario registrado con éxito. Ahora serás redirigido al plan de suscripción.'
-        );
-        window.location.href =
-          'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808492e620a40192e8bb0f0400ed';
-      } else {
-        alert('Hubo un problema durante el registro. Intenta nuevamente.');
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setError('');
+    
+      if (password !== confirmPassword) {
+        setError('Las contraseñas no coinciden.');
+        return;
       }
-    } catch (error) {
-      console.error('Error durante el registro:', error.message);
-      alert('Hubo un problema al registrarse. Por favor, intenta de nuevo.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    
+      if (!rango) {
+        setError('Por favor selecciona un rango.');
+        return;
+      }
+    
+      setLoading(true);
+    
+      try {
+        const payload = {
+          username,
+          password,
+          rango, // Incluyendo el rango en el payload
+        };
+    
+        console.log("Datos enviados al backend:", payload); // Debug para verificar qué se está enviando
+    
+        const response = await axios.post(`/api/register`, payload);
+    
+        if (response.data.success) {
+          alert(
+            'Usuario registrado con éxito. Ahora serás redirigido al plan de suscripción.'
+          );
+          window.location.href =
+            'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808492e620a40192e8bb0f0400ed';
+        } else {
+          alert('Hubo un problema durante el registro. Intenta nuevamente.');
+        }
+      } catch (error) {
+        console.error('Error durante el registro:', error.message);
+        alert('Hubo un problema al registrarse. Por favor, intenta de nuevo.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
 
   return (
     <div
