@@ -37,19 +37,36 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
   const getCuotaPrice = (psvpPrice, cuotaPrice) => {
     const parsedPSVPPrice = parsePrice(psvpPrice);
     const parsedCuotaPrice = parsePrice(cuotaPrice);
-    return parsedCuotaPrice > 0
-      ? formatPrice(parsedPSVPPrice / (parsedPSVPPrice / parsedCuotaPrice))
-      : formatPrice(0);
+
+    if (parsedCuotaPrice > 0) {
+      return formatPrice(parsedCuotaPrice);
+    }
+
+    return formatPrice(0);
   };
 
   const getAdjustedCuotaLabel = (cuota) => {
-    if (cuota === "tres_con_interes" || cuota === "tres_sin_interes") {
-      return "3 cuotas en efectivo";
+    const cuotasNumero = cuota.match(/\d+/); // Extrae el número de cuotas del nombre de la cuota
+    if (cuotasNumero) {
+      if (cuota.includes("sin_interes")) {
+        return `${cuotasNumero[0]} cuotas sin interés`;
+      }
+      if (cuota.includes("con_interes")) {
+        return `${cuotasNumero[0]} cuotas con interés`;
+      }
     }
-    if (cuota === "seis_con_interes" || cuota === "seis_sin_interes") {
-      return "6 en efectivo";
-    }
+    // Si no se puede determinar el número de cuotas, devolver el nombre tal como está
     return cuota.replace(/_/g, " ");
+  };
+
+  const isValidCuota = (cuotaValue) => {
+    return (
+      cuotaValue &&
+      cuotaValue !== "NO" &&
+      cuotaValue !== "$0" &&
+      cuotaValue !== "0" &&
+      parseFloat(cuotaValue.replace(/[^\d.]/g, "")) > 0
+    );
   };
 
   const handleCuotaChange = (event) => {
@@ -88,15 +105,7 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
         {/* Mostrar cuotas */}
         {cuotas.map((cuota, idx) => {
           const cuotaValue = product[cuota];
-          const isValidCuota =
-            cuotaValue &&
-            cuotaValue !== "NO" &&
-            cuotaValue !== "$0" &&
-            cuotaValue !== "0" &&
-            cuotaValue !== 0 &&
-            !isNaN(parseFloat(cuotaValue.replace(/[^\d.]/g, "")));
-
-          if (isValidCuota) {
+          if (isValidCuota(cuotaValue)) {
             return (
               <div className="flex-center" key={idx}>
                 {cuotaType !== "con_interes" && (
@@ -126,15 +135,7 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
           >
             {cuotas.map((cuota, idx) => {
               const cuotaValue = product[cuota];
-              const isValidCuota =
-                cuotaValue &&
-                cuotaValue !== "NO" &&
-                cuotaValue !== "$0" &&
-                cuotaValue !== "0" &&
-                cuotaValue !== 0 &&
-                !isNaN(parseFloat(cuotaValue.replace(/[^\d.]/g, "")));
-
-              if (isValidCuota) {
+              if (isValidCuota(cuotaValue)) {
                 return (
                   <MenuItem key={idx} value={getCuotaPrice(product.psvp_lista, cuotaValue)}>
                     {`${getAdjustedCuotaLabel(cuota)} de ${getCuotaPrice(
