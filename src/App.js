@@ -1,19 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Login from "./Login";
 import Home from "./home";
 import Registro from "./Registro";
 import Catalogo from "./catalogo";
-import Catalogo3 from "./catalogo3";
-import Catalogo6 from "./catalogo6";
-import Catalogo9 from "./catalogo9";
-import Catalogo12 from "./catalogo12";
-import Catalogo18 from "./catalogo18";
-import Catalogo20 from "./catalogo20";
-import Catalogo24 from "./catalogo24";
-/* import Contado from "./contado"; */
 import { AuthProvider, useAuth } from "./AuthContext";
+import axios from "axios";
 
 // Tema personalizado
 const theme = createTheme({
@@ -35,7 +28,6 @@ const theme = createTheme({
 const PrivateRoute = ({ children }) => {
   const { auth } = useAuth();
 
-  // Verificar si el token está presente en el contexto de autenticación
   if (!auth || !auth.token) {
     return <Navigate to="/login" replace />;
   }
@@ -47,7 +39,6 @@ const PrivateRoute = ({ children }) => {
 const LoginRoute = () => {
   const { auth } = useAuth();
 
-  // Redirigir a la home si ya hay un token activo
   if (auth && auth.token) {
     return <Navigate to="/home" replace />;
   }
@@ -56,8 +47,26 @@ const LoginRoute = () => {
 };
 
 const App = () => {
+  const [dynamicRoutes, setDynamicRoutes] = useState([]);
+
   useEffect(() => {
-    // Limpieza automática de datos almacenados
+    const fetchDynamicRoutes = async () => {
+      try {
+        const { data } = await axios.get("http://localhost:3001/api/dynamic-urls");
+        if (data.success && data.urls) {
+          setDynamicRoutes(data.urls);
+        } else {
+          console.error("Error: respuesta inesperada del backend", data);
+        }
+      } catch (error) {
+        console.error("Error fetching dynamic routes:", error);
+      }
+    };
+
+    fetchDynamicRoutes();
+  }, []);
+
+  useEffect(() => {
     try {
       const authData = localStorage.getItem("token");
       if (!authData || typeof authData !== "string") {
@@ -72,7 +81,6 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    // Detectar nuevas versiones del Service Worker
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistration().then((registration) => {
         if (registration) {
@@ -81,9 +89,8 @@ const App = () => {
             if (installingWorker) {
               installingWorker.onstatechange = () => {
                 if (installingWorker.state === "installed" && navigator.serviceWorker.controller) {
-                  // Mostrar alerta para actualizar
                   alert("Hay una nueva versión disponible. La aplicación se actualizará automáticamente.");
-                  window.location.reload(); // Recarga la aplicación
+                  window.location.reload();
                 }
               };
             }
@@ -102,14 +109,10 @@ const App = () => {
             <Route path="/registro" element={<Registro />} />
             <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
             <Route path="/catalogo" element={<Catalogo />} />
-            <Route path="/catalogo3" element={<Catalogo3 />} />
-            <Route path="/catalogo6" element={<Catalogo6 />} />
-            <Route path="/catalogo9" element={<Catalogo9 />} />
-            <Route path="/catalogo12" element={<Catalogo12 />} />
-            <Route path="/catalogo18" element={<Catalogo18 />} />
-            <Route path="/catalogo20" element={<Catalogo20 />} />
-            <Route path="/catalogo24" element={<Catalogo24 />} />
-            {/* <Route path="/contado" element={<Contado />} /> */}
+            {dynamicRoutes.map((route, index) => {
+              const path = new URL(route).pathname; // Extraer el path de la URL dinámica
+              return <Route key={index} path={path} element={<Catalogo />} />;
+            })}
             <Route path="/" element={<Navigate to="/login" replace />} />
           </Routes>
         </Router>
