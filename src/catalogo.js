@@ -173,6 +173,7 @@ const Catalogo = () => {
           color="primary"
           onClick={() => setShowFavorites(!showFavorites)}
           className="btn-absolute-favorite"
+          style={{display: 'none'}}
           disabled={favorites.length === 0}
         >
           {showFavorites ? 'Todos' : 'Favoritos'}
@@ -183,6 +184,7 @@ const Catalogo = () => {
           color="secondary" 
           size="large" 
           className="btn-absolute-tour"
+          style={{display: 'none'}}
           onClick={startTour}
         >
           {isMobile ? "Guía tutorial" : "¿Cómo utilizar el catálogo?"}
