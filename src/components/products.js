@@ -35,7 +35,6 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
   const cuotas = cuotaType === "con_interes" ? cuotasConInteres : cuotasSinInteres;
 
   const getCuotaPrice = (psvpPrice, cuotaPrice) => {
-    const parsedPSVPPrice = parsePrice(psvpPrice);
     const parsedCuotaPrice = parsePrice(cuotaPrice);
 
     if (parsedCuotaPrice > 0) {
