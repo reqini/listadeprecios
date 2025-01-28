@@ -10,18 +10,6 @@ import logo from "./assets/logo-navidad.png";
 import { Snackbar, Alert, Typography } from "@mui/material";
 import { formatPrice } from './utils/priceUtils';
 
-// Función para limpiar y convertir el precio a número
-const cleanPrice = (price) => {
-  if (!price) return 0; // Si no hay precio, devolver 0
-  try {
-    const cleanedPrice = price.replace(/[$,\s]/g, ""); // Eliminar símbolos $, comas y espacios
-    return parseFloat(cleanedPrice); // Convertir a número
-  } catch (error) {
-    console.error("Error limpiando el precio:", price, error.message);
-    return 0; // Devolver 0 en caso de error
-  }
-};
-
 const Contado = () => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,13 +25,12 @@ const Contado = () => {
 
   // Eliminar productos duplicados por código o ID
   const eliminarDuplicados = (productos) => {
-    const productosUnicos = productos.reduce((acc, producto) => {
+    return productos.reduce((acc, producto) => {
       if (!acc.some(item => item.codigo === producto.codigo)) {
         acc.push(producto);
       }
       return acc;
     }, []);
-    return productosUnicos;
   };
 
   // Cargar productos desde la API
@@ -82,7 +69,7 @@ const Contado = () => {
     setProductosAgrupados(productosPorLinea);
   };
 
-  // Manejar el scroll para hacer sticky el header
+  // Manejar scroll para hacer sticky el header
   useEffect(() => {
     const handleScroll = () => {
       const offset = window.scrollY;
@@ -153,7 +140,7 @@ const Contado = () => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <Helmet>
-        <title>Catálogo Contado - Catálogo</title>
+        <title>Catálogo Contado - Contado</title>
       </Helmet>
       <div className="w-100 flex justify-center">
         <img src={logo} alt="logo" height="100" className="mar-t30 mar-b20" />
@@ -189,18 +176,17 @@ const Contado = () => {
       {Object.keys(productosAMostrar).map((linea) => (
         <div key={linea} className="linea-section">
           <Typography variant="h5" gutterBottom margin="20px 0">
-            Linea: <b>{linea}</b>
+            Línea: <b>{linea}</b>
           </Typography>
           <ul className="lista-prod-catalog w-100">
             {productosAMostrar[linea].map((product) => {
-              const precioLimpio = cleanPrice(product.precio_negocio || "0");
+              const precioNegocio = formatPrice(product.precio_negocio || 0);
               return (
                 <li className="grid-item" key={product.id}>
                   <ProductsCalatogo
-                    product={product}
-                    showPriceOnly={true} // Forzar a mostrar solo el precio
+                    product={{ ...product, precio: precioNegocio }}
+                    showPriceOnly={true}
                   />
-
                 </li>
               );
             })}

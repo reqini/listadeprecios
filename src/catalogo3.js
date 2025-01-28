@@ -6,10 +6,9 @@ import Skeleton from "@mui/material/Skeleton";
 import LinearProgress from "@mui/material/LinearProgress";
 import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
-/* import logo from "./assets/logo.png"; */
-import logo from "./assets/logo-navidad.png";
+import logo from "./assets/logo.png";
 import { Snackbar, Alert, Typography } from "@mui/material";
-import { formatPrice } from './utils/priceUtils';
+/* import { formatPrice } from './utils/priceUtils'; */
 
 const Catalogo3 = () => {
   const [cart, setCart] = useState([]);
@@ -24,26 +23,37 @@ const Catalogo3 = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
+  // Mapeo correcto de cuotas
+  const cuotasMap = useMemo(() => ({
+    "3 cuotas sin interés": 'tres_sin_interes',
+  }), []);
+
+  // Eliminar duplicados por código
   const eliminarDuplicados = (productos) => {
-    const productosUnicos = productos.reduce((acc, producto) => {
+    return productos.reduce((acc, producto) => {
       if (!acc.some(item => item.codigo === producto.codigo)) {
         acc.push(producto);
       }
       return acc;
     }, []);
-    return productosUnicos;
   };
 
+  // Cargar productos desde la API
   const getData = async () => {
-    const result = await axios.get(`/api/productos`);
-    return result.data;
+    try {
+      const result = await axios.get(`/api/productos`);
+      return result.data;
+    } catch (error) {
+      console.error("Error cargando productos:", error);
+      return [];
+    }
   };
 
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
       const productosData = await getData();
-      const productosFiltrados = productosData.filter(producto => producto.vigencia.toLowerCase() !== "no");
+      const productosFiltrados = productosData.filter(producto => producto.vigencia?.toLowerCase() !== "no");
       const productosUnicos = eliminarDuplicados(productosFiltrados);
       setProductos(productosUnicos);
       agruparProductosPorLinea(productosUnicos);
@@ -53,6 +63,7 @@ const Catalogo3 = () => {
     loadInitialData();
   }, []);
 
+  // Agrupar productos por línea
   const agruparProductosPorLinea = (productos) => {
     const productosPorLinea = productos.reduce((acc, producto) => {
       const { linea } = producto;
@@ -63,6 +74,7 @@ const Catalogo3 = () => {
     setProductosAgrupados(productosPorLinea);
   };
 
+  // Manejar el scroll para sticky header
   useEffect(() => {
     const handleScroll = () => {
       const offset = window.scrollY;
@@ -70,20 +82,16 @@ const Catalogo3 = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
-  const cuotasMap = useMemo(() => ({
-    "3 cuotas sin interés": 'doce_sin_interes',
-  }), []);
-
+  // Filtrar productos según descripción, línea y cuota
   useEffect(() => {
     let productosFiltrados = productos.filter((producto) =>
-      producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) &&
-      producto.linea.toLowerCase() !== 'repuestos'
+      producto.descripcion?.toLowerCase().includes(filtro.toLowerCase()) &&
+      producto.linea?.toLowerCase() !== 'repuestos'
     );
 
     if (cuotasMap["3 cuotas sin interés"]) {
@@ -96,10 +104,12 @@ const Catalogo3 = () => {
     agruparProductosPorLinea(productosFiltrados);
   }, [filtro, productos, cuotasMap]);
 
+  // Añadir producto al carrito
   const addToCart = (product) => {
     setCart([...cart, product]);
   };
 
+  // Manejar favoritos
   const toggleFavorite = (product) => {
     let updatedFavorites;
     let message;
@@ -125,6 +135,7 @@ const Catalogo3 = () => {
     }
   };
 
+  // Productos que se deben mostrar
   const productosAMostrar = showFavorites
     ? Object.keys(productosAgrupados).reduce((acc, linea) => {
         const productosFavoritos = productosAgrupados[linea].filter(product =>
@@ -140,7 +151,7 @@ const Catalogo3 = () => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <Helmet>
-        <title>Catalogo Simple - Catálogo</title>
+        <title>Catálogo 3 Cuotas - Catálogo</title>
       </Helmet>
       <div className="w-100 flex justify-center">
         <img src={logo} alt="logo" height="100" className='mar-t30 mar-b20' />
@@ -179,19 +190,17 @@ const Catalogo3 = () => {
       {Object.keys(productosAMostrar).map((linea) => (
         <div key={linea} className="linea-section">
           <Typography variant="h5" gutterBottom margin="20px 0">
-            Linea: <b>{linea}</b>
+            Línea: <b>{linea}</b>
           </Typography>
           <ul className="lista-prod-catalog w-100">
             {productosAMostrar[linea].map((product) => (
               <li className="grid-item" key={product.id}>
                 <ProductsCalatogo
-                  key={product.familia}
                   product={product}
                   onAddToCart={addToCart}
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
                   selectedCuota={'3 cuotas sin interés'}
-                  precio={formatPrice(product.precio || 0)}  // Se usa 0 como valor por defecto si el precio es undefined
                 />
               </li>
             ))}

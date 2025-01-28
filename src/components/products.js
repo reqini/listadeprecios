@@ -34,38 +34,23 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
 
   const cuotas = cuotaType === "con_interes" ? cuotasConInteres : cuotasSinInteres;
 
-  const getCuotaPrice = (psvpPrice, cuotaPrice) => {
+  const getCuotaPrice = (cuotaPrice) => {
     const parsedCuotaPrice = parsePrice(cuotaPrice);
-
-    if (parsedCuotaPrice > 0) {
-      return formatPrice(parsedCuotaPrice);
-    }
-
-    return formatPrice(0);
+    return parsedCuotaPrice > 0 ? formatPrice(parsedCuotaPrice) : formatPrice(0);
   };
 
   const getAdjustedCuotaLabel = (cuota) => {
-    const cuotasNumero = cuota.match(/\d+/); // Extrae el número de cuotas del nombre de la cuota
+    const cuotasNumero = cuota.match(/\d+/);
     if (cuotasNumero) {
-      if (cuota.includes("sin_interes")) {
-        return `${cuotasNumero[0]} cuotas sin interés`;
-      }
-      if (cuota.includes("con_interes")) {
-        return `${cuotasNumero[0]} cuotas con interés`;
-      }
+      return cuota.includes("sin_interes")
+        ? `${cuotasNumero[0]} cuotas sin interés`
+        : `${cuotasNumero[0]} cuotas con interés`;
     }
-    // Si no se puede determinar el número de cuotas, devolver el nombre tal como está
     return cuota.replace(/_/g, " ");
   };
 
   const isValidCuota = (cuotaValue) => {
-    return (
-      cuotaValue &&
-      cuotaValue !== "NO" &&
-      cuotaValue !== "$0" &&
-      cuotaValue !== "0" &&
-      parseFloat(cuotaValue.replace(/[^\d.]/g, "")) > 0
-    );
+    return cuotaValue && parseFloat(cuotaValue.replace(/[^\d.]/g, "")) > 0;
   };
 
   const handleCuotaChange = (event) => {
@@ -104,47 +89,32 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
         {/* Mostrar cuotas */}
         {cuotas.map((cuota, idx) => {
           const cuotaValue = product[cuota];
-          if (isValidCuota(cuotaValue)) {
-            return (
-              <div className="flex-center" key={idx}>
-                {cuotaType !== "con_interes" && (
-                  <img src={cuotaSimple} alt="Cuota sin interés" height="15" />
-                )}
-                <Typography variant="body2" fontSize={13} fontStyle="italic">
-                  <b style={{ color: "green" }}>
-                    {`${getAdjustedCuotaLabel(cuota)} de: `}
-                    <i style={{ color: "black" }}>
-                      {getCuotaPrice(product.psvp_lista, cuotaValue)}
-                    </i>
-                  </b>
-                </Typography>
-              </div>
-            );
-          }
-          return null;
+          return isValidCuota(cuotaValue) ? (
+            <div className="flex-center" key={idx}>
+              {cuotaType !== "con_interes" && (
+                <img src={cuotaSimple} alt="Cuota sin interés" height="15" />
+              )}
+              <Typography variant="body2" fontSize={13} fontStyle="italic">
+                <b style={{ color: "green" }}>
+                  {`${getAdjustedCuotaLabel(cuota)} de: `}
+                  <i style={{ color: "black" }}>{getCuotaPrice(cuotaValue)}</i>
+                </b>
+              </Typography>
+            </div>
+          ) : null;
         })}
 
         {/* Combo de selección de cuotas */}
         <FormControl fullWidth sx={{ my: 2 }}>
           <InputLabel>Selecciona una cuota</InputLabel>
-          <Select
-            value={selectedCuota}
-            onChange={handleCuotaChange}
-            label="Selecciona una cuota"
-          >
+          <Select value={selectedCuota} onChange={handleCuotaChange} label="Selecciona una cuota">
             {cuotas.map((cuota, idx) => {
               const cuotaValue = product[cuota];
-              if (isValidCuota(cuotaValue)) {
-                return (
-                  <MenuItem key={idx} value={getCuotaPrice(product.psvp_lista, cuotaValue)}>
-                    {`${getAdjustedCuotaLabel(cuota)} de ${getCuotaPrice(
-                      product.psvp_lista,
-                      cuotaValue
-                    )}`}
-                  </MenuItem>
-                );
-              }
-              return null;
+              return isValidCuota(cuotaValue) ? (
+                <MenuItem key={idx} value={getCuotaPrice(cuotaValue)}>
+                  {`${getAdjustedCuotaLabel(cuota)} de ${getCuotaPrice(cuotaValue)}`}
+                </MenuItem>
+              ) : null;
             })}
           </Select>
         </FormControl>
@@ -152,43 +122,27 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
 
       <CardActions sx={{ display: "flex", flexDirection: "column" }}>
         {!catalog && (
-          <Button
-            fullWidth
-            onClick={() => onAddToCart && onAddToCart(product)}
-            variant="contained"
-            size="medium"
-            color="primary"
-          >
+          <Button fullWidth onClick={() => onAddToCart(product)} variant="contained" size="medium" color="primary">
             Agregar al carrito
           </Button>
         )}
         <Button
           fullWidth
-          href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-            `¡Hola! Te envío el valor de tu próxima Essen:
-            Producto: ${product.descripcion}
-            Precio de Negocio: ${formatPrice(parsePrice(product.precio_negocio))}
-            PSVP lista: ${formatPrice(parsePrice(product.psvp_lista))}
-            `
-          )}`}
-          target="_blank"
+          href={selectedCuota ? `https://api.whatsapp.com/send?text=${encodeURIComponent(
+            `¡Hola! Te envío el valor de tu próxima Essen:\nProducto: ${product.descripcion}\nPrecio de Negocio: ${formatPrice(parsePrice(product.precio_negocio))}\nPSVP lista: ${formatPrice(parsePrice(product.psvp_lista))}\n`
+          )}` : "#"}
+          target={selectedCuota ? "_blank" : ""}
           variant="contained"
           size="medium"
           color="primary"
           sx={{ my: 1, backgroundColor: "#25D366", color: "white" }}
           startIcon={<FaWhatsapp />}
+          disabled={!selectedCuota}
         >
           Compartir
         </Button>
         {product.ficha_tecnica ? (
-          <Button
-            fullWidth
-            target="_blank"
-            href={product.ficha_tecnica}
-            variant="outlined"
-            size="medium"
-            color="primary"
-          >
+          <Button fullWidth target="_blank" href={product.ficha_tecnica} variant="outlined" size="medium" color="primary">
             Ficha técnica
           </Button>
         ) : (

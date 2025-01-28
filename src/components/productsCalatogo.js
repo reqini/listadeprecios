@@ -5,9 +5,10 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { FaWhatsapp } from 'react-icons/fa';
 import { Button, CardActions } from '@mui/material';
-import { formatPrice } from '../utils/priceUtils'; // Importamos la función de formateo
+import { formatPrice } from '../utils/priceUtils';
 
-const ProductsCalatogo = ({ product, selectedCuota, showPriceOnly = false }) => {
+const ProductsCalatogo = ({ product, selectedCuota, showPriceOnly = false, isContado = false }) => {
+  // Mapeo de cuotas con sus respectivos campos
   const cuotasMap = {
     "24 cuotas sin interés": 'veinticuatro_sin_interes',
     "20 cuotas sin interés": 'veinte_sin_interes',
@@ -20,20 +21,26 @@ const ProductsCalatogo = ({ product, selectedCuota, showPriceOnly = false }) => 
   };
 
   const cuotaKey = cuotasMap[selectedCuota];
-  let cuotaValue = product[cuotaKey] !== 'NO' ? product[cuotaKey] : null;
+  let cuotaValue = null;
 
-  if (cuotaValue) {
-    // Eliminar caracteres no numéricos y convertir a número
-    cuotaValue = parseFloat(cuotaValue.replace(/[^\d.-]/g, ''));
+  // Validar y procesar cuota seleccionada
+  if (cuotaKey && product[cuotaKey] && product[cuotaKey] !== 'NO') {
+    try {
+      cuotaValue = parseFloat(product[cuotaKey].replace(/[^0-9.-]/g, '')) || null;
+    } catch {
+      cuotaValue = null;
+    }
   }
 
-  // Crear enlace de WhatsApp
-  const createWhatsAppLink = (product) => {
-    const message = `¡Quiero este Producto :)!
-      Producto: ${product.descripcion}`;
+  // Procesar precio de negocio
+  const precioNegocio = product.precio_negocio
+    ? parseFloat(product.precio_negocio.replace(/[^0-9.-]/g, '')) || null
+    : null;
 
-    return `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-  };
+  // Determinar precio final según el contexto
+  const precioFinal = isContado
+    ? precioNegocio || 0
+    : cuotaValue || parseFloat(product.psvp_lista?.replace(/[^0-9.-]/g, '')) || 0;
 
   return (
     <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className="card-product-catalogo">
@@ -49,7 +56,7 @@ const ProductsCalatogo = ({ product, selectedCuota, showPriceOnly = false }) => 
             height: 100,
           },
         }}
-        alt="product"
+        alt="Imagen del producto"
       />
       <CardContent style={{ display: 'flex', flexDirection: 'column', padding: '6px 16px 0 16px' }}>
         {product.event && <div className="descuento-black mar-b10">{product.event}</div>}
@@ -72,24 +79,27 @@ const ProductsCalatogo = ({ product, selectedCuota, showPriceOnly = false }) => 
           {product.descripcion}
         </Typography>
 
-        {/* Mostrar precio de lista si showPriceOnly es true */}
-        {showPriceOnly && product.psvp_lista && (
+        {/* Mostrar el precio según el contexto */}
+        {isContado ? (
           <Typography variant="body2" color="text.secondary" style={{ marginTop: 5 }}>
-            Precio de Contado: <b>{formatPrice(parseFloat(product.psvp_lista.replace(/[^\d.-]/g, '')) || 0)}</b>
+            Precio de Negocio: <b>{formatPrice(precioFinal)}</b>
           </Typography>
-        )}
-
-        {/* Mostrar el valor de la cuota si showPriceOnly es false */}
-        {!showPriceOnly && cuotaValue && (
+        ) : selectedCuota && cuotaValue ? (
           <Typography variant="body2" color="text.secondary" style={{ marginTop: 5 }}>
             {selectedCuota}: <b>{formatPrice(cuotaValue)}</b>
+          </Typography>
+        ) : (
+          <Typography variant="body2" color="text.secondary" style={{ marginTop: 5 }}>
+            No disponible
           </Typography>
         )}
       </CardContent>
       <CardActions style={{ display: 'flex', flexDirection: 'column' }}>
         <Button
           fullWidth
-          href={createWhatsAppLink(product)}
+          href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+            `¡Quiero este Producto :)!\nProducto: ${product.descripcion}`
+          )}`}
           target="_blank"
           variant="contained"
           size="medium"

@@ -37,7 +37,7 @@ const Home = () => {
 
   const onAddToCart = (product) => {
     setCart((prevCart) => [...prevCart, product]);
-    /* console.log(`${product.descripcion} agregado al carrito`); */
+    console.log(`${product.descripcion} agregado al carrito`);
   };
 
   const clearCart = () => setCart([]);

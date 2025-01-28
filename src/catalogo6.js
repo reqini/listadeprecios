@@ -6,7 +6,6 @@ import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
 import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
-/* import logo from "./assets/logo.png"; */
 import logo from "./assets/logo-navidad.png";
 import { Snackbar, Alert, Typography } from "@mui/material";
 import { formatPrice } from './utils/priceUtils';
@@ -24,26 +23,34 @@ const Catalogo6 = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
+  const cuotasMap = useMemo(() => ({
+    "6 cuotas sin interés": 'seis_sin_interes',
+  }), []);
+
   const eliminarDuplicados = (productos) => {
-    const productosUnicos = productos.reduce((acc, producto) => {
+    return productos.reduce((acc, producto) => {
       if (!acc.some(item => item.codigo === producto.codigo)) {
         acc.push(producto);
       }
       return acc;
     }, []);
-    return productosUnicos;
   };
 
   const getData = async () => {
-    const result = await axios.get(`/api/productos`);
-    return result.data;
+    try {
+      const result = await axios.get(`/api/productos`);
+      return result.data;
+    } catch (error) {
+      console.error("Error cargando productos:", error);
+      return [];
+    }
   };
 
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
       const productosData = await getData();
-      const productosFiltrados = productosData.filter(producto => producto.vigencia.toLowerCase() !== "no");
+      const productosFiltrados = productosData.filter(producto => producto.vigencia?.toLowerCase() !== "no");
       const productosUnicos = eliminarDuplicados(productosFiltrados);
       setProductos(productosUnicos);
       agruparProductosPorLinea(productosUnicos);
@@ -76,14 +83,10 @@ const Catalogo6 = () => {
     };
   }, []);
 
-  const cuotasMap = useMemo(() => ({
-    "6 cuotas sin interés": 'doce_sin_interes',
-  }), []);
-
   useEffect(() => {
     let productosFiltrados = productos.filter((producto) =>
-      producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) &&
-      producto.linea.toLowerCase() !== 'repuestos'
+      producto.descripcion?.toLowerCase().includes(filtro.toLowerCase()) &&
+      producto.linea?.toLowerCase() !== 'repuestos'
     );
 
     if (cuotasMap["6 cuotas sin interés"]) {
@@ -140,7 +143,7 @@ const Catalogo6 = () => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <Helmet>
-      <title>Catalogo Simple - Catálogo</title>
+        <title>Catálogo 6 Cuotas - Catálogo</title>
       </Helmet>
       <div className="w-100 flex justify-center">
         <img src={logo} alt="logo" height="100" className='mar-t30 mar-b20' />
@@ -176,19 +179,17 @@ const Catalogo6 = () => {
       {Object.keys(productosAMostrar).map((linea) => (
         <div key={linea} className="linea-section">
           <Typography variant="h5" gutterBottom margin="20px 0">
-            Linea: <b>{linea}</b>
+            Línea: <b>{linea}</b>
           </Typography>
           <ul className="lista-prod-catalog w-100">
             {productosAMostrar[linea].map((product) => (
               <li className="grid-item" key={product.id}>
                 <ProductsCalatogo
-                  /* key={product.codigo} */
                   product={product}
                   onAddToCart={addToCart}
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
                   selectedCuota={'6 cuotas sin interés'}
-                  precio={formatPrice(product.precio || 0)}  // Se usa 0 como valor por defecto si el precio es undefined
                 />
               </li>
             ))}

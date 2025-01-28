@@ -101,14 +101,14 @@ const App = () => {
             <Route path="/login" element={<LoginRoute />} />
             <Route path="/registro" element={<Registro />} />
             <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
-            <Route path="/catalogo" element={<Catalogo />} />
-            <Route path="/catalogo3" element={<Catalogo3 />} />
-            <Route path="/catalogo6" element={<Catalogo6 />} />
-            <Route path="/catalogo9" element={<Catalogo9 />} />
-            <Route path="/catalogo12" element={<Catalogo12 />} />
-            <Route path="/catalogo18" element={<Catalogo18 />} />
-            <Route path="/catalogo20" element={<Catalogo20 />} />
-            <Route path="/catalogo24" element={<Catalogo24 />} />
+            <Route path="/cat" element={<Catalogo />} />
+            <Route path="/cat3" element={<Catalogo3 />} />
+            <Route path="/cat6" element={<Catalogo6 />} />
+            <Route path="/cat9" element={<Catalogo9 />} />
+            <Route path="/cat12" element={<Catalogo12 />} />
+            <Route path="/cat18" element={<Catalogo18 />} />
+            <Route path="/cat20" element={<Catalogo20 />} />
+            <Route path="/cat24" element={<Catalogo24 />} />
             {/* <Route path="/contado" element={<Contado />} /> */}
             <Route path="/" element={<Navigate to="/login" replace />} />
           </Routes>
