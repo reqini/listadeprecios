@@ -15,6 +15,8 @@ export default function BancosDialog() {
   const [open, setOpen] = useState(false);
   const [bancos, setBancos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [buttonBottom, setButtonBottom] = useState(window.innerWidth <= 768 ? 60 : 10);
+  const [zIndex, setZIndex] = useState(window.innerWidth <= 768 ? 2 : 100);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -28,7 +30,7 @@ export default function BancosDialog() {
     const getData = async () => {
       try {
         const result = await axios.get(`/api/bancos`);
-       /*  console.log(result.data);  */
+        console.log(result.data); // Verificar los datos que se reciben
         setBancos(result.data);
       } catch (error) {
         console.error("Error fetching bancos data:", error);
@@ -40,13 +42,36 @@ export default function BancosDialog() {
     getData();
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setButtonBottom(window.innerWidth <= 768 ? 30 : 10);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   if (loading) return <p>Cargando...</p>;
 
   return (
     <React.Fragment>
-      <Button variant="contained" color="secondary" onClick={handleClickOpen} style={{ width: 'auto' }}>
+      {/* Botón fijo con ajuste dinámico en mobile y desktop */}
+      <Button
+        variant="contained"
+        color="secondary"
+        onClick={handleClickOpen}
+        style={{
+          width: 'auto',
+          position: 'fixed',
+          zIndex: zIndex,
+          bottom: `${buttonBottom}px`,
+          right: 20,
+        }}
+      >
         Promociones Bancarias
       </Button>
+
+      {/* Modal con la lista de bancos y promociones */}
       <Dialog
         open={open}
         onClose={handleClose}
@@ -57,54 +82,56 @@ export default function BancosDialog() {
         </DialogTitle>
         <DialogContent>
           <List sx={{ width: '100%', minWidth: 300, bgcolor: 'background.paper' }}>
-            {bancos.map((banco, index) => (
-              <React.Fragment key={index}>
-                <ListItem>
-                  <ListItemAvatar>
-                    <Avatar src={banco.logo} alt={banco.nombre} />
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={banco.banco}
-                    secondary={
-                      <div style={{ color: 'green' }}>
-                        {banco.promocion && <p>{banco.promocion}</p>}
-                        <ul>
-                          {Object.entries({
-                            tres: "3",
-                            seis: "6",
-                            nueve: "9",
-                            doce: "12",
-                            dieciocho: "18",
-                            veinte: "20",
-                            veinticuatro: "24"
-                          }).map(([key, value]) => {
-                            if (banco[key] === "SI" || banco[key] === "TLD") {
-                              // Muestra las cuotas que tienen "SI" o "TLD"
-                              return (
-                                <li key={key}>
-                                  {`${value} cuotas`}
-                                </li>
-                              );
-                            } else if (banco[key] === "VIGENCIA" && banco.vigencia) {
-                              // Muestra las cuotas que tienen "VIGENCIA" con el texto adicional
-                              return (
-                                <li key={key}>
-                                  <span style={{ color: 'green' }}>{`${value} cuotas:`}</span>
-                                  <span style={{ color: 'black' }}> {banco.vigencia}</span>
-                                </li>
-                              );
-                            } else {
-                              return null; // No mostrar si no es "SI", "TLD", o "VIGENCIA"
-                            }
-                          })}
-                        </ul>
-                      </div>
-                    }
-                  />
-                </ListItem>
-                <Divider />
-              </React.Fragment>
-            ))}
+            {bancos.length > 0 ? (
+              bancos.map((banco, index) => (
+                <React.Fragment key={index}>
+                  <ListItem>
+                    <ListItemAvatar>
+                      <Avatar src={banco.logo} alt={banco.nombre} />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={banco.banco}
+                      secondary={
+                        <div style={{ color: 'green' }}>
+                          {banco.promocion && <p>{banco.promocion}</p>}
+                          <ul>
+                            {Object.entries({
+                              tres: "3",
+                              seis: "6",
+                              nueve: "9",
+                              doce: "12",
+                              dieciocho: "18",
+                              veinte: "20",
+                              veinticuatro: "24"
+                            }).map(([key, value]) => {
+                              if (banco[key] === "SI" || banco[key] === "TLD") {
+                                return (
+                                  <li key={key}>
+                                    {`${value} cuotas`}
+                                  </li>
+                                );
+                              } else if (banco[key] === "VIGENCIA" && banco.vigencia) {
+                                return (
+                                  <li key={key}>
+                                    <span style={{ color: 'green' }}>{`${value} cuotas:`}</span>
+                                    <span style={{ color: 'black' }}> {banco.vigencia}</span>
+                                  </li>
+                                );
+                              } else {
+                                return null;
+                              }
+                            })}
+                          </ul>
+                        </div>
+                      }
+                    />
+                  </ListItem>
+                  <Divider />
+                </React.Fragment>
+              ))
+            ) : (
+              <p style={{ textAlign: "center", color: "red" }}>No hay promociones disponibles</p>
+            )}
           </List>
         </DialogContent>
         <DialogActions>
