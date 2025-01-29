@@ -45,6 +45,7 @@ export default function BancosDialog() {
   useEffect(() => {
     const handleResize = () => {
       setButtonBottom(window.innerWidth <= 768 ? 30 : 10);
+      setZIndex(window.innerWidth <= 768 ? 2 : 100);
     };
 
     window.addEventListener("resize", handleResize);
