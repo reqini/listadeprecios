@@ -8,14 +8,19 @@ import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import { Avatar, Divider } from "@mui/material";
+import { Avatar, Divider, useMediaQuery } from "@mui/material";
 import ListItemAvatar from '@mui/material/ListItemAvatar';
+import { useTheme } from '@mui/material/styles';
 import '../css/index.css';
 
 export default function BancosDialog() {
   const [open, setOpen] = useState(false);
   const [bancos, setBancos] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Detectar si la pantalla es mobile
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -60,11 +65,12 @@ export default function BancosDialog() {
         Promociones Bancarias
       </Button>
 
-      {/* Modal con la lista de bancos y promociones */}
+      {/* Modal con la lista de bancos y promociones, fullscreen en mobile */}
       <Dialog
         open={open}
         onClose={handleClose}
         aria-labelledby="bancos-dialog-title"
+        fullScreen={fullScreen} // Se activa en pantallas pequeñas
       >
         <DialogTitle id="bancos-dialog-title">
           Promociones Bancarias
