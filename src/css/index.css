@@ -11,7 +11,9 @@ html, body {
   overflow: auto;
   height: 100%;
 }
-
+.full-width {
+  width: 100%;
+}
 .introjs-tooltip {
   max-width: 90%;  /* Para evitar que el tooltip se desborde en pantallas pequeñas */
 }
