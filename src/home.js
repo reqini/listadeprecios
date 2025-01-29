@@ -102,10 +102,6 @@ const Home = () => {
     setSnackbarOpen(false);
   };
 
-/*   const handleOpenDialog = () => {
-    setOpenDialog(true);
-  }; */
-
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
@@ -167,7 +163,7 @@ const Home = () => {
       <Navbar title={<p>{timeOfDay} <b>{username || "Usuario"}</b>, Te damos la Bienvenida</p> } user={{ username }} onLogout={logout} />
       <Container maxWidth="lg" className="conteiner-list">
         <div className="w-100 flex justify-center">
-          <img src={logo} alt="logo" height="150" className="mar-t30 mar-b20" />
+          <img src={logo} alt="logo" height="100" className="mar-t30 mar-b20" />
         </div>
 
         <div className="header mar-b30 flex-center pad20">
