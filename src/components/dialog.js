@@ -10,13 +10,12 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import { Avatar, Divider } from "@mui/material";
 import ListItemAvatar from '@mui/material/ListItemAvatar';
+import '../css/index.css';
 
 export default function BancosDialog() {
   const [open, setOpen] = useState(false);
   const [bancos, setBancos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [buttonBottom, setButtonBottom] = useState(window.innerWidth <= 768 ? 60 : 10);
-  const [zIndex, setZIndex] = useState(window.innerWidth <= 768 ? 2 : 100);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -42,16 +41,6 @@ export default function BancosDialog() {
     getData();
   }, []);
 
-  useEffect(() => {
-    const handleResize = () => {
-      setButtonBottom(window.innerWidth <= 768 ? 30 : 10);
-      setZIndex(window.innerWidth <= 768 ? 2 : 100);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   if (loading) return <p>Cargando...</p>;
 
   return (
@@ -64,10 +53,9 @@ export default function BancosDialog() {
         style={{
           width: 'auto',
           position: 'fixed',
-          zIndex: zIndex,
-          bottom: `${buttonBottom}px`,
           right: 20,
         }}
+        className="fixed-btn"
       >
         Promociones Bancarias
       </Button>
