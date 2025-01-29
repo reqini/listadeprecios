@@ -1,23 +1,16 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "./utils/axios";
 import {
-  Button,
   Container,
   TextField,
   Snackbar,
   Alert,
-  Typography,
-  Skeleton,
-  Fab,
-  ToggleButton,
-  ToggleButtonGroup,
-  Tooltip,
+  Skeleton
 } from "@mui/material";
-import { Logout as LogoutIcon, Navigation as NavigationIcon } from "@mui/icons-material";
 import Product from "./components/products";
-import ResponsiveDialog from "./components/dialog";
 import ShoppingCart from "./components/cart";
-import Navbar from "./components/Navbar"; // Agregado el Navbar
+import Navbar from "./components/Navbar";
+import ResponsiveDialog from "./components/dialog";
 import logo from "./assets/logo.png";
 import { useAuth } from "./AuthContext";
 
@@ -33,19 +26,13 @@ const Home = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [rango, setRango] = useState("");
   const [cart, setCart] = useState([]);
-  const [cuotaType, setCuotaType] = useState("sin_interes");
+  const [openDialog, setOpenDialog] = useState(false);
 
   const onAddToCart = (product) => {
     setCart((prevCart) => [...prevCart, product]);
   };
 
   const clearCart = () => setCart([]);
-
-  const handleCuotaTypeChange = (event, newType) => {
-    if (newType !== null) {
-      setCuotaType(newType);
-    }
-  };
 
   const getTimeOfDay = useCallback(() => {
     const currentHour = new Date().getHours();
@@ -115,6 +102,14 @@ const Home = () => {
     setSnackbarOpen(false);
   };
 
+/*   const handleOpenDialog = () => {
+    setOpenDialog(true);
+  }; */
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
   const getBannerForRango = () => {
     const rangosGrupo1 = [
       "Demostrador/a",
@@ -169,7 +164,7 @@ const Home = () => {
 
   return (
     <>
-      <Navbar title={<p>{timeOfDay} <b>{username || "Usuario"}</b>, Te damos la Bienvenida</p> } user={{ username }} onLogout={logout} /> {/* Navbar agregado aquí */}
+      <Navbar title={<p>{timeOfDay} <b>{username || "Usuario"}</b>, Te damos la Bienvenida</p> } user={{ username }} onLogout={logout} />
       <Container maxWidth="lg" className="conteiner-list">
         <div className="w-100 flex justify-center">
           <img src={logo} alt="logo" height="150" className="mar-t30 mar-b20" />
@@ -203,13 +198,17 @@ const Home = () => {
           ) : (
             productosFiltrados.map((product) => (
               <li className="grid-item" key={product.id}>
-                <Product product={product} cuotaType={cuotaType} onAddToCart={onAddToCart} />
+                <Product product={product} cuotaType="sin_interes" onAddToCart={onAddToCart} />
               </li>
             ))
           )}
         </ul>
 
         <ShoppingCart cart={cart} setCart={setCart} onClearCart={clearCart} />
+
+        {/* Modal de promociones bancarias */}
+        <ResponsiveDialog open={openDialog} onClose={handleCloseDialog} />
+
         <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
           <Alert onClose={handleSnackbarClose} severity="success">
             Producto agregado al carrito
