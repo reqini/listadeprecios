@@ -17,6 +17,7 @@ import { Logout as LogoutIcon, Navigation as NavigationIcon } from "@mui/icons-m
 import Product from "./components/products";
 import ResponsiveDialog from "./components/dialog";
 import ShoppingCart from "./components/cart";
+import Navbar from "./components/Navbar"; // Agregado el Navbar
 import logo from "./assets/logo.png";
 import { useAuth } from "./AuthContext";
 
@@ -32,19 +33,13 @@ const Home = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [rango, setRango] = useState("");
   const [cart, setCart] = useState([]);
-  const [mostrarBoton, setMostrarBoton] = useState(false);
   const [cuotaType, setCuotaType] = useState("sin_interes");
 
   const onAddToCart = (product) => {
     setCart((prevCart) => [...prevCart, product]);
-    console.log(`${product.descripcion} agregado al carrito`);
   };
 
   const clearCart = () => setCart([]);
-
-  const volverArriba = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   const handleCuotaTypeChange = (event, newType) => {
     if (newType !== null) {
@@ -89,14 +84,6 @@ const Home = () => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setMostrarBoton(window.scrollY > 200);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const fetchData = useCallback(async (endpoint, setState) => {
@@ -181,120 +168,55 @@ const Home = () => {
   };
 
   return (
-    <Container maxWidth="lg" className="conteiner-list">
-      <div
-        className="flex-between-mobile"
-        style={{
-          paddingTop: 30,
-          display: "flex",
-          justifyContent: "space-between",
-          flexWrap: "wrap",
-          gap: "10px",
-        }}
-      >
-        <Typography variant="body1" color="primary" fontSize={18}>
-          {timeOfDay} <b>{username || "Usuario"}</b>, Te damos la Bienvenida
-        </Typography>
-        <Button
-          variant="contained"
-          onClick={logout}
-          color="error"
-          style={{ width: "100%", maxWidth: 200 }}
-          startIcon={<LogoutIcon />}
-        >
-          Cerrar Sesión
-        </Button>
-      </div>
+    <>
+      <Navbar title={<p>{timeOfDay} <b>{username || "Usuario"}</b>, Te damos la Bienvenida</p> } user={{ username }} onLogout={logout} /> {/* Navbar agregado aquí */}
+      <Container maxWidth="lg" className="conteiner-list">
+        <div className="w-100 flex justify-center">
+          <img src={logo} alt="logo" height="150" className="mar-t30 mar-b20" />
+        </div>
 
-      <div className="w-100 flex justify-center">
-        <img src={logo} alt="logo" height="150" className="mar-t30 mar-b20" />
-      </div>
+        <div className="header mar-b30 flex-center pad20">
+          <TextField
+            style={{ maxWidth: 450 }}
+            fullWidth
+            className="search"
+            label="Buscar Producto"
+            variant="outlined"
+            value={filtro}
+            onChange={(e) => setFiltro(e.target.value)}
+          />
+        </div>
 
-      <div className="header mar-b30 flex-center pad20">
-        <TextField
-          style={{ maxWidth: 450 }}
-          fullWidth
-          className="search"
-          label="Buscar Producto"
-          variant="outlined"
-          value={filtro}
-          onChange={(e) => setFiltro(e.target.value)}
-        />
-      </div>
+        {getBannerForRango()}
 
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
-        <ToggleButtonGroup
-          value={cuotaType}
-          exclusive
-          onChange={handleCuotaTypeChange}
-          aria-label="Tipo de cuotas"
-        >
-          <ToggleButton value="sin_interes" aria-label="Cuotas sin interés">
-            Cuotas sin interés
-          </ToggleButton>
-          <Tooltip title="Disponible a la brevedad">
-            <ToggleButton value="con_interes" disabled aria-label="Cuotas con interés">
-              Cuotas con interés
-            </ToggleButton>
-          </Tooltip>
-        </ToggleButtonGroup>
-      </div>
-
-      {getBannerForRango()}
-
-      <ul className="lista-prod w-100">
-        {loading ? (
-          [...Array(6)].map((_, index) => (
-            <Skeleton
-              key={index}
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-          ))
-        ) : (
-          productosFiltrados.map((product) => (
-            <li className="grid-item" key={product.id}>
-              <Product
-                product={product}
-                cuotaType={cuotaType}
-                onAddToCart={onAddToCart} // Pasa la función al componente Product
+        <ul className="lista-prod w-100">
+          {loading ? (
+            [...Array(6)].map((_, index) => (
+              <Skeleton
+                key={index}
+                sx={{ height: 300, margin: 1 }}
+                animation="wave"
+                variant="rectangular"
+                className="grid-item"
               />
-            </li>
-          ))
-        )}
-      </ul>
+            ))
+          ) : (
+            productosFiltrados.map((product) => (
+              <li className="grid-item" key={product.id}>
+                <Product product={product} cuotaType={cuotaType} onAddToCart={onAddToCart} />
+              </li>
+            ))
+          )}
+        </ul>
 
-      {productosFiltrados.length === 0 && !loading && (
-        <Typography variant="body1" color="textSecondary">
-          No se encontraron productos.
-        </Typography>
-      )}
-      <div className="absolute-btn">
-        <ResponsiveDialog />
-      </div>
-      <Fab
-        onClick={volverArriba}
-        className={`${mostrarBoton ? "visible" : "oculto"}`}
-        variant="extended"
-        size="small"
-        color="primary"
-      >
-        <NavigationIcon sx={{ mr: 1 }} />
-      </Fab>
-      <ShoppingCart
-        cart={cart}
-        setCart={setCart}
-        onClearCart={clearCart}
-        onRemoveFromCart={(product) => setCart(cart.filter((item) => item.id !== product.id))}
-      />
-      <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
-        <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: "100%" }}>
-          Producto agregado al carrito
-        </Alert>
-      </Snackbar>
-    </Container>
+        <ShoppingCart cart={cart} setCart={setCart} onClearCart={clearCart} />
+        <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
+          <Alert onClose={handleSnackbarClose} severity="success">
+            Producto agregado al carrito
+          </Alert>
+        </Snackbar>
+      </Container>
+    </>
   );
 };
 
