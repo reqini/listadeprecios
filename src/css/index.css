@@ -19,7 +19,7 @@ html, body {
   bottom: 10px;
   left: 20px;
   max-width: 250px;
-  z-index: 100;
+  z-index: 10;
 }
 .introjs-tooltip {
   max-width: 90%;  /* Para evitar que el tooltip se desborde en pantallas pequeñas */
@@ -325,6 +325,7 @@ li {
 @media screen and (max-width:600px) {
   .fixed-btn {
     bottom: 60px;
+    z-index: 2;
   }
   .lista-prod-catalog {
     grid-template-columns: 50% 50%;

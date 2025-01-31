@@ -162,7 +162,7 @@ const Navbar = ({ user, onLogout, title }) => {
           }}
         >
           <Button variant='outlined' onClick={handleProfileClose} color="primary" fullWidth={isMobile}>
-            Cancelar
+            Cerrar
           </Button>
           <Button 
             onClick={handleSaveChanges} 
