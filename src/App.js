@@ -22,7 +22,7 @@ const TRACKING_ID = "G-5S2G3FYSPS";
 ReactGA.initialize(TRACKING_ID);
 
 // Configuración de Hotjar
-const HOTJAR_ID = 2668945; // Site ID de Hotjar
+const HOTJAR_ID = 5288080; // Site ID de Hotjar
 const HOTJAR_VERSION = 6;
 
 // Tema personalizado
