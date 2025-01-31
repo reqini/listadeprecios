@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import ReactGA from "react-ga4"; // Importar Google Analytics
+import ReactGA from "react-ga4";
 
 import Login from "./Login";
 import Home from "./home";
@@ -18,8 +18,12 @@ import Contado from "./contado";
 import { AuthProvider, useAuth } from "./AuthContext";
 
 // Configuración de Google Analytics
-const TRACKING_ID = "G-5S2G3FYSPS"; // Reemplazá con tu ID real
+const TRACKING_ID = "G-5S2G3FYSPS";
 ReactGA.initialize(TRACKING_ID);
+
+// Configuración de Hotjar
+const HOTJAR_ID = 2668945; // Site ID de Hotjar
+const HOTJAR_VERSION = 6;
 
 // Tema personalizado
 const theme = createTheme({
@@ -40,28 +44,35 @@ const theme = createTheme({
 // Ruta privada
 const PrivateRoute = ({ children }) => {
   const { auth } = useAuth();
-  if (!auth || !auth.token) {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
+  return auth?.token ? children : <Navigate to="/login" replace />;
 };
 
 // Ruta para login
 const LoginRoute = () => {
   const { auth } = useAuth();
-  if (auth && auth.token) {
-    return <Navigate to="/home" replace />;
-  }
-  return <Login />;
+  return auth?.token ? <Navigate to="/home" replace /> : <Login />;
 };
 
-// Componente para rastrear cambios de ruta en Google Analytics
+// Componente para rastrear cambios de ruta y eventos en Analytics y Hotjar
 const AnalyticsTracker = () => {
   const location = useLocation();
 
   useEffect(() => {
     ReactGA.send({ hitType: "pageview", page: location.pathname });
   }, [location]);
+
+  useEffect(() => {
+    // Inicializar Hotjar (solo una vez)
+    (function(h, o, t, j, a, r) {
+      h.hj = h.hj || function() { (h.hj.q = h.hj.q || []).push(arguments); };
+      h._hjSettings = { hjid: HOTJAR_ID, hjsv: HOTJAR_VERSION };
+      a = o.getElementsByTagName("head")[0];
+      r = o.createElement("script");
+      r.async = 1;
+      r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
+      a.appendChild(r);
+    })(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
+  }, []); // Se ejecuta solo una vez
 
   return null;
 };
@@ -107,7 +118,7 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <AuthProvider>
         <Router>
-          <AnalyticsTracker /> {/* Tracker de Google Analytics */}
+          <AnalyticsTracker /> {/* Tracker de Google Analytics y Hotjar */}
           <Routes>
             <Route path="/login" element={<LoginRoute />} />
             <Route path="/registro" element={<Registro />} />
