@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import ReactGA from "react-ga4"; // Importar Google Analytics
+
 import Login from "./Login";
 import Home from "./home";
 import Registro from "./Registro";
@@ -14,6 +16,10 @@ import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
 import Contado from "./contado";
 import { AuthProvider, useAuth } from "./AuthContext";
+
+// Configuración de Google Analytics
+const TRACKING_ID = "G-5S2G3FYSPS"; // Reemplazá con tu ID real
+ReactGA.initialize(TRACKING_ID);
 
 // Tema personalizado
 const theme = createTheme({
@@ -34,25 +40,30 @@ const theme = createTheme({
 // Ruta privada
 const PrivateRoute = ({ children }) => {
   const { auth } = useAuth();
-
-  // Verificar si el token está presente en el contexto de autenticación
   if (!auth || !auth.token) {
     return <Navigate to="/login" replace />;
   }
-
   return children;
 };
 
 // Ruta para login
 const LoginRoute = () => {
   const { auth } = useAuth();
-
-  // Redirigir a la home si ya hay un token activo
   if (auth && auth.token) {
     return <Navigate to="/home" replace />;
   }
-
   return <Login />;
+};
+
+// Componente para rastrear cambios de ruta en Google Analytics
+const AnalyticsTracker = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    ReactGA.send({ hitType: "pageview", page: location.pathname });
+  }, [location]);
+
+  return null;
 };
 
 const App = () => {
@@ -81,9 +92,8 @@ const App = () => {
             if (installingWorker) {
               installingWorker.onstatechange = () => {
                 if (installingWorker.state === "installed" && navigator.serviceWorker.controller) {
-                  // Mostrar alerta para actualizar
                   alert("Hay una nueva versión disponible. La aplicación se actualizará automáticamente.");
-                  window.location.reload(); // Recarga la aplicación
+                  window.location.reload();
                 }
               };
             }
@@ -97,6 +107,7 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <AuthProvider>
         <Router>
+          <AnalyticsTracker /> {/* Tracker de Google Analytics */}
           <Routes>
             <Route path="/login" element={<LoginRoute />} />
             <Route path="/registro" element={<Registro />} />
