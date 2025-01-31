@@ -34,7 +34,7 @@ export default function BancosDialog() {
     const getData = async () => {
       try {
         const result = await axios.get(`/api/bancos`);
-        console.log(result.data); // Verificar los datos que se reciben
+        /* console.log(result.data); */
         setBancos(result.data);
       } catch (error) {
         console.error("Error fetching bancos data:", error);
