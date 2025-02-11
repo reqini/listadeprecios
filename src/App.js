@@ -15,6 +15,7 @@ import Catalogo18 from "./catalogo18";
 import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
 import Contado from "./contado";
+import Rifa from "./rifa"; // Importamos la grilla de rifas
 import { AuthProvider, useAuth } from "./AuthContext";
 
 // Configuración de Google Analytics
@@ -132,6 +133,7 @@ const App = () => {
             <Route path="/cat20" element={<Catalogo20 />} />
             <Route path="/cat24" element={<Catalogo24 />} />
             <Route path="/cont-02-25" element={<Contado />} />
+            <Route path="/rifa" element={<Rifa nombreRifa="Rifa 2025" />} /> {/* 🔹 Nueva sección Rifa */}
             <Route path="/" element={<Navigate to="/login" replace />} />
           </Routes>
         </Router>

@@ -5,6 +5,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Link } from "react-router-dom"; // 🔹 Importamos Link para la navegación
 import axios from '../utils/axios';
 
 const Navbar = ({ user, onLogout, title }) => {
@@ -37,15 +38,6 @@ const Navbar = ({ user, onLogout, title }) => {
     setEdited(false);
   };
 
-  const handleDeleteOpen = () => {
-    setOpenDeleteConfirm(true);
-    handleProfileClose();
-  };
-
-  const handleDeleteClose = () => {
-    setOpenDeleteConfirm(false);
-  };
-
   const handleChangePassword = (event) => {
     setPassword(event.target.value);
     setEdited(true);
@@ -62,7 +54,7 @@ const Navbar = ({ user, onLogout, title }) => {
     }
   
     try {
-      const token = localStorage.getItem("token"); // Obtiene el token del usuario
+      const token = localStorage.getItem("token"); 
       const response = await axios.post(
         "/api/update-password",
         { username: user.username, password },
@@ -97,7 +89,6 @@ const Navbar = ({ user, onLogout, title }) => {
       setAlert({ type: "error", message: "Error al eliminar la cuenta" });
     }
   };
-  
 
   return (
     <>
@@ -113,6 +104,12 @@ const Navbar = ({ user, onLogout, title }) => {
           >
             {title}
           </Typography>
+
+          {/* 🔹 Nueva opción para la Rifa en el Navbar */}
+          <Button color="inherit" component={Link} to="/rifa">
+            Rifas
+          </Button>
+
           <IconButton color="inherit" onClick={handleMenuOpen}>
             <Avatar>{user.username.charAt(0).toUpperCase()}</Avatar>
           </IconButton>
@@ -123,7 +120,7 @@ const Navbar = ({ user, onLogout, title }) => {
         </Toolbar>
       </AppBar>
 
-      {/* Diálogo de perfil RESPONSIVO */}
+      {/* Diálogo de perfil */}
       <Dialog open={openProfile} onClose={handleProfileClose} fullScreen={isMobile}>
         <DialogTitle>Perfil de usuario</DialogTitle>
         <DialogContent>
@@ -153,44 +150,25 @@ const Navbar = ({ user, onLogout, title }) => {
             }}
           />
         </DialogContent>
-        <DialogActions 
-          sx={{
-            flexDirection: isMobile ? "column" : "row",
-            gap: "10px",
-            width: "100%",
-            padding: "16px",
-          }}
-        >
-          <Button variant='outlined' onClick={handleProfileClose} color="primary" fullWidth={isMobile}>
-            Cerrar
-          </Button>
-          <Button 
-            onClick={handleSaveChanges} 
-            color="primary" 
-            disabled={!edited} 
-            fullWidth={isMobile}
-          >
+        <DialogActions>
+          <Button variant="outlined" onClick={handleProfileClose} color="primary">Cerrar</Button>
+          <Button onClick={handleSaveChanges} color="primary" disabled={!edited}>
             Guardar cambios
           </Button>
-          <Button 
-            variant='contained'
-            onClick={handleDeleteOpen} 
-            color="error" 
-            fullWidth={isMobile}
-          >
+          <Button variant="contained" onClick={() => setOpenDeleteConfirm(true)} color="error">
             Eliminar cuenta
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Diálogo de confirmación de eliminación */}
-      <Dialog open={openDeleteConfirm} onClose={handleDeleteClose}>
+      <Dialog open={openDeleteConfirm} onClose={() => setOpenDeleteConfirm(false)}>
         <DialogTitle>¿Estás seguro?</DialogTitle>
         <DialogContent>
           <Typography>Esta acción eliminará tu cuenta permanentemente.</Typography>
         </DialogContent>
         <DialogActions>
-          <Button variant='outlined' onClick={handleDeleteClose} color="primary">Cancelar</Button>
+          <Button variant="outlined" onClick={() => setOpenDeleteConfirm(false)} color="primary">Cancelar</Button>
           <Button onClick={handleDeleteAccount} color="error">Eliminar</Button>
         </DialogActions>
       </Dialog>
