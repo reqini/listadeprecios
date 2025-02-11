@@ -6,8 +6,7 @@ import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
 import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
-/* import logo from "./assets/logo.png"; */
-import logo from "./assets/logo-navidad.png";
+import logo from './assets/logo.png';
 import { Snackbar, Alert, Typography } from "@mui/material";
 import { formatPrice } from './utils/priceUtils';
 
