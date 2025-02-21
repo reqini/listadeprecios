@@ -123,15 +123,15 @@ const App = () => {
             <Route path="/login" element={<LoginRoute />} />
             <Route path="/registro" element={<Registro />} />
             <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
-            <Route path="/cat" element={<Catalogo />} />
-            <Route path="/cat3" element={<Catalogo3 />} />
-            <Route path="/cat6" element={<Catalogo6 />} />
-            <Route path="/cat9" element={<Catalogo9 />} />
-            <Route path="/cat12" element={<Catalogo12 />} />
-            <Route path="/cat18" element={<Catalogo18 />} />
-            <Route path="/cat20" element={<Catalogo20 />} />
-            <Route path="/cat24" element={<Catalogo24 />} />
-            <Route path="/cont-02-25" element={<Contado />} />
+            <Route path="/mar-25-cat" element={<Catalogo />} />
+            <Route path="/mar-25-cat3" element={<Catalogo3 />} />
+            <Route path="/mar-25-cat6" element={<Catalogo6 />} />
+            <Route path="/mar-25-cat9" element={<Catalogo9 />} />
+            <Route path="/mar-25-cat12" element={<Catalogo12 />} />
+            <Route path="/mar-25-cat18" element={<Catalogo18 />} />
+            <Route path="/mar-25-cat20" element={<Catalogo20 />} />
+            <Route path="/mar-25-cat24" element={<Catalogo24 />} />
+            <Route path="/mar-25-cont" element={<Contado />} />
             <Route path="/" element={<Navigate to="/login" replace />} />
           </Routes>
         </Router>
