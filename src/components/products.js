@@ -129,7 +129,10 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
         <Button
           fullWidth
           href={selectedCuota ? `https://api.whatsapp.com/send?text=${encodeURIComponent(
-            `¡Hola! Te envío el valor de tu próxima Essen:\nProducto: ${product.descripcion}\nPrecio de Negocio: ${formatPrice(parsePrice(product.precio_negocio))}\nPSVP lista: ${formatPrice(parsePrice(product.psvp_lista))}\n`
+            `¡Hola! Te envío el valor de tu próxima Essen:\n
+            🛒 Producto: ${product.descripcion}\n
+            💳 Cuota seleccionada: ${selectedCuota}\n
+            ¡Aprovechá esta oferta!`
           )}` : "#"}
           target={selectedCuota ? "_blank" : ""}
           variant="contained"
@@ -141,6 +144,7 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
         >
           Compartir
         </Button>
+
         {product.ficha_tecnica ? (
           <Button fullWidth target="_blank" href={product.ficha_tecnica} variant="outlined" size="medium" color="primary">
             Ficha técnica
