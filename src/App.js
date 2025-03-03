@@ -17,13 +17,12 @@ import Catalogo24 from "./catalogo24";
 import Contado from "./contado";
 import { AuthProvider, useAuth } from "./AuthContext";
 
+// **🔹 NUEVO: Importar el Dashboard de Emprendedoras**
+import Emprendedoras from "./Emprendedoras";
+
 // Configuración de Google Analytics
 const TRACKING_ID = "G-5S2G3FYSPS";
 ReactGA.initialize(TRACKING_ID);
-
-// Configuración de Hotjar
-const HOTJAR_ID = 5288080; // Site ID de Hotjar
-const HOTJAR_VERSION = 6;
 
 // Tema personalizado
 const theme = createTheme({
@@ -41,19 +40,19 @@ const theme = createTheme({
   },
 });
 
-// Ruta privada
+// Ruta privada para proteger páginas autenticadas
 const PrivateRoute = ({ children }) => {
   const { auth } = useAuth();
   return auth?.token ? children : <Navigate to="/login" replace />;
 };
 
-// Ruta para login
+// Ruta para login con redirección si ya está autenticado
 const LoginRoute = () => {
   const { auth } = useAuth();
   return auth?.token ? <Navigate to="/home" replace /> : <Login />;
 };
 
-// Componente para rastrear cambios de ruta y eventos en Analytics y Hotjar
+// Componente para rastrear cambios de ruta con Google Analytics y Hotjar
 const AnalyticsTracker = () => {
   const location = useLocation();
 
@@ -61,40 +60,11 @@ const AnalyticsTracker = () => {
     ReactGA.send({ hitType: "pageview", page: location.pathname });
   }, [location]);
 
-  useEffect(() => {
-    // Inicializar Hotjar (solo una vez)
-    (function(h, o, t, j, a, r) {
-      h.hj = h.hj || function() { (h.hj.q = h.hj.q || []).push(arguments); };
-      h._hjSettings = { hjid: HOTJAR_ID, hjsv: HOTJAR_VERSION };
-      a = o.getElementsByTagName("head")[0];
-      r = o.createElement("script");
-      r.async = 1;
-      r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
-      a.appendChild(r);
-    })(window, document, "https://static.hotjar.com/c/hotjar-", ".js?sv=");
-  }, []); // Se ejecuta solo una vez
-
   return null;
 };
 
 const App = () => {
   useEffect(() => {
-    // Limpieza automática de datos almacenados
-    try {
-      const authData = localStorage.getItem("token");
-      if (!authData || typeof authData !== "string") {
-        localStorage.clear();
-        sessionStorage.clear();
-      }
-    } catch (error) {
-      console.error("Error limpiando datos almacenados:", error);
-      localStorage.clear();
-      sessionStorage.clear();
-    }
-  }, []);
-
-  useEffect(() => {
-    // Detectar nuevas versiones del Service Worker
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistration().then((registration) => {
         if (registration) {
@@ -103,7 +73,7 @@ const App = () => {
             if (installingWorker) {
               installingWorker.onstatechange = () => {
                 if (installingWorker.state === "installed" && navigator.serviceWorker.controller) {
-                  alert("Hay una nueva versión disponible. La aplicación se actualizará automáticamente.");
+                  alert("Nueva versión disponible. Se actualizará automáticamente.");
                   window.location.reload();
                 }
               };
@@ -118,7 +88,7 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <AuthProvider>
         <Router>
-          <AnalyticsTracker /> {/* Tracker de Google Analytics y Hotjar */}
+          <AnalyticsTracker />
           <Routes>
             <Route path="/login" element={<LoginRoute />} />
             <Route path="/registro" element={<Registro />} />
@@ -132,6 +102,11 @@ const App = () => {
             <Route path="/mar-25-cat20" element={<Catalogo20 />} />
             <Route path="/mar-25-cat24" element={<Catalogo24 />} />
             <Route path="/mar-25-cont" element={<Contado />} />
+
+            {/* 🔹 NUEVA RUTA PROTEGIDA PARA EL DASHBOARD (EMPRENDEDORAS) */}
+            <Route path="/emprendedoras" element={<PrivateRoute><Emprendedoras /></PrivateRoute>} />
+
+            {/* Redirección por defecto al login */}
             <Route path="/" element={<Navigate to="/login" replace />} />
           </Routes>
         </Router>
