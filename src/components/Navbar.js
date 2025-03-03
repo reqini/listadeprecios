@@ -117,7 +117,12 @@ const Navbar = ({ user, onLogout, title }) => {
             <Avatar>{user.username.charAt(0).toUpperCase()}</Avatar>
           </IconButton>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+<<<<<<< Updated upstream
             <MenuItem onClick={handleProfileOpen}>Perfil</MenuItem>
+=======
+            <MenuItem onClick={() => setOpenDialog("profile")}>Perfil</MenuItem>
+            {/* <MenuItem onClick={() => navigate("/emprendedoras")}>Dashboard</MenuItem> */}
+>>>>>>> Stashed changes
             <MenuItem onClick={onLogout}>Cerrar sesión</MenuItem>
           </Menu>
         </Toolbar>

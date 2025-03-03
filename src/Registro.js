@@ -74,8 +74,6 @@ const Register = () => {
           rango, // Incluyendo el rango en el payload
         };
     
-        /* console.log("Datos enviados al backend:", payload); */ // Debug para verificar qué se está enviando
-    
         const response = await axios.post(`/api/register`, payload);
     
         if (response.data.success) {
