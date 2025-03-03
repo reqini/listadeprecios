@@ -94,6 +94,7 @@ const Navbar = ({ user, onLogout, title }) => {
             
             {/* Nuevo acceso a /emprendedora */}
             <MenuItem
+              style={{display: 'none'}}
               onClick={() => {
                 navigate("/emprendedoras");
                 handleMenuClose();

@@ -185,7 +185,7 @@ const Home = () => {
 
     if (!rango || rango.trim() === "" || rangosGrupo1.includes(rango)) {
       return (
-        <div className="banner card-product mar-b30">
+        <div className="banner card-product mar-b30" style={{display: 'none'}}>
           <img
             src={windowWidth <= 460 ? extras[0]?.banner_mobile : extras[0]?.banner}
             alt="Banner Grupo 1"
@@ -195,7 +195,7 @@ const Home = () => {
       );
     } else if (rangosGrupo2.includes(rango)) {
       return (
-        <div className="banner card-product mar-b30">
+        <div className="banner card-product mar-b30" style={{display: 'none'}}>
           <a
             href="https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808493147926019315fc5d760034"
             target="_blank"
