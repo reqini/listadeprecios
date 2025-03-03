@@ -10,12 +10,23 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import axios from "./utils/axios";
 import { v4 as uuidv4 } from "uuid"; // Importamos uuid para generar el deviceId
 
+// ==== IMPORTS PARA EL MODAL (Material UI) ====
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Typography from "@mui/material/Typography";
+
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [deviceId, setDeviceId] = useState("");
+
+  // ==== ESTADOS PARA EL MODAL ====
+  const [showModal, setShowModal] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
     // Generar un deviceId único y guardarlo en localStorage
@@ -42,6 +53,8 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setShowModal(false);
+    setErrorMsg("");
 
     try {
       // Hacemos una solicitud POST al backend para autenticar
@@ -63,8 +76,20 @@ const Login = () => {
         alert("Usuario o contraseña incorrectos");
       }
     } catch (error) {
-      console.error("Error durante la autenticación:", error.message);
-      alert("Hubo un problema al iniciar sesión. Por favor, intenta de nuevo.");
+      // Si el backend responde con 403 y showModal = true, mostramos nuestro diálogo.
+      if (
+        error.response &&
+        error.response.status === 403 &&
+        error.response.data.showModal
+      ) {
+        setErrorMsg(
+          error.response.data.message || "Máximo de sesiones activas alcanzado."
+        );
+        setShowModal(true);
+      } else {
+        console.error("Error durante la autenticación:", error.message);
+        alert("Hubo un problema al iniciar sesión. Por favor, intenta de nuevo.");
+      }
     } finally {
       setLoading(false);
     }
@@ -136,6 +161,20 @@ const Login = () => {
           </Grid>
         </form>
       </Container>
+
+      {/* TODO: Integrar login biométrico si fuera una app móvil (TouchID/FaceID).
+          En web no es usual, pero podrías añadir algo como WebAuthn/FIDO2. */}
+
+      {/* Modal para avisar que se superó el límite de sesiones */}
+      <Dialog open={showModal} onClose={() => setShowModal(false)}>
+        <DialogTitle>Atención</DialogTitle>
+        <DialogContent>
+          <Typography>{errorMsg}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowModal(false)}>Cerrar</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

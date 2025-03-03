@@ -14,27 +14,32 @@ instance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token"); // Obtener el token del localStorage
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`; // Agregar el token al header
+      console.log("🛠️ Enviando token:", token); // Log para depuración
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      console.warn("⚠️ No se encontró token en localStorage");
     }
     return config;
   },
   (error) => {
     console.error("Error en la configuración de la solicitud:", error);
-    return Promise.reject(error); // Propagar el error
+    return Promise.reject(error);
   }
 );
 
 // Interceptor para manejar respuestas de errores
 instance.interceptors.response.use(
-  (response) => response, // Retornar la respuesta si es exitosa
+  (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      console.warn("Token inválido o expirado. Cerrando sesión...");
-      localStorage.removeItem("token"); // Eliminar el token si es inválido
-      // Puedes redirigir al login o manejar el cierre de sesión aquí
-      window.location.href = "/login"; // Redirigir al login
+    if (error.response) {
+      if (error.response.status === 401) {
+        console.warn("⚠️ Token inválido o expirado. Mostrar aviso antes de cerrar sesión.");
+        alert("Tu sesión ha expirado. Por favor, vuelve a iniciar sesión.");
+        localStorage.removeItem("token");
+        window.location.href = "/login"; 
+      }
     }
-    return Promise.reject(error); // Propagar el error
+    return Promise.reject(error);
   }
 );
 
