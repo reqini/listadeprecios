@@ -82,7 +82,7 @@ const Navbar = ({ user, onLogout, title }) => {
             <Avatar>{user?.username?.charAt(0).toUpperCase() || "?"}</Avatar>
           </IconButton>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-            <MenuItem onClick={handleProfileOpen}>Perfil</MenuItem>
+            <MenuItem onClick={()=> {}}>Perfil</MenuItem>
             <MenuItem onClick={onLogout}>Cerrar sesión</MenuItem>
           </Menu>
         </Toolbar>
