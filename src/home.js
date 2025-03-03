@@ -16,6 +16,12 @@ import { useAuth } from "./AuthContext";
 
 const Home = () => {
   const { logout } = useAuth();
+
+  // =============== NUEVO: validación de sesión ===============
+  const [sessionChecked, setSessionChecked] = useState(false);
+  const [sessionValid, setSessionValid] = useState(false);
+
+  // =============== Tus estados originales ===============
   const [extras, setExtras] = useState(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [loading, setLoading] = useState(true);
@@ -34,6 +40,7 @@ const Home = () => {
 
   const clearCart = () => setCart([]);
 
+  // Tu función original para determinar saludo según la hora
   const getTimeOfDay = useCallback(() => {
     const currentHour = new Date().getHours();
     if (currentHour >= 0 && currentHour < 5) return "¿Trabajando de madrugada? :)";
@@ -42,7 +49,45 @@ const Home = () => {
     return "Buenas noches";
   }, []);
 
+  // =============== NUEVO: Verificar sesión antes de todo ===============
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    const deviceId = localStorage.getItem("deviceId");
+
+    // Si no hay token, directo al login
+    if (!token) {
+      window.location.href = "/";
+      return;
+    }
+
+    const validateSession = async () => {
+      try {
+        const { data } = await axios.post("/api/validate-session", { token, deviceId });
+        if (data.valid) {
+          setSessionValid(true);
+        } else {
+          // Sesión inválida
+          localStorage.removeItem("token");
+          localStorage.removeItem("activeSession");
+          window.location.href = "/";
+        }
+      } catch (error) {
+        console.error("Error al validar la sesión:", error.message);
+        localStorage.removeItem("token");
+        localStorage.removeItem("activeSession");
+        window.location.href = "/";
+      } finally {
+        setSessionChecked(true);
+      }
+    };
+
+    validateSession();
+  }, []);
+
+  // =============== Efecto para obtener datos de usuario, solo si la sesión es válida ===============
+  useEffect(() => {
+    if (!sessionValid) return;
+
     const fetchUserData = async () => {
       const storedUsername = localStorage.getItem("activeSession");
       if (!storedUsername) return;
@@ -51,7 +96,7 @@ const Home = () => {
 
       try {
         const { data: usuarios } = await axios.get(`/api/usuarios`);
-        const user = usuarios.find((user) => user.username === storedUsername);
+        const user = usuarios.find((u) => u.username === storedUsername);
         if (user) {
           setRango(user.rango);
         }
@@ -62,17 +107,21 @@ const Home = () => {
 
     fetchUserData();
     setTimeOfDay(getTimeOfDay());
+
+    // Actualiza saludo cada hora
     const interval = setInterval(() => setTimeOfDay(getTimeOfDay()), 3600000);
-
     return () => clearInterval(interval);
-  }, [getTimeOfDay]);
+  }, [sessionValid, getTimeOfDay]);
 
+  // =============== Manejo de resize de ventana ===============
   useEffect(() => {
+    if (!sessionValid) return;
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [sessionValid]);
 
+  // =============== Función reutilizable para fetch data ===============
   const fetchData = useCallback(async (endpoint, setState) => {
     try {
       const { data } = await axios.get(`/api/${endpoint}`);
@@ -86,26 +135,32 @@ const Home = () => {
     }
   }, []);
 
+  // =============== Efecto para cargar productos y extras, solo si la sesión es válida ===============
   useEffect(() => {
+    if (!sessionValid) return;
     fetchData("productos", setProductos);
     fetchData("extras", setExtras);
-  }, [fetchData]);
+  }, [sessionValid, fetchData]);
 
+  // Filtra tus productos
   const productosFiltrados = productos.filter(
     (producto) =>
       producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) &&
       producto.vigencia === "SI"
   );
 
+  // Cerrar snackbar
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") return;
     setSnackbarOpen(false);
   };
 
+  // Cerrar modal
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
 
+  // Renderizar banner según rango
   const getBannerForRango = () => {
     const rangosGrupo1 = [
       "Demostrador/a",
@@ -158,9 +213,34 @@ const Home = () => {
     return null;
   };
 
+  // =============== Renderizado condicional según validación de sesión ===============
+  if (!sessionChecked) {
+    // Esperando validación, mostramos un “cargando” (podés estilizarlo a tu gusto)
+    return (
+      <Container maxWidth="lg" className="conteiner-list">
+        <h2>Validando sesión...</h2>
+        <Skeleton sx={{ height: 50, marginTop: 2 }} animation="wave" />
+      </Container>
+    );
+  }
+
+  if (!sessionValid) {
+    // Si la sesión no es válida, se habrá redirigido; retornamos null
+    return null;
+  }
+
+  // Si llegamos hasta acá, la sesión es válida
   return (
     <>
-      <Navbar title={<p>{timeOfDay} <b>{username || "Usuario"}</b>, Te damos la Bienvenida</p> } user={{ username }} onLogout={logout} />
+      <Navbar
+        title={
+          <p>
+            {timeOfDay} <b>{username || "Usuario"}</b>, Te damos la Bienvenida
+          </p>
+        }
+        user={{ username }}
+        onLogout={logout}
+      />
       <Container maxWidth="lg" className="conteiner-list">
         <div className="w-100 flex justify-center">
           <img src={logo} alt="logo" height="100" className="mar-t30 mar-b20" />
@@ -194,13 +274,21 @@ const Home = () => {
           ) : (
             productosFiltrados.map((product) => (
               <li className="grid-item" key={product.id}>
-                <Product product={product} cuotaType="sin_interes" onAddToCart={onAddToCart} />
+                <Product
+                  product={product}
+                  cuotaType="sin_interes"
+                  onAddToCart={onAddToCart}
+                />
               </li>
             ))
           )}
         </ul>
 
-        <ShoppingCart cart={cart} setCart={setCart} onClearCart={clearCart} />
+        <ShoppingCart
+          cart={cart}
+          setCart={setCart}
+          onClearCart={clearCart}
+        />
 
         {/* Modal de promociones bancarias */}
         <ResponsiveDialog open={openDialog} onClose={handleCloseDialog} />
