@@ -20,7 +20,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import axios from "../utils/axios";
-import { useNavigate } from "react-router-dom"; // Para redirigir al Dashboard
+import { useNavigate } from "react-router-dom"; // Para redirigir
 
 const Navbar = ({ user, onLogout, title }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -82,8 +82,34 @@ const Navbar = ({ user, onLogout, title }) => {
             <Avatar>{user?.username?.charAt(0).toUpperCase() || "?"}</Avatar>
           </IconButton>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-            <MenuItem onClick={()=> {}}>Perfil</MenuItem>
-            <MenuItem onClick={onLogout}>Cerrar sesión</MenuItem>
+            <MenuItem
+              onClick={() => {
+                // Ejemplo: abrir el modal de perfil
+                setOpenDialog("profile");
+                handleMenuClose();
+              }}
+            >
+              Perfil
+            </MenuItem>
+            
+            {/* Nuevo acceso a /emprendedora */}
+            <MenuItem
+              onClick={() => {
+                navigate("/emprendedoras");
+                handleMenuClose();
+              }}
+            >
+              Emprendedora
+            </MenuItem>
+            
+            <MenuItem
+              onClick={() => {
+                onLogout();
+                handleMenuClose();
+              }}
+            >
+              Cerrar sesión
+            </MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>
@@ -93,11 +119,17 @@ const Navbar = ({ user, onLogout, title }) => {
         <DialogTitle>Perfil de usuario</DialogTitle>
         <DialogContent>
           {alertState && <Alert severity={alertState.type}>{alertState.message}</Alert>}
-          <TextField label="Nombre de usuario" fullWidth disabled value={user?.username || ""} style={{marginTop:10}} />
+          <TextField
+            label="Nombre de usuario"
+            fullWidth
+            disabled
+            value={user?.username || ""}
+            style={{ marginTop: 10 }}
+          />
           <TextField
             label="Nueva contraseña"
             fullWidth
-            style={{marginTop:10}}
+            style={{ marginTop: 10 }}
             type={showPassword ? "text" : "password"}
             value={password}
             onChange={handleChangePassword}
