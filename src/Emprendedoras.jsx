@@ -173,7 +173,7 @@ const Emprendedoras = () => {
   }
 };
   // 📌 ELIMINAR CLIENTE
-  const handleDeleteClient = async (client, index) => {
+  /* const handleDeleteClient = async (client, index) => {
     if (!window.confirm("¿Seguro que deseas eliminar este cliente?")) return;
     try {
       const token = localStorage.getItem("token");
@@ -198,7 +198,7 @@ const Emprendedoras = () => {
       console.error("Error al eliminar cliente:", error);
       alert("Error al eliminar cliente. Revisa la consola.");
     }
-  };
+  }; */
 
   // Selección individual
   const handleToggleSelect = (client) => {
@@ -318,15 +318,16 @@ const Emprendedoras = () => {
                     }
                     label=""
                   />
+                  <Typography variant="body1"><strong>Nombre:</strong> {cliente.nombre}</Typography>
                   <Typography variant="body1"><strong>Dirección:</strong> {cliente.direccion}</Typography>
                   <Typography variant="subtitle1"><strong>Banco:</strong> {cliente.banco}</Typography>
                   <Typography variant="body2"><strong>Phone:</strong> {cliente.phone}</Typography>
                 </CardContent>
                 <CardActions>
                   <Button size="small" onClick={() => openEditClientDialog(cliente, idx)}>Editar</Button>
-                  <Button size="small" color="error" onClick={() => handleDeleteClient(cliente, idx)}>
+{/*                   <Button size="small" color="error" onClick={() => handleDeleteClient(cliente, idx)}>
                     Eliminar
-                  </Button>
+                  </Button> */}
                 </CardActions>
               </Card>
             ))
