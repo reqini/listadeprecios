@@ -5,7 +5,8 @@ import {
   TextField,
   Snackbar,
   Alert,
-  Skeleton
+  Skeleton,
+  Typography
 } from "@mui/material";
 import Product from "./components/products";
 import ShoppingCart from "./components/cart";
@@ -185,7 +186,7 @@ const Home = () => {
 
     if (!rango || rango.trim() === "" || rangosGrupo1.includes(rango)) {
       return (
-        <div className="banner card-product mar-b30" style={{display: 'none'}}>
+        <div className="banner card-product mar-b30">
           <img
             src={windowWidth <= 460 ? extras[0]?.banner_mobile : extras[0]?.banner}
             alt="Banner Grupo 1"
@@ -195,18 +196,12 @@ const Home = () => {
       );
     } else if (rangosGrupo2.includes(rango)) {
       return (
-        <div className="banner card-product mar-b30" style={{display: 'none'}}>
-          <a
-            href="https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808493147926019315fc5d760034"
-            target="_blank"
-            rel="noreferrer"
-          >
+        <div className="banner card-product mar-b30">
             <img
               src={windowWidth <= 460 ? extras[0]?.banner_super_mobile : extras[0]?.banner_super}
               alt="Banner Grupo 2"
               style={{ width: "100%" }}
             />
-          </a>
         </div>
       );
     }
@@ -219,6 +214,8 @@ const Home = () => {
     return (
       <Container maxWidth="lg" className="conteiner-list">
         <h2>Validando sesión...</h2>
+        <Skeleton sx={{ height: 50, marginTop: 2 }} animation="wave" />
+        <Skeleton sx={{ height: 50, marginTop: 2 }} animation="wave" />
         <Skeleton sx={{ height: 50, marginTop: 2 }} animation="wave" />
       </Container>
     );
@@ -242,8 +239,10 @@ const Home = () => {
         onLogout={logout}
       />
       <Container maxWidth="lg" className="conteiner-list">
-        <div className="w-100 flex justify-center">
-          <img src={logo} alt="logo" height="100" className="mar-t30 mar-b20" />
+        
+        <div className="w-100 flex justify-center items-center flex-direction mar-t10">
+          <Typography fontSize={13} margin={'6px 0 12px 0'}>Desarrollado por: <b><a href="https://www.instagram.com/lrecchini/" target="_blank">Luciano Recchini</a></b></Typography>
+          <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
         </div>
 
         <div className="header mar-b30 flex-center pad20">
