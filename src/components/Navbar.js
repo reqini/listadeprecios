@@ -79,7 +79,7 @@ const Navbar = ({ user, onLogout, title }) => {
             {title}
           </Typography>
           <IconButton color="inherit" onClick={handleMenuOpen}>
-            <Avatar>{user?.username?.charAt(0).toUpperCase() || "?"}</Avatar>
+            <Typography margin={'0 10px 0 0'}>Mi Menú</Typography><Avatar>{user?.username?.charAt(0).toUpperCase() || "?"}</Avatar>
           </IconButton>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
             <MenuItem

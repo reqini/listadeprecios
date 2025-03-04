@@ -272,11 +272,11 @@ const Emprendedoras = () => {
       />
       <Container sx={{ mt: 3 }}>
         <Stack spacing={2}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Button variant="outlined" onClick={() => navigate("/home")} style={{marginRight: 20}}>
+          <div className="bt-responsive-emp">
+            <Button fullWidth variant="outlined" onClick={() => navigate("/home")} style={{marginRight: 20}}>
               Volver a Home
             </Button>
-            <Button variant="contained" onClick={() => setOpenAddClientDialog(true)}>
+            <Button fullWidth variant="contained" onClick={() => setOpenAddClientDialog(true)}>
               Agregar nuevo cliente
             </Button>
           </div>
