@@ -75,7 +75,7 @@ const Navbar = ({ user, onLogout, title }) => {
     <>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="body1" fontSize={18} sx={{ flexGrow: 1 }}>
+          <Typography variant="body1" fontSize={16} sx={{ flexGrow: 1 }}>
             {title}
           </Typography>
           <IconButton color="inherit" onClick={handleMenuOpen}>

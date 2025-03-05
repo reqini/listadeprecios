@@ -20,7 +20,13 @@ import {
   FormControlLabel,
   Stack,
   Alert,
+  List,
+  ListItem,
+  IconButton,
+  ListItemText,
+  ListItemSecondaryAction
 } from "@mui/material";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import axios from "./utils/axios";
 import Navbar from "./components/Navbar";
 
@@ -43,6 +49,17 @@ const Emprendedoras = () => {
   const [editAddress, setEditAddress] = useState("");
   const [editBank, setEditBank] = useState("");
   const [editPhone, setEditPhone] = useState("");
+
+  const [catalogos] = useState([
+    { nombre: "Contado", url: "/mar-25-cont" },
+    { nombre: "3 Cuotas", url: "/mar-25-cat3" },
+    { nombre: "6 Cuotas", url: "/mar-25-cat6" },
+    { nombre: "9 Cuotas", url: "/mar-25-cat9" },
+    { nombre: "12 Cuotas", url: "/mar-25-cat12" },
+    { nombre: "18 Cuotas", url: "/mar-25-cat18" },
+    { nombre: "20 Cuotas", url: "/mar-25-cat20" },
+    { nombre: "24 Cuotas", url: "/mar-25-cat24" }
+  ]);
 
   // Estado para manejo de selección de clientes
   const [selectedClientes, setSelectedClientes] = useState([]);
@@ -172,33 +189,6 @@ const Emprendedoras = () => {
     alert("Error al actualizar cliente. Revisa la consola.");
   }
 };
-  // 📌 ELIMINAR CLIENTE
-  /* const handleDeleteClient = async (client, index) => {
-    if (!window.confirm("¿Seguro que deseas eliminar este cliente?")) return;
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.delete("/api/clientes", {
-        headers: { Authorization: `Bearer ${token}` },
-        data: client,
-      });
-      if (response.data.success) {
-        alert("Cliente eliminado correctamente");
-        setClientes((prevClientes) => {
-          const newClientes = [...prevClientes];
-          newClientes.splice(index, 1);
-          return newClientes;
-        });
-        setSelectedClientes((prevSelected) =>
-          prevSelected.filter((c) => c.nombre !== client.nombre)
-        );
-      } else {
-        alert("Error al eliminar el cliente: " + response.data.message);
-      }
-    } catch (error) {
-      console.error("Error al eliminar cliente:", error);
-      alert("Error al eliminar cliente. Revisa la consola.");
-    }
-  }; */
 
   // Selección individual
   const handleToggleSelect = (client) => {
@@ -305,6 +295,8 @@ const Emprendedoras = () => {
               ))}
             </Select>
           </FormControl>
+          {/* Sección de Clientes */}
+          <Typography variant="h5" sx={{ mt: 3, mb: 2 }}>Clientes</Typography>
           {filteredClientes.length > 0 ? (
             filteredClientes.map((cliente, idx) => (
               <Card key={idx} variant="outlined" sx={{ mb: 2, p: 1 }}>
@@ -336,10 +328,31 @@ const Emprendedoras = () => {
           )}
         </Stack>
 
+        {/* Sección de Catálogos */}
+        <Typography variant="h5" sx={{ mt: 3, mb: 2 }}>Catálogos</Typography>
+        <List style={{background: 'white', marginBottom: 34}}>
+          {catalogos.map((catalogo, idx) => (
+            <ListItem key={idx} divider>
+              <ListItemText primary={catalogo.nombre} secondary={catalogo.url} />
+              <ListItemSecondaryAction>
+                <IconButton 
+                  edge="end" 
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.origin + catalogo.url);
+                    alert("URL copiada al portapapeles");
+                  }}
+                >
+                  <ContentCopyIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))}
+        </List>
+
         {/* Modal Agregar Cliente */}
         <Dialog open={openAddClientDialog} onClose={() => setOpenAddClientDialog(false)}>
           <DialogTitle>Agregar Cliente</DialogTitle>
-          <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, width: '100%', maxWidth: 420 }}>
             <TextField label="Nombre" fullWidth value={newName} onChange={(e) => setNewName(e.target.value)} />
             <TextField label="Dirección" fullWidth value={newAddress} onChange={(e) => setNewAddress(e.target.value)} />
             <FormControl fullWidth>
@@ -363,7 +376,7 @@ const Emprendedoras = () => {
         {/* Modal Editar Cliente */}
         <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
           <DialogTitle>Editar Cliente</DialogTitle>
-          <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, width: '100%', maxWidth: 420 }}>
             <TextField label="Nombre" fullWidth value={editName} onChange={(e) => setEditName(e.target.value)} />
             <TextField label="Dirección" fullWidth value={editAddress} onChange={(e) => setEditAddress(e.target.value)} />
             <FormControl fullWidth>
@@ -387,7 +400,7 @@ const Emprendedoras = () => {
         {/* Modal WhatsApp */}
         <Dialog open={openWhatsappModal} onClose={() => setOpenWhatsappModal(false)}>
           <DialogTitle>Mensaje de WhatsApp</DialogTitle>
-          <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, width: '100%', maxWidth: 420 }}>
             <TextField
               label="Mensaje"
               multiline

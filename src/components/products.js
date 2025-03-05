@@ -126,24 +126,29 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
             Agregar al carrito
           </Button>
         )}
-        <Button
-          fullWidth
-          href={selectedCuota ? `https://api.whatsapp.com/send?text=${encodeURIComponent(
-            `¡Hola! Te envío el valor de tu próxima Essen:\n
-            🛒 Producto: ${product.descripcion}\n
-            💳 Cuota seleccionada: ${selectedCuota}\n
-            ¡Aprovechá esta oferta!`
-          )}` : "#"}
-          target={selectedCuota ? "_blank" : ""}
-          variant="contained"
-          size="medium"
-          color="primary"
-          sx={{ my: 1, backgroundColor: "#25D366", color: "white" }}
-          startIcon={<FaWhatsapp />}
-          disabled={!selectedCuota}
-        >
-          Compartir
-        </Button>
+       <Button
+  fullWidth
+  href={selectedCuota
+    ? `https://api.whatsapp.com/send?text=${encodeURIComponent(
+        `¡Hola! Te envío el valor de tu próxima Essen:\n
+        🛒 Producto: ${product.descripcion}\n
+        💳 ${getAdjustedCuotaLabel(
+          cuotas.find((cuota) => getCuotaPrice(product[cuota]) === selectedCuota) || "1 cuota sin interés"
+        )} de ${selectedCuota}\n
+        ¡Aprovechá esta oferta!`
+      )}`
+    : "#"}
+  target={selectedCuota ? "_blank" : ""}
+  variant="contained"
+  size="medium"
+  color="primary"
+  sx={{ my: 1, backgroundColor: "#25D366", color: "white" }}
+  startIcon={<FaWhatsapp />}
+  disabled={!selectedCuota}
+>
+  Compartir
+</Button>
+
 
         {product.ficha_tecnica ? (
           <Button fullWidth target="_blank" href={product.ficha_tecnica} variant="outlined" size="medium" color="primary">
