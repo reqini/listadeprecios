@@ -138,7 +138,20 @@ const ShoppingCart = ({ cart, onClearCart, setCart, /* onRemoveFromCart */ }) =>
 
   return (
     <div className="fixed-menu flex-center" style={{ position: "relative" }}>
-      <Accordion style={{ width: "100%", maxWidth: 600 }}>
+      <Accordion   sx={{
+        width: "100%",
+        maxWidth: 500,
+        bottom: 12,
+        borderRadius: '25px!important',
+        overflow: "hidden",
+
+        // Media queries responsivas
+        "@media (max-width:986px)": {
+          borderRadius: '0px!important',
+          width: '100%',
+          bottom: 0
+        },
+      }}>
         <AccordionSummary
           expandIcon={<ArrowDropDownIcon />}
           aria-controls="panel2-content"

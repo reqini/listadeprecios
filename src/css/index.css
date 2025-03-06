@@ -381,7 +381,7 @@ li {
 }
 @media screen and (min-width: 968px) {
   .absolute-btn {
-    bottom: 10px;
+    bottom: 60px;
     z-index: 10;
   }
 }
@@ -395,12 +395,12 @@ li {
   .bt-responsive-emp button {
     margin-bottom: 10px;
   }
-}
-@media screen and (max-width: 600px) {
   .fixed-btn {
     bottom: 60px;
     z-index: 2;
   }
+}
+@media screen and (max-width: 600px) {
   .lista-prod-catalog {
     grid-template-columns: 50% 50%;
   }

@@ -21,6 +21,7 @@ import {
   Stack,
   Alert,
   List,
+  Grid,
   ListItem,
   IconButton,
   ListItemText,
@@ -263,7 +264,7 @@ const Emprendedoras = () => {
       <Container sx={{ mt: 3 }}>
         <Stack spacing={2}>
           <div className="bt-responsive-emp">
-            <Button fullWidth variant="outlined" onClick={() => navigate("/home")} style={{marginRight: 20}}>
+            <Button fullWidth variant="contained" color="secondary" onClick={() => navigate("/home")} style={{marginRight: 20}}>
               Volver a Home
             </Button>
             <Button fullWidth variant="contained" onClick={() => setOpenAddClientDialog(true)}>
@@ -284,7 +285,7 @@ const Emprendedoras = () => {
               Enviar WhatsApp a {selectedClientes.length} seleccionado
             </Button>
           )}
-          <FormControl sx={{ minWidth: 200 }}>
+          <FormControl sx={{ minWidth: 200, background: 'white' }}>
             <InputLabel>Filtrar por Banco</InputLabel>
             <Select value={bancoFilter} onChange={(e) => setBancoFilter(e.target.value)} label="Filtrar por Banco">
               <MenuItem value="">-- Todos --</MenuItem>
@@ -297,35 +298,38 @@ const Emprendedoras = () => {
           </FormControl>
           {/* Sección de Clientes */}
           <Typography variant="h5" sx={{ mt: 3, mb: 2 }}>Clientes</Typography>
-          {filteredClientes.length > 0 ? (
-            filteredClientes.map((cliente, idx) => (
-              <Card key={idx} variant="outlined" sx={{ mb: 2, p: 1 }}>
-                <CardContent>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={selectedClientes.some((c) => c.nombre === cliente.nombre)}
-                        onChange={() => handleToggleSelect(cliente)}
+          <Grid container spacing={1} style={{boxSizing: 'border-box'}}>
+            {filteredClientes.length > 0 ? (
+              filteredClientes.map((cliente, idx) => (
+                <Grid item xs={12} sm={6} key={idx} style={{boxSizing: 'border-box', padding: '0'}}>  {/* En mobile ocupa 1 col, en desktop 2 col */}
+                  <Card variant="outlined" sx={{ mb: 0, p: 1 }}>
+                    <CardContent>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={selectedClientes.some((c) => c.nombre === cliente.nombre)}
+                            onChange={() => handleToggleSelect(cliente)}
+                          />
+                        }
+                        label=""
                       />
-                    }
-                    label=""
-                  />
-                  <Typography variant="body1"><strong>Nombre:</strong> {cliente.nombre}</Typography>
-                  <Typography variant="body1"><strong>Dirección:</strong> {cliente.direccion}</Typography>
-                  <Typography variant="subtitle1"><strong>Banco:</strong> {cliente.banco}</Typography>
-                  <Typography variant="body2"><strong>Phone:</strong> {cliente.phone}</Typography>
-                </CardContent>
-                <CardActions>
-                  <Button size="small" onClick={() => openEditClientDialog(cliente, idx)}>Editar</Button>
-{/*                   <Button size="small" color="error" onClick={() => handleDeleteClient(cliente, idx)}>
-                    Eliminar
-                  </Button> */}
-                </CardActions>
-              </Card>
-            ))
-          ) : (
-            <Alert severity="info">No hay clientes para mostrar.</Alert>
-          )}
+                      <Typography variant="body1"><strong>Nombre:</strong> {cliente.nombre}</Typography>
+                      <Typography variant="body1"><strong>Dirección:</strong> {cliente.direccion}</Typography>
+                      <Typography variant="subtitle1"><strong>Banco:</strong> {cliente.banco}</Typography>
+                      <Typography variant="body2"><strong>Phone:</strong> {cliente.phone}</Typography>
+                    </CardContent>
+                    <CardActions>
+                      <Button size="small" onClick={() => openEditClientDialog(cliente, idx)}>Editar</Button>
+                    </CardActions>
+                  </Card>
+                </Grid>
+              ))
+            ) : (
+              <Grid item xs={12}>
+                <Alert severity="info">No hay clientes para mostrar.</Alert>
+              </Grid>
+            )}
+          </Grid>
         </Stack>
 
         {/* Sección de Catálogos */}
