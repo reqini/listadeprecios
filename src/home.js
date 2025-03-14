@@ -1,305 +1,117 @@
-import React, { useEffect, useState, useCallback } from "react";
-import axios from "./utils/axios";
-import {
-  Container,
-  TextField,
-  Snackbar,
-  Alert,
-  Skeleton,
-  Typography
-} from "@mui/material";
-import Product from "./components/products";
-import ShoppingCart from "./components/cart";
-import Navbar from "./components/Navbar";
-import ResponsiveDialog from "./components/dialog";
-import logo from "./assets/logo.png";
-import { useAuth } from "./AuthContext";
+import React from "react";
+import { Button } from "@mui/material";
+import html2canvas from "html2canvas";
 
-const Home = () => {
-  const { logout } = useAuth();
-
-  // =============== NUEVO: validación de sesión ===============
-  const [sessionChecked, setSessionChecked] = useState(false);
-  const [sessionValid, setSessionValid] = useState(false);
-
-  // =============== Tus estados originales ===============
-  const [extras, setExtras] = useState(null);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [loading, setLoading] = useState(true);
-  const [productos, setProductos] = useState([]);
-  const [filtro, setFiltro] = useState("");
-  const [username, setUsername] = useState("");
-  const [timeOfDay, setTimeOfDay] = useState("");
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [rango, setRango] = useState("");
-  const [cart, setCart] = useState([]);
-  const [openDialog, setOpenDialog] = useState(false);
-
-  const onAddToCart = (product) => {
-    setCart((prevCart) => [...prevCart, product]);
+const CardGenerator = ({ selectedProducts = [] }) => {
+  const captureImage = () => {
+    const cardElement = document.getElementById("card-container");
+    html2canvas(cardElement).then((canvas) => {
+      const link = document.createElement("a");
+      link.href = canvas.toDataURL("image/png");
+      link.download = "card.png";
+      link.click();
+    });
   };
 
-  const clearCart = () => setCart([]);
-
-  // Tu función original para determinar saludo según la hora
-  const getTimeOfDay = useCallback(() => {
-    const currentHour = new Date().getHours();
-    if (currentHour >= 0 && currentHour < 5) return "¿Trabajando de madrugada? :)";
-    if (currentHour < 12) return "Buen día";
-    if (currentHour < 20) return "Buenas tardes";
-    return "Buenas noches";
-  }, []);
-
-  // =============== NUEVO: Verificar sesión antes de todo ===============
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const deviceId = localStorage.getItem("deviceId");
-
-    // Si no hay token, directo al login
-    if (!token) {
-      window.location.href = "/";
-      return;
-    }
-
-    const validateSession = async () => {
-      try {
-        const { data } = await axios.post("/api/validate-session", { token, deviceId });
-        if (data.valid) {
-          setSessionValid(true);
-        } else {
-          // Sesión inválida
-          localStorage.removeItem("token");
-          localStorage.removeItem("activeSession");
-          window.location.href = "/";
-        }
-      } catch (error) {
-        console.error("Error al validar la sesión:", error.message);
-        localStorage.removeItem("token");
-        localStorage.removeItem("activeSession");
-        window.location.href = "/";
-      } finally {
-        setSessionChecked(true);
-      }
-    };
-
-    validateSession();
-  }, []);
-
-  // =============== Efecto para obtener datos de usuario, solo si la sesión es válida ===============
-  useEffect(() => {
-    if (!sessionValid) return;
-
-    const fetchUserData = async () => {
-      const storedUsername = localStorage.getItem("activeSession");
-      if (!storedUsername) return;
-
-      setUsername(storedUsername);
-
-      try {
-        const { data: usuarios } = await axios.get(`/api/usuarios`);
-        const user = usuarios.find((u) => u.username === storedUsername);
-        if (user) {
-          setRango(user.rango);
-        }
-      } catch (error) {
-        console.error("Error al obtener los datos del usuario:", error.message);
-      }
-    };
-
-    fetchUserData();
-    setTimeOfDay(getTimeOfDay());
-
-    // Actualiza saludo cada hora
-    const interval = setInterval(() => setTimeOfDay(getTimeOfDay()), 3600000);
-    return () => clearInterval(interval);
-  }, [sessionValid, getTimeOfDay]);
-
-  // =============== Manejo de resize de ventana ===============
-  useEffect(() => {
-    if (!sessionValid) return;
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [sessionValid]);
-
-  // =============== Función reutilizable para fetch data ===============
-  const fetchData = useCallback(async (endpoint, setState) => {
-    try {
-      const { data } = await axios.get(`/api/${endpoint}`);
-      setState(data);
-      setTimeout(() => {
-        setLoading(false);
-      }, 500);
-    } catch (error) {
-      console.error(`Error al obtener ${endpoint}:`, error);
-      setLoading(false);
-    }
-  }, []);
-
-  // =============== Efecto para cargar productos y extras, solo si la sesión es válida ===============
-  useEffect(() => {
-    if (!sessionValid) return;
-    fetchData("productos", setProductos);
-    fetchData("extras", setExtras);
-  }, [sessionValid, fetchData]);
-
-  // Filtra tus productos
-  const productosFiltrados = productos.filter(
-    (producto) =>
-      producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) &&
-      producto.vigencia === "SI"
-  );
-
-  // Cerrar snackbar
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") return;
-    setSnackbarOpen(false);
-  };
-
-  // Cerrar modal
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
-
-  // Renderizar banner según rango
-  const getBannerForRango = () => {
-    const rangosGrupo1 = [
-      "Demostrador/a",
-      "Demostrador/a plata",
-      "Demostrador/a oro",
-      "Coordinador/a",
-      "Coordinador/a diamante",
-    ];
-    const rangosGrupo2 = [
-      "Ejecutivo/a",
-      "Ejecutivo/a senior",
-      "Ejecutivo/a máster",
-      "Ejecutivo/a premium",
-      "Empresario/a",
-      "Empresario/a VIP",
-    ];
-
-    if (!extras || !extras[0]) {
-      console.warn("Extras no disponibles o vacíos.");
-      return null;
-    }
-
-    if (!rango || rango.trim() === "" || rangosGrupo1.includes(rango)) {
-      return (
-        <div className="banner card-product mar-b30">
-          <img
-            src={windowWidth <= 460 ? extras[0]?.banner_mobile : extras[0]?.banner}
-            alt="Banner Grupo 1"
-            style={{ width: "100%" }}
-          />
-        </div>
-      );
-    } else if (rangosGrupo2.includes(rango)) {
-      return (
-        <div className="banner card-product mar-b30">
-            <img
-              src={windowWidth <= 460 ? extras[0]?.banner_super_mobile : extras[0]?.banner_super}
-              alt="Banner Grupo 2"
-              style={{ width: "100%" }}
-            />
-        </div>
-      );
-    }
-    return null;
-  };
-
-  // =============== Renderizado condicional según validación de sesión ===============
-  if (!sessionChecked) {
-    // Esperando validación, mostramos un “cargando” (podés estilizarlo a tu gusto)
-    return (
-      <Container maxWidth="lg" className="conteiner-list">
-        <h2>Validando sesión...</h2>
-        <Skeleton sx={{ height: 50, marginTop: 2 }} animation="wave" />
-        <Skeleton sx={{ height: 50, marginTop: 2 }} animation="wave" />
-        <Skeleton sx={{ height: 50, marginTop: 2 }} animation="wave" />
-      </Container>
-    );
-  }
-
-  if (!sessionValid) {
-    // Si la sesión no es válida, se habrá redirigido; retornamos null
-    return null;
-  }
-
-  // Si llegamos hasta acá, la sesión es válida
   return (
-    <>
-      <Navbar
-        title={
-          <p>
-            {timeOfDay} <b>{username || "Usuario"}</b>, Te damos la Bienvenida
-          </p>
-        }
-        user={{ username }}
-        onLogout={logout}
-      />
-      <Container maxWidth="lg" className="conteiner-list">
-        
-        <div className="w-100 flex justify-center items-center flex-direction mar-t10">
-          <Typography fontSize={13} margin={'6px 0 12px 0'}>Desarrollado por: <b><a href="https://www.instagram.com/lrecchini/" rel="noreferrer">Luciano Recchini</a></b></Typography>
-          <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
-        </div>
+    <div id="card-container" style={{
+      width: "360px",
+      height: "640px",
+      background: "#fff",
+      position: "relative",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: "10px",
+      overflow: "hidden",
+      border: "2px solid #000",
+    }}>
+      <div style={{
+        width: "100%",
+        height: "100%",
+        background: "#e0e0e0",
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: "10px",
+        overflow: "hidden",
+        textAlign: "center",
+        padding: "10px",
+      }}>
+        {selectedProducts.length > 0 ? (
+          selectedProducts.map((product, index) => {
+            console.log("Producto recibido:", product);
+            console.log("Precio recibido:", product.precio_lista, product.precio_negocio, product.cuota_precio);
 
-        <div className="header mar-b30 flex-center pad20">
-          <TextField
-            style={{ maxWidth: 450 }}
-            fullWidth
-            className="search"
-            label="Buscar Producto"
-            variant="outlined"
-            value={filtro}
-            onChange={(e) => setFiltro(e.target.value)}
-          />
-        </div>
-        <p>Les dejo el alias que esta circulando para ayudar al Hospital Interzonal Dr. José Penna de Bahía Blanca. Fuente Neura YouTube</p>
-        {getBannerForRango()}
+            // Determinar el precio válido a mostrar
+            const precioValido =
+              product.cuota_precio && !isNaN(Number(product.cuota_precio))
+                ? Number(product.cuota_precio).toFixed(2)
+                : product.precio_negocio && !isNaN(Number(product.precio_negocio))
+                ? Number(product.precio_negocio).toFixed(2)
+                : product.precio_lista && !isNaN(Number(product.precio_lista))
+                ? Number(product.precio_lista).toFixed(2)
+                : null;
 
-        <ul className="lista-prod w-100">
-          {loading ? (
-            [...Array(6)].map((_, index) => (
-              <Skeleton
-                key={index}
-                sx={{ height: 300, margin: 1 }}
-                animation="wave"
-                variant="rectangular"
-                className="grid-item"
-              />
-            ))
-          ) : (
-            productosFiltrados.map((product) => (
-              <li className="grid-item" key={product.id}>
-                <Product
-                  product={product}
-                  cuotaType="sin_interes"
-                  onAddToCart={onAddToCart}
+            return (
+              <div key={index} style={{ position: "relative", width: "100%" }}>
+                <h3 style={{ marginTop: "10px", fontSize: "18px", color: "#333" }}>
+                  {product.descripcion || "Sin descripción"}
+                </h3>
+                <img
+                  src={product.imagen || "/placeholder.png"}
+                  alt={product.descripcion || "Sin imagen"}
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    objectFit: "contain",
+                    borderRadius: "5px",
+                    background: "white",
+                  }}
                 />
-              </li>
-            ))
-          )}
-        </ul>
-
-        <ShoppingCart
-          cart={cart}
-          setCart={setCart}
-          onClearCart={clearCart}
-        />
-
-        {/* Modal de promociones bancarias */}
-        <ResponsiveDialog open={openDialog} onClose={handleCloseDialog} />
-
-        <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
-          <Alert onClose={handleSnackbarClose} severity="success">
-            Producto agregado al carrito
-          </Alert>
-        </Snackbar>
-      </Container>
-    </>
+                {precioValido ? (
+                  <h3 style={{ fontSize: "20px", color: "#333" }}>
+                    ${precioValido}
+                  </h3>
+                ) : (
+                  <h3 style={{ fontSize: "20px", color: "#777" }}>Precio no disponible</h3>
+                )}
+                {product.cuotas ? (
+                  <h2 style={{ fontSize: "22px", fontWeight: "bold", color: "#000" }}>
+                    {product.cuotas} cuotas
+                  </h2>
+                ) : (
+                  <h2 style={{ fontSize: "22px", fontWeight: "bold", color: "#777" }}>Sin cuotas disponibles</h2>
+                )}
+                {product.banco ? (
+                  <h2 style={{ fontSize: "18px", fontWeight: "bold", color: "#555" }}>
+                    Banco: {product.banco}
+                  </h2>
+                ) : (
+                  <h2 style={{ fontSize: "18px", fontWeight: "bold", color: "#777" }}>Sin banco asignado</h2>
+                )}
+                {product.bancoImagen && (
+                  <img
+                    src={product.bancoImagen}
+                    alt={product.banco || "Banco desconocido"}
+                    style={{ width: "80px", height: "auto", marginTop: "10px" }}
+                  />
+                )}
+              </div>
+            );
+          })
+        ) : (
+          <h3 style={{ fontSize: "20px", color: "#777" }}>Selecciona un producto</h3>
+        )}
+      </div>
+      <Button onClick={captureImage} variant="contained" color="primary" style={{ marginTop: "20px" }}>
+        Exportar Imagen
+      </Button>
+    </div>
   );
 };
 
-export default Home;
+export default CardGenerator;

@@ -19,6 +19,7 @@ import { AuthProvider, useAuth } from "./AuthContext";
 
 // **🔹 NUEVO: Importar el Dashboard de Emprendedoras**
 import Emprendedoras from "./Emprendedoras";
+import GeneradorDePlacas from "./GeneradorDePlacas";
 
 // Configuración de Google Analytics
 const TRACKING_ID = "G-5S2G3FYSPS";
@@ -102,6 +103,7 @@ const App = () => {
             <Route path="/mar-25-cat20" element={<Catalogo20 />} />
             <Route path="/mar-25-cat24" element={<Catalogo24 />} />
             <Route path="/mar-25-cont" element={<Contado />} />
+            <Route path="/generarPlaca" element={<GeneradorDePlacas />} />
 
             {/* 🔹 NUEVA RUTA PROTEGIDA PARA EL DASHBOARD (EMPRENDEDORAS) */}
             <Route path="/emprendedoras" element={<PrivateRoute><Emprendedoras /></PrivateRoute>} />
