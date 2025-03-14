@@ -103,7 +103,7 @@ const App = () => {
             <Route path="/mar-25-cat20" element={<Catalogo20 />} />
             <Route path="/mar-25-cat24" element={<Catalogo24 />} />
             <Route path="/mar-25-cont" element={<Contado />} />
-            <Route path="/generarPlaca" element={<GeneradorDePlacas />} />
+            <Route path="/generarPlaca" element={<PrivateRoute><GeneradorDePlacas /></PrivateRoute>} />
 
             {/* 🔹 NUEVA RUTA PROTEGIDA PARA EL DASHBOARD (EMPRENDEDORAS) */}
             <Route path="/emprendedoras" element={<PrivateRoute><Emprendedoras /></PrivateRoute>} />
