@@ -10,7 +10,7 @@ const GeneradorDePlacas = () => {
   const [selectedQuota, setSelectedQuota] = useState("tres_sin_interes");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedBank, setSelectedBank] = useState(null);
-  const [isProductDisabled, setIsProductDisabled] = useState(true);
+ /*  const [isProductDisabled, setIsProductDisabled] = useState(true); */
   const [customQuotaValue, setCustomQuotaValue] = useState("");
   const [showCard, setShowCard] = useState(false);
 
@@ -86,7 +86,7 @@ const GeneradorDePlacas = () => {
             options={products || []}
             getOptionLabel={(option) => option?.descripcion || ""}
             onChange={handleSelectProduct}
-            renderInput={(params) => <TextField {...params} label="Selecciona un Producto" variant="outlined" fullWidth disabled={isProductDisabled} />}
+            renderInput={(params) => <TextField {...params} label="Selecciona un Producto" variant="outlined" fullWidth />}
             style={{ width: "400px", marginBottom: "20px", background: 'white' }}
           />
           <FormControl fullWidth style={{ width: "400px", marginBottom: "20px", background: 'white' }}>

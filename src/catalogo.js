@@ -7,7 +7,7 @@ const GeneradorDePlacas = () => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedQuota, setSelectedQuota] = useState(null);
-  const [selectedBank, setSelectedBank] = useState(null);
+  /* const [selectedBank, setSelectedBank] = useState(null); */
   const [banks, setBanks] = useState([]);
   const cuotasMap = {
     "3 cuotas": "tres_sin_interes",
@@ -72,9 +72,9 @@ const GeneradorDePlacas = () => {
     setSelectedQuota(newValue);
   };
 
-  const handleBankChange = (event, newValue) => {
+  /* const handleBankChange = (event, newValue) => {
     setSelectedBank(newValue);
-  };
+  }; */
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "20px" }}>
