@@ -102,14 +102,14 @@ const Navbar = ({ user, onLogout, title }) => {
             >
               Emprendedora
             </MenuItem>
-            {/* <MenuItem
+            <MenuItem
               onClick={() => {
                 navigate("/generarPlaca");
                 handleMenuClose();
               }}
             >
-              Crear Placas <i style={{color: 'red'}}>version Beta</i>
-            </MenuItem> */}
+              Crear Placas <i style={{color: 'red', marginLeft: 12}}>V.0.1 Beta</i>
+            </MenuItem>
             <MenuItem
               onClick={() => {
                 onLogout();

@@ -6,7 +6,6 @@ import ReactGA from "react-ga4";
 import Login from "./Login";
 import Home from "./home";
 import Registro from "./Registro";
-/* import Catalogo from "./catalogo"; */
 import Catalogo3 from "./catalogo3";
 import Catalogo6 from "./catalogo6";
 import Catalogo9 from "./catalogo9";
@@ -94,7 +93,6 @@ const App = () => {
             <Route path="/login" element={<LoginRoute />} />
             <Route path="/registro" element={<Registro />} />
             <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
-            {/* <Route path="/mar-25-cat" element={<Catalogo />} /> */}
             <Route path="/mar-25-cat3" element={<Catalogo3 />} />
             <Route path="/mar-25-cat6" element={<Catalogo6 />} />
             <Route path="/mar-25-cat9" element={<Catalogo9 />} />

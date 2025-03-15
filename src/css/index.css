@@ -271,6 +271,15 @@ li {
   font-weight: 700 !important;
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
 }
+.desktop {
+  display: block;
+}
+.desktop-fflex {
+  display: flex;
+}
+.mobile {
+  display: none;
+}
 .flex {
   display: flex !important;
 }
@@ -403,6 +412,15 @@ li {
     bottom: 60px;
     z-index: 2;
   }
+  .desktop {
+    display: none;
+  }
+  .desktop-fflex {
+    display: none;
+  }
+  .mobile {
+    display: block;
+  }
 }
 @media screen and (max-width: 600px) {
   .lista-prod-catalog {
@@ -423,6 +441,14 @@ li {
     right: 10px;
     display: flex;
     bottom: 5px;
+  }
+  .fixed-float {
+    position: fixed !important;
+    bottom: 12px;
+    margin: 0 auto !important;
+    left: calc(50% - 100px);
+    width: 200px;
+    border-radius: 50px !important;
   }
   .lista-prod {
     display: grid;

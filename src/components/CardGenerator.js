@@ -1,29 +1,49 @@
 import React from "react";
 import html2canvas from "html2canvas";
+import { Button } from "@mui/material";
 
-const CardGenerator = ({ selectedProducts = [], selectedQuota, customQuotaValue, selectedBank }) => {
+const CardGenerator = ({ selectedProducts = [], selectedQuota, customQuotaValue, selectedBank, titleColor }) => {
   
 const captureImage = () => {
   const cardElement = document.getElementById("card-container");
 
-  setTimeout(() => { // Espera 300ms para asegurar que todas las imágenes carguen
-    html2canvas(cardElement, {
-      scale: 1, // Captura con más calidad
-      useCORS: true, // Permite cargar imágenes externas
+  if (!cardElement) {
+    console.error("Error: No se encontró el elemento #card-container");
+    return;
+  }
 
-      logging: false, // Reduce los logs en la consola
-    }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/jpeg", 1.0); // Exportación en JPG con calidad máxima
-      const link = document.createElement("a");
-      link.href = imgData;
-      link.download = "placa.jpg";
-      link.click();
-    }).catch((error) => {
-      console.error("Error al generar la imagen:", error);
-    });
-  }, 400); // Espera 300ms antes de capturar
+  // Clonamos el contenido para capturarlo fuera del Dialog en mobile
+  const clonedElement = cardElement.cloneNode(true);
+  clonedElement.style.position = "absolute";
+  clonedElement.style.left = "-9999px"; // Lo ocultamos fuera de la vista
+  document.body.appendChild(clonedElement);
+
+  setTimeout(() => {
+    html2canvas(clonedElement, {
+      scale: 2, // Aumenta la calidad en mobile
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+    })
+      .then((canvas) => {
+        document.body.removeChild(clonedElement); // Eliminamos el clon después de la captura
+
+        const imgData = canvas.toDataURL("image/jpeg", 1.0);
+        if (imgData.length < 50) {
+          console.error("Error: La imagen generada está vacía");
+          return;
+        }
+
+        const link = document.createElement("a");
+        link.href = imgData;
+        link.download = "placa.jpg";
+        link.click();
+      })
+      .catch((error) => {
+        console.error("Error al generar la imagen:", error);
+      });
+  }, 500); // Esperamos un poco más para asegurarnos de que todo está cargado
 };
-
 
   const getImageUrl = (imagen) => {
   if (!imagen || imagen.trim() === "") return "/placeholder.png";
@@ -71,15 +91,9 @@ const captureImage = () => {
                 flexDirection: 'column',
                 alignItems: 'center'
               }}>
-                <h3 style={{
-                  marginTop: "10px",
-                  fontSize: "35px",
-                  color: "blueviolet",
-                  margin: 0
-                }}>
+                <h3 style={{ color: titleColor || "blueviolet", fontSize: "35px", margin: 0 }}>
                   {product.descripcion || "Sin descripción"}
                 </h3>
-
                 <img
                   src={getImageUrl(product.imagen)}
                   alt={product.descripcion || "Sin imagen"}
@@ -115,15 +129,15 @@ const captureImage = () => {
                 </span>
 
 
-                <div className="flex items-center"> 
-                  <h2 style={{ fontSize: "16px", fontWeight: "bold", color: "#555", margin: '0 12px 0 0' }}>
+                <div className="flex flex-direction items-center"> 
+                  <h2 style={{ fontSize: "16px", fontWeight: "bold", color: "#555", margin: '12px 12px 0 0' }}>
                     Con Banco
                   </h2>
                   {selectedBank?.logo && (
                     <img
                       src={getImageUrl(selectedBank.logo)}
                       alt={selectedBank.banco || "Banco desconocido"}
-                      style={{ width: "50px", height: "auto", marginTop: "10px" }}
+                      style={{ width: "70px", height: "auto", marginTop: "10px" }}
                     />
                   )}
                 </div>
@@ -134,12 +148,13 @@ const captureImage = () => {
           )}
         </div>
       </div>
-      <button 
+      <Button 
+        variant="contained"
         onClick={captureImage} 
         style={{ marginTop: "20px", padding: "10px", fontSize: "16px", cursor: "pointer" }}
       >
         Descargar JPG
-      </button>
+      </Button>
     </div>
   );
 };
