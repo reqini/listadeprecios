@@ -63,10 +63,9 @@ const captureImage = () => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        padding: 4,
         justifyContent: "center",
-        borderRadius: "10px",
-        overflow: "hidden",
-        border: "2px solid #000",
+        overflow: "hidden"
       }}>
         <div style={{
           width: "100%",
@@ -81,6 +80,7 @@ const captureImage = () => {
           overflow: "hidden",
           textAlign: "center",
           padding: "10px",
+          border: `4px solid ${titleColor || "blueviolet"}`,
         }}>
           {selectedProducts.length > 0 ? (
             selectedProducts.map((product, index) => (

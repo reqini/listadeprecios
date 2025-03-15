@@ -8,15 +8,18 @@ import {
   Menu,
   MenuItem,
   Dialog,
+  Divider,
   DialogTitle,
   DialogContent,
   DialogActions,
+  Badge,
   Button,
   TextField,
   Alert,
   useMediaQuery,
   InputAdornment,
 } from "@mui/material";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import { useTheme } from "@mui/material/styles";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import axios from "../utils/axios";
@@ -79,7 +82,15 @@ const Navbar = ({ user, onLogout, title }) => {
             {title}
           </Typography>
           <IconButton color="inherit" onClick={handleMenuOpen}>
-            <Typography margin={'0 10px 0 0'}>Mi Menú</Typography><Avatar>{user?.username?.charAt(0).toUpperCase() || "?"}</Avatar>
+            <Typography margin={'0 10px 0 0'}>Mi Menú</Typography>
+            <Badge 
+              badgeContent={'1'} 
+              color="error"
+              overlap="circular"
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+              <Avatar>{user?.username?.charAt(0).toUpperCase() || "?"}</Avatar>
+            </Badge>
           </IconButton>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
             <MenuItem
@@ -91,7 +102,7 @@ const Navbar = ({ user, onLogout, title }) => {
             >
               Perfil
             </MenuItem>
-            
+            <Divider></Divider>
             {/* Nuevo acceso a /emprendedora */}
             <MenuItem
               /* style={{display: 'none'}} */
@@ -102,19 +113,22 @@ const Navbar = ({ user, onLogout, title }) => {
             >
               Emprendedora
             </MenuItem>
+            <Divider></Divider>
             <MenuItem
               onClick={() => {
                 navigate("/generarPlaca");
                 handleMenuClose();
               }}
             >
-              Crear Placas <i style={{color: 'red', marginLeft: 12}}>V.0.1 Beta</i>
+              Crear Placas <i style={{color: 'green', marginLeft: 12}}>V.0.1 Beta</i>
             </MenuItem>
+            <Divider></Divider>
             <MenuItem
               onClick={() => {
                 onLogout();
                 handleMenuClose();
               }}
+              style={{color: 'red'}}
             >
               Cerrar sesión
             </MenuItem>
