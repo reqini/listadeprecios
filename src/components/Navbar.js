@@ -19,7 +19,6 @@ import {
   useMediaQuery,
   InputAdornment,
 } from "@mui/material";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import { useTheme } from "@mui/material/styles";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import axios from "../utils/axios";
