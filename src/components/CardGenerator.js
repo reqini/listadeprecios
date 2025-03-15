@@ -91,9 +91,24 @@ const captureImage = () => {
                 flexDirection: 'column',
                 alignItems: 'center'
               }}>
-                <h3 style={{ color: titleColor || "blueviolet", fontSize: "35px", margin: 0 }}>
+                <h3 style={{ color: titleColor || "blueviolet", fontSize: "35px", margin: '12px 0 0 0' }}>
                   {product.descripcion || "Sin descripción"}
                 </h3>
+
+                {product.discount && (
+                  <p style={{
+                    color: "white",
+                    fontSize: "20px",
+                    fontWeight: "normal",
+                    margin: 0,
+                    background: 'black',
+                    padding: '4px 12px',
+                    marginTop: 4
+                  }}>
+                    {product.discount}
+                  </p>
+                )}
+
                 <img
                   src={getImageUrl(product.imagen)}
                   alt={product.descripcion || "Sin imagen"}
