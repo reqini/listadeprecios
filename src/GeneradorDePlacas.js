@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "./utils/axios";
 import DialogResponsive from "./components/DialogResponsive"; // Ajusta la ruta según sea necesario
 import { Autocomplete, TextField, Button, MenuItem, Select, FormControl, InputLabel, Typography } from "@mui/material";
@@ -13,7 +14,7 @@ const GeneradorDePlacas = () => {
   const [customQuotaValue, setCustomQuotaValue] = useState("");
   const [showCard, setShowCard] = useState(false);
   const [titleColor, setTitleColor] = useState("#8A2BE2"); // Color inicial (blueviolet)
-
+  const navigate = useNavigate();
   const cuotasMap = {
     "3 cuotas": "tres_sin_interes",
     "6 cuotas": "seis_sin_interes",
@@ -98,9 +99,14 @@ const GeneradorDePlacas = () => {
 
   return (
     <>
-      <Typography variant="h4" textAlign="center" fontSize={35} margin="24px 0">
+      <div className="flex flex-direction items-center justify-center">
+        <Typography variant="body" textAlign="center" fontSize={25} margin="8px 0">
         Generador de Placas
-      </Typography>
+        </Typography>
+        <Button size="medium" variant="contained" color="secondary" onClick={() => navigate("/home")} style={{maxWidth: 240}}>
+          Volver a Home
+        </Button>
+      </div>
       <div
         style={{
           display: "flex",
@@ -173,7 +179,7 @@ const GeneradorDePlacas = () => {
 
         <div
           className="w-100 desktop-fflex flex-direction items-center justify-center"
-          style={{ border: "1px dashed silver", minHeight: 700, background: "#fafafa", borderRadius: 12, alignItems: 'center' }}
+          style={{ border: "1px dashed silver", minHeight: 700, background: "#fafafa", borderRadius: 12, alignItems: 'center', marginTop: 20 }}
         >
           {!showCard && <Typography variant="body1" fontSize={20} color="primary">Espacio para vista previa</Typography>}
           <div className="desktop">

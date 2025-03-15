@@ -264,7 +264,7 @@ const Emprendedoras = () => {
       <Container sx={{ mt: 3 }}>
         <Stack spacing={2}>
           <div className="bt-responsive-emp">
-            <Button fullWidth variant="contained" color="secondary" onClick={() => navigate("/home")} style={{marginRight: 20}}>
+            <Button fullWidth variant="contained" color="secondary" onClick={() => navigate("/home")}>
               Volver a Home
             </Button>
             <Button fullWidth variant="contained" onClick={() => setOpenAddClientDialog(true)}>
