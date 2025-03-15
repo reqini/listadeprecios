@@ -256,9 +256,7 @@ const Home = () => {
             onChange={(e) => setFiltro(e.target.value)}
           />
         </div>
-        <p>Les dejo el alias que esta circulando para ayudar al Hospital Interzonal Dr. José Penna de Bahía Blanca. Fuente Neura YouTube</p>
         {getBannerForRango()}
-
         <ul className="lista-prod w-100">
           {loading ? (
             [...Array(6)].map((_, index) => (
