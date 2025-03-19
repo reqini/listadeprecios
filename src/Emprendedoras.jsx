@@ -12,21 +12,21 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Card,
-  CardContent,
-  CardActions,
   Typography,
   Checkbox,
-  FormControlLabel,
   Stack,
   Alert,
   List,
-  Grid,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   ListItem,
   IconButton,
   ListItemText,
   ListItemSecondaryAction
 } from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import axios from "./utils/axios";
 import Navbar from "./components/Navbar";
@@ -297,61 +297,89 @@ const Emprendedoras = () => {
             </Select>
           </FormControl>
           {/* Sección de Clientes */}
-          <Typography variant="h5" sx={{ mt: 3, mb: 2 }}>Clientes</Typography>
-          <Grid container spacing={1} style={{boxSizing: 'border-box'}}>
-            {filteredClientes.length > 0 ? (
-              filteredClientes.map((cliente, idx) => (
-                <Grid item xs={12} sm={6} key={idx} style={{boxSizing: 'border-box', padding: '0'}}>  {/* En mobile ocupa 1 col, en desktop 2 col */}
-                  <Card variant="outlined" sx={{ mb: 0, p: 1 }}>
-                    <CardContent>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={selectedClientes.some((c) => c.nombre === cliente.nombre)}
-                            onChange={() => handleToggleSelect(cliente)}
-                          />
-                        }
-                        label=""
+          <Accordion defaultExpanded>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1-content"
+              id="panel1-header"
+            >
+              <Typography variant="h6">Clientes</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <List style={{background: 'white'}}>
+                {filteredClientes.length > 0 ? (
+                  filteredClientes.map((cliente, idx) => (
+                    <ListItem key={idx} divider>
+                      <Checkbox
+                        edge="start"
+                        checked={selectedClientes.some((c) => c.nombre === cliente.nombre)}
+                        onChange={() => handleToggleSelect(cliente)}
                       />
-                      <Typography variant="body1"><strong>Nombre:</strong> {cliente.nombre}</Typography>
-                      <Typography variant="body1"><strong>Dirección:</strong> {cliente.direccion}</Typography>
-                      <Typography variant="subtitle1"><strong>Banco:</strong> {cliente.banco}</Typography>
-                      <Typography variant="body2"><strong>Phone:</strong> {cliente.phone}</Typography>
-                    </CardContent>
-                    <CardActions>
-                      <Button size="small" onClick={() => openEditClientDialog(cliente, idx)}>Editar</Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
-              ))
-            ) : (
-              <Grid item xs={12}>
-                <Alert severity="info">No hay clientes para mostrar.</Alert>
-              </Grid>
-            )}
-          </Grid>
+                      <ListItemText
+                        primary={
+                          <Typography variant="body1" component="span">
+                            <strong>Nombre:</strong> {cliente.nombre}
+                          </Typography>
+                        }
+                        secondary={
+                          <>
+                            <Typography variant="body2">
+                              <strong>Dirección:</strong> {cliente.direccion}
+                            </Typography>
+                            <Typography variant="body2">
+                              <strong>Banco:</strong> {cliente.banco}
+                            </Typography>
+                            <Typography variant="body2">
+                              <strong>Phone:</strong> {cliente.phone}
+                            </Typography>
+                          </>
+                        }
+                      />
+                      <ListItemSecondaryAction>
+                        <IconButton edge="end" aria-label="editar" onClick={() => openEditClientDialog(cliente, idx)}>
+                          <EditIcon />
+                        </IconButton>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  ))
+                ) : (
+                  <Alert severity="info">No hay clientes para mostrar.</Alert>
+                )}
+              </List>
+            </AccordionDetails>
+          </Accordion>
         </Stack>
 
         {/* Sección de Catálogos */}
-        <Typography variant="h5" sx={{ mt: 3, mb: 2 }}>Catálogos</Typography>
-        <List style={{background: 'white', marginBottom: 34}}>
-          {catalogos.map((catalogo, idx) => (
-            <ListItem key={idx} divider>
-              <ListItemText primary={catalogo.nombre} secondary={catalogo.url} />
-              <ListItemSecondaryAction>
-                <IconButton 
-                  edge="end" 
-                  onClick={() => {
-                    navigator.clipboard.writeText(window.location.origin + catalogo.url);
-                    alert("URL copiada al portapapeles");
-                  }}
-                >
-                  <ContentCopyIcon />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-        </List>
+        <Accordion defaultExpanded>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1-content"
+            id="panel1-header"
+          >
+            <Typography variant="h5">Catálogos</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <List style={{background: 'white', marginBottom: 34}}>
+              {catalogos.map((catalogo, idx) => (
+                <ListItem key={idx} divider>
+                  <ListItemText primary={catalogo.nombre} secondary={catalogo.url} />
+                  <ListItemSecondaryAction>
+                    <IconButton 
+                      edge="end" 
+                      onClick={() => {
+                        navigator.clipboard.writeText(window.location.origin + catalogo.url);
+                        alert("URL copiada al portapapeles");
+                      }}
+                    >
+                      <ContentCopyIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
+              ))}
+            </List>
+          </AccordionDetails>
+       </Accordion>
 
         {/* Modal Agregar Cliente */}
         <Dialog open={openAddClientDialog} onClose={() => setOpenAddClientDialog(false)}>
