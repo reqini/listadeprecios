@@ -146,7 +146,16 @@ const Catalogo6 = () => {
         <title>Catálogo 6 Cuotas - Catálogo</title>
       </Helmet>
       <div className="w-100 flex justify-center items-center flex-direction mar-t10">
-        <Typography fontSize={13} margin={'6px 0 12px 0'}>Desarrollado por: <b><a href="https://www.instagram.com/lrecchini/" rel="noreferrer">Luciano Recchini</a></b></Typography>
+        <Typography fontSize={13} margin={'6px 0 12px 0'} style={{textAlign: 'center'}}>
+            <b>Desarrollado por:</b><br></br>
+            <b>
+              <a href="https://www.instagram.com/cocinatyy" rel="noreferrer">@Cocinatyy </a>
+            </b>
+            y
+            <b>
+              <a href="https://www.instagram.com/lrecchini/" rel="noreferrer"> Luciano Recchini</a>
+            </b>
+          </Typography>
         <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
       </div>
 
