@@ -119,7 +119,7 @@ const Navbar = ({ user, onLogout, title }) => {
                 handleMenuClose();
               }}
             >
-              Crear Placas <i style={{color: 'green', marginLeft: 12}}>V.0.1 Beta</i>
+              Crear Placas <i style={{color: 'green', marginLeft: 12}}>V.0.3 Beta</i>
             </MenuItem>
             <Divider></Divider>
             <MenuItem

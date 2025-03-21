@@ -2,7 +2,16 @@ import React from "react";
 import html2canvas from "html2canvas";
 import { Button } from "@mui/material";
 
-const CardGenerator = ({ selectedProducts = [], selectedQuota, customQuotaValue, selectedBank, titleColor }) => {
+const CardGenerator = ({ 
+  selectedProducts = [],
+  selectedQuota,
+  customQuotaValue,
+  selectedBank,
+  titleColor,
+  selectedFont,
+  titleFontSize = 35,
+  quotaFontSize = 35,
+  }) => {
   
 const captureImage = () => {
   const cardElement = document.getElementById("card-container");
@@ -91,7 +100,14 @@ const captureImage = () => {
                 flexDirection: 'column',
                 alignItems: 'center'
               }}>
-                <h3 style={{ color: titleColor || "blueviolet", fontSize: "35px", margin: '12px 0 0 0' }}>
+                <h3
+                  style={{
+                    color: titleColor || "blueviolet",
+                    fontSize: `${titleFontSize}px`,
+                    margin: "12px 0 0 0",
+                    fontFamily: `"${selectedFont}", sans-serif`, // ✅ Agregar comillas en nombres con espacios
+                  }}
+                >
                   {product.descripcion || "Sin descripción"}
                 </h3>
 
@@ -130,7 +146,8 @@ const captureImage = () => {
                   contentEditable="true" 
                   suppressContentEditableWarning={true}
                   style={{
-                    fontSize: "35px",
+                    fontSize: `${quotaFontSize}px`,
+                    fontFamily: `"${selectedFont}", sans-serif`,
                     fontWeight: "bold",
                     color: "#000",
                     textAlign: "center",

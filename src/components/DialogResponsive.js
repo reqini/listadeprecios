@@ -4,7 +4,16 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
 import CardGenerator from "./CardGenerator"; // Asegúrate de que la ruta sea correcta
 
-const DialogResponsive = ({ selectedProduct, selectedQuota, customQuotaValue, selectedBank, titleColor }) => {
+const DialogResponsive = ({ 
+  selectedProduct,
+  selectedQuota,
+  customQuotaValue,
+  selectedBank,
+  titleColor,
+  selectedFont,
+  titleFontSize,
+  quotaFontSize
+}) => {
   const [open, setOpen] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm")); // Detecta si está en mobile
@@ -58,6 +67,9 @@ const DialogResponsive = ({ selectedProduct, selectedQuota, customQuotaValue, se
             customQuotaValue={customQuotaValue}
             selectedBank={selectedBank}
             titleColor={titleColor}
+            selectedFont={selectedFont}
+            titleFontSize={titleFontSize}
+            quotaFontSize={quotaFontSize}
           />
         </DialogContent>
 

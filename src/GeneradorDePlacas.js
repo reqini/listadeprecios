@@ -4,6 +4,8 @@ import axios from "./utils/axios";
 import DialogResponsive from "./components/DialogResponsive"; // Ajusta la ruta según sea necesario
 import { Autocomplete, TextField, Button, MenuItem, Select, FormControl, InputLabel, Typography } from "@mui/material";
 import CardGenerator from "./components/CardGenerator";
+import WebFont from "webfontloader";
+
 
 const GeneradorDePlacas = () => {
   const [products, setProducts] = useState([]);
@@ -14,6 +16,11 @@ const GeneradorDePlacas = () => {
   const [customQuotaValue, setCustomQuotaValue] = useState("");
   const [showCard, setShowCard] = useState(false);
   const [titleColor, setTitleColor] = useState("#8A2BE2"); // Color inicial (blueviolet)
+  const [selectedFont, setSelectedFont] = useState("Roboto");
+  const [titleFontSize, setTitleFontSize] = useState(35);
+  const [quotaFontSize, setQuotaFontSize] = useState(35);
+
+
   const navigate = useNavigate();
   const cuotasMap = {
     "3 cuotas": "tres_sin_interes",
@@ -22,6 +29,24 @@ const GeneradorDePlacas = () => {
     "18 cuotas": "dieciocho_sin_interes",
     "24 cuotas": "veinticuatro_sin_interes"
   };
+
+  useEffect(() => {
+  WebFont.load({
+    google: {
+      families: [
+        "Roboto",
+        "Montserrat",
+        "Lato",
+        "Poppins",
+        "Playfair Display",
+        "Oswald",
+        "Raleway",
+        "Lobster",
+      ],
+    },
+  });
+}, []);
+
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -126,6 +151,22 @@ const GeneradorDePlacas = () => {
             renderInput={(params) => <TextField {...params} label="Selecciona un Producto" variant="outlined" fullWidth />}
             style={{ marginBottom: "20px", background: "white" }}
           />
+          <TextField
+            label="Tamaño del título (px)"
+            type="number"
+            variant="outlined"
+            fullWidth
+            value={titleFontSize}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === "") {
+                setTitleFontSize(""); // permite que se vacíe el input sin forzar 0
+              } else {
+                setTitleFontSize(Number(value));
+              }
+            }}
+            style={{ marginBottom: "20px", background: "white" }}
+          />
 
           <FormControl fullWidth style={{ marginBottom: "20px", background: "white" }}>
             <InputLabel>Selecciona Cuotas</InputLabel>
@@ -148,21 +189,63 @@ const GeneradorDePlacas = () => {
             type="text"
             placeholder="$0.00"
           />
-
-          {/* Selector de Color */}
           <TextField
-            label="Color del título"
+            label="Tamaño de la cuota (px)"
+            type="number"
             variant="outlined"
             fullWidth
-            InputProps={{
-              inputProps: {
-                type: "color"
+            value={quotaFontSize}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === "") {
+                setQuotaFontSize(""); // permite dejar el input vacío sin forzar 0
+              } else {
+                setQuotaFontSize(Number(value));
               }
             }}
-            value={titleColor}
-            onChange={handleColorChange}
             style={{ marginBottom: "20px", background: "white" }}
           />
+
+          {/* Selector de Color */}
+          <div className="flex w-100">
+            <TextField
+              label="Color del título"
+              variant="outlined"
+              fullWidth
+              InputProps={{
+                inputProps: {
+                  type: "color"
+                }
+              }}
+              value={titleColor}
+              onChange={handleColorChange}
+              style={{ marginBottom: "20px", background: "white" }}
+            />
+            <div style={{
+                width: 50,
+                height: 55,
+                borderRadius: 6,
+                marginLeft: 12,
+                border: "1px solid #ccc",
+                backgroundColor: titleColor
+              }}
+            />
+          </div>
+          <FormControl fullWidth style={{ marginBottom: "20px", background: "white" }}>
+            <InputLabel>Tipografía del título</InputLabel>
+              <Select
+                value={selectedFont}
+                onChange={(e) => setSelectedFont(e.target.value)}
+                variant="outlined"
+              >
+                {["Roboto", "Montserrat", "Lato", "Poppins", "Playfair Display", "Oswald", "Raleway", "Lobster"].map((font) => (
+                  <MenuItem key={font} value={font} style={{ fontFamily: font }}>
+                    {font}
+                  </MenuItem>
+                ))}
+              </Select>
+          </FormControl>
+
           <Autocomplete
             options={banks || []}
             fullWidth
@@ -189,7 +272,10 @@ const GeneradorDePlacas = () => {
                 selectedQuota={selectedQuota}
                 customQuotaValue={customQuotaValue}
                 selectedBank={selectedBank}
-                titleColor={titleColor} // Pasamos el color del título
+                titleColor={titleColor}
+                selectedFont={selectedFont}
+                titleFontSize={titleFontSize}
+                quotaFontSize={quotaFontSize}
               />
             )}
           </div>
@@ -202,6 +288,9 @@ const GeneradorDePlacas = () => {
           customQuotaValue={customQuotaValue}
           selectedBank={selectedBank}
           titleColor={titleColor}
+          selectedFont={selectedFont}           // ✅ falta
+          titleFontSize={titleFontSize}         // ✅ falta
+          quotaFontSize={quotaFontSize}         // ✅ falta
         />
       </div>
     </>
