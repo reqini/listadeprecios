@@ -151,22 +151,27 @@ const GeneradorDePlacas = () => {
             renderInput={(params) => <TextField {...params} label="Selecciona un Producto" variant="outlined" fullWidth />}
             style={{ marginBottom: "20px", background: "white" }}
           />
-          <TextField
-            label="Tamaño del título (px)"
-            type="number"
-            variant="outlined"
-            fullWidth
-            value={titleFontSize}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value === "") {
-                setTitleFontSize(""); // permite que se vacíe el input sin forzar 0
-              } else {
-                setTitleFontSize(Number(value));
+          {/* Tamaño del título con slider intuitivo */}
+          <div style={{ marginBottom: "20px", width: "100%" }}>
+            <Typography gutterBottom>Tamaño del Título</Typography>
+            <input
+              type="range"
+              min={12}
+              max={60}
+              step={1}
+              value={titleFontSize}
+              onChange={(e) => setTitleFontSize(Number(e.target.value))}
+              style={{ width: "100%" }}
+            />
+            <Typography variant="caption" display="block">
+              {titleFontSize}px — {
+                titleFontSize <= 16 ? "Muy chico" :
+                titleFontSize <= 24 ? "Chico" :
+                titleFontSize <= 32 ? "Mediano" :
+                titleFontSize <= 45 ? "Grande" : "Muy grande"
               }
-            }}
-            style={{ marginBottom: "20px", background: "white" }}
-          />
+            </Typography>
+          </div>
 
           <FormControl fullWidth style={{ marginBottom: "20px", background: "white" }}>
             <InputLabel>Selecciona Cuotas</InputLabel>
@@ -189,22 +194,27 @@ const GeneradorDePlacas = () => {
             type="text"
             placeholder="$0.00"
           />
-          <TextField
-            label="Tamaño de la cuota (px)"
-            type="number"
-            variant="outlined"
-            fullWidth
-            value={quotaFontSize}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value === "") {
-                setQuotaFontSize(""); // permite dejar el input vacío sin forzar 0
-              } else {
-                setQuotaFontSize(Number(value));
+          {/* Tamaño de la cuota con slider intuitivo */}
+          <div style={{ marginBottom: "20px", width: "100%" }}>
+            <Typography gutterBottom>Tamaño de la Cuota</Typography>
+            <input
+              type="range"
+              min={12}
+              max={60}
+              step={1}
+              value={quotaFontSize}
+              onChange={(e) => setQuotaFontSize(Number(e.target.value))}
+              style={{ width: "100%" }}
+            />
+            <Typography variant="caption" display="block">
+              {quotaFontSize}px — {
+                quotaFontSize <= 16 ? "Muy chico" :
+                quotaFontSize <= 24 ? "Chico" :
+                quotaFontSize <= 32 ? "Mediano" :
+                quotaFontSize <= 45 ? "Grande" : "Muy grande"
               }
-            }}
-            style={{ marginBottom: "20px", background: "white" }}
-          />
+            </Typography>
+          </div>
 
           {/* Selector de Color */}
           <div className="flex w-100">
