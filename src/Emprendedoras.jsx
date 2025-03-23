@@ -23,7 +23,9 @@ import {
   ListItem,
   IconButton,
   ListItemText,
-  ListItemSecondaryAction
+  ListItemSecondaryAction,
+  FormControlLabel,
+  Switch
 } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -50,6 +52,10 @@ const Emprendedoras = () => {
   const [editAddress, setEditAddress] = useState("");
   const [editBank, setEditBank] = useState("");
   const [editPhone, setEditPhone] = useState("");
+
+  const [sumarEnvio, setSumarEnvio] = useState(() => {
+    return localStorage.getItem("sumarEnvio") === "true";
+  });
 
   const [catalogos] = useState([
     { nombre: "Contado", url: "/mar-25-cont" },
@@ -156,6 +162,13 @@ const Emprendedoras = () => {
     setEditPhone(client.phone);
     setOpenEditDialog(true);
   };
+
+  const handleToggleEnvio = () => {
+    const nuevoValor = !sumarEnvio;
+    setSumarEnvio(nuevoValor);
+    localStorage.setItem("sumarEnvio", nuevoValor);
+  };
+
 
   const handleUpdateClient = async () => {
   const safeEditName = editName ?? "";
@@ -355,6 +368,26 @@ const Emprendedoras = () => {
             <Typography variant="h6">Catálogos</Typography>
           </AccordionSummary>
           <AccordionDetails>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={sumarEnvio}
+                  onChange={handleToggleEnvio}
+                  name="sumarEnvio"
+                  color="primary"
+                />
+              }
+              label="Sumar envío a la cuota (solo Bazar/Repuestos)"
+              sx={{ mb: 2 }}
+            />
+            {sumarEnvio && (
+              <Typography
+                variant="body2"
+                sx={{ color: "green", fontWeight: 500, marginBottom: 2 }}
+              >
+                ✅ Se activó el costo de envío en los catálogos (solo Bazar/Repuestos)
+              </Typography>
+            )}
             <List style={{background: 'white', marginBottom: 34}}>
               {catalogos.map((catalogo, idx) => (
                 <ListItem key={idx} divider>

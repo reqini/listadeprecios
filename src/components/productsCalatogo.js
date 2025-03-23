@@ -8,6 +8,11 @@ import { Button, CardActions } from '@mui/material';
 import { formatPrice } from '../utils/priceUtils';
 
 const ProductsCalatogo = ({ product, selectedCuota, showPriceOnly = false, isContado = false }) => {
+  const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
+  const aplicaEnvio = ['Bazar', 'Repuestos'].includes(product.linea);
+
+  const SHIPPING_COST = 17362;
+
   // Mapeo de cuotas con sus respectivos campos
   const cuotasMap = {
     "24 cuotas sin interés": 'veinticuatro_sin_interes',
@@ -39,8 +44,11 @@ const ProductsCalatogo = ({ product, selectedCuota, showPriceOnly = false, isCon
 
   // Determinar precio final según el contexto
   const precioFinal = isContado
-    ? precioNegocio || 0
-    : cuotaValue || parseFloat(product.psvp_lista?.replace(/[^0-9.-]/g, '')) || 0;
+  ? (precioNegocio || 0) + (sumarEnvio && aplicaEnvio ? SHIPPING_COST : 0)
+  : (cuotaValue || parseFloat(product.psvp_lista?.replace(/[^0-9.-]/g, '')) || 0) +
+    (sumarEnvio && aplicaEnvio ? SHIPPING_COST : 0);
+
+
 
   return (
     <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className="card-product-catalogo">
@@ -85,10 +93,10 @@ const ProductsCalatogo = ({ product, selectedCuota, showPriceOnly = false, isCon
             Precio de Negocio: <b>{formatPrice(precioFinal)}</b>
           </Typography>
         ) : selectedCuota && cuotaValue ? (
-          <Typography variant="body2" color="text.secondary" style={{ marginTop: 5 }}>
-            {selectedCuota}: <b>{formatPrice(cuotaValue)}</b>
-          </Typography>
-        ) : (
+            <Typography variant="body2" color="text.secondary" style={{ marginTop: 5 }}>
+              {selectedCuota}: <b>{formatPrice(precioFinal)}</b>
+            </Typography>
+          ) : (
           <Typography variant="body2" color="text.secondary" style={{ marginTop: 5 }}>
             No disponible
           </Typography>

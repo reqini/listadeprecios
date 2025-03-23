@@ -79,14 +79,14 @@ const Navbar = ({ user, onLogout, title }) => {
     <>
       <AppBar position="static">
         <Toolbar>
-          <Button variant="contained" size="small" color="secondary" onClick={() => navigate("/home")} disabled={location.pathname === "/home"}>
-              <HomeIcon color="primary" />
-          </Button>
+          <IconButton variant="contained" size="small" color="secondary" onClick={() => navigate("/home")} disabled={location.pathname === "/home"}>
+              <HomeIcon color="secondary" />
+          </IconButton>
           <Typography variant="body1" fontSize={16} sx={{ flexGrow: 1, margin: '0 12px' }}>
             {title}
           </Typography>
           <IconButton color="inherit" onClick={handleMenuOpen}>
-            <Typography margin={'0 colo 10px 0 0'}>Mi Menú</Typography>
+            <Typography margin={'0 10px 0 0'}>Menú</Typography>
             <Badge 
               badgeContent={'1'} 
               color="error"
