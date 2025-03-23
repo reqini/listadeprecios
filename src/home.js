@@ -14,6 +14,7 @@ import Navbar from "./components/Navbar";
 import ResponsiveDialog from "./components/dialog";
 import logo from "./assets/logo.png";
 import { useAuth } from "./AuthContext";
+import ReviewSlider from "./components/ReviewSlider"; // ajustá la ruta
 
 const Home = () => {
   const { logout } = useAuth();
@@ -266,6 +267,7 @@ const Home = () => {
           />
         </div>
         {getBannerForRango()}
+        <ReviewSlider />
         <ul className="lista-prod w-100">
           {loading ? (
             [...Array(6)].map((_, index) => (
