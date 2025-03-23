@@ -262,15 +262,10 @@ const Emprendedoras = () => {
         user={{ username: localStorage.getItem("activeSession") || "" }}
       />
       <Container sx={{ mt: 3 }}>
+        <Button fullWidth variant="contained" onClick={() => setOpenAddClientDialog(true)} style={{marginBottom: 12, maxWidth: 300}}>
+          Agregar nuevo cliente
+        </Button>
         <Stack spacing={2}>
-          <div className="bt-responsive-emp">
-            <Button fullWidth variant="contained" color="secondary" onClick={() => navigate("/home")}>
-              Volver a Home
-            </Button>
-            <Button fullWidth variant="contained" onClick={() => setOpenAddClientDialog(true)}>
-              Agregar nuevo cliente
-            </Button>
-          </div>
           {bancoFilter && (
             <Button variant="outlined" onClick={handleSelectAll}>
               {filteredClientes.every((client) =>
@@ -357,7 +352,7 @@ const Emprendedoras = () => {
             aria-controls="panel1-content"
             id="panel1-header"
           >
-            <Typography variant="h5">Catálogos</Typography>
+            <Typography variant="h6">Catálogos</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <List style={{background: 'white', marginBottom: 34}}>

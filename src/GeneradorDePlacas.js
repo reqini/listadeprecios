@@ -5,6 +5,7 @@ import DialogResponsive from "./components/DialogResponsive"; // Ajusta la ruta 
 import { Autocomplete, TextField, Button, MenuItem, Select, FormControl, InputLabel, Typography } from "@mui/material";
 import CardGenerator from "./components/CardGenerator";
 import WebFont from "webfontloader";
+import Navbar from "./components/Navbar";
 
 
 const GeneradorDePlacas = () => {
@@ -22,6 +23,13 @@ const GeneradorDePlacas = () => {
 
 
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("activeSession");
+    navigate("/login");
+  };
+  
   const cuotasMap = {
     "3 cuotas": "tres_sin_interes",
     "6 cuotas": "seis_sin_interes",
@@ -124,14 +132,19 @@ const GeneradorDePlacas = () => {
 
   return (
     <>
-      <div className="flex flex-direction items-center justify-center">
+      <Navbar
+        title="Generador de Placas"
+        onLogout={handleLogout}
+        user={{ username: localStorage.getItem("activeSession") || "" }}
+      />
+      {/* <div className="flex flex-direction items-center justify-center">
         <Typography variant="body" textAlign="center" fontSize={25} margin="8px 0">
         Generador de Placas
         </Typography>
         <Button size="medium" variant="contained" color="secondary" onClick={() => navigate("/home")} style={{maxWidth: 240}}>
           Volver a Home
         </Button>
-      </div>
+      </div> */}
       <div
         style={{
           display: "flex",
@@ -142,17 +155,17 @@ const GeneradorDePlacas = () => {
           margin: "0 auto",
         }}
       >
-        <div className="w-100" style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "20px" }}>
+        <div className="w-100" style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "12px" }}>
           <Autocomplete
             options={products || []}
             fullWidth
             getOptionLabel={(option) => option?.descripcion || ""}
             onChange={handleSelectProduct}
             renderInput={(params) => <TextField {...params} label="Selecciona un Producto" variant="outlined" fullWidth />}
-            style={{ marginBottom: "20px", background: "white" }}
+            style={{ marginBottom: "12px", background: "white" }}
           />
           {/* Tamaño del título con slider intuitivo */}
-          <div style={{ marginBottom: "20px", width: "100%" }}>
+          <div style={{ marginBottom: "12px", width: "100%" }}>
             <Typography gutterBottom>Tamaño del Título</Typography>
             <input
               type="range"
@@ -173,7 +186,7 @@ const GeneradorDePlacas = () => {
             </Typography>
           </div>
 
-          <FormControl fullWidth style={{ marginBottom: "20px", background: "white" }}>
+          <FormControl fullWidth style={{ marginBottom: "12px", background: "white" }}>
             <InputLabel>Selecciona Cuotas</InputLabel>
             <Select value={selectedQuota} onChange={handleQuotaChange} variant="outlined">
               {Object.keys(cuotasMap).map((label) => (
@@ -190,7 +203,7 @@ const GeneradorDePlacas = () => {
             fullWidth
             value={customQuotaValue}
             onChange={(event) => setCustomQuotaValue(event.target.value)}
-            style={{ marginBottom: "20px", background: "white" }}
+            style={{ marginBottom: "12px", background: "white" }}
             type="text"
             placeholder="$0.00"
           />
@@ -229,7 +242,7 @@ const GeneradorDePlacas = () => {
               }}
               value={titleColor}
               onChange={handleColorChange}
-              style={{ marginBottom: "20px", background: "white" }}
+              style={{ marginBottom: "12px", background: "white" }}
             />
             <div style={{
                 width: 50,
@@ -241,7 +254,7 @@ const GeneradorDePlacas = () => {
               }}
             />
           </div>
-          <FormControl fullWidth style={{ marginBottom: "20px", background: "white" }}>
+          <FormControl fullWidth style={{ marginBottom: "12px", background: "white" }}>
             <InputLabel>Tipografía del título</InputLabel>
               <Select
                 value={selectedFont}

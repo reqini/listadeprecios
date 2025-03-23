@@ -24,13 +24,23 @@ const reviews = [
     rating: 4.5,
     },
   {
-    name: "Solu de Essen",
+    name: "Ana Laura <3",
     review: "Holaa!! Increíble!! Me encanta.",
     rating: 4.5,
   },
   {
     name: "Marisel Chamorro",
     review: "La app está buenísima. Lo mejor: la calculadora de cuotas. También le sumaría poder elegir color de fondo en las placas.",
+    rating: 5,
+},
+  {
+    name: "ig: Aracabralok",
+    review: "Es util, te ayuda a tener a mano los valores,promos bancarias etc, es facil de usar.",
+    rating: 5,
+    },
+  {
+    name: "Solu de Essen",
+    review: "La app es un 1000! Súper útil para emprendedoras: combos, catálogos detallados y placas para clientes. Increíble. ❤️",
     rating: 5,
   },
 ];

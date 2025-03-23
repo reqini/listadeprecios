@@ -21,8 +21,9 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import HomeIcon from '@mui/icons-material/Home';
 import axios from "../utils/axios";
-import { useNavigate } from "react-router-dom"; // Para redirigir
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Navbar = ({ user, onLogout, title }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -33,6 +34,7 @@ const Navbar = ({ user, onLogout, title }) => {
   const [openDialog, setOpenDialog] = useState(null);
 
   const theme = useTheme();
+  const location = useLocation();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate(); // Hook para la navegación
 
@@ -77,11 +79,14 @@ const Navbar = ({ user, onLogout, title }) => {
     <>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="body1" fontSize={16} sx={{ flexGrow: 1, margin: 0 }}>
+          <Button variant="contained" size="small" color="secondary" onClick={() => navigate("/home")} disabled={location.pathname === "/home"}>
+              <HomeIcon color="primary" />
+          </Button>
+          <Typography variant="body1" fontSize={16} sx={{ flexGrow: 1, margin: '0 12px' }}>
             {title}
           </Typography>
           <IconButton color="inherit" onClick={handleMenuOpen}>
-            <Typography margin={'0 10px 0 0'}>Mi Menú</Typography>
+            <Typography margin={'0 colo 10px 0 0'}>Mi Menú</Typography>
             <Badge 
               badgeContent={'1'} 
               color="error"
@@ -91,7 +96,18 @@ const Navbar = ({ user, onLogout, title }) => {
               <Avatar>{user?.username?.charAt(0).toUpperCase() || "?"}</Avatar>
             </Badge>
           </IconButton>
+          
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+            <MenuItem
+              onClick={() => {
+                navigate("/home");
+                handleMenuClose();
+              }}
+              disabled={location.pathname === "/home"}
+            >
+              Home
+            </MenuItem>
+            <Divider />
             <MenuItem
               onClick={() => {
                 // Ejemplo: abrir el modal de perfil

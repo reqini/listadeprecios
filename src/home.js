@@ -233,7 +233,7 @@ const Home = () => {
       <Navbar
         title={
           <p>
-            {timeOfDay} <b>{username || "Usuario"}</b>, Te damos la Bienvenida
+            {timeOfDay} <b>{username || "Usuario"}</b>{/* , Te damos la Bienvenida */}
           </p>
         }
         user={{ username }}
