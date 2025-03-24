@@ -42,7 +42,12 @@ const reviews = [
     name: "Solu de Essen",
     review: "La app es un 1000! Súper útil para emprendedoras: combos, catálogos detallados y placas para clientes. Increíble. ❤️",
     rating: 5,
-  },
+    },
+  {
+    name: "Pau Amarilla",
+    review: "Una app intuitiva, veloz y actualizada, ideal para emprendedores que buscan agilizar sus respuestas. ¡Una herramienta indispensable!",
+    rating: 5,
+  }
 ];
 
 const ReviewSlider = () => {
