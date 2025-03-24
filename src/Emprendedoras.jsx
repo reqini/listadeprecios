@@ -369,6 +369,7 @@ const Emprendedoras = () => {
           </AccordionSummary>
           <AccordionDetails>
             <FormControlLabel
+              style={{display: 'none'}}
               control={
                 <Switch
                   checked={sumarEnvio}
