@@ -58,14 +58,14 @@ const Emprendedoras = () => {
   });
 
   const [catalogos] = useState([
-    { nombre: "Contado", url: "/mar-25-cont" },
-    { nombre: "3 Cuotas", url: "/mar-25-cat3" },
-    { nombre: "6 Cuotas", url: "/mar-25-cat6" },
-    { nombre: "9 Cuotas", url: "/mar-25-cat9" },
-    { nombre: "12 Cuotas", url: "/mar-25-cat12" },
-    { nombre: "18 Cuotas", url: "/mar-25-cat18" },
-    { nombre: "20 Cuotas", url: "/mar-25-cat20" },
-    { nombre: "24 Cuotas", url: "/mar-25-cat24" }
+    { nombre: "Contado", url: "/contado" },
+    { nombre: "3 Cuotas", url: "/catalogo3" },
+    { nombre: "6 Cuotas", url: "/catalogo6" },
+    { nombre: "9 Cuotas", url: "/catalogo9" },
+    { nombre: "12 Cuotas", url: "/catalogo12" },
+    { nombre: "18 Cuotas", url: "/catalogo18" },
+    { nombre: "20 Cuotas", url: "/catalogo20" },
+    { nombre: "24 Cuotas", url: "/catalogo24" }
   ]);
 
   // Estado para manejo de selección de clientes
