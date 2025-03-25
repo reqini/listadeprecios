@@ -80,7 +80,7 @@ const Navbar = ({ user, onLogout, title }) => {
       <AppBar position="static">
         <Toolbar>
           <IconButton variant="contained" size="small" color="secondary" onClick={() => navigate("/home")} disabled={location.pathname === "/home"}>
-              <HomeIcon color="secondary" />
+              <HomeIcon disabled={location.pathname === "/home"} color="secondary" />
           </IconButton>
           <Typography variant="body1" fontSize={16} sx={{ flexGrow: 1, margin: '0 12px' }}>
             {title}
@@ -136,6 +136,15 @@ const Navbar = ({ user, onLogout, title }) => {
               }}
             >
               Crear Placas <i style={{color: 'green', marginLeft: 12}}>V.0.3 Beta</i>
+            </MenuItem>
+            <Divider></Divider>
+            <MenuItem
+              onClick={() => {
+                navigate("/faqs");
+                handleMenuClose();
+              }}
+            >
+              Preguntas Frecuentes
             </MenuItem>
             <Divider></Divider>
             <MenuItem

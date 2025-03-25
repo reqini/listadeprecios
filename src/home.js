@@ -170,8 +170,6 @@ const Home = () => {
       "Demostrador/a oro",
       "Coordinador/a",
       "Coordinador/a diamante",
-    ];
-    const rangosGrupo2 = [
       "Ejecutivo/a",
       "Ejecutivo/a senior",
       "Ejecutivo/a máster",
@@ -179,6 +177,14 @@ const Home = () => {
       "Empresario/a",
       "Empresario/a VIP",
     ];
+    /* const rangosGrupo2 = [
+      "Ejecutivo/a",
+      "Ejecutivo/a senior",
+      "Ejecutivo/a máster",
+      "Ejecutivo/a premium",
+      "Empresario/a",
+      "Empresario/a VIP",
+    ]; */
 
     if (!extras || !extras[0]) {
       console.warn("Extras no disponibles o vacíos.");
@@ -195,17 +201,7 @@ const Home = () => {
           />
         </div>
       );
-    } else if (rangosGrupo2.includes(rango)) {
-      return (
-        <div className="banner card-product mar-b30">
-            <img
-              src={windowWidth <= 460 ? extras[0]?.banner_super_mobile : extras[0]?.banner_super}
-              alt="Banner Grupo 2"
-              style={{ width: "100%" }}
-            />
-        </div>
-      );
-    }
+    } 
     return null;
   };
 
