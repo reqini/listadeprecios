@@ -38,6 +38,9 @@ const Emprendedoras = () => {
   const [clientes, setClientes] = useState([]);
   const [bancoFilter, setBancoFilter] = useState("");
   const [openAddClientDialog, setOpenAddClientDialog] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingClientId, setEditingClientId] = useState(null);
+
 
   // Estados para el formulario de agregar cliente
   const [newName, setNewName] = useState("");
@@ -46,8 +49,6 @@ const Emprendedoras = () => {
   const [newPhone, setNewPhone] = useState("");
 
   // Estados para el formulario de edición
-  const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [editingClientIndex, setEditingClientIndex] = useState(null);
   const [editName, setEditName] = useState("");
   const [editAddress, setEditAddress] = useState("");
   const [editBank, setEditBank] = useState("");
@@ -135,10 +136,7 @@ const Emprendedoras = () => {
       );
       if (response.data.success) {
         alert("Cliente agregado con éxito");
-        setClientes((prevClientes) => [
-          ...prevClientes,
-          { nombre: newName, direccion: newAddress, banco: newBank, phone: newPhone },
-        ]);
+        await fetchClientes();
         setOpenAddClientDialog(false);
         setNewName("");
         setNewAddress("");
@@ -155,12 +153,13 @@ const Emprendedoras = () => {
 
   // 📌 EDITAR CLIENTE
   const openEditClientDialog = (client, index) => {
-    setEditingClientIndex(index);
-    setEditName(client.nombre_del_cliente);
-    setEditAddress(client.direccion);
-    setEditBank(client.banco);
-    setEditPhone(client.phone);
-    setOpenEditDialog(true);
+    setEditingClientId(client.id);
+    setEditName(client.nombre || client.nombre_del_cliente || "");
+    setEditAddress(client.direccion || "");
+    setEditBank(client.banco || "");
+    setEditPhone(client.phone || "");
+    setEditingClientId(client.id); // <-- NUEVO ESTADO
+    setIsEditDialogOpen(true);
   };
 
   const handleToggleEnvio = () => {
@@ -170,12 +169,12 @@ const Emprendedoras = () => {
   };
 
 
-  const handleUpdateClient = async () => {
+const handleUpdateClient = async () => {
   const safeEditName = editName ?? "";
   const safeEditAddress = editAddress ?? "";
   const safeEditBank = editBank ?? "";
   const safeEditPhone = editPhone ?? "";
-  
+
   if (
     !safeEditName.trim() ||
     !safeEditAddress.trim() ||
@@ -185,19 +184,30 @@ const Emprendedoras = () => {
     alert("Por favor, completa todos los campos.");
     return;
   }
-  
+
   try {
-    setClientes((prevClientes) => {
-      const newClientes = [...prevClientes];
-      newClientes[editingClientIndex] = {
+    const token = localStorage.getItem("token");
+    await axios.put(
+      `/api/clientes/${editingClientId}`,
+      {
         nombre: safeEditName,
         direccion: safeEditAddress,
         banco: safeEditBank,
         phone: safeEditPhone,
-      };
-      return newClientes;
-    });
-    setOpenEditDialog(false);
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    alert("Cliente actualizado con éxito");
+
+    await fetchClientes(); // refrescamos desde el backend
+    setIsEditDialogOpen(true);
+    // limpiamos
+    setEditName("");
+    setEditAddress("");
+    setEditBank("");
+    setEditPhone("");
+    setEditingClientId(null);
   } catch (error) {
     console.error("Error al actualizar cliente:", error);
     alert("Error al actualizar cliente. Revisa la consola.");
@@ -267,6 +277,15 @@ const Emprendedoras = () => {
     setOpenWhatsappModal(false);
   };
 
+  const handleCloseEditDialog = () => {
+    setIsEditDialogOpen(true);
+    setEditName("");
+    setEditAddress("");
+    setEditBank("");
+    setEditPhone("");
+    setEditingClientId(null);
+  };
+
   return (
     <>
       <Navbar
@@ -275,7 +294,7 @@ const Emprendedoras = () => {
         user={{ username: localStorage.getItem("activeSession") || "" }}
       />
       <Container sx={{ mt: 3 }}>
-        <Button fullWidth variant="contained" onClick={() => setOpenAddClientDialog(true)} style={{marginBottom: 12, maxWidth: 300}}>
+        <Button fullWidth variant="contained" onClick={() => setOpenAddClientDialog(true)} style={{marginBottom: 12, maxWidth: 300, display: 'none'}}>
           Agregar nuevo cliente
         </Button>
         <Stack spacing={2}>
@@ -293,7 +312,7 @@ const Emprendedoras = () => {
               Enviar WhatsApp a {selectedClientes.length} seleccionado
             </Button>
           )}
-          <FormControl sx={{ minWidth: 200, background: 'white' }}>
+          <FormControl sx={{ minWidth: 200, background: 'white', display: 'none' }}>
             <InputLabel>Filtrar por Banco</InputLabel>
             <Select value={bancoFilter} onChange={(e) => setBancoFilter(e.target.value)} label="Filtrar por Banco">
               <MenuItem value="">-- Todos --</MenuItem>
@@ -305,13 +324,13 @@ const Emprendedoras = () => {
             </Select>
           </FormControl>
           {/* Sección de Clientes */}
-          <Accordion defaultExpanded>
+          <Accordion disabled>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1-content"
               id="panel1-header"
             >
-              <Typography variant="h6">Clientes</Typography>
+              <Typography variant="h6">Clientes - Proximamente</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <List style={{background: 'white'}}>
@@ -411,21 +430,31 @@ const Emprendedoras = () => {
        </Accordion>
 
         {/* Modal Agregar Cliente */}
-        <Dialog open={openAddClientDialog} onClose={() => setOpenAddClientDialog(false)}>
+        <Dialog
+          open={openAddClientDialog}
+          onClose={() => setOpenAddClientDialog(false)}
+          fullWidth
+          maxWidth="sm"
+        >
           <DialogTitle>Agregar Cliente</DialogTitle>
-          <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, width: '100%', maxWidth: 420 }}>
+          <DialogContent
+            dividers
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          >
             <TextField label="Nombre" fullWidth value={newName} onChange={(e) => setNewName(e.target.value)} />
             <TextField label="Dirección" fullWidth value={newAddress} onChange={(e) => setNewAddress(e.target.value)} />
-            <FormControl fullWidth>
-              <InputLabel>Banco</InputLabel>
-              <Select value={newBank} onChange={(e) => setNewBank(e.target.value)} label="Banco">
-                {bancos.map((bancoObj, index) => (
-                  <MenuItem key={index} value={bancoObj.banco}>
-                    {bancoObj.banco}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            {bancos.length === 0 ? (
+              <Alert severity="info">Cargando bancos...</Alert>
+            ) : (
+              <FormControl fullWidth>
+                <InputLabel>Banco</InputLabel>
+                <Select value={newBank} onChange={(e) => setNewBank(e.target.value)} label="Banco">
+                  {bancos.map((bancoObj, index) => (
+                    <MenuItem key={index} value={bancoObj.banco}>{bancoObj.banco}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
             <TextField label="Phone" fullWidth value={newPhone} onChange={(e) => setNewPhone(e.target.value)} />
           </DialogContent>
           <DialogActions>
@@ -433,31 +462,35 @@ const Emprendedoras = () => {
             <Button onClick={handleAddClient} variant="contained">Guardar</Button>
           </DialogActions>
         </Dialog>
-
         {/* Modal Editar Cliente */}
-        <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+        <Dialog
+          open={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+          fullWidth
+          maxWidth="sm"
+        >
           <DialogTitle>Editar Cliente</DialogTitle>
-          <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, width: '100%', maxWidth: 420 }}>
-            <TextField label="Nombre" fullWidth value={editName} onChange={(e) => setEditName(e.target.value)} />
+          <DialogContent
+            dividers
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          >
+            <TextField fullWidth label="Nombre" value={editName} onChange={(e) => setEditName(e.target.value)} />
             <TextField label="Dirección" fullWidth value={editAddress} onChange={(e) => setEditAddress(e.target.value)} />
             <FormControl fullWidth>
               <InputLabel>Banco</InputLabel>
               <Select value={editBank} onChange={(e) => setEditBank(e.target.value)} label="Banco">
                 {bancos.map((bancoObj, index) => (
-                  <MenuItem key={index} value={bancoObj.banco}>
-                    {bancoObj.banco}
-                  </MenuItem>
+                  <MenuItem key={index} value={bancoObj.banco}>{bancoObj.banco}</MenuItem>
                 ))}
               </Select>
             </FormControl>
             <TextField label="Phone" fullWidth value={editPhone} onChange={(e) => setEditPhone(e.target.value)} />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenEditDialog(false)}>Cancelar</Button>
+            <Button onClick={handleCloseEditDialog}>Cancelar</Button>
             <Button onClick={handleUpdateClient} variant="contained">Guardar cambios</Button>
           </DialogActions>
         </Dialog>
-
         {/* Modal WhatsApp */}
         <Dialog open={openWhatsappModal} onClose={() => setOpenWhatsappModal(false)}>
           <DialogTitle>Mensaje de WhatsApp</DialogTitle>
