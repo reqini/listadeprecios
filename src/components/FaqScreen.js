@@ -37,7 +37,7 @@ const preguntas = [
   },
   {
     pregunta: "¿Teléfono de soporte?",
-    respuesta: "📞 +54 9 11 51347453 (también WhatsApp) – Horario: Lunes a Viernes de 9 a 18hs. Correo: soporte@addicad.com",
+    respuesta: "📞 +54 9 11 51347453 (también WhatsApp) – Horario: Lunes a Viernes de  a 21hs. Correo: reqini@gmail.com",
   },
   {
     pregunta: "Quiero enviar una reseña, ¿cómo hago?",
