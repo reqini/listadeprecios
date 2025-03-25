@@ -302,6 +302,12 @@ const Home = () => {
             Producto agregado al carrito
           </Alert>
         </Snackbar>
+        <section style={{ fontSize: '0.9rem', color: '#666', padding: '2rem 0', width: '100%' }}>
+          <p>
+            Catálogo Simple es una herramienta pensada para <strong>emprendedoras Essen</strong> que buscan simplificar su trabajo. Accedé gratis a la <strong>lista de precios Essen actualizada</strong>, catálogos visuales con cuotas y mucho más. 
+            Ideal para quienes venden Essen en Argentina y quieren tener todo en un solo lugar.
+          </p>
+        </section>
       </Container>
     </>
   );
