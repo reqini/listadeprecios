@@ -8,6 +8,7 @@ import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from "./assets/logo.png";
 import { Snackbar, Alert, Typography } from "@mui/material";
+import { formatPrice } from './utils/priceUtils';
 
 const Catalogo14 = () => {
   const [cart, setCart] = useState([]);
@@ -87,7 +88,7 @@ const Catalogo14 = () => {
   }, []);
 
   // Filtrar productos según descripción, línea y cuota
-useEffect(() => {
+  useEffect(() => {
   let productosFiltrados = productos.filter((producto) =>
     producto.descripcion?.toLowerCase().includes(filtro.toLowerCase()) &&
     producto.linea?.toLowerCase() !== 'repuestos'
@@ -96,7 +97,10 @@ useEffect(() => {
   if (cuotasMap["14 cuotas sin interés"]) {
     const cuotaKey = cuotasMap["14 cuotas sin interés"];
     productosFiltrados = productosFiltrados.filter(
-      (producto) => producto[cuotaKey] && producto[cuotaKey] !== 'NO'
+      (producto) => {
+        const cuotaValue = producto[cuotaKey]?.trim();
+        return cuotaValue && cuotaValue !== 'NO' && cuotaValue !== '';
+      }
     );
   }
 
@@ -150,7 +154,7 @@ useEffect(() => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <Helmet>
-        <title>Catálogo 4 Cuotas - Catálogo</title>
+        <title>Catálogo 14 Cuotas - Catálogo</title>
       </Helmet>
       <div className="w-100 flex justify-center items-center flex-direction mar-t10">
         <Typography fontSize={13} margin={'6px 0 12px 0'} style={{textAlign: 'center'}}>
@@ -206,7 +210,9 @@ useEffect(() => {
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
                   selectedCuota={'14 cuotas sin interés'}
+                  precio={formatPrice(product.precio || 0)}  // Se usa 0 como valor por defecto si el precio es undefined
                 />
+
               </li>
             ))}
           </ul>

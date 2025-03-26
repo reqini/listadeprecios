@@ -63,7 +63,9 @@ const Emprendedoras = () => {
     { nombre: "3 Cuotas", url: "/catalogo3" },
     { nombre: "6 Cuotas", url: "/catalogo6" },
     { nombre: "9 Cuotas", url: "/catalogo9" },
+    { nombre: "10 Cuotas", url: "/catalogo10" },
     { nombre: "12 Cuotas", url: "/catalogo12" },
+    { nombre: "14 Cuotas", url: "/catalogo14" },
     { nombre: "18 Cuotas", url: "/catalogo18" }
     /* { nombre: "20 Cuotas", url: "/catalogo20" }, */
     /* { nombre: "24 Cuotas", url: "/catalogo24" } */
