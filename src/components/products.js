@@ -26,6 +26,7 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
     "veinte_sin_interes",
     "dieciocho_sin_interes",
     "doce_sin_interes",
+    "catorce_sin_interes",
     "diez_sin_interes",
     "nueve_sin_interes",
     "seis_sin_interes",
