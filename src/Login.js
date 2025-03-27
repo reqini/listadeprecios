@@ -160,7 +160,7 @@ const Login = () => {
             </Grid>
             <Grid item xs={12} style={{ margin: "10px 0", textAlign: 'center' }}>
               <Typography fontSize={18} variant="body1">¿Queres ser parte de esta gran experiencia?</Typography>
-              <Typography fontSize={16} variant="body2"><a href="https://wa.me/5491123456789" rel="noopener" style={{ color: 'black'}}>Charlemos por whatsapp mi nombre es Luciano</a></Typography>
+              <Typography fontSize={16} variant="body2"><a href="https://wa.me/5491151347453" rel="noopener" style={{ color: 'black'}}>Charlemos por whatsapp mi nombre es Luciano</a></Typography>
             </Grid>
           </Grid>
         </form>
