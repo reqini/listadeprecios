@@ -32,6 +32,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import axios from "./utils/axios";
 import Navbar from "./components/Navbar";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const Emprendedoras = () => {
   const [bancos, setBancos] = useState([]);
@@ -40,7 +42,7 @@ const Emprendedoras = () => {
   const [openAddClientDialog, setOpenAddClientDialog] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingClientId, setEditingClientId] = useState(null);
-
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   // Estados para el formulario de agregar cliente
   const [newName, setNewName] = useState("");
@@ -77,6 +79,64 @@ const Emprendedoras = () => {
   const [whatsappMessage, setWhatsappMessage] = useState("Hola, te contacto desde mi dashboard...");
 
   const navigate = useNavigate();
+
+const handleExportCatalogosPDF = async () => {
+  setIsGeneratingPdf(true);
+  try {
+    const cuotas = [
+      { label: "Contado", key: "contado" },
+      { label: "3 Cuotas", key: "tres_sin_interes" },
+      { label: "6 Cuotas", key: "seis_sin_interes" },
+      { label: "9 Cuotas", key: "nueve_sin_interes" },
+      { label: "10 Cuotas", key: "diez_sin_interes" },
+      { label: "12 Cuotas", key: "doce_sin_interes" },
+      { label: "14 Cuotas", key: "catorce_sin_interes" },
+      { label: "18 Cuotas", key: "dieciocho_sin_interes" },
+      { label: "20 Cuotas", key: "veinte_sin_interes" },
+      { label: "24 Cuotas", key: "veinticuatro_sin_interes" },
+    ];
+
+    const doc = new jsPDF();
+    let currentY = 10;
+
+    for (const { label, key } of cuotas) {
+      const { data: productos } = await axios.get(`/api/productos?cuota=${key}`);
+
+      if (!productos || productos.length === 0) continue;
+
+      doc.setFontSize(14);
+      doc.text(`Catálogo: ${label}`, 10, currentY);
+      currentY += 6;
+
+      const tableData = productos.map((prod) => [
+        prod.descripcion,
+        prod[key],
+      ]);
+
+      doc.autoTable({
+        head: [["Producto", "Precio"]],
+        body: tableData,
+        startY: currentY,
+        theme: "grid",
+        styles: { fontSize: 10 },
+        margin: { left: 10, right: 10 },
+      });
+
+      currentY = doc.autoTable.previous.finalY + 10;
+      if (currentY > 250) {
+        doc.addPage();
+        currentY = 10;
+      }
+    }
+
+    doc.save("catalogos.pdf");
+  } catch (err) {
+    console.error("❌ Error al generar PDF:", err);
+    alert("Error al generar el PDF");
+  } finally {
+    setIsGeneratingPdf(false);
+  }
+};
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -407,6 +467,15 @@ const handleUpdateClient = async () => {
                 ✅ Se activó el costo de envío en los catálogos (solo Bazar/Repuestos)
               </Typography>
             )}
+            <Button
+              variant="contained"
+              fullWidth
+              disabled={isGeneratingPdf}
+              onClick={handleExportCatalogosPDF}
+              sx={{ mt: 2 }}
+            >
+              {isGeneratingPdf ? "Generando PDF..." : "Exportar todos los catálogos a PDF"}
+            </Button>
             <List style={{background: 'white', marginBottom: 34}}>
               {catalogos.map((catalogo, idx) => (
                 <ListItem key={idx} divider>
@@ -421,6 +490,61 @@ const handleUpdateClient = async () => {
                     >
                       <ContentCopyIcon />
                     </IconButton>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={async () => {
+                        const doc = new jsPDF();
+                        const nombreCatalogo = catalogo.nombre;
+                        const cuotaMap = {
+                          "Contado": "contado",
+                          "3 Cuotas": "tres_sin_interes",
+                          "6 Cuotas": "seis_sin_interes",
+                          "9 Cuotas": "nueve_sin_interes",
+                          "10 Cuotas": "diez_sin_interes",
+                          "12 Cuotas": "doce_sin_interes",
+                          "14 Cuotas": "catorce_sin_interes",
+                          "18 Cuotas": "dieciocho_sin_interes",
+                        };
+
+                        const cuotaKey = cuotaMap[nombreCatalogo];
+
+
+                        try {
+                          const { data: productos } = await axios.get(`/api/productos?cuota=${cuotaKey}`);
+
+                          if (!productos || productos.length === 0) {
+                            alert("Este catálogo no tiene productos.");
+                            return;
+                          }
+
+                          doc.setFontSize(14);
+                          doc.text(`Catálogo: ${nombreCatalogo}`, 10, 10);
+
+                          const tableData = productos.map((prod) => [
+                            prod.descripcion,
+                            prod[cuotaKey] ?? "N/A",
+                          ]);
+
+                          doc.autoTable({
+                            head: [["Producto", "Precio"]],
+                            body: tableData,
+                            startY: 16,
+                            theme: "grid",
+                            styles: { fontSize: 10 },
+                            margin: { left: 10, right: 10 },
+                          });
+
+                          doc.save(`catalogo_${cuotaKey}.pdf`);
+                        } catch (error) {
+                          console.error("❌ Error al exportar:", error);
+                          alert("Error al exportar este catálogo.");
+                        }
+                      }}
+                      sx={{ ml: 1 }}
+                    >
+                      Exportar PDF
+                    </Button>
                   </ListItemSecondaryAction>
                 </ListItem>
               ))}

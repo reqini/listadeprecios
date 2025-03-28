@@ -8,7 +8,8 @@ import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from "./assets/logo.png";
 import { Snackbar, Alert, Typography } from "@mui/material";
-/* import { formatPrice } from './utils/priceUtils'; */
+/* import { Button } from "@mui/material"; */
+/* import exportCatalogoToPDF from "./utils/exportCatalogoToPDF"; */
 
 const Catalogo3 = () => {
   const [cart, setCart] = useState([]);
@@ -28,6 +29,12 @@ const Catalogo3 = () => {
   const cuotasMap = useMemo(() => ({
     "3 cuotas sin interés": 'tres_sin_interes',
   }), []);
+
+  /* const handleExportarPDF = () => {
+    const productosExport = Object.values(productosAMostrar).flat();
+    exportCatalogoToPDF(productosExport, "3 cuotas sin interés");
+  }; */
+
 
   // Eliminar duplicados por código
   const eliminarDuplicados = (productos) => {
@@ -176,6 +183,16 @@ const Catalogo3 = () => {
           onChange={(e) => setFiltro(e.target.value)}
         />
       </div>
+      {/* <div>
+        <Button
+          onClick={handleExportarPDF}
+          variant="contained"
+          color="primary"
+          style={{ margin: '12px 0' }}
+        >
+          Exportar catálogo a PDF (tabla)
+        </Button>
+      </div> */}
 
       {loading && (
         <>
