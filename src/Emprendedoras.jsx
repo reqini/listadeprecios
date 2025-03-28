@@ -17,6 +17,7 @@ import {
   Stack,
   Alert,
   List,
+  Grid,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -43,6 +44,8 @@ const Emprendedoras = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingClientId, setEditingClientId] = useState(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  // ✅ Estado para cuotas seleccionadas (agregar cerca del resto de estados)
+  const [selectedCuotas, setSelectedCuotas] = useState([]);
 
   // Estados para el formulario de agregar cliente
   const [newName, setNewName] = useState("");
@@ -80,7 +83,7 @@ const Emprendedoras = () => {
 
   const navigate = useNavigate();
 
-const handleExportCatalogosPDF = async () => {
+/* const handleExportCatalogosPDF = async () => {
   setIsGeneratingPdf(true);
   try {
     const cuotas = [
@@ -136,8 +139,72 @@ const handleExportCatalogosPDF = async () => {
   } finally {
     setIsGeneratingPdf(false);
   }
-};
+}; */
 
+  // ✅ Lógica nueva (debajo de handleExportCatalogosPDF)
+const handleExportComparativoPDF = async () => {
+  setIsGeneratingPdf(true);
+  try {
+    const cuotaMap = {
+      "Contado": "contado",
+      "3 Cuotas": "tres_sin_interes",
+      "6 Cuotas": "seis_sin_interes",
+      "9 Cuotas": "nueve_sin_interes",
+      "10 Cuotas": "diez_sin_interes",
+      "12 Cuotas": "doce_sin_interes",
+      "14 Cuotas": "catorce_sin_interes",
+      "18 Cuotas": "dieciocho_sin_interes",
+    };
+
+    const cuotasKeys = selectedCuotas.map((nombre) => ({
+      label: nombre,
+      key: cuotaMap[nombre]
+    }));
+
+    const productosMap = {};
+    for (const { key } of cuotasKeys) {
+      const { data: productos } = await axios.get(`/api/productos?cuota=${key}`);
+      productos.forEach((prod) => {
+        if (!productosMap[prod.descripcion]) {
+          productosMap[prod.descripcion] = {};
+        }
+        productosMap[prod.descripcion][key] = prod[key];
+      });
+    }
+
+    const doc = new jsPDF();
+    doc.setFontSize(14);
+    doc.text("Catálogo Comparativo de Cuotas", 10, 10);
+
+    const head = ["Producto", ...cuotasKeys.map((c) => c.label)];
+    const body = Object.entries(productosMap).map(([desc, precios]) => [
+      desc,
+     ...cuotasKeys.map(({ key }) => {
+        const raw = precios[key];
+        if (!raw || raw.trim() === "") return "";
+        const num = Number(raw.toString().replace(/\D/g, ""));
+        return isNaN(num) ? "" : `$ ${num.toLocaleString("es-AR")}`;
+      })
+    ]);
+
+    doc.autoTable({
+      head: [head],
+      body,
+      startY: 16,
+      theme: "grid",
+      styles: { fontSize: 9 },
+      margin: { left: 10, right: 10 },
+    });
+
+    doc.save("comparativo_catalogos.pdf");
+  } catch (err) {
+    console.error("❌ Error al generar PDF comparativo:", err);
+    alert("Error al generar el PDF comparativo");
+  } finally {
+    setIsGeneratingPdf(false);
+  }
+};
+  
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("activeSession");
@@ -435,8 +502,7 @@ const handleUpdateClient = async () => {
               </List>
             </AccordionDetails>
           </Accordion>
-        </Stack>
-
+        </Stack> 
         {/* Sección de Catálogos */}
         <Accordion defaultExpanded>
           <AccordionSummary
@@ -447,7 +513,42 @@ const handleUpdateClient = async () => {
             <Typography variant="h6">Catálogos</Typography>
           </AccordionSummary>
           <AccordionDetails>
+            <Grid container spacing={2}>
+              <Grid item sm={8} xs={12}>
+                <FormControl fullWidth sx={{ mt: 2 }}>
+                  <InputLabel>Seleccionar cuotas a comparar</InputLabel>
+                  <Select
+                    multiple
+                    value={selectedCuotas}
+                    onChange={(e) => setSelectedCuotas(e.target.value)}
+                    label="Seleccionar cuotas a comparar"
+                    renderValue={(selected) => selected.join(", ")}
+                  >
+                    {catalogos.map((catalogo) => (
+                      <MenuItem key={catalogo.nombre} value={catalogo.nombre}>
+                        <Checkbox checked={selectedCuotas.includes(catalogo.nombre)} />
+                        {catalogo.nombre}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>     
+              </Grid> 
+              <Grid item sm={4} xs={12}>
+                <Button
+                  variant="outlined"
+                  style={{height: 55}}
+                  fullWidth
+                  size="large"
+                  disabled={isGeneratingPdf || selectedCuotas.length === 0}
+                  onClick={handleExportComparativoPDF}
+                  sx={{ mt: 2 }}
+                >
+                  {isGeneratingPdf ? "Generando..." : "Armar PDF Comparativo"}
+                </Button>
+              </Grid> 
+            </Grid>
             <FormControlLabel
+              style={{marginTop: 12}}
               control={
                 <Switch
                   checked={sumarEnvio}
@@ -467,15 +568,7 @@ const handleUpdateClient = async () => {
                 ✅ Se activó el costo de envío en los catálogos (solo Bazar/Repuestos)
               </Typography>
             )}
-            <Button
-              variant="contained"
-              fullWidth
-              disabled={isGeneratingPdf}
-              onClick={handleExportCatalogosPDF}
-              sx={{ mt: 2 }}
-            >
-              {isGeneratingPdf ? "Generando PDF..." : "Exportar todos los catálogos a PDF"}
-            </Button>
+
             <List style={{background: 'white', marginBottom: 34}}>
               {catalogos.map((catalogo, idx) => (
                 <ListItem key={idx} divider>
@@ -490,7 +583,7 @@ const handleUpdateClient = async () => {
                     >
                       <ContentCopyIcon />
                     </IconButton>
-                    <Button
+                    {/* <Button
                       variant="outlined"
                       size="small"
                       onClick={async () => {
@@ -544,7 +637,7 @@ const handleUpdateClient = async () => {
                       sx={{ ml: 1 }}
                     >
                       Exportar PDF
-                    </Button>
+                    </Button> */}
                   </ListItemSecondaryAction>
                 </ListItem>
               ))}
