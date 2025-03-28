@@ -51,7 +51,13 @@ const Home = () => {
   const aplicarColores = () => {
     localStorage.setItem("userPrimary", primaryColor);
     localStorage.setItem("userSecondary", secondaryColor);
-    window.location.reload(); // 🔄 recarga para aplicar el tema en el ThemeProvider
+
+    const themeMetaTag = document.querySelector('meta[name="theme-color"]');
+    if (themeMetaTag) {
+      themeMetaTag.setAttribute("content", primaryColor);
+    }
+
+    window.location.reload(); // recarga para aplicar todo
   };
 
   const onAddToCart = (product) => {
@@ -359,7 +365,16 @@ const Home = () => {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenThemeDialog(false)}>Cancelar</Button>
+            <Button onClick={() => setOpenThemeDialog(false)}>Cancelar</Button>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                setPrimaryColor("#A47A9E");
+                setSecondaryColor("#FBE5B2");
+              }}
+            >
+              Volver al color original
+            </Button>
           <Button onClick={aplicarColores} variant="contained">Aplicar</Button>
         </DialogActions>
       </Dialog>
