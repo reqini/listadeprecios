@@ -67,8 +67,6 @@ const Emprendedoras = () => {
     { nombre: "12 Cuotas", url: "/catalogo12" },
     { nombre: "14 Cuotas", url: "/catalogo14" },
     { nombre: "18 Cuotas", url: "/catalogo18" }
-    /* { nombre: "20 Cuotas", url: "/catalogo20" }, */
-    /* { nombre: "24 Cuotas", url: "/catalogo24" } */
   ]);
 
   // Estado para manejo de selección de clientes
@@ -390,7 +388,6 @@ const handleUpdateClient = async () => {
           </AccordionSummary>
           <AccordionDetails>
             <FormControlLabel
-              style={{display: 'none'}}
               control={
                 <Switch
                   checked={sumarEnvio}
@@ -399,7 +396,7 @@ const handleUpdateClient = async () => {
                   color="primary"
                 />
               }
-              label="Sumar envío a la cuota (solo Bazar/Repuestos)"
+              label="Mostrar leyenda de envío en los productos (no modifica el precio)"
               sx={{ mb: 2 }}
             />
             {sumarEnvio && (

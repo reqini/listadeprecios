@@ -33,7 +33,9 @@ const GeneradorDePlacas = () => {
   const cuotasMap = {
     "3 cuotas": "tres_sin_interes",
     "6 cuotas": "seis_sin_interes",
+    "10 cuotas": "diez_sin_interes",
     "12 cuotas": "doce_sin_interes",
+    "14 cuotas": "catorce_sin_interes",
     "18 cuotas": "dieciocho_sin_interes",
     "24 cuotas": "veinticuatro_sin_interes"
   };
@@ -137,14 +139,6 @@ const GeneradorDePlacas = () => {
         onLogout={handleLogout}
         user={{ username: localStorage.getItem("activeSession") || "" }}
       />
-      {/* <div className="flex flex-direction items-center justify-center">
-        <Typography variant="body" textAlign="center" fontSize={25} margin="8px 0">
-        Generador de Placas
-        </Typography>
-        <Button size="medium" variant="contained" color="secondary" onClick={() => navigate("/home")} style={{maxWidth: 240}}>
-          Volver a Home
-        </Button>
-      </div> */}
       <div
         style={{
           display: "flex",

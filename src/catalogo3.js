@@ -22,6 +22,7 @@ const Catalogo3 = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
 
   // Mapeo correcto de cuotas
   const cuotasMap = useMemo(() => ({
@@ -207,6 +208,8 @@ const Catalogo3 = () => {
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
                   selectedCuota={'3 cuotas sin interés'}
+                  sumarEnvio={sumarEnvio}
+                  costoEnvio={17362}
                 />
               </li>
             ))}

@@ -8,7 +8,7 @@ import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from "./assets/logo.png";
 import { Snackbar, Alert, Typography } from "@mui/material";
-import { formatPrice } from './utils/priceUtils';
+/* import { formatPrice } from './utils/priceUtils'; */
 
 const Catalogo14 = () => {
   const [cart, setCart] = useState([]);
@@ -22,6 +22,7 @@ const Catalogo14 = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
 
   // Mapeo correcto de cuotas
   const cuotasMap = useMemo(() => ({
@@ -210,9 +211,9 @@ const Catalogo14 = () => {
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
                   selectedCuota={'14 cuotas sin interés'}
-                  precio={formatPrice(product.precio || 0)}  // Se usa 0 como valor por defecto si el precio es undefined
+                  sumarEnvio={sumarEnvio}
+                  costoEnvio={17362}
                 />
-
               </li>
             ))}
           </ul>

@@ -7,9 +7,11 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { Button, CardActions } from '@mui/material';
 import { formatPrice } from '../utils/priceUtils';
 
-const ProductsCalatogo = ({ product, selectedCuota, showPriceOnly = false, isContado = false }) => {
+const ProductsCalatogo = ({ product, selectedCuota, isContado = false }) => {
   const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
   const aplicaEnvio = ['Bazar', 'Repuestos'].includes(product.linea);
+
+ /*  const aplicaEnvio = product.puntos && parseFloat(product.puntos) < 140; */
 
   const SHIPPING_COST = 17362;
 
@@ -100,6 +102,11 @@ const ProductsCalatogo = ({ product, selectedCuota, showPriceOnly = false, isCon
           ) : (
           <Typography variant="body2" color="text.secondary" style={{ marginTop: 5 }}>
             No disponible
+          </Typography>
+        )}
+        {sumarEnvio && aplicaEnvio && (
+          <Typography variant="caption" color="error" style={{ marginTop: 4 }}>
+            ¡A esta compra le tenes que sumar de envio: <b>{formatPrice(SHIPPING_COST)}!</b>
           </Typography>
         )}
       </CardContent>

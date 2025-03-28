@@ -22,6 +22,7 @@ const Catalogo20 = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
 
   // Eliminar productos duplicados por código o ID
   const eliminarDuplicados = (productos) => {
@@ -194,13 +195,13 @@ const Catalogo20 = () => {
             {productosAMostrar[linea].map((product) => (
               <li className="grid-item" key={product.id}>
                 <ProductsCalatogo
-                  /* key={product.codigo} */
                   product={product}
                   onAddToCart={addToCart}
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
                   selectedCuota={'20 cuotas sin interés'}
-                  precio={formatPrice(product.precio || 0)}  // Se usa 0 como valor por defecto si el precio es undefined
+                  sumarEnvio={sumarEnvio}
+                  costoEnvio={17362}
                 />
               </li>
             ))}
