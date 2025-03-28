@@ -125,7 +125,7 @@ li {
   align-items: flex-start;
 }
 .accordion {
-  background-color: #d7aed2 !important;
+  /* background-color: #d7aed2 !important; */
 }
 .accordion > div:first-child {
   width: 100%;

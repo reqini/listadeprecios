@@ -18,7 +18,7 @@ import { FaWhatsapp, FaTrashAlt } from "react-icons/fa";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-
+import { useTheme } from "@mui/material/styles";
 import { getDiscountedPrice, getCuotaPrice } from "../utils/cartUtils";
 import { parsePrice, formatPrice } from "../utils/priceUtils";
 
@@ -28,6 +28,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, /* onRemoveFromCart */ }) =>
   const [totalPrice, setTotalPrice] = useState(0);
   const [includeShipping, setIncludeShipping] = useState(false);
   const SHIPPING_COST = 17362;
+  const theme = useTheme();
 
   // Función para calcular el precio total
   const calculateTotalPrice = useCallback(() => {
@@ -157,6 +158,11 @@ const ShoppingCart = ({ cart, onClearCart, setCart, /* onRemoveFromCart */ }) =>
           aria-controls="panel2-content"
           id="panel2-header"
           className="accordion"
+          sx={{
+            backgroundColor: theme.palette.primary.main,
+            color: "#fff", // opcional para texto blanco
+            borderRadius: 1,
+          }}
         >
           <div className="flex">
             <AddShoppingCartIcon />
@@ -166,6 +172,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, /* onRemoveFromCart */ }) =>
             Total: {formatPrice(totalPrice)}
           </Typography>
         </AccordionSummary>
+
         <AccordionDetails>
           <Container
             maxWidth="lg"

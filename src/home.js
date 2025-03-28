@@ -6,7 +6,14 @@ import {
   Snackbar,
   Alert,
   Skeleton,
-  Typography
+  Typography,
+  Grid,
+  InputLabel,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from "@mui/material";
 import Product from "./components/products";
 import ShoppingCart from "./components/cart";
@@ -18,6 +25,11 @@ import ReviewSlider from "./components/ReviewSlider"; // ajustá la ruta
 
 const Home = () => {
   const { logout } = useAuth();
+  const [openThemeDialog, setOpenThemeDialog] = useState(false);
+
+  // Nuevo estado para los colores
+  const [primaryColor, setPrimaryColor] = useState(localStorage.getItem("userPrimary") || "#A47A9E");
+  const [secondaryColor, setSecondaryColor] = useState(localStorage.getItem("userSecondary") || "#FBE5B2");
 
   // =============== NUEVO: validación de sesión ===============
   const [sessionChecked, setSessionChecked] = useState(false);
@@ -35,6 +47,12 @@ const Home = () => {
   const [rango, setRango] = useState("");
   const [cart, setCart] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
+
+  const aplicarColores = () => {
+    localStorage.setItem("userPrimary", primaryColor);
+    localStorage.setItem("userSecondary", secondaryColor);
+    window.location.reload(); // 🔄 recarga para aplicar el tema en el ThemeProvider
+  };
 
   const onAddToCart = (product) => {
     setCart((prevCart) => [...prevCart, product]);
@@ -236,8 +254,16 @@ const Home = () => {
         onLogout={logout}
       />
       <Container maxWidth="lg" className="conteiner-list">
-        
         <div className="w-100 flex justify-center items-center flex-direction mar-t10">
+          <Button
+            variant="contained"
+            color="secondary"
+            size="small"
+            onClick={() => setOpenThemeDialog(true)}
+            sx={{ margin: 1 }}
+          >
+            Personalizar Colores
+          </Button>
           <Typography fontSize={13} margin={'6px 0 12px 0'} style={{textAlign: 'center'}}>
             <b>Desarrollado por:</b><br></br>
             <b>
@@ -308,6 +334,36 @@ const Home = () => {
             Ideal para quienes venden Essen en Argentina y quieren tener todo en un solo lugar.
           </p>
         </section>
+      <Dialog open={openThemeDialog} onClose={() => setOpenThemeDialog(false)} fullWidth maxWidth="sm">
+        <DialogTitle>Personalización de Tema</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2} mt={1}>
+            <Grid item xs={6}>
+              <InputLabel>Color Primario</InputLabel>
+              <TextField
+                type="color"
+                fullWidth
+                value={primaryColor}
+                onChange={(e) => setPrimaryColor(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <InputLabel>Color Secundario</InputLabel>
+              <TextField
+                type="color"
+                fullWidth
+                value={secondaryColor}
+                onChange={(e) => setSecondaryColor(e.target.value)}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenThemeDialog(false)}>Cancelar</Button>
+          <Button onClick={aplicarColores} variant="contained">Aplicar</Button>
+        </DialogActions>
+      </Dialog>
+
       </Container>
     </>
   );
