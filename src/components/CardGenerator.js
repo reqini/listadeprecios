@@ -6,12 +6,12 @@ const CardGenerator = ({
   selectedProducts = [],
   selectedQuota,
   customQuotaValue,
-  selectedBank,
+  selectedBanks, // ✅ debe estar igual que el prop
   titleColor,
   selectedFont,
   titleFontSize = 35,
   quotaFontSize = 35,
-  }) => {
+}) => {
   
 const captureImage = () => {
   const cardElement = document.getElementById("card-container");
@@ -60,6 +60,7 @@ const captureImage = () => {
     ? `${imagen}?cacheBust=${Date.now()}` // Fuerza la recarga de la imagen para que html2canvas la procese bien
     : `https://tu-dominio.com${imagen}`;
 };
+console.log("🔍 selectedBanks", selectedBanks);
 
     
   return (
@@ -159,20 +160,30 @@ const captureImage = () => {
                 >
                   {customQuotaValue}
                 </span>
+{Array.isArray(selectedBanks) && selectedBanks.filter(b => b?.logo).length > 0 && (
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: 12 }}>
+    <h2 style={{ fontSize: "16px", fontWeight: "bold", color: "#555", marginBottom: 6 }}>
+      Con Banco{selectedBanks.length > 1 ? "s" : ""}
+    </h2>
+    <div style={{
+      display: "flex",
+      gap: "8px",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      alignItems: "center"
+    }}>
+      {selectedBanks.filter(b => b?.logo).map((bank, idx) => (
+        <img
+          key={idx}
+          src={getImageUrl(bank.logo)}
+          alt={bank.banco || "Banco"}
+          style={{ width: "70px", height: "auto" }}
+        />
+      ))}
+    </div>
+  </div>
+)}
 
-
-                <div className="flex flex-direction items-center"> 
-                  <h2 style={{ fontSize: "16px", fontWeight: "bold", color: "#555", margin: '12px 12px 0 0' }}>
-                    Con Banco
-                  </h2>
-                  {selectedBank?.logo && (
-                    <img
-                      src={getImageUrl(selectedBank.logo)}
-                      alt={selectedBank.banco || "Banco desconocido"}
-                      style={{ width: "70px", height: "auto", marginTop: "10px" }}
-                    />
-                  )}
-                </div>
               </div>
             ))
           ) : (

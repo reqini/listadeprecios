@@ -13,7 +13,7 @@ const GeneradorDePlacas = () => {
   const [banks, setBanks] = useState([]);
   const [selectedQuota, setSelectedQuota] = useState("3 cuotas");
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedBank, setSelectedBank] = useState(null);
+  const [selectedBanks, setSelectedBanks] = useState([]);
   const [customQuotaValue, setCustomQuotaValue] = useState("");
   const [showCard, setShowCard] = useState(false);
   const [titleColor, setTitleColor] = useState("#8A2BE2"); // Color inicial (blueviolet)
@@ -118,7 +118,7 @@ const GeneradorDePlacas = () => {
   };
 
   const handleBankChange = (event, newValue) => {
-    setSelectedBank(newValue);
+    setSelectedBanks(newValue);
     setShowCard(false);
   };
 
@@ -264,13 +264,23 @@ const GeneradorDePlacas = () => {
           </FormControl>
 
           <Autocomplete
+            multiple
             options={banks || []}
             fullWidth
             getOptionLabel={(option) => option?.banco || ""}
             onChange={handleBankChange}
-            renderInput={(params) => <TextField {...params} label="Selecciona Banco (Opcional)" variant="outlined" fullWidth />}
+            value={selectedBanks}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Selecciona uno o más Bancos"
+                variant="outlined"
+                fullWidth
+              />
+            )}
             style={{ marginBottom: "20px", background: "white" }}
           />
+
 
           <Button fullWidth variant="contained" color="primary" onClick={handleApply} disabled={!selectedProduct}>
             Generar Vista Previa
@@ -288,7 +298,7 @@ const GeneradorDePlacas = () => {
                 selectedProducts={[selectedProduct]}
                 selectedQuota={selectedQuota}
                 customQuotaValue={customQuotaValue}
-                selectedBank={selectedBank}
+                selectedBanks={selectedBanks} // ✅ esto debe estar
                 titleColor={titleColor}
                 selectedFont={selectedFont}
                 titleFontSize={titleFontSize}
@@ -303,11 +313,11 @@ const GeneradorDePlacas = () => {
           selectedProduct={selectedProduct}
           selectedQuota={selectedQuota}
           customQuotaValue={customQuotaValue}
-          selectedBank={selectedBank}
+          selectedBanks={selectedBanks} // ✅ acá también
           titleColor={titleColor}
-          selectedFont={selectedFont}           // ✅ falta
-          titleFontSize={titleFontSize}         // ✅ falta
-          quotaFontSize={quotaFontSize}         // ✅ falta
+          selectedFont={selectedFont}
+          titleFontSize={titleFontSize}
+          quotaFontSize={quotaFontSize}
         />
       </div>
     </>
