@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "./utils/axios";
 import DialogResponsive from "./components/DialogResponsive"; // Ajusta la ruta según sea necesario
-import { Autocomplete, TextField, Button, MenuItem, Select, FormControl, InputLabel, Typography } from "@mui/material";
+import { Autocomplete, TextField, Button, MenuItem, Select, FormControl, InputLabel, Typography, Grid, Divider } from "@mui/material";
 import CardGenerator from "./components/CardGenerator";
 import WebFont from "webfontloader";
 import Navbar from "./components/Navbar";
-
+import FancyFileInput from "./components/FancyFileInput";
+import Slider from "react-slick";
+import CardGeneratorBG from "./components/CardGeneratorBg"; // Este será el nuevo diseño
 
 const GeneradorDePlacas = () => {
   const [products, setProducts] = useState([]);
@@ -20,7 +22,8 @@ const GeneradorDePlacas = () => {
   const [selectedFont, setSelectedFont] = useState("Roboto");
   const [titleFontSize, setTitleFontSize] = useState(35);
   const [quotaFontSize, setQuotaFontSize] = useState(35);
-
+  const [backgroundImage, setBackgroundImage] = useState(null);
+  const [selectedDesign, setSelectedDesign] = useState("modelo1"); // o "modelo2" como valor inicial si querés que arranque con fondo
 
   const navigate = useNavigate();
 
@@ -127,7 +130,7 @@ const GeneradorDePlacas = () => {
   };
 
   const handleApply = () => {
-    if (selectedProduct) {
+    if (selectedDesign === "modelo2" || selectedProduct) {
       setShowCard(true);
     }
   };
@@ -149,7 +152,7 @@ const GeneradorDePlacas = () => {
           margin: "0 auto",
         }}
       >
-        <div className="w-100" style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", padding: "12px" }}>
+        <div className="w-100" style={{ padding: "12px" }}>
           <Autocomplete
             options={products || []}
             fullWidth
@@ -179,30 +182,35 @@ const GeneradorDePlacas = () => {
               }
             </Typography>
           </div>
-
-          <FormControl fullWidth style={{ marginBottom: "12px", background: "white" }}>
-            <InputLabel>Selecciona Cuotas</InputLabel>
-            <Select value={selectedQuota} onChange={handleQuotaChange} variant="outlined">
-              {Object.keys(cuotasMap).map((label) => (
-                <MenuItem key={label} value={label}>
-                  {label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <TextField
-            label="Valor de la cuota"
-            variant="outlined"
-            fullWidth
-            value={customQuotaValue}
-            onChange={(event) => setCustomQuotaValue(event.target.value)}
-            style={{ marginBottom: "12px", background: "white" }}
-            type="text"
-            placeholder="$0.00"
-          />
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <FormControl fullWidth style={{ marginBottom: "12px", background: "white" }}>
+                <InputLabel>Selecciona Cuotas</InputLabel>
+                <Select value={selectedQuota} onChange={handleQuotaChange} variant="outlined">
+                  {Object.keys(cuotasMap).map((label) => (
+                    <MenuItem key={label} value={label}>
+                      {label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                label="Valor de la cuota"
+                variant="outlined"
+                fullWidth
+                value={customQuotaValue}
+                onChange={(event) => setCustomQuotaValue(event.target.value)}
+                style={{ marginBottom: "12px", background: "white" }}
+                type="text"
+                placeholder="$0.00"
+              />
+            </Grid>
+          </Grid>
+      
           {/* Tamaño de la cuota con slider intuitivo */}
-          <div style={{ marginBottom: "20px", width: "100%" }}>
+          <div style={{ marginBottom: "12px", width: "100%" }}>
             <Typography gutterBottom>Tamaño de la Cuota</Typography>
             <input
               type="range"
@@ -222,104 +230,179 @@ const GeneradorDePlacas = () => {
               }
             </Typography>
           </div>
-
-          {/* Selector de Color */}
-          <div className="flex w-100">
-            <TextField
-              label="Color del título"
-              variant="outlined"
-              fullWidth
-              InputProps={{
-                inputProps: {
-                  type: "color"
-                }
-              }}
-              value={titleColor}
-              onChange={handleColorChange}
-              style={{ marginBottom: "12px", background: "white" }}
-            />
-            <div style={{
-                width: 50,
-                height: 55,
-                borderRadius: 6,
-                marginLeft: 12,
-                border: "1px solid #ccc",
-                backgroundColor: titleColor
-              }}
-            />
-          </div>
-          <FormControl fullWidth style={{ marginBottom: "12px", background: "white" }}>
-            <InputLabel>Tipografía del título</InputLabel>
-              <Select
-                value={selectedFont}
-                onChange={(e) => setSelectedFont(e.target.value)}
-                variant="outlined"
-              >
-                {["Roboto", "Montserrat", "Lato", "Poppins", "Playfair Display", "Oswald", "Raleway", "Lobster"].map((font) => (
-                  <MenuItem key={font} value={font} style={{ fontFamily: font }}>
-                    {font}
-                  </MenuItem>
-                ))}
-              </Select>
-          </FormControl>
-
-          <Autocomplete
-            multiple
-            options={banks || []}
-            fullWidth
-            getOptionLabel={(option) => option?.banco || ""}
-            onChange={handleBankChange}
-            value={selectedBanks}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Selecciona uno o más Bancos"
-                variant="outlined"
+          <Divider style={{margin: '12px 0'}} />
+          <Grid container spacing={2}>
+            <Grid item xs={4}>
+              {/* Selector de Color */}
+              <div className="flex w-100">
+                <TextField
+                  label="Color del título"
+                  variant="outlined"
+                  fullWidth
+                  InputProps={{
+                    inputProps: {
+                      type: "color"
+                    }
+                  }}
+                  value={titleColor}
+                  onChange={handleColorChange}
+                  style={{ background: "white" }}
+                />
+                <div style={{
+                    width: 50,
+                    height: 55,
+                    borderRadius: 6,
+                    marginLeft: 12,
+                    border: "1px solid #ccc",
+                    backgroundColor: titleColor
+                  }}
+                />
+              </div>
+            </Grid>
+            <Grid item xs={8}>
+              <Autocomplete
+                multiple
+                options={banks || []}
                 fullWidth
-              />
-            )}
-            style={{ marginBottom: "20px", background: "white" }}
-          />
-
-
-          <Button fullWidth variant="contained" color="primary" onClick={handleApply} disabled={!selectedProduct}>
-            Generar Vista Previa
-          </Button>
+                getOptionLabel={(option) => option?.banco || ""}
+                onChange={handleBankChange}
+                value={selectedBanks}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Selecciona uno o más Bancos"
+                    variant="outlined"
+                    fullWidth
+                  />
+                )}
+                style={{ background: "white" }}
+              />      
+            </Grid>
+          </Grid>
+          <Divider style={{margin: '12px 0'}} />
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <FormControl fullWidth style={{ background: "white" }}>
+                <InputLabel>Tipografía del título</InputLabel>
+                  <Select
+                    value={selectedFont}
+                    onChange={(e) => setSelectedFont(e.target.value)}
+                    variant="outlined"
+                  >
+                    {["Roboto", "Montserrat", "Lato", "Poppins", "Playfair Display", "Oswald", "Raleway", "Lobster"].map((font) => (
+                      <MenuItem key={font} value={font} style={{ fontFamily: font }}>
+                        {font}
+                      </MenuItem>
+                    ))}
+                  </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth style={{ background: "white" }}>
+                <InputLabel>Elegí el diseño</InputLabel>
+                <Select
+                  value={selectedDesign}
+                  onChange={(e) => setSelectedDesign(e.target.value)}
+                  variant="outlined"
+                >
+                  <MenuItem value="modelo1">Diseño clásico</MenuItem>
+                  <MenuItem value="modelo2">Con imagen de fondo</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle2" style={{ margin: "8px 0" }}>
+                Imagen de fondo
+              </Typography>
+              {selectedDesign === "modelo2" && (
+                <FancyFileInput
+                  onImageChange={(file) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      setBackgroundImage(reader.result);
+                    };
+                    reader.readAsDataURL(file);
+                  }}
+                />
+              )}
+            </Grid>
+          </Grid>
+          <Grid item margin={'12px 0'}> 
+            <Button fullWidth variant="contained" color="primary" onClick={handleApply} disabled={selectedDesign === "modelo1" && !selectedProduct}>
+              Generar Vista Previa
+            </Button>
+          </Grid>
         </div>
 
         <div
           className="w-100 desktop-fflex flex-direction items-center justify-center"
-          style={{ border: "1px dashed silver", minHeight: 700, background: "#fafafa", borderRadius: 12, alignItems: 'center', marginTop: 20 }}
+          style={{ border: "1px dashed silver", minHeight: 700, background: "#c6c6c6", borderRadius: 12, alignItems: 'center', marginTop: 20 }}
         >
           {!showCard && <Typography variant="body1" fontSize={20} color="primary">Espacio para vista previa</Typography>}
-          <div className="desktop">
+          <div className="desktop" style={{ width: "100%", maxWidth: 360 }}>
             {showCard && (
-              <CardGenerator
-                selectedProducts={[selectedProduct]}
-                selectedQuota={selectedQuota}
-                customQuotaValue={customQuotaValue}
-                selectedBanks={selectedBanks} // ✅ esto debe estar
-                titleColor={titleColor}
-                selectedFont={selectedFont}
-                titleFontSize={titleFontSize}
-                quotaFontSize={quotaFontSize}
-              />
+              <Slider dots infinite speed={500} slidesToShow={1} slidesToScroll={1}>
+                <div>
+                  <CardGenerator
+                    selectedProducts={[selectedProduct]}
+                    selectedQuota={selectedQuota}
+                    customQuotaValue={customQuotaValue}
+                    selectedBanks={selectedBanks}
+                    titleColor={titleColor}
+                    selectedFont={selectedFont}
+                    titleFontSize={titleFontSize}
+                    quotaFontSize={quotaFontSize}
+                  />
+                </div>
+                <div>
+                  <CardGeneratorBG
+                    selectedProducts={[selectedProduct]}
+                    selectedQuota={selectedQuota}
+                    customQuotaValue={customQuotaValue}
+                    selectedBanks={selectedBanks}
+                    titleColor={titleColor}
+                    selectedFont={selectedFont}
+                    titleFontSize={titleFontSize}
+                    quotaFontSize={quotaFontSize}
+                    backgroundImage={backgroundImage}
+                  />
+                </div>
+              </Slider>
             )}
           </div>
         </div>
       </div>
       <div className="w-100 mobile">
-        <DialogResponsive
-          selectedProduct={selectedProduct}
-          selectedQuota={selectedQuota}
-          customQuotaValue={customQuotaValue}
-          selectedBanks={selectedBanks} // ✅ acá también
-          titleColor={titleColor}
-          selectedFont={selectedFont}
-          titleFontSize={titleFontSize}
-          quotaFontSize={quotaFontSize}
-        />
-      </div>
+      {showCard && (
+        <Slider dots infinite speed={500} slidesToShow={1} slidesToScroll={1}>
+          <div>
+            <DialogResponsive
+              selectedProduct={selectedProduct}
+              selectedQuota={selectedQuota}
+              customQuotaValue={customQuotaValue}
+              selectedBanks={selectedBanks}
+              titleColor={titleColor}
+              selectedFont={selectedFont}
+              titleFontSize={titleFontSize}
+              quotaFontSize={quotaFontSize}
+            />
+          </div>
+          <div>
+            <CardGeneratorBG
+              selectedProducts={[selectedProduct]}
+              selectedQuota={selectedQuota}
+              customQuotaValue={customQuotaValue}
+              selectedBanks={selectedBanks}
+              titleColor={titleColor}
+              selectedFont={selectedFont}
+              titleFontSize={titleFontSize}
+              quotaFontSize={quotaFontSize}
+              backgroundImage={backgroundImage}
+            />
+          </div>
+        </Slider>
+      )}
+    </div>
     </>
   );
 };

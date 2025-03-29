@@ -1,3 +1,6 @@
+@import "~slick-carousel/slick/slick.css";
+@import "~slick-carousel/slick/slick-theme.css";
+
 .App {
   text-align: center;
 }
@@ -15,7 +18,7 @@
 .btn-fix {
   position: fixed;
   bottom: 10;
-z-index: 100;
+  z-index: 100;
 }
 .App-header {
   background-color: #282c34;
