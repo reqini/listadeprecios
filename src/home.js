@@ -340,44 +340,82 @@ const Home = () => {
             Ideal para quienes venden Essen en Argentina y quieren tener todo en un solo lugar.
           </p>
         </section>
-      <Dialog open={openThemeDialog} onClose={() => setOpenThemeDialog(false)} fullWidth maxWidth="sm">
-        <DialogTitle>Personalización de Tema</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} mt={1}>
-            <Grid item xs={6}>
-              <InputLabel>Color Primario</InputLabel>
-              <TextField
-                type="color"
-                fullWidth
-                value={primaryColor}
-                onChange={(e) => setPrimaryColor(e.target.value)}
-              />
+        <Dialog
+          open={openThemeDialog}
+          onClose={() => setOpenThemeDialog(false)}
+          fullWidth
+          maxWidth="sm"
+          sx={{
+            '& .MuiDialog-paper': {
+              margin: { xs: 1, sm: 2 },
+              width: '100%',
+            },
+          }}
+        >
+          <DialogTitle sx={{ textAlign: 'center', fontWeight: 600 }}>
+            Personalización de Tema
+          </DialogTitle>
+
+          <DialogContent sx={{ px: { xs: 2, sm: 4 }, pb: 2 }}>
+            <Grid container spacing={2} mt={1}>
+              <Grid item xs={12} sm={6}>
+                <InputLabel>Color Primario</InputLabel>
+                <TextField
+                  type="color"
+                  fullWidth
+                  value={primaryColor}
+                  onChange={(e) => setPrimaryColor(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <InputLabel>Color Secundario</InputLabel>
+                <TextField
+                  type="color"
+                  fullWidth
+                  value={secondaryColor}
+                  onChange={(e) => setSecondaryColor(e.target.value)}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={6}>
-              <InputLabel>Color Secundario</InputLabel>
-              <TextField
-                type="color"
-                fullWidth
-                value={secondaryColor}
-                onChange={(e) => setSecondaryColor(e.target.value)}
-              />
+          </DialogContent>
+
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={4}>
+                <Button
+                  variant="text"
+                  color="primary"
+                  fullWidth
+                  onClick={() => setOpenThemeDialog(false)}
+                >
+                  Cancelar
+                </Button>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={() => {
+                    setPrimaryColor("#A47A9E");
+                    setSecondaryColor("#FBE5B2");
+                  }}
+                >
+                  Colores originales
+                </Button>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  onClick={aplicarColores}
+                >
+                  Aplicar
+                </Button>
+              </Grid>
             </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-            <Button onClick={() => setOpenThemeDialog(false)}>Cancelar</Button>
-            <Button
-              variant="outlined"
-              onClick={() => {
-                setPrimaryColor("#A47A9E");
-                setSecondaryColor("#FBE5B2");
-              }}
-            >
-              Volver al color original
-            </Button>
-          <Button onClick={aplicarColores} variant="contained">Aplicar</Button>
-        </DialogActions>
-      </Dialog>
+          </DialogActions>
+        </Dialog>
+
 
       </Container>
     </>

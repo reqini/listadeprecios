@@ -83,64 +83,6 @@ const Emprendedoras = () => {
 
   const navigate = useNavigate();
 
-/* const handleExportCatalogosPDF = async () => {
-  setIsGeneratingPdf(true);
-  try {
-    const cuotas = [
-      { label: "Contado", key: "contado" },
-      { label: "3 Cuotas", key: "tres_sin_interes" },
-      { label: "6 Cuotas", key: "seis_sin_interes" },
-      { label: "9 Cuotas", key: "nueve_sin_interes" },
-      { label: "10 Cuotas", key: "diez_sin_interes" },
-      { label: "12 Cuotas", key: "doce_sin_interes" },
-      { label: "14 Cuotas", key: "catorce_sin_interes" },
-      { label: "18 Cuotas", key: "dieciocho_sin_interes" },
-      { label: "20 Cuotas", key: "veinte_sin_interes" },
-      { label: "24 Cuotas", key: "veinticuatro_sin_interes" },
-    ];
-
-    const doc = new jsPDF();
-    let currentY = 10;
-
-    for (const { label, key } of cuotas) {
-      const { data: productos } = await axios.get(`/api/productos?cuota=${key}`);
-
-      if (!productos || productos.length === 0) continue;
-
-      doc.setFontSize(14);
-      doc.text(`Catálogo: ${label}`, 10, currentY);
-      currentY += 6;
-
-      const tableData = productos.map((prod) => [
-        prod.descripcion,
-        prod[key],
-      ]);
-
-      doc.autoTable({
-        head: [["Producto", "Precio"]],
-        body: tableData,
-        startY: currentY,
-        theme: "grid",
-        styles: { fontSize: 10 },
-        margin: { left: 10, right: 10 },
-      });
-
-      currentY = doc.autoTable.previous.finalY + 10;
-      if (currentY > 250) {
-        doc.addPage();
-        currentY = 10;
-      }
-    }
-
-    doc.save("catalogos.pdf");
-  } catch (err) {
-    console.error("❌ Error al generar PDF:", err);
-    alert("Error al generar el PDF");
-  } finally {
-    setIsGeneratingPdf(false);
-  }
-}; */
-
   // ✅ Lógica nueva (debajo de handleExportCatalogosPDF)
 const handleExportComparativoPDF = async () => {
   setIsGeneratingPdf(true);
@@ -535,7 +477,7 @@ const handleUpdateClient = async () => {
               </Grid> 
               <Grid item sm={4} xs={12}>
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   style={{height: 55}}
                   fullWidth
                   size="large"
@@ -574,77 +516,22 @@ const handleUpdateClient = async () => {
                 <ListItem key={idx} divider>
                   <ListItemText primary={catalogo.nombre} secondary={catalogo.url} />
                   <ListItemSecondaryAction>
-                    <IconButton 
-                      edge="end" 
+                    <Button
+                      variant="outlined"
+                      startIcon={<ContentCopyIcon />}
                       onClick={() => {
                         navigator.clipboard.writeText(window.location.origin + catalogo.url);
                         alert("URL copiada al portapapeles");
                       }}
-                    >
-                      <ContentCopyIcon />
-                    </IconButton>
-                    {/* <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={async () => {
-                        const doc = new jsPDF();
-                        const nombreCatalogo = catalogo.nombre;
-                        const cuotaMap = {
-                          "Contado": "contado",
-                          "3 Cuotas": "tres_sin_interes",
-                          "6 Cuotas": "seis_sin_interes",
-                          "9 Cuotas": "nueve_sin_interes",
-                          "10 Cuotas": "diez_sin_interes",
-                          "12 Cuotas": "doce_sin_interes",
-                          "14 Cuotas": "catorce_sin_interes",
-                          "18 Cuotas": "dieciocho_sin_interes",
-                        };
-
-                        const cuotaKey = cuotaMap[nombreCatalogo];
-
-
-                        try {
-                          const { data: productos } = await axios.get(`/api/productos?cuota=${cuotaKey}`);
-
-                          if (!productos || productos.length === 0) {
-                            alert("Este catálogo no tiene productos.");
-                            return;
-                          }
-
-                          doc.setFontSize(14);
-                          doc.text(`Catálogo: ${nombreCatalogo}`, 10, 10);
-
-                          const tableData = productos.map((prod) => [
-                            prod.descripcion,
-                            prod[cuotaKey] ?? "N/A",
-                          ]);
-
-                          doc.autoTable({
-                            head: [["Producto", "Precio"]],
-                            body: tableData,
-                            startY: 16,
-                            theme: "grid",
-                            styles: { fontSize: 10 },
-                            margin: { left: 10, right: 10 },
-                          });
-
-                          doc.save(`catalogo_${cuotaKey}.pdf`);
-                        } catch (error) {
-                          console.error("❌ Error al exportar:", error);
-                          alert("Error al exportar este catálogo.");
-                        }
-                      }}
-                      sx={{ ml: 1 }}
-                    >
-                      Exportar PDF
-                    </Button> */}
+                      >
+                        Copiar Url
+                      </Button>
                   </ListItemSecondaryAction>
                 </ListItem>
               ))}
             </List>
           </AccordionDetails>
        </Accordion>
-
         {/* Modal Agregar Cliente */}
         <Dialog
           open={openAddClientDialog}
