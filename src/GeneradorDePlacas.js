@@ -372,36 +372,46 @@ const GeneradorDePlacas = () => {
           </div>
         </div>
       </div>
-      <div className="w-100 mobile">
-      {showCard && (
-        <Slider dots infinite speed={500} slidesToShow={1} slidesToScroll={1}>
-          <div>
-            <DialogResponsive
-              selectedProduct={selectedProduct}
-              selectedQuota={selectedQuota}
-              customQuotaValue={customQuotaValue}
-              selectedBanks={selectedBanks}
-              titleColor={titleColor}
-              selectedFont={selectedFont}
-              titleFontSize={titleFontSize}
-              quotaFontSize={quotaFontSize}
-            />
-          </div>
-          <div>
-            <CardGeneratorBG
-              selectedProducts={[selectedProduct]}
-              selectedQuota={selectedQuota}
-              customQuotaValue={customQuotaValue}
-              selectedBanks={selectedBanks}
-              titleColor={titleColor}
-              selectedFont={selectedFont}
-              titleFontSize={titleFontSize}
-              quotaFontSize={quotaFontSize}
-              backgroundImage={backgroundImage}
-            />
-          </div>
-        </Slider>
-      )}
+      <div
+        className="w-100 mobile"
+        style={{
+          marginTop: 20,
+          paddingBottom: 40,
+          display: showCard ? "block" : "none"
+        }}
+      >
+    {showCard && (
+      <DialogResponsive
+        disabled={selectedDesign === "modelo1" && !selectedProduct}
+        designs={[
+          <CardGenerator
+            key="modelo1"
+            selectedProducts={[selectedProduct]}
+            selectedQuota={selectedQuota}
+            customQuotaValue={customQuotaValue}
+            selectedBanks={selectedBanks}
+            titleColor={titleColor}
+            selectedFont={selectedFont}
+            titleFontSize={titleFontSize}
+            quotaFontSize={quotaFontSize}
+          />,
+          <CardGeneratorBG
+            key="modelo2"
+            selectedProducts={[selectedProduct]}
+            selectedQuota={selectedQuota}
+            customQuotaValue={customQuotaValue}
+            selectedBanks={selectedBanks}
+            titleColor={titleColor}
+            selectedFont={selectedFont}
+            titleFontSize={titleFontSize}
+            quotaFontSize={quotaFontSize}
+            backgroundImage={backgroundImage}
+          />
+        ]}
+      />
+    )}
+
+
     </div>
     </>
   );

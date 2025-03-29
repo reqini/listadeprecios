@@ -64,7 +64,7 @@ console.log("🔍 selectedBanks", selectedBanks);
 
     
   return (
-    <div className="flex" style={{ flexDirection: "column", alignSelf: 'center' }}>
+     <div className="flex" style={{ flexDirection: "column", alignSelf: 'center', alignItems: 'center', justifyContent: 'center' }}>
       <div id="card-container" style={{
         width: "360px",
         height: "640px",

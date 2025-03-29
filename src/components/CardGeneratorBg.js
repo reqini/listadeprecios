@@ -59,7 +59,7 @@ const CardGeneratorBg = ({
   };
 
   return (
-    <div className="flex" style={{ flexDirection: "column", alignSelf: "center" }}>
+    <div className="flex" style={{ flexDirection: "column", alignSelf: 'center', alignItems: 'center', justifyContent: 'center' }}>
       <div
         id="card-container"
         style={{

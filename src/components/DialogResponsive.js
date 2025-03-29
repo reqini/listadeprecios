@@ -2,51 +2,57 @@ import React, { useState } from "react";
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, IconButton, useMediaQuery } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
-import CardGenerator from "./CardGenerator"; // Asegúrate de que la ruta sea correcta
+import Slider from "react-slick";
 
 const DialogResponsive = ({ 
-  selectedProduct,
-  selectedQuota,
-  customQuotaValue,
-  selectedBank,
-  titleColor,
-  selectedFont,
-  titleFontSize,
-  quotaFontSize
+  designs = [],
+  disabled = false // opcional para desactivar el botón
 }) => {
   const [open, setOpen] = useState(false);
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm")); // Detecta si está en mobile
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const settings = {
+    dots: false,
+    infinite: false,
+    autoplay: true,
+    speed: 600,
+    slidesToShow: 1,
+    arrows: false,
+    responsive: [
+      {
+        breakpoint: 600, // mobile
+        settings: {
+           infinite: false,
+          centerMode: false,
+          slidesToShow: 1,
+        },
+      },
+    ],
+  };
 
   const handleOpen = () => {
     setOpen(true);
-    setTimeout(() => {
-        window.dispatchEvent(new Event("resize")); // Forzar re-render en mobile
-    }, 300);
-    };
+    setTimeout(() => window.dispatchEvent(new Event("resize")), 300); // Fix slick en mobile
+  };
 
   const handleClose = () => {
     setOpen(false);
   };
 
-  // Validar si hay una placa generada (un producto seleccionado)
-  const isDisabled = !selectedProduct;
-
   return (
     <>
-      {/* Botón para abrir el Dialog, deshabilitado si no hay producto */}
       <Button 
         size="large" 
         className="mobile fixed-float" 
         variant="contained" 
         color="secondary" 
         onClick={handleOpen}
-        disabled={isDisabled} // Bloquea el botón si no hay producto
+        disabled={disabled}
       >
         Vista Previa
       </Button>
 
-      {/* Dialog Responsive */}
       <Dialog open={open} onClose={handleClose} fullScreen={fullScreen} fullWidth maxWidth="sm">
         <DialogTitle>
           Vista Previa
@@ -59,18 +65,12 @@ const DialogResponsive = ({
           </IconButton>
         </DialogTitle>
 
-        <DialogContent dividers className="flex flex-direction items-center">
-          {/* CardGenerator dentro del Dialog */}
-          <CardGenerator
-            selectedProducts={[selectedProduct]}
-            selectedQuota={selectedQuota}
-            customQuotaValue={customQuotaValue}
-            selectedBank={selectedBank}
-            titleColor={titleColor}
-            selectedFont={selectedFont}
-            titleFontSize={titleFontSize}
-            quotaFontSize={quotaFontSize}
-          />
+        <DialogContent dividers style={{ padding: 0 }}>
+          <Slider {...settings} dots infinite speed={500} slidesToShow={1} slidesToScroll={1}>
+            {designs.map((component, idx) => (
+              <div key={idx}>{component}</div>
+            ))}
+          </Slider>
         </DialogContent>
 
         <DialogActions>
