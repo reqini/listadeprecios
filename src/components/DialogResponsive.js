@@ -2,34 +2,16 @@ import React, { useState } from "react";
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, IconButton, useMediaQuery } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
-import Slider from "react-slick";
 
 const DialogResponsive = ({ 
-  designs = [],
-  disabled = false // opcional para desactivar el botón
+  disabled,
+  selectedDesign,
+  handleApply,
+  designs = []
 }) => {
   const [open, setOpen] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
-
-  const settings = {
-    dots: false,
-    infinite: false,
-    autoplay: true,
-    speed: 600,
-    slidesToShow: 1,
-    arrows: false,
-    responsive: [
-      {
-        breakpoint: 600, // mobile
-        settings: {
-           infinite: false,
-          centerMode: false,
-          slidesToShow: 1,
-        },
-      },
-    ],
-  };
 
   const handleOpen = () => {
     setOpen(true);
@@ -66,11 +48,9 @@ const DialogResponsive = ({
         </DialogTitle>
 
         <DialogContent dividers style={{ padding: 0 }}>
-          <Slider {...settings} dots infinite speed={500} slidesToShow={1} slidesToScroll={1}>
-            {designs.map((component, idx) => (
+          {designs.map((component, idx) => (
               <div key={idx}>{component}</div>
             ))}
-          </Slider>
         </DialogContent>
 
         <DialogActions>

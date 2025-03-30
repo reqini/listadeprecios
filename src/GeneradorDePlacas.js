@@ -6,9 +6,6 @@ import { Autocomplete, TextField, Button, MenuItem, Select, FormControl, InputLa
 import CardGenerator from "./components/CardGenerator";
 import WebFont from "webfontloader";
 import Navbar from "./components/Navbar";
-import FancyFileInput from "./components/FancyFileInput";
-import Slider from "react-slick";
-import CardGeneratorBG from "./components/CardGeneratorBg"; // Este será el nuevo diseño
 
 const GeneradorDePlacas = () => {
   const [products, setProducts] = useState([]);
@@ -22,8 +19,6 @@ const GeneradorDePlacas = () => {
   const [selectedFont, setSelectedFont] = useState("Roboto");
   const [titleFontSize, setTitleFontSize] = useState(35);
   const [quotaFontSize, setQuotaFontSize] = useState(35);
-  const [backgroundImage, setBackgroundImage] = useState(null);
-  const [selectedDesign, setSelectedDesign] = useState("modelo1"); // o "modelo2" como valor inicial si querés que arranque con fondo
 
   const navigate = useNavigate();
 
@@ -130,10 +125,10 @@ const GeneradorDePlacas = () => {
   };
 
   const handleApply = () => {
-    if (selectedDesign === "modelo2" || selectedProduct) {
-      setShowCard(true);
-    }
-  };
+  if (selectedProduct) {
+    setShowCard(true);
+  }
+};
 
   return (
     <>
@@ -232,7 +227,7 @@ const GeneradorDePlacas = () => {
           </div>
           <Divider style={{margin: '12px 0'}} />
           <Grid container spacing={2}>
-            <Grid item xs={4}>
+            <Grid item xs={12}>
               {/* Selector de Color */}
               <div className="flex w-100">
                 <TextField
@@ -259,7 +254,7 @@ const GeneradorDePlacas = () => {
                 />
               </div>
             </Grid>
-            <Grid item xs={8}>
+            <Grid item xs={12}>
               <Autocomplete
                 multiple
                 options={banks || []}
@@ -281,7 +276,7 @@ const GeneradorDePlacas = () => {
           </Grid>
           <Divider style={{margin: '12px 0'}} />
           <Grid container spacing={2}>
-            <Grid item xs={6}>
+            <Grid item xs={12}>
               <FormControl fullWidth style={{ background: "white" }}>
                 <InputLabel>Tipografía del título</InputLabel>
                   <Select
@@ -297,38 +292,9 @@ const GeneradorDePlacas = () => {
                   </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={6}>
-              <FormControl fullWidth style={{ background: "white" }}>
-                <InputLabel>Elegí el diseño</InputLabel>
-                <Select
-                  value={selectedDesign}
-                  onChange={(e) => setSelectedDesign(e.target.value)}
-                  variant="outlined"
-                >
-                  <MenuItem value="modelo1">Diseño clásico</MenuItem>
-                  <MenuItem value="modelo2">Con imagen de fondo</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="subtitle2" style={{ margin: "8px 0" }}>
-                Imagen de fondo
-              </Typography>
-              {selectedDesign === "modelo2" && (
-                <FancyFileInput
-                  onImageChange={(file) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                      setBackgroundImage(reader.result);
-                    };
-                    reader.readAsDataURL(file);
-                  }}
-                />
-              )}
-            </Grid>
           </Grid>
           <Grid item margin={'12px 0'}> 
-            <Button fullWidth variant="contained" color="primary" onClick={handleApply} disabled={selectedDesign === "modelo1" && !selectedProduct}>
+            <Button fullWidth variant="contained" color="primary" onClick={handleApply}>
               Generar Vista Previa
             </Button>
           </Grid>
@@ -341,33 +307,16 @@ const GeneradorDePlacas = () => {
           {!showCard && <Typography variant="body1" fontSize={20} color="primary">Espacio para vista previa</Typography>}
           <div className="desktop" style={{ width: "100%", maxWidth: 360 }}>
             {showCard && (
-              <Slider dots infinite speed={500} slidesToShow={1} slidesToScroll={1}>
-                <div>
-                  <CardGenerator
-                    selectedProducts={[selectedProduct]}
-                    selectedQuota={selectedQuota}
-                    customQuotaValue={customQuotaValue}
-                    selectedBanks={selectedBanks}
-                    titleColor={titleColor}
-                    selectedFont={selectedFont}
-                    titleFontSize={titleFontSize}
-                    quotaFontSize={quotaFontSize}
-                  />
-                </div>
-                <div>
-                  <CardGeneratorBG
-                    selectedProducts={[selectedProduct]}
-                    selectedQuota={selectedQuota}
-                    customQuotaValue={customQuotaValue}
-                    selectedBanks={selectedBanks}
-                    titleColor={titleColor}
-                    selectedFont={selectedFont}
-                    titleFontSize={titleFontSize}
-                    quotaFontSize={quotaFontSize}
-                    backgroundImage={backgroundImage}
-                  />
-                </div>
-              </Slider>
+                <CardGenerator
+                  selectedProducts={[selectedProduct]}
+                  selectedQuota={selectedQuota}
+                  customQuotaValue={customQuotaValue}
+                  selectedBanks={selectedBanks}
+                  titleColor={titleColor}
+                  selectedFont={selectedFont}
+                  titleFontSize={titleFontSize}
+                  quotaFontSize={quotaFontSize}
+                />
             )}
           </div>
         </div>
@@ -381,34 +330,23 @@ const GeneradorDePlacas = () => {
         }}
       >
     {showCard && (
-      <DialogResponsive
-        disabled={selectedDesign === "modelo1" && !selectedProduct}
-        designs={[
-          <CardGenerator
-            key="modelo1"
-            selectedProducts={[selectedProduct]}
-            selectedQuota={selectedQuota}
-            customQuotaValue={customQuotaValue}
-            selectedBanks={selectedBanks}
-            titleColor={titleColor}
-            selectedFont={selectedFont}
-            titleFontSize={titleFontSize}
-            quotaFontSize={quotaFontSize}
-          />,
-          <CardGeneratorBG
-            key="modelo2"
-            selectedProducts={[selectedProduct]}
-            selectedQuota={selectedQuota}
-            customQuotaValue={customQuotaValue}
-            selectedBanks={selectedBanks}
-            titleColor={titleColor}
-            selectedFont={selectedFont}
-            titleFontSize={titleFontSize}
-            quotaFontSize={quotaFontSize}
-            backgroundImage={backgroundImage}
-          />
-        ]}
-      />
+   <DialogResponsive
+
+  designs={[
+    <CardGenerator
+      key="modelo1"
+      selectedProducts={[selectedProduct]}
+      selectedQuota={selectedQuota}
+      customQuotaValue={customQuotaValue}
+      selectedBanks={selectedBanks}
+      titleColor={titleColor}
+      selectedFont={selectedFont}
+      titleFontSize={titleFontSize}
+      quotaFontSize={quotaFontSize}
+    />
+  ]}
+/>
+
     )}
 
 

@@ -93,7 +93,9 @@ console.log("🔍 selectedBanks", selectedBanks);
           border: `4px solid ${titleColor || "blueviolet"}`,
         }}>
           {selectedProducts.length > 0 ? (
-            selectedProducts.map((product, index) => (
+            selectedProducts
+            .filter((p) => p && typeof p === "object" && p.descripcion)
+            .map((product, index) => (
               <div key={index} style={{
                 position: "relative",
                 width: "100%",

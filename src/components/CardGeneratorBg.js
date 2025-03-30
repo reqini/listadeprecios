@@ -59,71 +59,77 @@ const CardGeneratorBg = ({
   };
 
   return (
-    <div className="flex" style={{ flexDirection: "column", alignSelf: 'center', alignItems: 'center', justifyContent: 'center' }}>
+    <div className="flex" style={{ flexDirection: 'column', alignSelf: 'center', alignItems: 'center', justifyContent: 'center' }}>
       <div
         id="card-container"
         style={{
-            width: "360px",
-            height: "640px",
-            backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.05) 100%), url(${backgroundImage || 'https://i.ibb.co/BVr3YHJr/Guiso.jpg'})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            position: "relative",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            overflow: "hidden"
+          width: "360px",
+          height: "640px",
+          backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.05) 100%), url(${backgroundImage || "https://i.ibb.co/BVr3YHJr/Guiso.jpg"})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          transition: "background-image 0.3s ease-in-out",
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden",
         }}
-        >
+      >
         {selectedProducts.length > 0 ? (
-          selectedProducts.map((product, index) => (
-            <div key={index} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <h3 style={{
-                color: titleColor,
-                fontSize: `${titleFontSize}px`,
-                fontFamily: `'${selectedFont}', sans-serif`,
-                textAlign: 'center',
-                marginBottom: 12
-              }}>{product.descripcion}</h3>
+          selectedProducts.map((product, index) =>
+            product ? (
+              <div key={index} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <h3 style={{
+                  color: titleColor,
+                  fontSize: `${titleFontSize}px`,
+                  fontFamily: `'${selectedFont}', sans-serif`,
+                  textAlign: 'center',
+                  marginBottom: 12
+                }}>{product.descripcion}</h3>
 
-              <img
-                src={getImageUrl(product.imagen)}
-                alt={product.descripcion}
-                style={{
-                  width: "100%",
-                  objectFit: "contain",
-                  marginTop: 8,
-                  marginBottom: 8,
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
-                }}
-              />
+                <img
+                  src={getImageUrl(product.imagen)}
+                  alt={product.descripcion}
+                  style={{
+                    width: "100%",
+                    objectFit: "contain",
+                    marginTop: 8,
+                    marginBottom: 8,
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
+                  }}
+                />
 
-              <p style={{fontSize: 20, fontWeight: "bold", color: 'white', margin: '8px 0' }}>{selectedQuota}</p>
-              <h4 style={{ color: "white", margin: 0 }}>Sin interés de</h4>
-              <span style={{
-                fontSize: `${quotaFontSize}px`,
-                fontWeight: "bold",
-                color: "white",
-                fontFamily: `'${selectedFont}', sans-serif`
-              }}>{customQuotaValue}</span>
+                <p style={{ fontSize: 20, fontWeight: "bold", color: 'white', margin: '8px 0' }}>{selectedQuota}</p>
+                <h4 style={{ color: "white", margin: 0 }}>Sin interés de</h4>
+                <span style={{
+                  fontSize: `${quotaFontSize}px`,
+                  fontWeight: "bold",
+                  color: "white",
+                  fontFamily: `'${selectedFont}', sans-serif`
+                }}>{customQuotaValue}</span>
 
-              {Array.isArray(selectedBanks) && selectedBanks.length > 0 && (
-                <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
-                  {selectedBanks.map((bank, idx) => (
-                    <img
-                      key={idx}
-                      src={getImageUrl(bank.logo)}
-                      alt={bank.banco}
-                      style={{ width: 70 }}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          ))
+                {Array.isArray(selectedBanks) && selectedBanks.length > 0 && (
+                  <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
+                    {selectedBanks.map((bank, idx) => (
+                      <img
+                        key={idx}
+                        src={getImageUrl(bank.logo)}
+                        alt={bank.banco}
+                        style={{ width: 70 }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : null
+          )
         ) : (
-          <h3 style={{ fontSize: 20, color: "#777" }}>Selecciona un producto</h3>
+          <div style={{ color: "#ccc", fontSize: 18, padding: 20, textAlign: 'center' }}>
+            Selecciona un producto o cargá una imagen para empezar a diseñar tu placa.
+          </div>
         )}
       </div>
       <Button
