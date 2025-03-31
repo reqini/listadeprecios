@@ -22,7 +22,7 @@ const GeneradorDePlacas = () => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get("/api/productos");
-        console.log("Datos de la API:", response.data);
+        //console.log("Datos de la API:", response.data);
 
         const productosFiltrados = response.data?.filter(
           (producto) => producto?.linea?.toLowerCase() !== "repuestos"
@@ -43,7 +43,7 @@ const GeneradorDePlacas = () => {
     const fetchBanks = async () => {
       try {
         const response = await axios.get("/api/bancos");
-        console.log("Datos de Bancos:", response.data);
+        //console.log("Datos de Bancos:", response.data);
         setBanks(response.data);
       } catch (error) {
         console.error("Error al obtener bancos:", error);

@@ -60,8 +60,6 @@ const captureImage = () => {
     ? `${imagen}?cacheBust=${Date.now()}` // Fuerza la recarga de la imagen para que html2canvas la procese bien
     : `https://tu-dominio.com${imagen}`;
 };
-console.log("🔍 selectedBanks", selectedBanks);
-
     
   return (
      <div className="flex" style={{ flexDirection: "column", alignSelf: 'center', alignItems: 'center', justifyContent: 'center' }}>

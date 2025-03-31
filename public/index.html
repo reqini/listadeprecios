@@ -50,9 +50,9 @@
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/firebase-messaging-sw.js')
       .then((registration) => {
-        console.log('✅ SW registrado:', registration);
+        //console.log('✅ SW registrado:', registration);
       }).catch((err) => {
-        console.log('❌ Error al registrar el SW:', err);
+        //console.log('❌ Error al registrar el SW:', err);
       });
   }
 
@@ -65,22 +65,22 @@
         vapidKey: "TU_VAPID_KEY"
       }).then((currentToken) => {
         if (currentToken) {
-          console.log("🔐 Token generado:", currentToken);
+          //console.log("🔐 Token generado:", currentToken);
           // Acá podrías guardarlo en tu backend si querés notificaciones personalizadas
         } else {
-          console.log("❌ No se pudo obtener el token.");
+          //console.log("❌ No se pudo obtener el token.");
         }
       }).catch((err) => {
-        console.log("Error al obtener token", err);
+        //console.log("Error al obtener token", err);
       });
     } else {
-      console.log("Permiso denegado");
+      //console.log("Permiso denegado");
     }
   });
 
   // Escuchar notis cuando la app está abierta (foreground)
   messaging.onMessage((payload) => {
-    console.log("🔔 Notificación recibida:", payload);
+    //console.log("🔔 Notificación recibida:", payload);
     alert(payload.notification.title + ": " + payload.notification.body);
   });
 </script>
