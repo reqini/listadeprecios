@@ -3,11 +3,12 @@ import { Dialog, DialogActions, DialogContent, DialogTitle, Button, IconButton, 
 import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
 
-const DialogResponsive = ({ 
+const DialogResponsive = ({
   disabled,
   selectedDesign,
   handleApply,
-  designs = []
+  backgroundImage,
+  designs = [],
 }) => {
   const [open, setOpen] = useState(false);
   const theme = useTheme();

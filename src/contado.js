@@ -92,7 +92,7 @@ const Contado = () => {
         <ul className="lista-prod-catalog w-100">
           {productosFiltrados.map((product) => (
             <li className="grid-item" key={product.id}>
-              <ProductCatalogoNegocio product={product} />
+              <ProductCatalogoNegocio product={product} costoEnvio={17362}/>
             </li>
           ))}
         </ul>
