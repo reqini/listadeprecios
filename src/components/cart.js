@@ -27,7 +27,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, /* onRemoveFromCart */ }) =>
   const [planCanje, setPlanCanje] = useState({});
   const [totalPrice, setTotalPrice] = useState(0);
   const [includeShipping, setIncludeShipping] = useState(false);
-  const SHIPPING_COST = 17362;
+  const SHIPPING_COST = 17883;
   const theme = useTheme();
 
   // Función para calcular el precio total
