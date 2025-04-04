@@ -169,11 +169,12 @@ const Home = () => {
   }, [sessionValid, fetchData]);
 
   // Filtra tus productos
-  const productosFiltrados = productos.filter(
-    (producto) =>
-      producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) &&
-      producto.vigencia === "SI"
-  );
+const productosFiltrados = productos.filter(
+  (producto) =>
+    (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
+    producto?.vigencia === "SI"
+);
+
 
   // Cerrar snackbar
   const handleSnackbarClose = (event, reason) => {

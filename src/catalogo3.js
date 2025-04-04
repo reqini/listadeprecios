@@ -61,7 +61,9 @@ const Catalogo3 = () => {
     const loadInitialData = async () => {
       setLoading(true);
       const productosData = await getData();
-      const productosFiltrados = productosData.filter(producto => producto.vigencia?.toLowerCase() !== "no");
+      const productosFiltrados = productosData.filter(
+        (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
+      ); // cambio 1
       const productosUnicos = eliminarDuplicados(productosFiltrados);
       setProductos(productosUnicos);
       agruparProductosPorLinea(productosUnicos);
@@ -98,9 +100,9 @@ const Catalogo3 = () => {
   // Filtrar productos según descripción, línea y cuota
   useEffect(() => {
     let productosFiltrados = productos.filter((producto) =>
-      producto.descripcion?.toLowerCase().includes(filtro.toLowerCase()) &&
-      producto.linea?.toLowerCase() !== 'repuestos'
-    );
+      (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
+      (producto?.linea || '').toLowerCase() !== 'repuestos'
+    ); // cambio 2
 
     if (cuotasMap["3 cuotas sin interés"]) {
       const cuotaKey = cuotasMap["3 cuotas sin interés"];
