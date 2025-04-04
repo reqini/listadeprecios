@@ -51,7 +51,9 @@ const Catalogo6 = () => {
     const loadInitialData = async () => {
       setLoading(true);
       const productosData = await getData();
-      const productosFiltrados = productosData.filter(producto => producto.vigencia?.toLowerCase() !== "no");
+      const productosFiltrados = productosData.filter(
+        (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
+      );
       const productosUnicos = eliminarDuplicados(productosFiltrados);
       setProductos(productosUnicos);
       agruparProductosPorLinea(productosUnicos);
@@ -86,8 +88,8 @@ const Catalogo6 = () => {
 
   useEffect(() => {
     let productosFiltrados = productos.filter((producto) =>
-      producto.descripcion?.toLowerCase().includes(filtro.toLowerCase()) &&
-      producto.linea?.toLowerCase() !== 'repuestos'
+      (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
+      (producto?.linea || '').toLowerCase() !== 'repuestos'
     );
 
     if (cuotasMap["6 cuotas sin interés"]) {

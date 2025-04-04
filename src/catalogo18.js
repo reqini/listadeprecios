@@ -8,7 +8,6 @@ import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Snackbar, Alert, Typography } from "@mui/material";
-import { formatPrice } from './utils/priceUtils';
 
 const Catalogo18 = () => {
   const [cart, setCart] = useState([]);
@@ -45,7 +44,9 @@ const Catalogo18 = () => {
     const loadInitialData = async () => {
       setLoading(true);
       const productosData = await getData();  // Cargar todos los productos de una vez
-      const productosFiltrados = productosData.filter(producto => producto.vigencia.toLowerCase() !== "no");  // Filtrar por vigencia
+      const productosFiltrados = productosData.filter(
+        (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
+      );
       const productosUnicos = eliminarDuplicados(productosFiltrados);  // Eliminar duplicados
       setProductos(productosUnicos);
       agruparProductosPorLinea(productosUnicos);
@@ -88,10 +89,9 @@ const Catalogo18 = () => {
   // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir los productos con línea "Repuestos"
   useEffect(() => {
     let productosFiltrados = productos.filter((producto) =>
-      producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) &&
-      producto.linea.toLowerCase() !== 'repuestos'  // Excluir los productos con línea "Repuestos"
+      (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
+      (producto?.linea || '').toLowerCase() !== 'repuestos'
     );
-
     if (cuotasMap["18 cuotas sin interés"]) {
       const cuotaKey = cuotasMap["18 cuotas sin interés"];
       productosFiltrados = productosFiltrados.filter(
