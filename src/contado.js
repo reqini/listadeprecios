@@ -39,8 +39,8 @@ const Contado = () => {
       setLoading(true);
       const productosData = await getData();
       const productosFiltrados = productosData.filter(
-        (producto) => producto.vigencia.toLowerCase() !== "no"
-      );
+        (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
+      ); // cambio 1
       const productosUnicos = eliminarDuplicados(productosFiltrados);
       setProductos(productosUnicos);
       setLoading(false);
@@ -50,7 +50,8 @@ const Contado = () => {
   }, []);
 
   const productosFiltrados = productos.filter((producto) =>
-    producto.descripcion.toLowerCase().includes(filtro.toLowerCase())
+    (producto?.descripcion || "").toLowerCase().includes(filtro.toLowerCase()) &&
+    (producto?.linea || "").toLowerCase() !== "repuestos"
   );
 
   return (
