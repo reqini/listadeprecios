@@ -405,6 +405,9 @@ li {
   .lista-prod-catalog {
     grid-template-columns: repeat(3, 1fr);
   }
+  .flex-direction-mobile {
+    flex-direction: column;
+  }
   .bt-responsive-emp {
     flex-direction: column;
   }

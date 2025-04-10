@@ -305,7 +305,7 @@ const productosFiltrados = productos.filter(
           <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
         </div>
 
-        <div className="header mar-b30 flex-center pad20">
+        <div className="header mar-b30 flex-center pad10">
           <TextField
             style={{ maxWidth: 450 }}
             fullWidth
@@ -316,8 +316,7 @@ const productosFiltrados = productos.filter(
             onChange={(e) => setFiltro(e.target.value)}
           />
         </div>
-        {getBannerForRango()}
-        <Accordion sx={{ marginBottom: 3 }}>
+        <Accordion sx={{ marginBottom: 2 }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="subtitle1" fontWeight={600}>
               Desplegar Reseñas
@@ -327,9 +326,10 @@ const productosFiltrados = productos.filter(
             <ReviewSlider />
           </AccordionDetails>
         </Accordion>
+        {getBannerForRango()}
         {/* Selector de catálogo para copiar URL */}
-        <div className="flex align-center justify-center mar-b30 w-100" style={{ gap: 12 }}>
-          <FormControl size="small" sx={{ minWidth: 200, width: '100%', maxWidth: 300, background: 'white' }}>
+        <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100" style={{ gap: 12 }}>
+          <FormControl size="small" sx={{ minWidth: 200, width: '100%', maxWidth: 400, background: 'white' }}>
             <InputLabel>Seleccioná un catálogo</InputLabel>
             <Select
               value={selectedCatalog}
@@ -489,28 +489,28 @@ const productosFiltrados = productos.filter(
         </Dialog>
       </Container>
       {showScrollTop && (
-  <Button
-  variant="contained"
-  color="primary"
-  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-  sx={{
-    position: "fixed",
-    bottom: isMobile ? 65 : 24,
-    left: 24,
-    zIndex: 9999,
-    backgroundColor: "red",
-    borderRadius: "50%",
-    minWidth: 0,
-    width: 48,
-    height: 48,
-    boxShadow: 3,
-    fontSize: 24,
-  }}
->
-  ↑
-</Button>
+        <Button
+        variant="contained"
+        color="primary"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        sx={{
+          position: "fixed",
+          bottom: isMobile ? 65 : 24,
+          left: 24,
+          zIndex: 9999,
+          backgroundColor: "red",
+          borderRadius: "50%",
+          minWidth: 0,
+          width: 48,
+          height: 48,
+          boxShadow: 3,
+          fontSize: 24,
+        }}
+      >
+        ↑
+      </Button>
 
-)}
+      )}
     </>
   );
 };
