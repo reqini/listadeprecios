@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "./utils/axios";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import {
   Container,
   TextField,
@@ -13,8 +14,15 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  FormControl,
+  Select,
+  MenuItem,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
 } from "@mui/material";
+import { Link } from "react-router-dom";
 import Product from "./components/products";
 import ShoppingCart from "./components/cart";
 import Navbar from "./components/Navbar";
@@ -22,10 +30,26 @@ import ResponsiveDialog from "./components/dialog";
 import logo from "./assets/logo.png";
 import { useAuth } from "./AuthContext";
 import ReviewSlider from "./components/ReviewSlider"; // ajustá la ruta
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const Home = () => {
   const { logout } = useAuth();
   const [openThemeDialog, setOpenThemeDialog] = useState(false);
+  const isMobile = useMediaQuery('(max-width:600px)');
+
+  const [catalogos] = useState([
+    { nombre: "Contado", url: "/contado" },
+    { nombre: "3 Cuotas", url: "/catalogo3" },
+    { nombre: "6 Cuotas", url: "/catalogo6" },
+    { nombre: "9 Cuotas", url: "/catalogo9" },
+    { nombre: "10 Cuotas", url: "/catalogo10" },
+    { nombre: "12 Cuotas", url: "/catalogo12" },
+    { nombre: "14 Cuotas", url: "/catalogo14" },
+    { nombre: "18 Cuotas", url: "/catalogo18" }
+  ]);
+
+  const [selectedCatalog, setSelectedCatalog] = useState("");
+
 
   // Nuevo estado para los colores
   const [primaryColor, setPrimaryColor] = useState(localStorage.getItem("userPrimary") || "#A47A9E");
@@ -47,6 +71,19 @@ const Home = () => {
   const [rango, setRango] = useState("");
   const [cart, setCart] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      setShowScrollTop(scrollTop > 300);
+    };
+
+    handleScroll(); // ⚠️ Fuerza verificación inicial por si ya hay scroll
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const aplicarColores = () => {
     localStorage.setItem("userPrimary", primaryColor);
@@ -202,14 +239,6 @@ const productosFiltrados = productos.filter(
       "Empresario/a",
       "Empresario/a VIP",
     ];
-    /* const rangosGrupo2 = [
-      "Ejecutivo/a",
-      "Ejecutivo/a senior",
-      "Ejecutivo/a máster",
-      "Ejecutivo/a premium",
-      "Empresario/a",
-      "Empresario/a VIP",
-    ]; */
 
     if (!extras || !extras[0]) {
       console.warn("Extras no disponibles o vacíos.");
@@ -218,13 +247,15 @@ const productosFiltrados = productos.filter(
 
     if (!rango || rango.trim() === "" || rangosGrupo1.includes(rango)) {
       return (
-        <div className="banner card-product mar-b30">
-          <img
-            src={windowWidth <= 460 ? extras[0]?.banner_mobile : extras[0]?.banner}
-            alt="Banner Grupo 1"
-            style={{ width: "100%" }}
-          />
-        </div>
+        <Link to="/generarPlaca" style={{ textDecoration: "none" }}>
+          <div className="banner card-product mar-b30" style={{ cursor: "pointer" }}>
+            <img
+              src={windowWidth <= 460 ? extras[0]?.banner_mobile : extras[0]?.banner}
+              alt="Banner Grupo 1"
+              style={{ width: "100%" }}
+            />
+          </div>
+        </Link>
       );
     } 
     return null;
@@ -271,16 +302,6 @@ const productosFiltrados = productos.filter(
           >
             Personalizar Colores
           </Button>
-          <Typography fontSize={13} margin={'6px 0 12px 0'} style={{textAlign: 'center'}}>
-            <b>Desarrollado por:</b><br></br>
-            <b>
-              <a href="https://www.instagram.com/cocinatyy" rel="noreferrer">@Cocinatyy </a>
-            </b>
-            y
-            <b>
-              <a href="https://www.instagram.com/lrecchini/" rel="noreferrer"> Luciano Recchini</a>
-            </b>
-          </Typography>
           <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
         </div>
 
@@ -296,7 +317,47 @@ const productosFiltrados = productos.filter(
           />
         </div>
         {getBannerForRango()}
-        <ReviewSlider />
+        <Accordion sx={{ marginBottom: 3 }}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="subtitle1" fontWeight={600}>
+              Desplegar Reseñas
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ background: '#e9e9e9' }}>
+            <ReviewSlider />
+          </AccordionDetails>
+        </Accordion>
+        {/* Selector de catálogo para copiar URL */}
+        <div className="flex align-center justify-center mar-b30 w-100" style={{ gap: 12 }}>
+          <FormControl size="small" sx={{ minWidth: 200, width: '100%', maxWidth: 300, background: 'white' }}>
+            <InputLabel>Seleccioná un catálogo</InputLabel>
+            <Select
+              value={selectedCatalog}
+              fullWidth
+              size="large"
+              variant="outlined"
+              onChange={(e) => setSelectedCatalog(e.target.value)}
+              label="Seleccioná un catálogo"
+            >
+              <MenuItem value="">-- Elegí uno --</MenuItem>
+              {catalogos.map((cat) => (
+                <MenuItem key={cat.url} value={cat.url}>{cat.nombre}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button
+            variant="contained"
+            disabled={!selectedCatalog}
+            onClick={() => {
+              const url = `${window.location.origin}${selectedCatalog}`;
+              navigator.clipboard.writeText(url);
+              setSnackbarOpen(true);
+            }}
+          >
+            Copiar URL
+          </Button>
+        </div>
+
         <ul className="lista-prod w-100">
           {loading ? (
             [...Array(6)].map((_, index) => (
@@ -340,6 +401,16 @@ const productosFiltrados = productos.filter(
             Catálogo Simple es una herramienta pensada para <strong>emprendedoras Essen</strong> que buscan simplificar su trabajo. Accedé gratis a la <strong>lista de precios Essen actualizada</strong>, catálogos visuales con cuotas y mucho más. 
             Ideal para quienes venden Essen en Argentina y quieren tener todo en un solo lugar.
           </p>
+          <Typography fontSize={13} margin={'6px 0 12px 0'} style={{textAlign: 'center'}}>
+            <b>Desarrollado por:</b><br></br>
+            <b>
+              <a href="https://www.instagram.com/cocinatyy" rel="noreferrer">@Cocinatyy </a>
+            </b>
+            y
+            <b>
+              <a href="https://www.instagram.com/lrecchini/" rel="noreferrer"> Luciano Recchini</a>
+            </b>
+          </Typography>
         </section>
         <Dialog
           open={openThemeDialog}
@@ -416,9 +487,30 @@ const productosFiltrados = productos.filter(
             </Grid>
           </DialogActions>
         </Dialog>
-
-
       </Container>
+      {showScrollTop && (
+  <Button
+  variant="contained"
+  color="primary"
+  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+  sx={{
+    position: "fixed",
+    bottom: isMobile ? 65 : 24,
+    left: 24,
+    zIndex: 9999,
+    backgroundColor: "red",
+    borderRadius: "50%",
+    minWidth: 0,
+    width: 48,
+    height: 48,
+    boxShadow: 3,
+    fontSize: 24,
+  }}
+>
+  ↑
+</Button>
+
+)}
     </>
   );
 };

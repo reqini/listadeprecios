@@ -126,7 +126,7 @@ const Navbar = ({ user, onLogout, title }) => {
                 handleMenuClose();
               }}
             >
-              Emprendedora
+              Catálogos
             </MenuItem>
             <Divider></Divider>
             <MenuItem
