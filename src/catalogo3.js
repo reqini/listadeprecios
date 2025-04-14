@@ -170,7 +170,7 @@ const Catalogo3 = () => {
               <a href="https://www.instagram.com/lrecchini/" rel="noreferrer"> Luciano Recchini</a>
             </b>
           </Typography>
-        <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
+        <img src={logo} alt="logo" width="150" className="mar-t10 mar-b20" />
       </div>
 
       <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>

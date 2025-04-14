@@ -4,7 +4,6 @@ import {
   Toolbar,
   IconButton,
   Typography,
-/*   Avatar, */
   Menu,
   MenuItem,
   Dialog,
@@ -12,7 +11,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-/*   Badge, */
   Button,
   TextField,
   Alert,
@@ -21,10 +19,11 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import HomeIcon from '@mui/icons-material/Home';
 import axios from "../utils/axios";
 import { useNavigate, useLocation } from "react-router-dom";
-import Logo from  '../assets/logo512.png'
+import Logo from '../assets/logo512.png'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import MenuIcon from '@mui/icons-material/Menu';
 
 const Navbar = ({ user, onLogout, title }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -81,26 +80,21 @@ const Navbar = ({ user, onLogout, title }) => {
       <AppBar position="static">
         <Toolbar style={{fdisplay: 'flex', justifyContent: 'space-between'}}>
           <div className="flex items-center">
-            <IconButton variant="contained" size="small" color="secondary" onClick={() => navigate("/home")} disabled={location.pathname === "/home"}>
-              <HomeIcon disabled={location.pathname === "/home"} color="secondary" />
-            </IconButton>
-            <img src={Logo} alt="logo" width="48" className="mar-t10 mar-b20" />
+              {location.pathname !== "/home" ? (
+                <IconButton size="small" color="secondary" onClick={() => navigate(-1)}>
+                  <ArrowBackIcon color="secondary" />
+                </IconButton>
+              ) : (
+                <img src={Logo} alt="logo" width="48" />
+              )}
           </div>
           <Typography variant="body1" fontSize={16} sx={{ flexGrow: 1, margin: '0 12px' }}>
             {title}
           </Typography>
           <IconButton color="inherit" onClick={handleMenuOpen}>
-            <Typography margin={'0 10px 0 0'}>Menú</Typography>
-            {/* <Badge 
-              badgeContent={'1'} 
-              color="error"
-              overlap="circular"
-              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            >
-              <Avatar>{user?.username?.charAt(0).toUpperCase() || "?"}</Avatar>
-            </Badge> */}
+            {/* <Typography margin={'0 10px 0 0'}>Menú</Typography> */}
+            <MenuIcon />
           </IconButton>
-          
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
             <MenuItem
               onClick={() => {

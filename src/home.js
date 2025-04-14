@@ -27,7 +27,6 @@ import Product from "./components/products";
 import ShoppingCart from "./components/cart";
 import Navbar from "./components/Navbar";
 import ResponsiveDialog from "./components/dialog";
-/* import logo from "./assets/logo.png"; */
 import { useAuth } from "./AuthContext";
 import ReviewSlider from "./components/ReviewSlider"; // ajustá la ruta
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -303,6 +302,7 @@ const productosFiltrados = productos.filter(
             onChange={(e) => setFiltro(e.target.value)}
           />
         </div>
+        {getBannerForRango()}
         <Accordion sx={{ marginBottom: 2 }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="subtitle1" fontWeight={600}>
@@ -313,7 +313,6 @@ const productosFiltrados = productos.filter(
             <ReviewSlider />
           </AccordionDetails>
         </Accordion>
-        {getBannerForRango()}
         <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100">
           <Typography style={{maxWidth: 350}} textAlign={'center'} variant="h6">Por este medio podes generar la url y enviar el catálogo que tu cliente quiera</Typography>
         </div>
@@ -497,8 +496,7 @@ const productosFiltrados = productos.filter(
         }}
       >
         ↑
-      </Button>
-
+        </Button>
       )}
     </>
   );
