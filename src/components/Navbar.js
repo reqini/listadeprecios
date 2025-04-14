@@ -4,7 +4,7 @@ import {
   Toolbar,
   IconButton,
   Typography,
-  Avatar,
+/*   Avatar, */
   Menu,
   MenuItem,
   Dialog,
@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Badge,
+/*   Badge, */
   Button,
   TextField,
   Alert,
@@ -24,6 +24,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import HomeIcon from '@mui/icons-material/Home';
 import axios from "../utils/axios";
 import { useNavigate, useLocation } from "react-router-dom";
+import Logo from  '../assets/logo512.png'
 
 const Navbar = ({ user, onLogout, title }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -78,23 +79,26 @@ const Navbar = ({ user, onLogout, title }) => {
   return (
     <>
       <AppBar position="static">
-        <Toolbar>
-          <IconButton variant="contained" size="small" color="secondary" onClick={() => navigate("/home")} disabled={location.pathname === "/home"}>
+        <Toolbar style={{fdisplay: 'flex', justifyContent: 'space-between'}}>
+          <div className="flex items-center">
+            <IconButton variant="contained" size="small" color="secondary" onClick={() => navigate("/home")} disabled={location.pathname === "/home"}>
               <HomeIcon disabled={location.pathname === "/home"} color="secondary" />
-          </IconButton>
+            </IconButton>
+            <img src={Logo} alt="logo" width="48" className="mar-t10 mar-b20" />
+          </div>
           <Typography variant="body1" fontSize={16} sx={{ flexGrow: 1, margin: '0 12px' }}>
             {title}
           </Typography>
           <IconButton color="inherit" onClick={handleMenuOpen}>
             <Typography margin={'0 10px 0 0'}>Menú</Typography>
-            <Badge 
+            {/* <Badge 
               badgeContent={'1'} 
               color="error"
               overlap="circular"
               anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             >
               <Avatar>{user?.username?.charAt(0).toUpperCase() || "?"}</Avatar>
-            </Badge>
+            </Badge> */}
           </IconButton>
           
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>

@@ -27,7 +27,7 @@ import Product from "./components/products";
 import ShoppingCart from "./components/cart";
 import Navbar from "./components/Navbar";
 import ResponsiveDialog from "./components/dialog";
-import logo from "./assets/logo.png";
+/* import logo from "./assets/logo.png"; */
 import { useAuth } from "./AuthContext";
 import ReviewSlider from "./components/ReviewSlider"; // ajustá la ruta
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -292,20 +292,7 @@ const productosFiltrados = productos.filter(
         onLogout={logout}
       />
       <Container maxWidth="lg" className="conteiner-list">
-        <div className="w-100 flex justify-center items-center flex-direction mar-t10">
-          <Button
-            variant="contained"
-            color="secondary"
-            size="small"
-            onClick={() => setOpenThemeDialog(true)}
-            sx={{ margin: 1 }}
-          >
-            Personalizar Colores
-          </Button>
-          <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
-        </div>
-
-        <div className="header mar-b30 flex-center pad10">
+        <div className="header mar-b30 mar-t30 flex-center pad10">
           <TextField
             style={{ maxWidth: 450 }}
             fullWidth
@@ -327,7 +314,9 @@ const productosFiltrados = productos.filter(
           </AccordionDetails>
         </Accordion>
         {getBannerForRango()}
-        {/* Selector de catálogo para copiar URL */}
+        <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100">
+          <Typography style={{maxWidth: 350}} textAlign={'center'} variant="h6">Por este medio podes generar la url y enviar el catálogo que tu cliente quiera</Typography>
+        </div>
         <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100" style={{ gap: 12 }}>
           <FormControl size="small" sx={{ minWidth: 200, width: '100%', maxWidth: 400, background: 'white' }}>
             <InputLabel>Seleccioná un catálogo</InputLabel>
