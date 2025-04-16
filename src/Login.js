@@ -58,7 +58,7 @@ const Login = () => {
 
     try {
       // Hacemos una solicitud POST al backend para autenticar
-      const response = await axios.post(`/api/login`, {
+      const response = await axios.post(`/auth/login`, {
         username,
         password,
         deviceId, // Enviamos el deviceId

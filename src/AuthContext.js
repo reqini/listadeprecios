@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
 
       if (token) {
         try {
-          const response = await axios.post("/api/validate-session", { token, deviceId: currentDeviceId });
+          const response = await axios.post("/auth/validate-session", { token, deviceId: currentDeviceId });
           if (!response.data.valid) {
             logout();
             alert("Fuiste deslogueado porque tu sesión se inició en otro dispositivo.");

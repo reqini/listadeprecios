@@ -74,7 +74,7 @@ const Register = () => {
           rango, // Incluyendo el rango en el payload
         };
     
-        const response = await axios.post(`/api/register`, payload);
+        const response = await axios.post(`/auth/register`, payload);
     
         if (response.data.success) {
           alert(

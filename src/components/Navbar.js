@@ -54,7 +54,7 @@ const Navbar = ({ user, onLogout, title }) => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "/api/update-password",
+        "/api/user/update-password",
         { username: user.username, password },
         { headers: { Authorization: `Bearer ${token}` } }
       );
