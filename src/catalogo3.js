@@ -8,7 +8,8 @@ import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from "./assets/logo.png";
 import { Snackbar, Alert, Typography } from "@mui/material";
-/* import { formatPrice } from './utils/priceUtils'; */
+/* import { Button } from "@mui/material"; */
+/* import exportCatalogoToPDF from "./utils/exportCatalogoToPDF"; */
 
 const Catalogo3 = () => {
   const [cart, setCart] = useState([]);
@@ -22,11 +23,18 @@ const Catalogo3 = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
 
   // Mapeo correcto de cuotas
   const cuotasMap = useMemo(() => ({
     "3 cuotas sin interés": 'tres_sin_interes',
   }), []);
+
+  /* const handleExportarPDF = () => {
+    const productosExport = Object.values(productosAMostrar).flat();
+    exportCatalogoToPDF(productosExport, "3 cuotas sin interés");
+  }; */
+
 
   // Eliminar duplicados por código
   const eliminarDuplicados = (productos) => {
@@ -53,7 +61,9 @@ const Catalogo3 = () => {
     const loadInitialData = async () => {
       setLoading(true);
       const productosData = await getData();
-      const productosFiltrados = productosData.filter(producto => producto.vigencia?.toLowerCase() !== "no");
+      const productosFiltrados = productosData.filter(
+        (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
+      ); // cambio 1
       const productosUnicos = eliminarDuplicados(productosFiltrados);
       setProductos(productosUnicos);
       agruparProductosPorLinea(productosUnicos);
@@ -90,9 +100,9 @@ const Catalogo3 = () => {
   // Filtrar productos según descripción, línea y cuota
   useEffect(() => {
     let productosFiltrados = productos.filter((producto) =>
-      producto.descripcion?.toLowerCase().includes(filtro.toLowerCase()) &&
-      producto.linea?.toLowerCase() !== 'repuestos'
-    );
+      (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
+      (producto?.linea || '').toLowerCase() !== 'repuestos'
+    ); // cambio 2
 
     if (cuotasMap["3 cuotas sin interés"]) {
       const cuotaKey = cuotasMap["3 cuotas sin interés"];
@@ -153,8 +163,14 @@ const Catalogo3 = () => {
       <Helmet>
         <title>Catálogo 3 Cuotas - Catálogo</title>
       </Helmet>
-      <div className="w-100 flex justify-center">
-        <img src={logo} alt="logo" height="100" className='mar-t30 mar-b20' />
+      <div className="w-100 flex justify-center items-center flex-direction mar-t10">
+        <Typography fontSize={13} margin={'6px 0 12px 0'} style={{textAlign: 'center'}}>
+            <b>Desarrollado por:</b><br></br>
+            <b>
+              <a href="https://www.instagram.com/lrecchini/" rel="noreferrer"> Luciano Recchini</a>
+            </b>
+          </Typography>
+        <img src={logo} alt="logo" width="150" className="mar-t10 mar-b20" />
       </div>
 
       <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
@@ -169,6 +185,16 @@ const Catalogo3 = () => {
           onChange={(e) => setFiltro(e.target.value)}
         />
       </div>
+      {/* <div>
+        <Button
+          onClick={handleExportarPDF}
+          variant="contained"
+          color="primary"
+          style={{ margin: '12px 0' }}
+        >
+          Exportar catálogo a PDF (tabla)
+        </Button>
+      </div> */}
 
       {loading && (
         <>
@@ -201,6 +227,8 @@ const Catalogo3 = () => {
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
                   selectedCuota={'3 cuotas sin interés'}
+                  sumarEnvio={sumarEnvio}
+                  costoEnvio={17362}
                 />
               </li>
             ))}

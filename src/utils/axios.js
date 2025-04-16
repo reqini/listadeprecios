@@ -14,7 +14,7 @@ instance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token"); // Obtener el token del localStorage
     if (token) {
-      console.log("🛠️ Enviando token:", token); // Log para depuración
+      /* console.log("🛠️ Enviando token:", token);  */// Log para depuración
       config.headers.Authorization = `Bearer ${token}`;
     } else {
       console.warn("⚠️ No se encontró token en localStorage");

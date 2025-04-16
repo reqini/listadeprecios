@@ -1,16 +1,16 @@
-/* eslint-disable */
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "./utils/axios";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
+import LinearProgress from "@mui/material/LinearProgress";
 import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
-import logo from './assets/logo.png';
+import logo from "./assets/logo.png";
 import { Snackbar, Alert, Typography } from "@mui/material";
-import { formatPrice } from './utils/priceUtils';
+/* import { formatPrice } from './utils/priceUtils'; */
 
-const Catalogo6 = () => {
+const Catalogo14 = () => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
@@ -24,10 +24,12 @@ const Catalogo6 = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
 
+  // Mapeo correcto de cuotas
   const cuotasMap = useMemo(() => ({
-    "6 cuotas sin interés": 'seis_sin_interes',
+    "14 cuotas sin interés": 'catorce_sin_interes',
   }), []);
 
+  // Eliminar duplicados por código
   const eliminarDuplicados = (productos) => {
     return productos.reduce((acc, producto) => {
       if (!acc.some(item => item.codigo === producto.codigo)) {
@@ -37,6 +39,7 @@ const Catalogo6 = () => {
     }, []);
   };
 
+  // Cargar productos desde la API
   const getData = async () => {
     try {
       const result = await axios.get(`/api/productos`);
@@ -51,9 +54,7 @@ const Catalogo6 = () => {
     const loadInitialData = async () => {
       setLoading(true);
       const productosData = await getData();
-      const productosFiltrados = productosData.filter(
-        (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
-      );
+      const productosFiltrados = productosData.filter(producto => producto.vigencia?.toLowerCase() !== "no");
       const productosUnicos = eliminarDuplicados(productosFiltrados);
       setProductos(productosUnicos);
       agruparProductosPorLinea(productosUnicos);
@@ -63,6 +64,7 @@ const Catalogo6 = () => {
     loadInitialData();
   }, []);
 
+  // Agrupar productos por línea
   const agruparProductosPorLinea = (productos) => {
     const productosPorLinea = productos.reduce((acc, producto) => {
       const { linea } = producto;
@@ -73,6 +75,7 @@ const Catalogo6 = () => {
     setProductosAgrupados(productosPorLinea);
   };
 
+  // Manejar el scroll para sticky header
   useEffect(() => {
     const handleScroll = () => {
       const offset = window.scrollY;
@@ -80,32 +83,37 @@ const Catalogo6 = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
+  // Filtrar productos según descripción, línea y cuota
   useEffect(() => {
-    let productosFiltrados = productos.filter((producto) =>
-      (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
-      (producto?.linea || '').toLowerCase() !== 'repuestos'
+  let productosFiltrados = productos.filter((producto) =>
+    producto.descripcion?.toLowerCase().includes(filtro.toLowerCase()) &&
+    producto.linea?.toLowerCase() !== 'repuestos'
+  );
+
+  if (cuotasMap["14 cuotas sin interés"]) {
+    const cuotaKey = cuotasMap["14 cuotas sin interés"];
+    productosFiltrados = productosFiltrados.filter(
+      (producto) => {
+        const cuotaValue = producto[cuotaKey]?.trim();
+        return cuotaValue && cuotaValue !== 'NO' && cuotaValue !== '';
+      }
     );
+  }
 
-    if (cuotasMap["6 cuotas sin interés"]) {
-      const cuotaKey = cuotasMap["6 cuotas sin interés"];
-      productosFiltrados = productosFiltrados.filter(
-        (producto) => producto[cuotaKey] && producto[cuotaKey] !== 'NO'
-      );
-    }
+  agruparProductosPorLinea(productosFiltrados);
+}, [filtro, productos, cuotasMap]);
 
-    agruparProductosPorLinea(productosFiltrados);
-  }, [filtro, productos, cuotasMap]);
-
+  // Añadir producto al carrito
   const addToCart = (product) => {
     setCart([...cart, product]);
   };
 
+  // Manejar favoritos
   const toggleFavorite = (product) => {
     let updatedFavorites;
     let message;
@@ -131,6 +139,7 @@ const Catalogo6 = () => {
     }
   };
 
+  // Productos que se deben mostrar
   const productosAMostrar = showFavorites
     ? Object.keys(productosAgrupados).reduce((acc, linea) => {
         const productosFavoritos = productosAgrupados[linea].filter(product =>
@@ -146,7 +155,7 @@ const Catalogo6 = () => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <Helmet>
-        <title>Catálogo 6 Cuotas - Catálogo</title>
+        <title>Catálogo 14 Cuotas - Catálogo</title>
       </Helmet>
       <div className="w-100 flex justify-center items-center flex-direction mar-t10">
         <Typography fontSize={13} margin={'6px 0 12px 0'} style={{textAlign: 'center'}}>
@@ -172,17 +181,20 @@ const Catalogo6 = () => {
       </div>
 
       {loading && (
-        <ul className="lista-prod-catalog w-100">
-          {[...Array(8)].map((_, idx) => (
-            <Skeleton
-              key={idx}
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-          ))}
-        </ul>
+        <>
+          <LinearProgress />
+          <ul className="lista-prod-catalog w-100">
+            {[...Array(8)].map((_, idx) => (
+              <Skeleton
+                key={idx}
+                sx={{ height: 300, margin: 1 }}
+                animation="wave"
+                variant="rectangular"
+                className="grid-item"
+              />
+            ))}
+          </ul>
+        </>
       )}
 
       {Object.keys(productosAMostrar).map((linea) => (
@@ -198,7 +210,7 @@ const Catalogo6 = () => {
                   onAddToCart={addToCart}
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
-                  selectedCuota={'6 cuotas sin interés'}
+                  selectedCuota={'14 cuotas sin interés'}
                   sumarEnvio={sumarEnvio}
                   costoEnvio={17362}
                 />
@@ -221,4 +233,4 @@ const Catalogo6 = () => {
   );
 };
 
-export default Catalogo6;
+export default Catalogo14;

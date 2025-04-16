@@ -10,9 +10,9 @@ import logo from './assets/logo.png';
 import { Snackbar, Alert, Typography } from "@mui/material";
 import { formatPrice } from './utils/priceUtils';
 
-const Catalogo6 = () => {
+const Catalogo10 = () => {
   const [cart, setCart] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);  // Carga inicial
   const [productos, setProductos] = useState([]);
   const [filtro, setFiltro] = useState("");
   const [productosAgrupados, setProductosAgrupados] = useState({});
@@ -22,47 +22,40 @@ const Catalogo6 = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
+    const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
 
-  const cuotasMap = useMemo(() => ({
-    "6 cuotas sin interés": 'seis_sin_interes',
-  }), []);
-
+  // Eliminar productos duplicados por código o ID
   const eliminarDuplicados = (productos) => {
-    return productos.reduce((acc, producto) => {
+    const productosUnicos = productos.reduce((acc, producto) => {
       if (!acc.some(item => item.codigo === producto.codigo)) {
         acc.push(producto);
       }
       return acc;
     }, []);
+    return productosUnicos;
   };
 
+  // Cargar productos desde la API (sin carga incremental)
   const getData = async () => {
-    try {
-      const result = await axios.get(`/api/productos`);
-      return result.data;
-    } catch (error) {
-      console.error("Error cargando productos:", error);
-      return [];
-    }
+    const result = await axios.get(`/api/productos`);
+    return result.data;
   };
 
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
-      const productosData = await getData();
-      const productosFiltrados = productosData.filter(
-        (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
-      );
-      const productosUnicos = eliminarDuplicados(productosFiltrados);
+      const productosData = await getData();  // Cargar todos los productos de una vez
+      const productosFiltrados = productosData.filter(producto => producto.vigencia.toLowerCase() !== "no");  // Filtrar por vigencia
+      const productosUnicos = eliminarDuplicados(productosFiltrados);  // Eliminar duplicados
       setProductos(productosUnicos);
       agruparProductosPorLinea(productosUnicos);
-      setLoading(false);
+      setLoading(false);  // Detener el estado de carga cuando los productos se hayan cargado completamente
     };
 
     loadInitialData();
   }, []);
 
+  // Agrupar productos por línea
   const agruparProductosPorLinea = (productos) => {
     const productosPorLinea = productos.reduce((acc, producto) => {
       const { linea } = producto;
@@ -73,6 +66,7 @@ const Catalogo6 = () => {
     setProductosAgrupados(productosPorLinea);
   };
 
+  // Manejar scroll para hacer sticky el header
   useEffect(() => {
     const handleScroll = () => {
       const offset = window.scrollY;
@@ -86,14 +80,20 @@ const Catalogo6 = () => {
     };
   }, []);
 
+  // Uso de useMemo para mantener cuotasMap sin cambios en cada render
+  const cuotasMap = useMemo(() => ({
+    "10 cuotas sin interés": 'diez_sin_interes',
+  }), []);
+
+  // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir los productos con línea "Repuestos"
   useEffect(() => {
     let productosFiltrados = productos.filter((producto) =>
-      (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
-      (producto?.linea || '').toLowerCase() !== 'repuestos'
+      producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) &&
+      producto.linea.toLowerCase() !== 'repuestos'  // Excluir los productos con línea "Repuestos"
     );
 
-    if (cuotasMap["6 cuotas sin interés"]) {
-      const cuotaKey = cuotasMap["6 cuotas sin interés"];
+    if (cuotasMap["10 cuotas sin interés"]) {
+      const cuotaKey = cuotasMap["10 cuotas sin interés"];
       productosFiltrados = productosFiltrados.filter(
         (producto) => producto[cuotaKey] && producto[cuotaKey] !== 'NO'
       );
@@ -102,10 +102,12 @@ const Catalogo6 = () => {
     agruparProductosPorLinea(productosFiltrados);
   }, [filtro, productos, cuotasMap]);
 
+  // Añadir producto al carrito
   const addToCart = (product) => {
     setCart([...cart, product]);
   };
 
+  // Manejar el agregado y eliminación de favoritos
   const toggleFavorite = (product) => {
     let updatedFavorites;
     let message;
@@ -125,12 +127,14 @@ const Catalogo6 = () => {
     setSnackbarMessage(message);
     setSnackbarOpen(true);
 
+    // Si no quedan favoritos, volver a mostrar todos los productos
     if (updatedFavorites.length === 0) {
       setShowFavorites(false);
       agruparProductosPorLinea(productos);
     }
   };
 
+  // Filtrar los productos que se deben mostrar (favoritos o todos)
   const productosAMostrar = showFavorites
     ? Object.keys(productosAgrupados).reduce((acc, linea) => {
         const productosFavoritos = productosAgrupados[linea].filter(product =>
@@ -146,7 +150,7 @@ const Catalogo6 = () => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <Helmet>
-        <title>Catálogo 6 Cuotas - Catálogo</title>
+      <title>Catalogo Simple - Catálogo</title>
       </Helmet>
       <div className="w-100 flex justify-center items-center flex-direction mar-t10">
         <Typography fontSize={13} margin={'6px 0 12px 0'} style={{textAlign: 'center'}}>
@@ -171,6 +175,7 @@ const Catalogo6 = () => {
         />
       </div>
 
+      {/* Skeleton para la carga inicial */}
       {loading && (
         <ul className="lista-prod-catalog w-100">
           {[...Array(8)].map((_, idx) => (
@@ -185,10 +190,11 @@ const Catalogo6 = () => {
         </ul>
       )}
 
+      {/* Productos cargados */}
       {Object.keys(productosAMostrar).map((linea) => (
         <div key={linea} className="linea-section">
           <Typography variant="h5" gutterBottom margin="20px 0">
-            Línea: <b>{linea}</b>
+            Linea: <b>{linea}</b>
           </Typography>
           <ul className="lista-prod-catalog w-100">
             {productosAMostrar[linea].map((product) => (
@@ -198,7 +204,7 @@ const Catalogo6 = () => {
                   onAddToCart={addToCart}
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
-                  selectedCuota={'6 cuotas sin interés'}
+                  selectedCuota={'10 cuotas sin interés'}
                   sumarEnvio={sumarEnvio}
                   costoEnvio={17362}
                 />
@@ -221,4 +227,4 @@ const Catalogo6 = () => {
   );
 };
 
-export default Catalogo6;
+export default Catalogo10;

@@ -26,6 +26,7 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
     "veinte_sin_interes",
     "dieciocho_sin_interes",
     "doce_sin_interes",
+    "catorce_sin_interes",
     "diez_sin_interes",
     "nueve_sin_interes",
     "seis_sin_interes",
@@ -68,57 +69,65 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
         image={product.imagen || "../descarga.png"}
         alt="Producto"
       />
-      <CardContent style={{ display: "flex", flexDirection: "column" }}>
-        <Typography className="titulo" gutterBottom variant="h6" fontSize={18}>
-          {product.descripcion}
-        </Typography>
-        <Typography variant="body2" fontSize={12} fontStyle="italic">
-          Línea <b>{product.linea}</b>
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Precio de Negocio: <b>{formatPrice(parsePrice(product.precio_negocio))}</b>
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          PSVP lista: <b>{formatPrice(parsePrice(product.psvp_lista))}</b>
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Puntos: <b>{product.puntos}</b>
-        </Typography>
-        <Divider sx={{ my: 2 }} />
+<CardContent style={{ display: "flex", flexDirection: "column" }}>
+  <Typography className="titulo" gutterBottom variant="h6" fontSize={18}>
+    {product.descripcion}
+  </Typography>
+  <Typography variant="body2" fontSize={12} fontStyle="italic">
+    Línea <b>{product.linea}</b>
+  </Typography>
+  <Typography variant="body2" color="text.secondary">
+    Precio de Negocio: <b>{formatPrice(parsePrice(product.precio_negocio))}</b>
+  </Typography>
+  <Typography variant="body2" color="text.secondary">
+    PSVP lista: <b>{formatPrice(parsePrice(product.psvp_lista))}</b>
+  </Typography>
+  <Typography variant="body2" color="text.secondary">
+    Puntos: <b>{product.puntos}</b>
+  </Typography>
 
-        {/* Mostrar cuotas */}
-        {cuotas.map((cuota, idx) => {
-          const cuotaValue = product[cuota];
-          return isValidCuota(cuotaValue) ? (
-            <div className="flex-center" key={idx}>
-              {cuotaType !== "con_interes" && (
-                <img src={cuotaSimple} alt="Cuota sin interés" height="15" />
-              )}
-              <Typography variant="body2" fontSize={13} fontStyle="italic">
-                <b style={{ color: "green" }}>
-                  {`${getAdjustedCuotaLabel(cuota)} de: `}
-                  <i style={{ color: "black" }}>{getCuotaPrice(cuotaValue)}</i>
-                </b>
-              </Typography>
-            </div>
-          ) : null;
-        })}
+  {product.precio_preferencial && (
+    <Typography variant="body2" color="text.secondary">
+      Precio Preferencial: <b>{formatPrice(parsePrice(product.precio_preferencial))}</b>
+    </Typography>
+  )}
 
-        {/* Combo de selección de cuotas */}
-        <FormControl fullWidth sx={{ my: 2 }}>
-          <InputLabel>Selecciona una cuota</InputLabel>
-          <Select value={selectedCuota} onChange={handleCuotaChange} label="Selecciona una cuota">
-            {cuotas.map((cuota, idx) => {
-              const cuotaValue = product[cuota];
-              return isValidCuota(cuotaValue) ? (
-                <MenuItem key={idx} value={getCuotaPrice(cuotaValue)}>
-                  {`${getAdjustedCuotaLabel(cuota)} de ${getCuotaPrice(cuotaValue)}`}
-                </MenuItem>
-              ) : null;
-            })}
-          </Select>
-        </FormControl>
-      </CardContent>
+  <Divider sx={{ my: 2 }} />
+
+  {/* Mostrar cuotas */}
+  {cuotas.map((cuota, idx) => {
+    const cuotaValue = product[cuota];
+    return isValidCuota(cuotaValue) ? (
+      <div className="flex-center" key={idx}>
+        {cuotaType !== "con_interes" && (
+          <img src={cuotaSimple} alt="Cuota sin interés" height="15" />
+        )}
+        <Typography variant="body2" fontSize={13} fontStyle="italic">
+          <b style={{ color: "green" }}>
+            {`${getAdjustedCuotaLabel(cuota)} de: `}
+            <i style={{ color: "black" }}>{getCuotaPrice(cuotaValue)}</i>
+          </b>
+        </Typography>
+      </div>
+    ) : null;
+  })}
+
+  {/* Combo de selección de cuotas */}
+  <FormControl fullWidth sx={{ my: 2 }}>
+    <InputLabel>Selecciona una cuota</InputLabel>
+    <Select value={selectedCuota} onChange={handleCuotaChange} label="Selecciona una cuota">
+      {cuotas.map((cuota, idx) => {
+        const cuotaValue = product[cuota];
+        return isValidCuota(cuotaValue) ? (
+          <MenuItem key={idx} value={getCuotaPrice(cuotaValue)}>
+            {`${getAdjustedCuotaLabel(cuota)} de ${getCuotaPrice(cuotaValue)}`}
+          </MenuItem>
+        ) : null;
+      })}
+    </Select>
+  </FormControl>
+</CardContent>
+
 
       <CardActions sx={{ display: "flex", flexDirection: "column" }}>
         {!catalog && (
@@ -126,24 +135,29 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
             Agregar al carrito
           </Button>
         )}
-        <Button
-          fullWidth
-          href={selectedCuota ? `https://api.whatsapp.com/send?text=${encodeURIComponent(
-            `¡Hola! Te envío el valor de tu próxima Essen:\n
-            🛒 Producto: ${product.descripcion}\n
-            💳 Cuota seleccionada: ${selectedCuota}\n
-            ¡Aprovechá esta oferta!`
-          )}` : "#"}
-          target={selectedCuota ? "_blank" : ""}
-          variant="contained"
-          size="medium"
-          color="primary"
-          sx={{ my: 1, backgroundColor: "#25D366", color: "white" }}
-          startIcon={<FaWhatsapp />}
-          disabled={!selectedCuota}
-        >
-          Compartir
-        </Button>
+       <Button
+  fullWidth
+  href={selectedCuota
+    ? `https://api.whatsapp.com/send?text=${encodeURIComponent(
+        `¡Hola! Te envío el valor de tu próxima Essen:\n
+        🛒 Producto: ${product.descripcion}\n
+        💳 ${getAdjustedCuotaLabel(
+          cuotas.find((cuota) => getCuotaPrice(product[cuota]) === selectedCuota) || "1 cuota sin interés"
+        )} de ${selectedCuota}\n
+        ¡Aprovechá esta oferta!`
+      )}`
+    : "#"}
+  target={selectedCuota ? "_blank" : ""}
+  variant="contained"
+  size="medium"
+  color="primary"
+  sx={{ my: 1, backgroundColor: "#25D366", color: "white" }}
+  startIcon={<FaWhatsapp />}
+  disabled={!selectedCuota}
+>
+  Compartir
+</Button>
+
 
         {product.ficha_tecnica ? (
           <Button fullWidth target="_blank" href={product.ficha_tecnica} variant="outlined" size="medium" color="primary">

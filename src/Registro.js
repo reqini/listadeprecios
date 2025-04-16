@@ -18,6 +18,8 @@ const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [codigoEmprendedora, setCodigoEmprendedora] = useState('');
+  const [codigoError, setCodigoError] = useState('');
   const [rango, setRango] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -48,51 +50,72 @@ const Register = () => {
     setUsername(value.replace(/\s+/g, '').toLowerCase());
   };
 
-  const isFormValid =
-    username && password && confirmPassword && rango && password === confirmPassword;
+  const handleCodigoChange = (e) => {
+    const value = e.target.value;
+    
+    if (!/^\d*$/.test(value)) {
+      setCodigoError("Solo se permiten números.");
+      return;
+    }
 
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      setError('');
-    
-      if (password !== confirmPassword) {
-        setError('Las contraseñas no coinciden.');
-        return;
-      }
-    
-      if (!rango) {
-        setError('Por favor selecciona un rango.');
-        return;
-      }
-    
-      setLoading(true);
-    
-      try {
-        const payload = {
-          username,
-          password,
-          rango, // Incluyendo el rango en el payload
-        };
-    
-        const response = await axios.post(`/auth/register`, payload);
-    
-        if (response.data.success) {
-          alert(
-            'Usuario registrado con éxito. Ahora serás redirigido al plan de suscripción.'
-          );
-          window.location.href =
-            'https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808492e620a40192e8bb0f0400ed';
-        } else {
-          alert('Hubo un problema durante el registro. Intenta nuevamente.');
-        }
-      } catch (error) {
-        console.error('Error durante el registro:', error.message);
-        alert('Hubo un problema al registrarse. Por favor, intenta de nuevo.');
-      } finally {
-        setLoading(false);
-      }
+    if (value.length > 8) {
+      return; // No permite más de 8 dígitos
+    }
+
+    setCodigoEmprendedora(value);
+    setCodigoError('');
+  };
+
+  const isFormValid =
+  username && password && confirmPassword && rango && codigoEmprendedora && password === confirmPassword;
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
+  setCodigoError('');
+
+  if (password !== confirmPassword) {
+    setError('Las contraseñas no coinciden.');
+    return;
+  }
+
+  if (!rango) {
+    setError('Por favor selecciona un rango.');
+    return;
+  }
+
+  if (!/^\d{6,8}$/.test(codigoEmprendedora)) {
+    setCodigoError("El código debe ser numérico y tener entre 6 y 8 dígitos.");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const payload = {
+      username,
+      password,
+      rango,
+      codigo_emprendedora: codigoEmprendedora, // Asegurar que coincida con el backend
     };
-    
+
+    const response = await axios.post(`/auth/register`, payload);
+
+    if (response.data.success) {
+      alert('Usuario registrado con éxito. Ahora serás redirigido al login.');
+      window.location.href = '/login';
+    } else {
+      setCodigoError(response.data.message || 'Hubo un problema durante el registro.');
+    }
+  } catch (error) {
+    console.error('Error durante el registro:', error.response?.data?.message || error.message);
+    setCodigoError(error.response?.data?.message || 'Hubo un problema al registrarse. Intenta de nuevo.');
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   return (
     <div
@@ -207,6 +230,20 @@ const Register = () => {
                   ))}
                 </Select>
               </FormControl>
+            </Grid>
+            <Grid item xs={12} style={{ margin: '10px 0' }}>
+              <TextField
+                required
+                fullWidth
+                style={{ color: 'black', backgroundColor: 'white' }}
+                id="filled-required-codigo-emprendedora"
+                label="Código de Emprendedora"
+                value={codigoEmprendedora}
+                variant="filled"
+                onChange={handleCodigoChange}
+                error={!!codigoError}
+                helperText={codigoError}
+              />
             </Grid>
             {error && (
               <Grid

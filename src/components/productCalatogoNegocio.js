@@ -7,7 +7,8 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { Button, CardActions } from '@mui/material';
 import { formatPrice } from '../utils/priceUtils';
 
-const ProductCatalogoNegocio = ({ product }) => {
+const ProductCatalogoNegocio = ({ product, sumarEnvio, costoEnvio }) => {
+
   // Procesar precio de negocio
   const precioNegocio = product.precio_negocio
     ? parseFloat(product.precio_negocio.replace(/[^0-9.-]/g, '')) || 0
@@ -52,6 +53,12 @@ const ProductCatalogoNegocio = ({ product }) => {
         <Typography variant="body2" color="text.secondary" style={{ marginTop: 5 }}>
           Precio de Contado: <b>{formatPrice(precioNegocio)}</b>
         </Typography>
+        {/* 👇 Agrega este bloque exactamente aquí */}
+        {sumarEnvio && (
+          <Typography variant="body2" sx={{ color: 'green', fontWeight: 500, marginTop: 1 }}>
+            📦 Esta compra suma un envío de: <b>{formatPrice(costoEnvio)}</b>
+          </Typography>
+        )}
       </CardContent>
       <CardActions style={{ display: 'flex', flexDirection: 'column' }}>
         <Button

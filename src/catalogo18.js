@@ -8,7 +8,6 @@ import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Snackbar, Alert, Typography } from "@mui/material";
-import { formatPrice } from './utils/priceUtils';
 
 const Catalogo18 = () => {
   const [cart, setCart] = useState([]);
@@ -22,6 +21,7 @@ const Catalogo18 = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
 
   // Eliminar productos duplicados por código o ID
   const eliminarDuplicados = (productos) => {
@@ -44,7 +44,9 @@ const Catalogo18 = () => {
     const loadInitialData = async () => {
       setLoading(true);
       const productosData = await getData();  // Cargar todos los productos de una vez
-      const productosFiltrados = productosData.filter(producto => producto.vigencia.toLowerCase() !== "no");  // Filtrar por vigencia
+      const productosFiltrados = productosData.filter(
+        (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
+      );
       const productosUnicos = eliminarDuplicados(productosFiltrados);  // Eliminar duplicados
       setProductos(productosUnicos);
       agruparProductosPorLinea(productosUnicos);
@@ -87,10 +89,9 @@ const Catalogo18 = () => {
   // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir los productos con línea "Repuestos"
   useEffect(() => {
     let productosFiltrados = productos.filter((producto) =>
-      producto.descripcion.toLowerCase().includes(filtro.toLowerCase()) &&
-      producto.linea.toLowerCase() !== 'repuestos'  // Excluir los productos con línea "Repuestos"
+      (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
+      (producto?.linea || '').toLowerCase() !== 'repuestos'
     );
-
     if (cuotasMap["18 cuotas sin interés"]) {
       const cuotaKey = cuotasMap["18 cuotas sin interés"];
       productosFiltrados = productosFiltrados.filter(
@@ -151,8 +152,14 @@ const Catalogo18 = () => {
       <Helmet>
       <title>Catalogo Simple - Catálogo</title>
       </Helmet>
-      <div className="w-100 flex justify-center">
-        <img src={logo} alt="logo" height="100" className='mar-t30 mar-b20' />
+      <div className="w-100 flex justify-center items-center flex-direction mar-t10">
+          <Typography fontSize={13} margin={'6px 0 12px 0'} style={{textAlign: 'center'}}>
+            <b>Desarrollado por:</b><br></br>
+            <b>
+              <a href="https://www.instagram.com/lrecchini/" rel="noreferrer"> Luciano Recchini</a>
+            </b>
+          </Typography>
+        <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
       </div>
 
       <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
@@ -193,13 +200,13 @@ const Catalogo18 = () => {
             {productosAMostrar[linea].map((product) => (
               <li className="grid-item" key={product.id}>
                 <ProductsCalatogo
-                  /* key={product.codigo} */
                   product={product}
                   onAddToCart={addToCart}
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
                   selectedCuota={'18 cuotas sin interés'}
-                  precio={formatPrice(product.precio || 0)}  // Se usa 0 como valor por defecto si el precio es undefined
+                  sumarEnvio={sumarEnvio}
+                  costoEnvio={17362}
                 />
               </li>
             ))}

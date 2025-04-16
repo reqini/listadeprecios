@@ -7,13 +7,21 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { Button, CardActions } from '@mui/material';
 import { formatPrice } from '../utils/priceUtils';
 
-const ProductsCalatogo = ({ product, selectedCuota, showPriceOnly = false, isContado = false }) => {
+const ProductsCalatogo = ({ product, selectedCuota, isContado = false }) => {
+  const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
+  const aplicaEnvio = ['Bazar', 'Repuestos'].includes(product.linea);
+
+ /*  const aplicaEnvio = product.puntos && parseFloat(product.puntos) < 140; */
+
+  const SHIPPING_COST = 17362;
+
   // Mapeo de cuotas con sus respectivos campos
   const cuotasMap = {
     "24 cuotas sin interés": 'veinticuatro_sin_interes',
     "20 cuotas sin interés": 'veinte_sin_interes',
     "18 cuotas sin interés": 'dieciocho_sin_interes',
     "12 cuotas sin interés": 'doce_sin_interes',
+    "14 cuotas sin interés": 'catorce_sin_interes',
     "10 cuotas sin interés": 'diez_sin_interes',
     "9 cuotas sin interés": 'nueve_sin_interes',
     "6 cuotas sin interés": 'seis_sin_interes',
@@ -39,8 +47,11 @@ const ProductsCalatogo = ({ product, selectedCuota, showPriceOnly = false, isCon
 
   // Determinar precio final según el contexto
   const precioFinal = isContado
-    ? precioNegocio || 0
-    : cuotaValue || parseFloat(product.psvp_lista?.replace(/[^0-9.-]/g, '')) || 0;
+  ? (precioNegocio || 0) + (sumarEnvio && aplicaEnvio ? SHIPPING_COST : 0)
+  : (cuotaValue || parseFloat(product.psvp_lista?.replace(/[^0-9.-]/g, '')) || 0) +
+    (sumarEnvio && aplicaEnvio ? SHIPPING_COST : 0);
+
+
 
   return (
     <Card sx={{ maxWidth: 600, paddingBottom: '12px' }} className="card-product-catalogo">
@@ -85,12 +96,17 @@ const ProductsCalatogo = ({ product, selectedCuota, showPriceOnly = false, isCon
             Precio de Negocio: <b>{formatPrice(precioFinal)}</b>
           </Typography>
         ) : selectedCuota && cuotaValue ? (
-          <Typography variant="body2" color="text.secondary" style={{ marginTop: 5 }}>
-            {selectedCuota}: <b>{formatPrice(cuotaValue)}</b>
-          </Typography>
-        ) : (
+            <Typography variant="body2" color="text.secondary" style={{ marginTop: 5 }}>
+              {selectedCuota}: <b>{formatPrice(precioFinal)}</b>
+            </Typography>
+          ) : (
           <Typography variant="body2" color="text.secondary" style={{ marginTop: 5 }}>
             No disponible
+          </Typography>
+        )}
+        {sumarEnvio && aplicaEnvio && (
+          <Typography variant="caption" color="error" style={{ marginTop: 4 }}>
+            ¡A esta compra le tenes que sumar de envio: <b>{formatPrice(SHIPPING_COST)}!</b>
           </Typography>
         )}
       </CardContent>

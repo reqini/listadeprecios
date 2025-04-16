@@ -22,29 +22,33 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Validar token y detectar si fue deslogueado desde otro dispositivo
-  useEffect(() => {
-    const validateSession = async () => {
-      const token = localStorage.getItem("token");
-      const currentDeviceId = localStorage.getItem("deviceId");
+// Validar token y detectar si fue deslogueado desde otro dispositivo
+useEffect(() => {
+  const validateSession = async () => {
+    const token = localStorage.getItem("token");
+    const currentDeviceId = localStorage.getItem("deviceId");
 
-      if (token) {
-        try {
-          const response = await axios.post("/auth/validate-session", { token, deviceId: currentDeviceId });
-          if (!response.data.valid) {
-            logout();
-            alert("Fuiste deslogueado porque tu sesión se inició en otro dispositivo.");
-          }
-        } catch (error) {
-          console.error("Error al validar la sesión:", error.message);
-          logout();
-        }
+    if (token) {
+      try {
+        await axios.post("/auth/validate-session", { token, deviceId: currentDeviceId });
+        // Se elimina la lógica que desloguea y muestra el mensaje
+        // if (!response.data.valid) {
+        //   logout();
+        //   alert("Fuiste deslogueado porque tu sesión se inició en otro dispositivo.");
+        // }
+      } catch (error) {
+        console.error("Error al validar la sesión:", error.message);
+        // Si deseas, también puedes quitar el logout aquí
+        // logout();
       }
-    };
+    }
+  };
 
-    const interval = setInterval(validateSession, 5000); // Validar cada 5 segundos
+  const interval = setInterval(validateSession, 5000); // Validar cada 5 segundos
 
-    return () => clearInterval(interval);
-  }, [auth]);
+  return () => clearInterval(interval);
+}, [auth]);
+
 
   return (
     <AuthContext.Provider value={{ auth, login, logout }}>

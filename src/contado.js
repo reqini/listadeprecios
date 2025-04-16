@@ -3,6 +3,7 @@ import axios from "./utils/axios";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
+import Typography from "@mui/material/Typography";
 import { Helmet } from "react-helmet";
 import ProductCatalogoNegocio from "./components/productCalatogoNegocio";
 import logo from "./assets/logo.png";
@@ -38,8 +39,8 @@ const Contado = () => {
       setLoading(true);
       const productosData = await getData();
       const productosFiltrados = productosData.filter(
-        (producto) => producto.vigencia.toLowerCase() !== "no"
-      );
+        (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
+      ); // cambio 1
       const productosUnicos = eliminarDuplicados(productosFiltrados);
       setProductos(productosUnicos);
       setLoading(false);
@@ -49,7 +50,8 @@ const Contado = () => {
   }, []);
 
   const productosFiltrados = productos.filter((producto) =>
-    producto.descripcion.toLowerCase().includes(filtro.toLowerCase())
+    (producto?.descripcion || "").toLowerCase().includes(filtro.toLowerCase()) &&
+    (producto?.linea || "").toLowerCase() !== "repuestos"
   );
 
   return (
@@ -57,8 +59,9 @@ const Contado = () => {
       <Helmet>
         <title>Catálogo Contado - Contado</title>
       </Helmet>
-      <div className="w-100 flex justify-center">
-        <img src={logo} alt="logo" height="100" className="mar-t30 mar-b20" />
+      <div className="w-100 flex justify-center items-center flex-direction mar-t10">
+        <Typography fontSize={13} margin={'6px 0 12px 0'}>Desarrollado por: <b><a href="https://www.instagram.com/lrecchini/" rel="noreferrer">Luciano Recchini</a></b></Typography>
+        <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
       </div>
 
       <div className={`header-catalogo flex-center pad10`}>
@@ -90,7 +93,7 @@ const Contado = () => {
         <ul className="lista-prod-catalog w-100">
           {productosFiltrados.map((product) => (
             <li className="grid-item" key={product.id}>
-              <ProductCatalogoNegocio product={product} />
+              <ProductCatalogoNegocio product={product} costoEnvio={17362}/>
             </li>
           ))}
         </ul>

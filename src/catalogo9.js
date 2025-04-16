@@ -22,6 +22,7 @@ const Catalogo9 = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
 
   // Eliminar productos duplicados por código o ID
   const eliminarDuplicados = (productos) => {
@@ -151,8 +152,14 @@ const Catalogo9 = () => {
       <Helmet>
       <title>Catalogo Simple - Catálogo</title>
       </Helmet>
-      <div className="w-100 flex justify-center">
-        <img src={logo} alt="logo" height="100" className='mar-t30 mar-b20' />
+      <div className="w-100 flex justify-center items-center flex-direction mar-t10">
+        <Typography fontSize={13} margin={'6px 0 12px 0'} style={{textAlign: 'center'}}>
+            <b>Desarrollado por:</b><br></br>
+            <b>
+              <a href="https://www.instagram.com/lrecchini/" rel="noreferrer"> Luciano Recchini</a>
+            </b>
+          </Typography>
+        <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
       </div>
 
       <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
@@ -193,13 +200,13 @@ const Catalogo9 = () => {
             {productosAMostrar[linea].map((product) => (
               <li className="grid-item" key={product.id}>
                 <ProductsCalatogo
-                  /* key={product.codigo} */
                   product={product}
                   onAddToCart={addToCart}
                   isFavorite={favorites.some(fav => fav.id === product.id)}
                   onToggleFavorite={() => toggleFavorite(product)}
                   selectedCuota={'9 cuotas sin interés'}
-                  precio={formatPrice(product.precio || 0)}  // Se usa 0 como valor por defecto si el precio es undefined
+                  sumarEnvio={sumarEnvio}
+                  costoEnvio={17362}
                 />
               </li>
             ))}
