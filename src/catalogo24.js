@@ -85,7 +85,7 @@ const Catalogo24 = () => {
 
   // Uso de useMemo para mantener cuotasMap sin cambios en cada render
   const cuotasMap = useMemo(() => ({
-    "24 cuotas sin interés": 'doce_sin_interes',
+    "24 cuotas sin interés": 'veinticuatro_sin_interes',  // Este debería ser el key correcto
   }), []);
 
   // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir los productos con línea "Repuestos"
