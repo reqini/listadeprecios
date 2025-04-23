@@ -5,7 +5,7 @@ import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import { Helmet } from "react-helmet";
-import ProductCatalogoNegocio from "./components/productCalatogoNegocio";
+import ProductCatalogoPreferencial from "./components/ProductCatalogoPreferencial";
 import logo from "./assets/logo.png";
 
 const Preferencial = () => {
@@ -109,7 +109,7 @@ const Preferencial = () => {
         <ul className="lista-prod-catalog w-100">
           {productosFiltrados.map((product) => (
             <li className="grid-item" key={product.id}>
-              <ProductCatalogoNegocio product={product} costoEnvio={17362} />
+              <ProductCatalogoPreferencial product={product} costoEnvio={17362} />
             </li>
           ))}
         </ul>
