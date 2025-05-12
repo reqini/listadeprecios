@@ -303,7 +303,7 @@ const productosFiltrados = productos.filter(
           />
         </div>
         <div className="w-100">
-          <Typography variant="h3" textAlign={'center'} color={'red'}>NO SE ACEPTAN MAS USUARIOS POR LIMITE DE COSTOS DE MANTENIMIENTO.</Typography>
+          <Typography variant="h6" textAlign={'center'} color={'red'}>NO SE ACEPTAN MAS USUARIOS POR LIMITE DE COSTOS DE MANTENIMIENTO.</Typography>
         </div>
         {getBannerForRango()}
         <Accordion sx={{ marginBottom: 2 }}>
