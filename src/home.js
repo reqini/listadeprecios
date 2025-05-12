@@ -302,6 +302,9 @@ const productosFiltrados = productos.filter(
             onChange={(e) => setFiltro(e.target.value)}
           />
         </div>
+        <div className="w-100">
+          <Typography variant="h3" textAlign={'center'} color={'red'}>NO SE ACEPTAN MAS USUARIOS POR LIMITE DE COSTOS DE MANTENIMIENTO.</Typography>
+        </div>
         {getBannerForRango()}
         <Accordion sx={{ marginBottom: 2 }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
