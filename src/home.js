@@ -72,6 +72,8 @@ const Home = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  const [activoSeleccionado, setActivoSeleccionado] = useState("");
+
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -161,6 +163,7 @@ const Home = () => {
         const user = usuarios.find((u) => u.username === storedUsername);
         if (user) {
           setRango(user.rango);
+          setActivoSeleccionado(user.activo || "");
         }
       } catch (error) {
         console.error("Error al obtener los datos del usuario:", error.message);
@@ -318,13 +321,29 @@ const productosFiltrados = productos.filter(
           <Typography style={{maxWidth: 350}} textAlign={'center'} variant="h6">Por este medio podes generar la url y enviar el catálogo que tu cliente quiera</Typography>
         </div>
         <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100" style={{ gap: 12 }}>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={() => window.location.href = "/activos"}
-          >
-            Gestión de activos
-          </Button>
+          <FormControl sx={{ maxWidth: 300, mt: 2 }}>
+  <InputLabel>¿Estás activo?</InputLabel>
+  <Select
+    value={activoSeleccionado}
+    onChange={async (e) => {
+      const value = e.target.value;
+      setActivoSeleccionado(value);
+      try {
+        await axios.post("/api/usuarios/actualizar-activo", {
+          username,
+          activo: value
+        });
+      } catch (error) {
+        console.error("Error actualizando estado activo:", error);
+      }
+    }}
+    label="¿Estás activo?"
+  >
+    <MenuItem value="SI">Sí</MenuItem>
+    <MenuItem value="NO">No</MenuItem>
+  </Select>
+</FormControl>
+
           <FormControl size="small" sx={{ minWidth: 200, width: '100%', maxWidth: 400, background: 'white' }}>
             <InputLabel>Seleccioná un catálogo</InputLabel>
             <Select
