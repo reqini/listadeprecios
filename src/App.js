@@ -18,6 +18,7 @@ import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
 import Preferencial from "./Preferencial";
 import Contado from "./contado";
+import Activos from "./Activos";
 import Emprendedoras from "./Emprendedoras";
 import GeneradorDePlacas from "./GeneradorDePlacas";
 import { AuthProvider, useAuth } from "./AuthContext";
@@ -63,6 +64,7 @@ const AppContent = () => {
       <Router>
         <AnalyticsTracker />
         <Routes>
+          <Route path="/activos" element={<Activos />} />
           <Route path="/login" element={<LoginRoute />} />
           <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
           <Route path="/faqs" element={<PrivateRoute><FaqScreen /></PrivateRoute>} />

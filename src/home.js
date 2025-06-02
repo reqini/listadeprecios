@@ -318,6 +318,13 @@ const productosFiltrados = productos.filter(
           <Typography style={{maxWidth: 350}} textAlign={'center'} variant="h6">Por este medio podes generar la url y enviar el catálogo que tu cliente quiera</Typography>
         </div>
         <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100" style={{ gap: 12 }}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => window.location.href = "/activos"}
+          >
+            Gestión de activos
+          </Button>
           <FormControl size="small" sx={{ minWidth: 200, width: '100%', maxWidth: 400, background: 'white' }}>
             <InputLabel>Seleccioná un catálogo</InputLabel>
             <Select
