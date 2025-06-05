@@ -27,7 +27,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, /* onRemoveFromCart */ }) =>
   const [planCanje, setPlanCanje] = useState({});
   const [totalPrice, setTotalPrice] = useState(0);
   const [includeShipping, setIncludeShipping] = useState(false);
-  const SHIPPING_COST = 17883;
+  const SHIPPING_COST = 18697; // COSTO DE ENVIO
   const theme = useTheme();
 
   // Función para calcular el precio total
@@ -191,6 +191,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, /* onRemoveFromCart */ }) =>
                       />
                     </div>
                     <FormControlLabel
+                      style={{display: 'none'}}
                       control={
                         <Switch
                           checked={planCanje[item.codigo] || false}
