@@ -6,7 +6,7 @@ import { parsePrice, formatPrice } from './priceUtils';
  * @returns {number} - El monto con descuento aplicado.
  */
 export const applyPlanCanjeDiscount = (amount) => {
-  return Math.max(amount - 37000, 0);
+  return Math.max(amount - 37000, 0); // PLAN CANJE BUSCAR
 };
 
 /**

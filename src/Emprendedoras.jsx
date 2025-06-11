@@ -71,7 +71,8 @@ const Emprendedoras = () => {
     { nombre: "10 Cuotas", url: "/catalogo10" },
     { nombre: "12 Cuotas", url: "/catalogo12" },
     { nombre: "14 Cuotas", url: "/catalogo14" },
-    { nombre: "18 Cuotas", url: "/catalogo18" }
+    { nombre: "18 Cuotas", url: "/catalogo18" },
+    { nombre: "preferencial", url: "/preferencial" }
   ]);
 
   // Estado para manejo de selección de clientes

@@ -59,6 +59,7 @@ export default function BancosDialog() {
           width: 'auto',
           position: 'fixed',
           right: 20,
+          display: 'none'
         }}
         className="fixed-btn"
       >

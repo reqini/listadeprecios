@@ -8,7 +8,6 @@ import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Snackbar, Alert, Typography } from "@mui/material";
-import { formatPrice } from './utils/priceUtils';
 
 const Catalogo24 = () => {
   const [cart, setCart] = useState([]);

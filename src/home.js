@@ -302,6 +302,7 @@ const productosFiltrados = productos.filter(
             onChange={(e) => setFiltro(e.target.value)}
           />
         </div>
+
         {getBannerForRango()}
         <Accordion sx={{ marginBottom: 2 }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
