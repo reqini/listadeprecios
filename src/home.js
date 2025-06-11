@@ -38,6 +38,7 @@ const Home = () => {
 
   const [catalogos] = useState([
     { nombre: "Contado", url: "/contado" },
+    { nombre: "Preferencial", url: "/preferencial" },
     { nombre: "3 Cuotas", url: "/catalogo3" },
     { nombre: "6 Cuotas", url: "/catalogo6" },
     { nombre: "9 Cuotas", url: "/catalogo9" },
