@@ -8,6 +8,8 @@ import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import axios from "./utils/axios";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import { v4 as uuidv4 } from "uuid"; // Importamos uuid para generar el deviceId
 
 // ==== IMPORTS PARA EL MODAL (Material UI) ====
@@ -23,6 +25,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [deviceId, setDeviceId] = useState("");
+  const [showSnackbar, setShowSnackbar] = useState(false);
 
   // ==== ESTADOS PARA EL MODAL ====
   const [showModal, setShowModal] = useState(false);
@@ -37,6 +40,13 @@ const Login = () => {
       setDeviceId(newDeviceId);
     } else {
       setDeviceId(storedDeviceId);
+    }
+  }, []);
+
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    if (query.get("status") === "approved") {
+      setShowSnackbar(true);
     }
   }, []);
 
@@ -179,6 +189,16 @@ const Login = () => {
           <Button onClick={() => setShowModal(false)}>Cerrar</Button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        open={showSnackbar}
+        autoHideDuration={5000}
+        onClose={() => setShowSnackbar(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <MuiAlert onClose={() => setShowSnackbar(false)} severity="success" elevation={6} variant="filled">
+          ¡Gracias por suscribirte! Ya podés iniciar sesión.
+        </MuiAlert>
+      </Snackbar>
     </div>
   );
 };
