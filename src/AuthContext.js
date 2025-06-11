@@ -30,7 +30,7 @@ useEffect(() => {
 
     if (token) {
       try {
-        await axios.post("/api/validate-session", { token, deviceId: currentDeviceId });
+        await axios.post("/auth/validate-session", { token, deviceId: currentDeviceId });
         // Se elimina la lógica que desloguea y muestra el mensaje
         // if (!response.data.valid) {
         //   logout();

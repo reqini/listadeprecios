@@ -16,7 +16,7 @@ import Catalogo14 from "./catalogo14";
 import Catalogo18 from "./catalogo18";
 import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
-import Preferencial from "./Preferencial";
+import Register from "./Registro";
 import Contado from "./contado";
 import Activos from "./Activos";
 import Emprendedoras from "./Emprendedoras";
@@ -66,6 +66,7 @@ const AppContent = () => {
         <Routes>
           <Route path="/activos" element={<Activos />} />
           <Route path="/login" element={<LoginRoute />} />
+          <Route path="/registro" element={< Register/>} />
           <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
           <Route path="/faqs" element={<PrivateRoute><FaqScreen /></PrivateRoute>} />
           <Route path="/catalogo3" element={<Catalogo3 />} />

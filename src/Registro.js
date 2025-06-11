@@ -69,51 +69,59 @@ const Register = () => {
   const isFormValid =
   username && password && confirmPassword && rango && codigoEmprendedora && password === confirmPassword;
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
-  setCodigoError('');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setCodigoError('');
 
-  if (password !== confirmPassword) {
-    setError('Las contraseñas no coinciden.');
-    return;
-  }
-
-  if (!rango) {
-    setError('Por favor selecciona un rango.');
-    return;
-  }
-
-  if (!/^\d{6,8}$/.test(codigoEmprendedora)) {
-    setCodigoError("El código debe ser numérico y tener entre 6 y 8 dígitos.");
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    const payload = {
-      username,
-      password,
-      rango,
-      codigo_emprendedora: codigoEmprendedora, // Asegurar que coincida con el backend
-    };
-
-    const response = await axios.post(`/api/register`, payload);
-
-    if (response.data.success) {
-      alert('Usuario registrado con éxito. Ahora serás redirigido al login.');
-      window.location.href = '/login';
-    } else {
-      setCodigoError(response.data.message || 'Hubo un problema durante el registro.');
+    if (password !== confirmPassword) {
+      setError('Las contraseñas no coinciden.');
+      return;
     }
-  } catch (error) {
-    console.error('Error durante el registro:', error.response?.data?.message || error.message);
-    setCodigoError(error.response?.data?.message || 'Hubo un problema al registrarse. Intenta de nuevo.');
-  } finally {
-    setLoading(false);
-  }
-};
+
+    if (!rango) {
+      setError('Por favor selecciona un rango.');
+      return;
+    }
+
+    if (!/^\d{6,8}$/.test(codigoEmprendedora)) {
+      setCodigoError("El código debe ser numérico y tener entre 6 y 8 dígitos.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const payload = {
+        username,
+        password,
+        rango,
+        codigo_emprendedora: codigoEmprendedora, // Asegurar que coincida con el backend
+      };
+
+      const response = await axios.post(`/auth/register`, payload);
+
+      if (response.data.success) {
+        // 🟢 Guardamos el username para prellenar el login después de suscribirse
+        localStorage.setItem("registeredUsername", username);
+
+        // Redirige a Mercado Pago con retorno a /login
+        // local
+        //const mercadoPagoUrl = "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808494f9e81b01952fe6e9e01a76&back_url=http://localhost:3000/login";
+        // prod
+        const mercadoPagoUrl = "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808494f9e81b01952fe6e9e01a76&back_url=https://addicad.com/login";
+
+        window.location.href = mercadoPagoUrl;
+      } else {
+        setCodigoError(response.data.message || 'Hubo un problema durante el registro.');
+      }
+    } catch (error) {
+      console.error('Error durante el registro:', error.response?.data?.message || error.message);
+      setCodigoError(error.response?.data?.message || 'Hubo un problema al registrarse. Intenta de nuevo.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
 

@@ -124,7 +124,7 @@ const Home = () => {
 
     const validateSession = async () => {
       try {
-        const { data } = await axios.post("/api/validate-session", { token, deviceId });
+        const { data } = await axios.post("/auth/validate-session", { token, deviceId });
         if (data.valid) {
           setSessionValid(true);
         } else {
@@ -157,7 +157,7 @@ const Home = () => {
       setUsername(storedUsername);
 
       try {
-        const { data: usuarios } = await axios.get(`/api/usuarios`);
+        const { data: usuarios } = await axios.get(`/api/user/all`);
         const user = usuarios.find((u) => u.username === storedUsername);
         if (user) {
           setRango(user.rango);
