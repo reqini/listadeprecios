@@ -67,6 +67,7 @@ const Home = () => {
   const [productos, setProductos] = useState([]);
   const [filtro, setFiltro] = useState("");
   const [username, setUsername] = useState("");
+  const [tipoUsuario, setTipoUsuario] = useState("");
   const [timeOfDay, setTimeOfDay] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [rango, setRango] = useState("");
@@ -163,6 +164,7 @@ const Home = () => {
         const user = usuarios.find((u) => u.username === storedUsername);
         if (user) {
           setRango(user.rango);
+          setTipoUsuario(user.tipo_usuario); // 👈 Agregamos esto
         }
       } catch (error) {
         console.error("Error al obtener los datos del usuario:", error.message);
@@ -279,6 +281,9 @@ const productosFiltrados = productos.filter(
     // Si la sesión no es válida, se habrá redirigido; retornamos null
     return null;
   }
+const user = JSON.parse(localStorage.getItem("user")); // o como lo estés usando
+
+  const esGratis = tipoUsuario === "gratis";
 
   // Si llegamos hasta acá, la sesión es válida
   return (
@@ -316,37 +321,44 @@ const productosFiltrados = productos.filter(
             <ReviewSlider />
           </AccordionDetails>
         </Accordion>
-        <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100">
-          <Typography style={{maxWidth: 350}} textAlign={'center'} variant="h6">Por este medio podes generar la url y enviar el catálogo que tu cliente quiera</Typography>
-        </div>
+        {user?.tipo_usuario === "gratis" && (
+          <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100">
+            <Typography style={{maxWidth: 350}} textAlign={'center'} variant="h6">Por este medio podes generar la url y enviar el catálogo que tu cliente quiera</Typography>
+          </div>
+        )}
         <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100" style={{ gap: 12 }}>
-          <FormControl size="small" sx={{ minWidth: 200, width: '100%', maxWidth: 400, background: 'white' }}>
-            <InputLabel>Seleccioná un catálogo</InputLabel>
-            <Select
-              value={selectedCatalog}
-              fullWidth
-              size="large"
-              variant="outlined"
-              onChange={(e) => setSelectedCatalog(e.target.value)}
-              label="Seleccioná un catálogo"
+          {user?.tipo_usuario === "gratis" && (
+            <FormControl size="small" sx={{ minWidth: 200, width: '100%', maxWidth: 400, background: 'white' }}>
+              <InputLabel>Seleccioná un catálogo</InputLabel>
+              <Select
+                value={selectedCatalog}
+                fullWidth
+                size="large"
+                variant="outlined"
+                onChange={(e) => setSelectedCatalog(e.target.value)}
+                label="Seleccioná un catálogo"
+              >
+                <MenuItem value="">-- Elegí uno --</MenuItem>
+                {catalogos.map((cat) => (
+                  <MenuItem key={cat.url} value={cat.url}>{cat.nombre}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+         
+          {!esGratis && (
+            <Button
+              variant="contained"
+              disabled={!selectedCatalog}
+              onClick={() => {
+                const url = `${window.location.origin}${selectedCatalog}`;
+                navigator.clipboard.writeText(url);
+                setSnackbarOpen(true);
+              }}
             >
-              <MenuItem value="">-- Elegí uno --</MenuItem>
-              {catalogos.map((cat) => (
-                <MenuItem key={cat.url} value={cat.url}>{cat.nombre}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Button
-            variant="contained"
-            disabled={!selectedCatalog}
-            onClick={() => {
-              const url = `${window.location.origin}${selectedCatalog}`;
-              navigator.clipboard.writeText(url);
-              setSnackbarOpen(true);
-            }}
-          >
-            Copiar URL
-          </Button>
+              Copiar URL
+            </Button>
+          )}
         </div>
 
         <ul className="lista-prod w-100">
@@ -366,18 +378,20 @@ const productosFiltrados = productos.filter(
                 <Product
                   product={product}
                   cuotaType="sin_interes"
-                  onAddToCart={onAddToCart}
+                  onAddToCart={!esGratis ? onAddToCart : null}
                 />
               </li>
             ))
           )}
         </ul>
 
-        <ShoppingCart
-          cart={cart}
-          setCart={setCart}
-          onClearCart={clearCart}
-        />
+        {!esGratis && (
+          <ShoppingCart
+            cart={cart}
+            setCart={setCart}
+            onClearCart={clearCart}
+          />
+        )}
 
         {/* Modal de promociones bancarias */}
         <ResponsiveDialog open={openDialog} onClose={handleCloseDialog} />

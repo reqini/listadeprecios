@@ -25,6 +25,8 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
+  const [tipoUsuario, setTipoUsuario] = useState("limitado"); // por defecto gratuito
+
 
   const rangos = [
     "Demostrador/a",
@@ -66,62 +68,70 @@ const Register = () => {
     setCodigoError('');
   };
 
-  const isFormValid =
-  username && password && confirmPassword && rango && codigoEmprendedora && password === confirmPassword;
+const isFormValid =
+  username &&
+  password &&
+  confirmPassword &&
+  rango &&
+  codigoEmprendedora &&
+  tipoUsuario && // 👈 agregado
+  password === confirmPassword;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setCodigoError('');
 
-    if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
-      return;
-    }
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
+  setCodigoError('');
 
-    if (!rango) {
-      setError('Por favor selecciona un rango.');
-      return;
-    }
+  if (password !== confirmPassword) {
+    setError('Las contraseñas no coinciden.');
+    return;
+  }
 
-    if (!/^\d{6,8}$/.test(codigoEmprendedora)) {
-      setCodigoError("El código debe ser numérico y tener entre 6 y 8 dígitos.");
-      return;
-    }
+  if (!rango) {
+    setError('Por favor selecciona un rango.');
+    return;
+  }
 
-    try {
-      setLoading(true);
+  if (!/^\d{6,8}$/.test(codigoEmprendedora)) {
+    setCodigoError("El código debe ser numérico y tener entre 6 y 8 dígitos.");
+    return;
+  }
 
-      const payload = {
-        username,
-        password,
-        rango,
-        codigo_emprendedora: codigoEmprendedora, // Asegurar que coincida con el backend
-      };
+  try {
+    setLoading(true);
 
-      const response = await axios.post(`/auth/register`, payload);
+    const payload = {
+      username,
+      password,
+      rango,
+      codigo_emprendedora: codigoEmprendedora,
+      tipo_usuario: tipoUsuario,
+    };
 
-      if (response.data.success) {
-        // 🟢 Guardamos el username para prellenar el login después de suscribirse
-        localStorage.setItem("registeredUsername", username);
+    const response = await axios.post(`/auth/register`, payload);
 
-        // Redirige a Mercado Pago con retorno a /login
-        // local
-        //const mercadoPagoUrl = "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808494f9e81b01952fe6e9e01a76&back_url=http://localhost:3000/login";
-        // prod
+    if (response.data.success) {
+      localStorage.setItem("registeredUsername", username);
+
+      if (tipoUsuario === "full") {
         const mercadoPagoUrl = "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808494f9e81b01952fe6e9e01a76&back_url=https://addicad.com/login";
-
         window.location.href = mercadoPagoUrl;
       } else {
-        setCodigoError(response.data.message || 'Hubo un problema durante el registro.');
+        window.location.href = "/login";
       }
-    } catch (error) {
-      console.error('Error durante el registro:', error.response?.data?.message || error.message);
-      setCodigoError(error.response?.data?.message || 'Hubo un problema al registrarse. Intenta de nuevo.');
-    } finally {
-      setLoading(false);
+
+    } else {
+      setCodigoError(response.data.message || 'Hubo un problema durante el registro.');
     }
-  };
+
+  } catch (error) {
+    console.error('Error durante el registro:', error.response?.data?.message || error.message);
+    setCodigoError(error.response?.data?.message || 'Hubo un problema al registrarse. Intenta de nuevo.');
+  } finally {
+    setLoading(false);
+  }
+};
 
 
 
@@ -253,6 +263,22 @@ const Register = () => {
                 helperText={codigoError}
               />
             </Grid>
+            <Grid item xs={12} style={{ margin: '10px 0' }}>
+              <FormControl fullWidth variant="filled" style={{ backgroundColor: 'white' }}>
+                <InputLabel id="tipo-usuario-label">Tipo de usuario</InputLabel>
+                <Select
+                  labelId="tipo-usuario-label"
+                  id="tipo_usuario"
+                  value={tipoUsuario}
+                  onChange={(e) => setTipoUsuario(e.target.value)}
+                  required
+                >
+                  <MenuItem value="limitado">Gratis (solo lista de precios)</MenuItem>
+                  <MenuItem value="full">Usuario full (con todas las herramientas)</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+
             {error && (
               <Grid
                 item
