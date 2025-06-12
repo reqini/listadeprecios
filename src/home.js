@@ -165,6 +165,7 @@ const Home = () => {
         if (user) {
           setRango(user.rango);
           setTipoUsuario(user.tipo_usuario); // 👈 Agregamos esto
+          localStorage.setItem("user", JSON.stringify(user)); // 👈 SUMALO
         }
       } catch (error) {
         console.error("Error al obtener los datos del usuario:", error.message);
@@ -281,7 +282,6 @@ const productosFiltrados = productos.filter(
     // Si la sesión no es válida, se habrá redirigido; retornamos null
     return null;
   }
-const user = JSON.parse(localStorage.getItem("user")); // o como lo estés usando
 
   const esGratis = tipoUsuario === "gratis";
 
@@ -321,13 +321,13 @@ const user = JSON.parse(localStorage.getItem("user")); // o como lo estés usand
             <ReviewSlider />
           </AccordionDetails>
         </Accordion>
-        {user?.tipo_usuario === "gratis" && (
+        {esGratis && (
           <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100">
             <Typography style={{maxWidth: 350}} textAlign={'center'} variant="h6">Por este medio podes generar la url y enviar el catálogo que tu cliente quiera</Typography>
           </div>
         )}
         <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100" style={{ gap: 12 }}>
-          {user?.tipo_usuario === "gratis" && (
+          {esGratis && (
             <FormControl size="small" sx={{ minWidth: 200, width: '100%', maxWidth: 400, background: 'white' }}>
               <InputLabel>Seleccioná un catálogo</InputLabel>
               <Select
@@ -385,7 +385,7 @@ const user = JSON.parse(localStorage.getItem("user")); // o como lo estés usand
           )}
         </ul>
 
-        {!esGratis && (
+        {esGratis && (
           <ShoppingCart
             cart={cart}
             setCart={setCart}
