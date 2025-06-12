@@ -37,6 +37,7 @@ const Home = () => {
   const isMobile = useMediaQuery('(max-width:600px)');
 
   const [catalogos] = useState([
+  { nombre: "Preferencial", url: "/preferencial" },
     { nombre: "Contado", url: "/contado" },
     { nombre: "Preferencial", url: "/preferencial" },
     { nombre: "3 Cuotas", url: "/catalogo3" },

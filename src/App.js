@@ -16,9 +16,8 @@ import Catalogo14 from "./catalogo14";
 import Catalogo18 from "./catalogo18";
 import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
-import Preferencial from './Preferencial.jsx';
 import Register from "./Registro";
-/* import Preferencial from "./Preferencial"; */
+import Preferencial from "./Preferencial";
 import Contado from "./contado";
 import Activos from "./Activos";
 import Emprendedoras from "./Emprendedoras";
@@ -82,7 +81,6 @@ const AppContent = () => {
           <Route path="/catalogo20" element={<Catalogo20 />} />
           <Route path="/catalogo24" element={<Catalogo24 />} />
           <Route path="/contado" element={<Contado />} />
-         {/*  <Route path="/preferencial" element={<Preferencial />} /> */}
           <Route path="/generarPlaca" element={<PrivateRoute><GeneradorDePlacas /></PrivateRoute>} />
           <Route path="/emprendedoras" element={<PrivateRoute><Emprendedoras /></PrivateRoute>} />
           <Route path="/" element={<Navigate to="/login" replace />} />
