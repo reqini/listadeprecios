@@ -1,3 +1,4 @@
+
 import axios from "axios";
 
 const url =
@@ -9,15 +10,12 @@ const instance = axios.create({
   baseURL: `${url}`,
 });
 
-// Interceptor para agregar el token a cada solicitud
+// Interceptor para agregar el token solo si existe
 instance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token"); // Obtener el token del localStorage
+    const token = localStorage.getItem("token");
     if (token) {
-      /* console.log("🛠️ Enviando token:", token);  */// Log para depuración
       config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      console.warn("⚠️ No se encontró token en localStorage");
     }
     return config;
   },
@@ -27,18 +25,21 @@ instance.interceptors.request.use(
   }
 );
 
-// Interceptor para manejar respuestas de errores
+// Interceptor de respuesta mejorado
 instance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response) {
-      if (error.response.status === 401) {
-        console.warn("⚠️ Token inválido o expirado. Mostrar aviso antes de cerrar sesión.");
-        alert("Tu sesión ha expirado. Por favor, vuelve a iniciar sesión.");
-        localStorage.removeItem("token");
-        window.location.href = "/login"; 
-      }
+    const requestURL = error?.config?.url || "";
+
+    // Solo alertar si es una ruta protegida
+    const isProtected = !requestURL.includes("/api/productos");
+
+    if (error.response && error.response.status === 401 && isProtected) {
+      console.warn("⚠️ Token inválido. Solo rutas protegidas redirigen.");
+      localStorage.removeItem("token");
+      window.location.href = "/login";
     }
+
     return Promise.reject(error);
   }
 );
