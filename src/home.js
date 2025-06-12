@@ -283,7 +283,7 @@ const productosFiltrados = productos.filter(
     return null;
   }
 
-  const esGratis = tipoUsuario === "gratis";
+  const esGratis = tipoUsuario === "full";
 
   // Si llegamos hasta acá, la sesión es válida
   return (
