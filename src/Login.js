@@ -10,14 +10,18 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import axios from "./utils/axios";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import { v4 as uuidv4 } from "uuid"; // Importamos uuid para generar el deviceId
-
-// ==== IMPORTS PARA EL MODAL (Material UI) ====
+import { v4 as uuidv4 } from "uuid";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Typography from "@mui/material/Typography";
+
+const frases = [
+  { icon: "📦", text: "Accedé a productos exclusivos" },
+  { icon: "📱", text: "Desde cualquier dispositivo" },
+  { icon: "🧾", text: "Listas actualizadas al instante" }
+];
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -26,13 +30,11 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [deviceId, setDeviceId] = useState("");
   const [showSnackbar, setShowSnackbar] = useState(false);
-
-  // ==== ESTADOS PARA EL MODAL ====
   const [showModal, setShowModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [slideIndex, setSlideIndex] = useState(0);
 
   useEffect(() => {
-    // Generar un deviceId único y guardarlo en localStorage
     const storedDeviceId = localStorage.getItem("deviceId");
     if (!storedDeviceId) {
       const newDeviceId = uuidv4();
@@ -41,25 +43,28 @@ const Login = () => {
     } else {
       setDeviceId(storedDeviceId);
     }
+
+    const query = new URLSearchParams(window.location.search);
+    if (query.get("status") === "approved") setShowSnackbar(true);
+
+    const savedUsername = localStorage.getItem("registeredUsername");
+    if (savedUsername) setUsername(savedUsername);
   }, []);
 
   useEffect(() => {
-    const query = new URLSearchParams(window.location.search);
-    if (query.get("status") === "approved") {
-      setShowSnackbar(true);
-    }
+    const interval = setInterval(() => {
+      setSlideIndex((prev) => (prev + 1) % frases.length);
+    }, 3000);
+    return () => clearInterval(interval);
   }, []);
 
-  // Toggle para mostrar u ocultar la contraseña
   const handleClickShowPassword = () => setShowPassword(!showPassword);
 
-  // Controlar el cambio del nombre de usuario
   const handleChangeUsername = (e) => {
     const value = e.target.value;
     setUsername(value.replace(/\s+/g, "").toLowerCase());
   };
 
-  // Enviar el formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -67,34 +72,22 @@ const Login = () => {
     setErrorMsg("");
 
     try {
-      // Hacemos una solicitud POST al backend para autenticar
       const response = await axios.post(`/auth/login`, {
         username,
         password,
-        deviceId, // Enviamos el deviceId
+        deviceId,
       });
 
       if (response.data.token) {
-        // Guardar el token y el nombre de usuario en localStorage para mantener la sesión
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("activeSession", response.data.username);
-
-        // Redirigir al home después de un login exitoso
         window.location.href = "/home";
       } else {
-        // Mostrar error si el usuario o la contraseña son incorrectos
         alert("Usuario o contraseña incorrectos");
       }
     } catch (error) {
-      // Si el backend responde con 403 y showModal = true, mostramos nuestro diálogo.
-      if (
-        error.response &&
-        error.response.status === 403 &&
-        error.response.data.showModal
-      ) {
-        setErrorMsg(
-          error.response.data.message || "Máximo de sesiones activas alcanzado."
-        );
+      if (error.response?.status === 403 && error.response.data.showModal) {
+        setErrorMsg(error.response.data.message || "Máximo de sesiones activas alcanzado.");
         setShowModal(true);
       } else {
         console.error("Error durante la autenticación:", error.message);
@@ -107,79 +100,53 @@ const Login = () => {
 
   return (
     <div className="full-width" style={{ backgroundColor: "#FFEDC4" }}>
-      <Container
-        className="flex justify-center items-center flex-direction"
-        maxWidth="sm"
-        style={{ paddingTop: 100 }}
-      >
+      <Container className="flex justify-center items-center flex-direction" maxWidth="sm" style={{ paddingTop: 80 }}>
         <img src={logo} alt="logo" height="100" className="mar-b10" />
+        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+          <Typography variant="h6">{frases[slideIndex].icon} {frases[slideIndex].text}</Typography>
+        </div>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={0} className="card">
             <Grid item xs={12} style={{ margin: "10px 0" }}>
-              <TextField
-                required
-                fullWidth
-                style={{ color: "black", backgroundColor: "white" }}
-                id="filled-required-name"
-                label={"Usuario"}
-                value={username}
-                variant="filled"
-                onChange={handleChangeUsername}
-              />
+              <TextField required fullWidth id="filled-required-name" label={"Usuario"} value={username} variant="filled" onChange={handleChangeUsername} style={{ backgroundColor: "white" }} />
             </Grid>
             <Grid item xs={12} style={{ margin: "10px 0" }}>
               <TextField
                 required
                 fullWidth
                 type={showPassword ? "text" : "password"}
-                style={{ color: "black", backgroundColor: "white" }}
                 id="filled-required-code"
                 label="Contraseña"
                 value={password}
                 variant="filled"
                 onChange={(e) => setPassword(e.target.value)}
+                style={{ backgroundColor: "white" }}
                 InputProps={{
                   endAdornment: (
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      edge="end"
-                      style={{
-                        position: "absolute",
-                        right: 15,
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                      }}
-                    >
+                    <IconButton onClick={handleClickShowPassword} edge="end">
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
-                  ),
+                  )
                 }}
               />
             </Grid>
             <Grid item xs={12} style={{ margin: "10px 0" }}>
-              <Button
-                fullWidth
-                type="submit"
-                variant="contained"
-                size="large"
-                disabled={loading}
-              >
+              <Button fullWidth type="submit" variant="contained" size="large" disabled={loading}>
                 {loading ? "Cargando..." : "Entrar"}
               </Button>
             </Grid>
             <Grid item xs={12} style={{ margin: "10px 0", textAlign: 'center' }}>
-              <Typography fontSize={18} variant="body1">¿Queres ser parte de esta gran experiencia?</Typography>
-              <Typography fontSize={16} variant="body2"><a href="https://wa.me/5491151347453" rel="noopener" style={{ color: 'black'}}>Charlemos por whatsapp mi nombre es Luciano</a></Typography>
+              <Typography fontSize={16} variant="body2">
+                ¿No sos parte aún? <a href="/registro" style={{ color: 'black', fontWeight: 'bold' }}>Registrate</a>
+              </Typography>
+              <Typography fontSize={14} variant="body2">
+                o charlemos por <a href="https://wa.me/5491151347453" rel="noopener" style={{ color: 'black' }}>Whatsapp</a>
+              </Typography>
             </Grid>
           </Grid>
         </form>
       </Container>
 
-      {/* TODO: Integrar login biométrico si fuera una app móvil (TouchID/FaceID).
-          En web no es usual, pero podrías añadir algo como WebAuthn/FIDO2. */}
-
-      {/* Modal para avisar que se superó el límite de sesiones */}
       <Dialog open={showModal} onClose={() => setShowModal(false)}>
         <DialogTitle>Atención</DialogTitle>
         <DialogContent>
@@ -189,6 +156,7 @@ const Login = () => {
           <Button onClick={() => setShowModal(false)}>Cerrar</Button>
         </DialogActions>
       </Dialog>
+
       <Snackbar
         open={showSnackbar}
         autoHideDuration={5000}
