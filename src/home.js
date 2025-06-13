@@ -35,8 +35,6 @@ const Home = () => {
   const { logout } = useAuth();
   const [openThemeDialog, setOpenThemeDialog] = useState(false);
   const isMobile = useMediaQuery('(max-width:600px)');
-  const user = JSON.parse(localStorage.getItem("user"));
-
 
   const [catalogos] = useState([
   { nombre: "Preferencial", url: "/preferencial" },
@@ -69,7 +67,6 @@ const Home = () => {
   const [productos, setProductos] = useState([]);
   const [filtro, setFiltro] = useState("");
   const [username, setUsername] = useState("");
-  const [tipoUsuario, setTipoUsuario] = useState("");
   const [timeOfDay, setTimeOfDay] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [rango, setRango] = useState("");
@@ -166,7 +163,6 @@ const Home = () => {
         const user = usuarios.find((u) => u.username === storedUsername);
         if (user) {
           setRango(user.rango);
-          setTipoUsuario(user.tipo_usuario); // 👈 Agregamos esto
           localStorage.setItem("user", JSON.stringify(user)); // 👈 SUMALO
         }
       } catch (error) {
@@ -285,16 +281,13 @@ const productosFiltrados = productos.filter(
     return null;
   }
 
-  const esGratis = tipoUsuario === "full";
-
   // Si llegamos hasta acá, la sesión es válida
   return (
     <>
       <Navbar
-        user={user}
         title={
           <p>
-            {timeOfDay} <b>{username || "Usuario"}</b>{/* , Te damos la Bienvenida */}
+            {timeOfDay} <b>{username === 'cocinatalia' ? 'Chupa Pito' : username || "Usuario"}</b>{/* , Te damos la Bienvenida */}
           </p>
         }
         onLogout={logout}
@@ -313,55 +306,47 @@ const productosFiltrados = productos.filter(
         </div>
 
         {getBannerForRango()}
-        <Accordion sx={{ marginBottom: 2 }}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="subtitle1" fontWeight={600}>
-              Desplegar Reseñas
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails sx={{ background: '#e9e9e9' }}>
-            <ReviewSlider />
-          </AccordionDetails>
-        </Accordion>
-        {esGratis && (
+          <Accordion sx={{ marginBottom: 2, display: 'none' }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="subtitle1" fontWeight={600}>
+                Desplegar Reseñas
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ background: '#e9e9e9' }}>
+              <ReviewSlider />
+            </AccordionDetails>
+          </Accordion>
           <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100">
             <Typography style={{maxWidth: 350}} textAlign={'center'} variant="h6">Por este medio podes generar la url y enviar el catálogo que tu cliente quiera</Typography>
           </div>
-        )}
         <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100" style={{ gap: 12 }}>
-          {esGratis && (
-            <>
-            <FormControl size="small" sx={{ minWidth: 200, width: '100%', maxWidth: 400, background: 'white' }}>
-              <InputLabel>Seleccioná un catálogo</InputLabel>
-              <Select
-                value={selectedCatalog}
-                fullWidth
-                size="large"
-                variant="outlined"
-                onChange={(e) => setSelectedCatalog(e.target.value)}
-                label="Seleccioná un catálogo"
-              >
-                <MenuItem value="">-- Elegí uno --</MenuItem>
-                {catalogos.map((cat) => (
-                  <MenuItem key={cat.url} value={cat.url}>{cat.nombre}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            {esGratis && (
-              <Button
-                variant="contained"
-                disabled={!selectedCatalog}
-                onClick={() => {
-                  const url = `${window.location.origin}${selectedCatalog}`;
-                  navigator.clipboard.writeText(url);
-                  setSnackbarOpen(true);
-                }}
-              >
-                Copiar URL
-              </Button>
-              )}
-              </>
-          )}
+          <FormControl size="small" sx={{ minWidth: 200, width: '100%', maxWidth: 400, background: 'white' }}>
+            <InputLabel>Seleccioná un catálogo</InputLabel>
+            <Select
+              value={selectedCatalog}
+              fullWidth
+              size="large"
+              variant="outlined"
+              onChange={(e) => setSelectedCatalog(e.target.value)}
+              label="Seleccioná un catálogo"
+            >
+              <MenuItem value="">-- Elegí uno --</MenuItem>
+              {catalogos.map((cat) => (
+                <MenuItem key={cat.url} value={cat.url}>{cat.nombre}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button
+            variant="contained"
+            disabled={!selectedCatalog}
+            onClick={() => {
+              const url = `${window.location.origin}${selectedCatalog}`;
+              navigator.clipboard.writeText(url);
+              setSnackbarOpen(true);
+            }}
+          >
+            Copiar URL
+          </Button>
         </div>
 
         <ul className="lista-prod w-100">
@@ -381,22 +366,17 @@ const productosFiltrados = productos.filter(
                 <Product
                   product={product}
                   cuotaType="sin_interes"
-                  onAddToCart={!esGratis ? onAddToCart : null}
-                  tipoUsuario={user?.tipo_usuario}
+                  onAddToCart={onAddToCart}
                 />
               </li>
             ))
           )}
         </ul>
-
-        {esGratis && (
           <ShoppingCart
             cart={cart}
             setCart={setCart}
             onClearCart={clearCart}
           />
-        )}
-
         {/* Modal de promociones bancarias */}
         <ResponsiveDialog open={openDialog} onClose={handleCloseDialog} />
 

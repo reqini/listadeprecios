@@ -26,8 +26,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MenuIcon from '@mui/icons-material/Menu';
 
 const Navbar = ({ user, onLogout, title }) => {
-  const tipoUsuario = user?.tipo_usuario?.toLowerCase() || "";
-
   const [anchorEl, setAnchorEl] = useState(null);
   const [password, setPassword] = useState("");
   const [edited, setEdited] = useState(false);
@@ -100,8 +98,6 @@ const Navbar = ({ user, onLogout, title }) => {
 
 
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-             {tipoUsuario === "full" && (
-              <>
               <MenuItem
                 onClick={() => {
                   navigate("/home");
@@ -151,8 +147,6 @@ const Navbar = ({ user, onLogout, title }) => {
                 Preguntas Frecuentes
               </MenuItem>
                 <Divider></Divider>
-                </>
-            )}
             <MenuItem
               onClick={() => {
                 onLogout();
