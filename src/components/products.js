@@ -17,7 +17,7 @@ import { parsePrice, formatPrice } from "../utils/priceUtils";
 
 const cuotaSimple = require("../../src/assets/cuotas-simples.webp");
 
-const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
+const Product = ({ product, cuotaType, onAddToCart, catalog = false, tipoUsuario }) => {
   const [selectedCuota, setSelectedCuota] = useState("");
 
   const cuotasConInteres = ["tres_con_interes", "seis_con_interes"];
@@ -130,8 +130,14 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
 
 
       <CardActions sx={{ display: "flex", flexDirection: "column" }}>
-        {!catalog && (
-          <Button fullWidth onClick={() => onAddToCart(product)} variant="contained" size="medium" color="primary">
+        {!catalog && tipoUsuario?.toLowerCase() === "full" && (
+          <Button
+            fullWidth
+            onClick={() => onAddToCart(product)}
+            variant="contained"
+            size="medium"
+            color="primary"
+          >
             Agregar al carrito
           </Button>
         )}

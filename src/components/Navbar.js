@@ -26,6 +26,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MenuIcon from '@mui/icons-material/Menu';
 
 const Navbar = ({ user, onLogout, title }) => {
+  const tipoUsuario = user?.tipo_usuario?.toLowerCase() || "";
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [password, setPassword] = useState("");
   const [edited, setEdited] = useState(false);
@@ -91,60 +93,66 @@ const Navbar = ({ user, onLogout, title }) => {
           <Typography variant="body1" fontSize={16} sx={{ flexGrow: 1, margin: '0 12px' }}>
             {title}
           </Typography>
-          <IconButton color="inherit" onClick={handleMenuOpen}>
-            {/* <Typography margin={'0 10px 0 0'}>Menú</Typography> */}
-            <MenuIcon />
-          </IconButton>
+
+            <IconButton color="inherit" onClick={handleMenuOpen}>
+              <MenuIcon />
+            </IconButton>
+
+
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-            <MenuItem
-              onClick={() => {
-                navigate("/home");
-                handleMenuClose();
-              }}
-              disabled={location.pathname === "/home"}
-            >
-              Home
-            </MenuItem>
-            <Divider />
-            <MenuItem
-              onClick={() => {
-                // Ejemplo: abrir el modal de perfil
-                setOpenDialog("profile");
-                handleMenuClose();
-              }}
-            >
-              Perfil
-            </MenuItem>
-            <Divider></Divider>
-            {/* Nuevo acceso a /emprendedora */}
-            <MenuItem
-              /* style={{display: 'none'}} */
-              onClick={() => {
-                navigate("/emprendedoras");
-                handleMenuClose();
-              }}
-            >
-              Catálogos
-            </MenuItem>
-            <Divider></Divider>
-            <MenuItem
-              onClick={() => {
-                navigate("/generarPlaca");
-                handleMenuClose();
-              }}
-            >
-              Crear Placas <i style={{color: 'green', marginLeft: 12}}>V.0.3 Beta</i>
-            </MenuItem>
-            <Divider></Divider>
-            <MenuItem
-              onClick={() => {
-                navigate("/faqs");
-                handleMenuClose();
-              }}
-            >
-              Preguntas Frecuentes
-            </MenuItem>
-            <Divider></Divider>
+             {tipoUsuario === "full" && (
+              <>
+              <MenuItem
+                onClick={() => {
+                  navigate("/home");
+                  handleMenuClose();
+                }}
+                disabled={location.pathname === "/home"}
+              >
+                Home
+              </MenuItem>
+              <Divider />
+              <MenuItem
+                onClick={() => {
+                  // Ejemplo: abrir el modal de perfil
+                  setOpenDialog("profile");
+                  handleMenuClose();
+                }}
+              >
+                Perfil
+              </MenuItem>
+              <Divider></Divider>
+              {/* Nuevo acceso a /emprendedora */}
+              <MenuItem
+                /* style={{display: 'none'}} */
+                onClick={() => {
+                  navigate("/emprendedoras");
+                  handleMenuClose();
+                }}
+              >
+                Catálogos
+              </MenuItem>
+              <Divider></Divider>
+              <MenuItem
+                onClick={() => {
+                  navigate("/generarPlaca");
+                  handleMenuClose();
+                }}
+              >
+                Crear Placas <i style={{color: 'green', marginLeft: 12}}>V.0.3 Beta</i>
+              </MenuItem>
+              <Divider></Divider>
+              <MenuItem
+                onClick={() => {
+                  navigate("/faqs");
+                  handleMenuClose();
+                }}
+              >
+                Preguntas Frecuentes
+              </MenuItem>
+                <Divider></Divider>
+                </>
+            )}
             <MenuItem
               onClick={() => {
                 onLogout();
