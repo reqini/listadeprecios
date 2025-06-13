@@ -126,7 +126,7 @@ const Navbar = ({ user, onLogout, title }) => {
                   handleMenuClose();
                 }}
               >
-                Catálogos
+                Catálogos y Clientes
               </MenuItem>
               <Divider></Divider>
               <MenuItem
