@@ -115,7 +115,7 @@ const handleSubmit = async (e) => {
       localStorage.setItem("registeredUsername", username);
 
       if (tipoUsuario === "full") {
-        const mercadoPagoUrl = "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808494f9e81b01952fe6e9e01a76&back_url=https://addicad.com/login";
+        const mercadoPagoUrl = "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808494f9e81b01952fe6e9e01a76&back_url=https://catalogosimple.ar/login";
         window.location.href = mercadoPagoUrl;
       } else {
         window.location.href = "/login";
