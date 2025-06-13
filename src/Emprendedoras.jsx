@@ -26,8 +26,10 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   FormControlLabel,
-  Switch
+  Switch,
+  InputAdornment
 } from "@mui/material";
+
 import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -42,7 +44,6 @@ const Emprendedoras = () => {
   const [bancoFilter, setBancoFilter] = useState("");
   const [openAddClientDialog, setOpenAddClientDialog] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingClientId, setEditingClientId] = useState(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   // ✅ Estado para cuotas seleccionadas (agregar cerca del resto de estados)
   const [selectedCuotas, setSelectedCuotas] = useState([]);
@@ -58,10 +59,21 @@ const Emprendedoras = () => {
   const [editAddress, setEditAddress] = useState("");
   const [editBank, setEditBank] = useState("");
   const [editPhone, setEditPhone] = useState("");
+  const [originalClient, setOriginalClient] = useState(null);
+
+
+  const isValidPhone = (phone) => {
+    const cleaned = phone.replace(/\D/g, "");
+    return /^54\d{10}$/.test(cleaned);
+  };
 
   const [sumarEnvio, setSumarEnvio] = useState(() => {
     return localStorage.getItem("sumarEnvio") === "true";
   });
+
+  useEffect(() => {
+    fetchBancos();
+  }, []);
 
   const [catalogos] = useState([
     { nombre: "Contado", url: "/contado" },
@@ -80,7 +92,7 @@ const Emprendedoras = () => {
 
   // Estado para el modal de WhatsApp
   const [openWhatsappModal, setOpenWhatsappModal] = useState(false);
-  const [whatsappMessage, setWhatsappMessage] = useState("Hola, te contacto desde mi dashboard...");
+  const [whatsappMessage, setWhatsappMessage] = useState("Hola! Hay promos increíbles con tu banco, te las comparto 😎");
 
   const navigate = useNavigate();
 
@@ -189,9 +201,14 @@ const handleExportComparativoPDF = async () => {
   // 📌 AGREGAR NUEVO CLIENTE
   const handleAddClient = async () => {
     if (!newName.trim() || !newAddress.trim() || !newBank.trim() || !newPhone.trim()) {
-      alert("Por favor, completa todos los campos.");
+      alert("Por favor, completá todos los campos.");
       return;
     }
+    if (!isValidPhone(newPhone)) {
+      alert("El número de teléfono no es válido. Usá formato: 541151234567");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
@@ -222,15 +239,15 @@ const handleExportComparativoPDF = async () => {
   };
 
   // 📌 EDITAR CLIENTE
-  const openEditClientDialog = (client, index) => {
-    setEditingClientId(client.id);
-    setEditName(client.nombre || client.nombre_del_cliente || "");
+  const openEditClientDialog = (client) => {
+    setOriginalClient(client); // guardamos datos originales
+    setEditName(client.nombre || "");
     setEditAddress(client.direccion || "");
     setEditBank(client.banco || "");
-    setEditPhone(client.phone || "");
-    setEditingClientId(client.id); // <-- NUEVO ESTADO
+    setEditPhone(client.phone?.toString().trim() || "");
     setIsEditDialogOpen(true);
   };
+
 
   const handleToggleEnvio = () => {
     const nuevoValor = !sumarEnvio;
@@ -238,51 +255,41 @@ const handleExportComparativoPDF = async () => {
     localStorage.setItem("sumarEnvio", nuevoValor);
   };
 
+  const handleUpdateClient = async () => {
+    if (!editName || !editAddress || !editBank || !editPhone) {
+      alert("Por favor, completá todos los campos.");
+      return;
+    }
 
-const handleUpdateClient = async () => {
-  const safeEditName = editName ?? "";
-  const safeEditAddress = editAddress ?? "";
-  const safeEditBank = editBank ?? "";
-  const safeEditPhone = editPhone ?? "";
+    try {
+      await axios.put(
+        "/api/clientes",
+        {
+          nombre: originalClient.nombre,
+          direccion: originalClient.direccion,
+          banco: originalClient.banco,
+          phone: originalClient.phone,
+          nuevoNombre: editName,
+          nuevaDireccion: editAddress,
+          nuevoBanco: editBank,
+          nuevoPhone: editPhone,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
-  if (
-    !safeEditName.trim() ||
-    !safeEditAddress.trim() ||
-    !safeEditBank.trim() ||
-    !safeEditPhone.trim()
-  ) {
-    alert("Por favor, completa todos los campos.");
-    return;
-  }
-
-  try {
-    const token = localStorage.getItem("token");
-    await axios.put(
-      `/api/clientes/${editingClientId}`,
-      {
-        nombre: safeEditName,
-        direccion: safeEditAddress,
-        banco: safeEditBank,
-        phone: safeEditPhone,
-      },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    alert("Cliente actualizado con éxito");
-
-    await fetchClientes(); // refrescamos desde el backend
-    setIsEditDialogOpen(true);
-    // limpiamos
-    setEditName("");
-    setEditAddress("");
-    setEditBank("");
-    setEditPhone("");
-    setEditingClientId(null);
-  } catch (error) {
-    console.error("Error al actualizar cliente:", error);
-    alert("Error al actualizar cliente. Revisa la consola.");
-  }
-};
+      alert("Cliente actualizado correctamente");
+      await fetchClientes();
+      setIsEditDialogOpen(false);
+      setOriginalClient(null);
+    } catch (error) {
+      console.error("Error al actualizar cliente:", error);
+      alert("Error al actualizar cliente. Revisa la consola.");
+    }
+  };
 
   // Selección individual
   const handleToggleSelect = (client) => {
@@ -353,7 +360,6 @@ const handleUpdateClient = async () => {
     setEditAddress("");
     setEditBank("");
     setEditPhone("");
-    setEditingClientId(null);
   };
 
   return (
@@ -364,7 +370,7 @@ const handleUpdateClient = async () => {
         user={{ username: localStorage.getItem("activeSession") || "" }}
       />
       <Container sx={{ mt: 3 }}>
-        <Button fullWidth variant="contained" onClick={() => setOpenAddClientDialog(true)} style={{marginBottom: 12, maxWidth: 300, display: 'none'}}>
+        <Button fullWidth variant="contained" onClick={() => setOpenAddClientDialog(true)} style={{marginBottom: 12, maxWidth: 300}}>
           Agregar nuevo cliente
         </Button>
         <Stack spacing={2}>
@@ -382,7 +388,7 @@ const handleUpdateClient = async () => {
               Enviar WhatsApp a {selectedClientes.length} seleccionado
             </Button>
           )}
-          <FormControl sx={{ minWidth: 200, background: 'white', display: 'none' }}>
+          <FormControl sx={{ minWidth: 200, background: 'white' }}>
             <InputLabel>Filtrar por Banco</InputLabel>
             <Select value={bancoFilter} onChange={(e) => setBancoFilter(e.target.value)} label="Filtrar por Banco">
               <MenuItem value="">-- Todos --</MenuItem>
@@ -394,13 +400,13 @@ const handleUpdateClient = async () => {
             </Select>
           </FormControl>
           {/* Sección de Clientes */}
-          <Accordion disabled>
+          <Accordion>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1-content"
               id="panel1-header"
             >
-              <Typography variant="h6">Clientes - Proximamente</Typography>
+              <Typography variant="h6">Clientes</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <List style={{background: 'white'}}>
@@ -433,7 +439,7 @@ const handleUpdateClient = async () => {
                         }
                       />
                       <ListItemSecondaryAction>
-                        <IconButton edge="end" aria-label="editar" onClick={() => openEditClientDialog(cliente, idx)}>
+                        <IconButton edge="end" aria-label="editar" onClick={() => openEditClientDialog(cliente)}>
                           <EditIcon />
                         </IconButton>
                       </ListItemSecondaryAction>
@@ -559,7 +565,19 @@ const handleUpdateClient = async () => {
                 </Select>
               </FormControl>
             )}
-            <TextField label="Phone" fullWidth value={newPhone} onChange={(e) => setNewPhone(e.target.value)} />
+            <TextField
+              label="Teléfono"
+              fullWidth
+              autoComplete="off"
+              value={editPhone.replace(/^54/, "")} // mostramos sin el 54
+              onChange={(e) => {
+                const soloNumeros = e.target.value.replace(/\D/g, "");
+                setEditPhone("54" + soloNumeros); // siempre guarda con 54 adelante
+              }}
+              InputProps={{
+                startAdornment: <InputAdornment position="start">+54</InputAdornment>,
+              }}
+            />
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenAddClientDialog(false)}>Cancelar</Button>
@@ -578,7 +596,14 @@ const handleUpdateClient = async () => {
             dividers
             sx={{ display: "flex", flexDirection: "column", gap: 2 }}
           >
-            <TextField fullWidth label="Nombre" value={editName} onChange={(e) => setEditName(e.target.value)} />
+            <TextField
+              fullWidth
+              label="Nombre"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              helperText={!editName ? "Campo requerido" : ""}
+              error={!editName}
+            />
             <TextField label="Dirección" fullWidth value={editAddress} onChange={(e) => setEditAddress(e.target.value)} />
             <FormControl fullWidth>
               <InputLabel>Banco</InputLabel>
@@ -588,7 +613,19 @@ const handleUpdateClient = async () => {
                 ))}
               </Select>
             </FormControl>
-            <TextField label="Phone" fullWidth value={editPhone} onChange={(e) => setEditPhone(e.target.value)} />
+            <TextField
+              label="Teléfono"
+              fullWidth
+              autoComplete="off"
+              value={editPhone.replace(/^54/, "")}
+              onChange={(e) => {
+                const soloNumeros = e.target.value.replace(/\D/g, "");
+                setEditPhone("54" + soloNumeros);
+              }}
+              InputProps={{
+                startAdornment: <InputAdornment position="start">+54</InputAdornment>,
+              }}
+            />
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseEditDialog}>Cancelar</Button>
