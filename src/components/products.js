@@ -17,7 +17,7 @@ import { parsePrice, formatPrice } from "../utils/priceUtils";
 
 const cuotaSimple = require("../../src/assets/cuotas-simples.webp");
 
-const Product = ({ product, cuotaType, onAddToCart, catalog = false, tipoUsuario }) => {
+const Product = ({ product, cuotaType, onAddToCart, catalog = false }) => {
   const [selectedCuota, setSelectedCuota] = useState("");
 
   const cuotasConInteres = ["tres_con_interes", "seis_con_interes"];
@@ -69,68 +69,66 @@ const Product = ({ product, cuotaType, onAddToCart, catalog = false, tipoUsuario
         image={product.imagen || "../descarga.png"}
         alt="Producto"
       />
-<CardContent style={{ display: "flex", flexDirection: "column" }}>
-  <Typography className="titulo" gutterBottom variant="h6" fontSize={18}>
-    {product.descripcion}
-  </Typography>
-  <Typography variant="body2" fontSize={12} fontStyle="italic">
-    Línea <b>{product.linea}</b>
-  </Typography>
-  <Typography variant="body2" color="text.secondary">
-    Precio de Negocio: <b>{formatPrice(parsePrice(product.precio_negocio))}</b>
-  </Typography>
-  <Typography variant="body2" color="text.secondary">
-    PSVP lista: <b>{formatPrice(parsePrice(product.psvp_lista))}</b>
-  </Typography>
-  <Typography variant="body2" color="text.secondary">
-    Puntos: <b>{product.puntos}</b>
-  </Typography>
-
-  {product.precio_preferencial && (
-    <Typography variant="body2" color="text.secondary">
-      Precio Preferencial: <b>{formatPrice(parsePrice(product.precio_preferencial))}</b>
-    </Typography>
-  )}
-
-  <Divider sx={{ my: 2 }} />
-
-  {/* Mostrar cuotas */}
-  {cuotas.map((cuota, idx) => {
-    const cuotaValue = product[cuota];
-    return isValidCuota(cuotaValue) ? (
-      <div className="flex-center" key={idx}>
-        {cuotaType !== "con_interes" && (
-          <img src={cuotaSimple} alt="Cuota sin interés" height="15" />
-        )}
-        <Typography variant="body2" fontSize={13} fontStyle="italic">
-          <b style={{ color: "green" }}>
-            {`${getAdjustedCuotaLabel(cuota)} de: `}
-            <i style={{ color: "black" }}>{getCuotaPrice(cuotaValue)}</i>
-          </b>
+      <CardContent style={{ display: "flex", flexDirection: "column" }}>
+        <Typography className="titulo" gutterBottom variant="h6" fontSize={18}>
+          {product.descripcion}
         </Typography>
-      </div>
-    ) : null;
-  })}
+        <Typography variant="body2" fontSize={12} fontStyle="italic">
+          Línea <b>{product.linea}</b>
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Precio de Negocio: <b>{formatPrice(parsePrice(product.precio_negocio))}</b>
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          PSVP lista: <b>{formatPrice(parsePrice(product.psvp_lista))}</b>
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Puntos: <b>{product.puntos}</b>
+        </Typography>
 
-  {/* Combo de selección de cuotas */}
-  <FormControl fullWidth sx={{ my: 2 }}>
-    <InputLabel>Selecciona una cuota</InputLabel>
-    <Select value={selectedCuota} onChange={handleCuotaChange} label="Selecciona una cuota">
-      {cuotas.map((cuota, idx) => {
-        const cuotaValue = product[cuota];
-        return isValidCuota(cuotaValue) ? (
-          <MenuItem key={idx} value={getCuotaPrice(cuotaValue)}>
-            {`${getAdjustedCuotaLabel(cuota)} de ${getCuotaPrice(cuotaValue)}`}
-          </MenuItem>
-        ) : null;
-      })}
-    </Select>
-  </FormControl>
-</CardContent>
+        {product.precio_preferencial && (
+          <Typography variant="body2" color="text.secondary">
+            Precio Preferencial: <b>{formatPrice(parsePrice(product.precio_preferencial))}</b>
+          </Typography>
+        )}
 
+        <Divider sx={{ my: 2 }} />
 
+        {/* Mostrar cuotas */}
+        {cuotas.map((cuota, idx) => {
+          const cuotaValue = product[cuota];
+          return isValidCuota(cuotaValue) ? (
+            <div className="flex-center" key={idx}>
+              {cuotaType !== "con_interes" && (
+                <img src={cuotaSimple} alt="Cuota sin interés" height="15" />
+              )}
+              <Typography variant="body2" fontSize={13} fontStyle="italic">
+                <b style={{ color: "green" }}>
+                  {`${getAdjustedCuotaLabel(cuota)} de: `}
+                  <i style={{ color: "black" }}>{getCuotaPrice(cuotaValue)}</i>
+                </b>
+              </Typography>
+            </div>
+          ) : null;
+        })}
+
+        {/* Combo de selección de cuotas */}
+        <FormControl fullWidth sx={{ my: 2 }}>
+          <InputLabel>Selecciona una cuota</InputLabel>
+          <Select value={selectedCuota} onChange={handleCuotaChange} label="Selecciona una cuota">
+            {cuotas.map((cuota, idx) => {
+              const cuotaValue = product[cuota];
+              return isValidCuota(cuotaValue) ? (
+                <MenuItem key={idx} value={getCuotaPrice(cuotaValue)}>
+                  {`${getAdjustedCuotaLabel(cuota)} de ${getCuotaPrice(cuotaValue)}`}
+                </MenuItem>
+              ) : null;
+            })}
+          </Select>
+        </FormControl>
+      </CardContent>
       <CardActions sx={{ display: "flex", flexDirection: "column" }}>
-        {!catalog && tipoUsuario?.toLowerCase() === "full" && (
+        {!catalog && (
           <Button
             fullWidth
             onClick={() => onAddToCart(product)}

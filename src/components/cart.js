@@ -63,9 +63,9 @@ const ShoppingCart = ({ cart, onClearCart, setCart, /* onRemoveFromCart */ }) =>
   }, []);
 
   // Cálculo de puntos totales
-/*   const calculateTotalPoints = useCallback(() => {
+  const calculateTotalPoints = useCallback(() => {
     return cart.reduce((acc, item) => acc + (item.puntos || 0), 0); // Asegura que siempre haya un número
-  }, [cart]); */
+  }, [cart]);
 
   // Efecto para recalcular el total al cambiar las dependencias
   useEffect(() => {
@@ -124,8 +124,8 @@ const ShoppingCart = ({ cart, onClearCart, setCart, /* onRemoveFromCart */ }) =>
   };
 
   // Determinar si mostrar el switch de envío
-/*   const totalPoints = calculateTotalPoints(); */
-  /* const showShippingSwitch = totalPoints < 140; */ // Ahora depende exclusivamente de los puntos totales
+  const totalPoints = calculateTotalPoints();
+  const showShippingSwitch = totalPoints < 140; // Ahora depende exclusivamente de los puntos totales
 
   // Manejo de la eliminación del producto del carrito y resetear cuotas/planCanje
   const handleRemoveFromCart = useCallback(
@@ -191,7 +191,6 @@ const ShoppingCart = ({ cart, onClearCart, setCart, /* onRemoveFromCart */ }) =>
                       />
                     </div>
                     <FormControlLabel
-                      style={{display: 'none'}}
                       control={
                         <Switch
                           checked={planCanje[item.codigo] || false}
@@ -306,26 +305,17 @@ const ShoppingCart = ({ cart, onClearCart, setCart, /* onRemoveFromCart */ }) =>
               )}
             </ul>
 
-            {/* {showShippingSwitch && (
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={includeShipping}
-                    onChange={(e) => setIncludeShipping(e.target.checked)}
-                  />
-                }
-                label="Incluir envío"
-              />
-            )} */}
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={includeShipping}
-                    onChange={(e) => setIncludeShipping(e.target.checked)}
-                  />
-                }
-                label="Incluir envío"
-              />
+              {showShippingSwitch && (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={includeShipping}
+                      onChange={(e) => setIncludeShipping(e.target.checked)}
+                    />
+                  }
+                  label="Incluir envío"
+                />
+            )} 
               <div
                 style={{
                   display: "flex",

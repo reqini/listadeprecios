@@ -25,8 +25,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
-  const [tipoUsuario, setTipoUsuario] = useState("limitado"); // por defecto gratuito
-
+  //const [tipoUsuario, setTipoUsuario] = useState("limitado"); // por defecto gratuito
 
   const rangos = [
     "Demostrador/a",
@@ -74,7 +73,7 @@ const isFormValid =
   confirmPassword &&
   rango &&
   codigoEmprendedora &&
-  tipoUsuario && // 👈 agregado
+  //tipoUsuario && // 👈 agregado
   password === confirmPassword;
 
 
@@ -106,7 +105,7 @@ const handleSubmit = async (e) => {
       password,
       rango,
       codigo_emprendedora: codigoEmprendedora,
-      tipo_usuario: tipoUsuario,
+      //tipo_usuario: tipoUsuario,
     };
 
     const response = await axios.post(`/auth/register`, payload);
@@ -114,12 +113,8 @@ const handleSubmit = async (e) => {
     if (response.data.success) {
       localStorage.setItem("registeredUsername", username);
 
-      if (tipoUsuario === "full") {
-        const mercadoPagoUrl = "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808494f9e81b01952fe6e9e01a76&back_url=https://catalogosimple.ar/login";
-        window.location.href = mercadoPagoUrl;
-      } else {
-        window.location.href = "/login";
-      }
+      const mercadoPagoUrl = "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808494f9e81b01952fe6e9e01a76&back_url=https://catalogosimple.ar/login";
+      window.location.href = mercadoPagoUrl;
 
     } else {
       setCodigoError(response.data.message || 'Hubo un problema durante el registro.');
@@ -263,7 +258,7 @@ const handleSubmit = async (e) => {
                 helperText={codigoError}
               />
             </Grid>
-            <Grid item xs={12} style={{ margin: '10px 0' }}>
+            {/* <Grid item xs={12} style={{ margin: '10px 0' }}>
               <FormControl fullWidth variant="filled" style={{ backgroundColor: 'white' }}>
                 <InputLabel id="tipo-usuario-label">Tipo de usuario</InputLabel>
                 <Select
@@ -277,7 +272,7 @@ const handleSubmit = async (e) => {
                   <MenuItem value="full">Usuario full (con todas las herramientas)</MenuItem>
                 </Select>
               </FormControl>
-            </Grid>
+            </Grid> */}
 
             {error && (
               <Grid
