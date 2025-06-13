@@ -35,6 +35,8 @@ const Home = () => {
   const { logout } = useAuth();
   const [openThemeDialog, setOpenThemeDialog] = useState(false);
   const isMobile = useMediaQuery('(max-width:600px)');
+  const user = JSON.parse(localStorage.getItem("user"));
+
 
   const [catalogos] = useState([
   { nombre: "Preferencial", url: "/preferencial" },
@@ -289,12 +291,12 @@ const productosFiltrados = productos.filter(
   return (
     <>
       <Navbar
+        user={user}
         title={
           <p>
             {timeOfDay} <b>{username || "Usuario"}</b>{/* , Te damos la Bienvenida */}
           </p>
         }
-        user={{ username }}
         onLogout={logout}
       />
       <Container maxWidth="lg" className="conteiner-list">
@@ -328,6 +330,7 @@ const productosFiltrados = productos.filter(
         )}
         <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100" style={{ gap: 12 }}>
           {esGratis && (
+            <>
             <FormControl size="small" sx={{ minWidth: 200, width: '100%', maxWidth: 400, background: 'white' }}>
               <InputLabel>Seleccioná un catálogo</InputLabel>
               <Select
@@ -344,20 +347,20 @@ const productosFiltrados = productos.filter(
                 ))}
               </Select>
             </FormControl>
-          )}
-         
-          {!esGratis && (
-            <Button
-              variant="contained"
-              disabled={!selectedCatalog}
-              onClick={() => {
-                const url = `${window.location.origin}${selectedCatalog}`;
-                navigator.clipboard.writeText(url);
-                setSnackbarOpen(true);
-              }}
-            >
-              Copiar URL
-            </Button>
+            {esGratis && (
+              <Button
+                variant="contained"
+                disabled={!selectedCatalog}
+                onClick={() => {
+                  const url = `${window.location.origin}${selectedCatalog}`;
+                  navigator.clipboard.writeText(url);
+                  setSnackbarOpen(true);
+                }}
+              >
+                Copiar URL
+              </Button>
+              )}
+              </>
           )}
         </div>
 
@@ -379,6 +382,7 @@ const productosFiltrados = productos.filter(
                   product={product}
                   cuotaType="sin_interes"
                   onAddToCart={!esGratis ? onAddToCart : null}
+                  tipoUsuario={user?.tipo_usuario}
                 />
               </li>
             ))
