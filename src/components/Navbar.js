@@ -127,6 +127,16 @@ const Navbar = ({ user, onLogout, title }) => {
                 }}
               >
                 Catálogos y Clientes
+            </MenuItem>
+            <Divider></Divider>
+              <MenuItem
+                /* style={{display: 'none'}} */
+                onClick={() => {
+                  navigate("/ventas");
+                  handleMenuClose();
+                }}
+              >
+                Ventas
               </MenuItem>
               <Divider></Divider>
               <MenuItem
