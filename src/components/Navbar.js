@@ -6,6 +6,7 @@ import {
   Typography,
   Menu,
   MenuItem,
+  Box,
   Dialog,
   Divider,
   DialogTitle,
@@ -16,6 +17,7 @@ import {
   Alert,
   useMediaQuery,
   InputAdornment,
+  Badge
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
@@ -91,72 +93,78 @@ const Navbar = ({ user, onLogout, title }) => {
           <Typography variant="body1" fontSize={16} sx={{ flexGrow: 1, margin: '0 12px' }}>
             {title}
           </Typography>
-
-            <IconButton color="inherit" onClick={handleMenuOpen}>
+          <IconButton color="inherit" onClick={handleMenuOpen}>
+            <Badge
+              variant="dot"
+              color="secondary"
+              sx={{
+                "& .MuiBadge-dot": {
+                  height: 15,
+                  minWidth: 15,
+                  borderRadius: "50%",
+                },
+              }}
+            >
               <MenuIcon />
-            </IconButton>
-
-
+            </Badge>
+          </IconButton>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-              <MenuItem
-                onClick={() => {
-                  navigate("/home");
-                  handleMenuClose();
-                }}
-                disabled={location.pathname === "/home"}
-              >
-                Home
-              </MenuItem>
-              <Divider />
-              <MenuItem
-                onClick={() => {
-                  // Ejemplo: abrir el modal de perfil
-                  setOpenDialog("profile");
-                  handleMenuClose();
-                }}
-              >
-                Perfil
-              </MenuItem>
-              <Divider></Divider>
-              {/* Nuevo acceso a /emprendedora */}
-              <MenuItem
-                /* style={{display: 'none'}} */
-                onClick={() => {
-                  navigate("/emprendedoras");
-                  handleMenuClose();
-                }}
-              >
-                Catálogos y Clientes
+            <MenuItem
+              onClick={() => {
+                navigate("/home");
+                handleMenuClose();
+              }}
+              disabled={location.pathname === "/home"}
+            >
+              Home
+            </MenuItem>
+            <Divider />
+            <MenuItem
+              onClick={() => {
+                // Ejemplo: abrir el modal de perfil
+                setOpenDialog("profile");
+                handleMenuClose();
+              }}
+            >
+              Perfil
             </MenuItem>
             <Divider></Divider>
-              <MenuItem
-                /* style={{display: 'none'}} */
-                onClick={() => {
-                  navigate("/ventas");
-                  handleMenuClose();
-                }}
-              >
-                Ventas
-              </MenuItem>
-              <Divider></Divider>
-              <MenuItem
-                onClick={() => {
-                  navigate("/generarPlaca");
-                  handleMenuClose();
-                }}
-              >
-                Crear Placas <i style={{color: 'green', marginLeft: 12}}>V.0.3 Beta</i>
-              </MenuItem>
-              <Divider></Divider>
-              <MenuItem
-                onClick={() => {
-                  navigate("/faqs");
-                  handleMenuClose();
-                }}
-              >
-                Preguntas Frecuentes
-              </MenuItem>
-                <Divider></Divider>
+            {/* Nuevo acceso a /emprendedora */}
+            <MenuItem
+              /* style={{display: 'none'}} */
+              onClick={() => {
+                navigate("/emprendedoras");
+                handleMenuClose();
+              }}
+            >
+              Catálogos y Clientes
+            </MenuItem>
+            <Divider></Divider>
+            <MenuItem onClick={() => navigate("/ventas")}>
+              <Box display="flex" alignItems="center" gap={1}>
+                <Typography fontWeight="bold">Ventas</Typography>
+                <Typography color="primary" fontSize={12}>🚀 Lanzamiento</Typography>
+              </Box>
+            </MenuItem>
+            <Divider></Divider>
+            <MenuItem
+              onClick={() => {
+                navigate("/generarPlaca");
+                handleMenuClose();
+              }}
+            >
+              Crear Placas
+            </MenuItem>
+            <Divider></Divider>
+            <MenuItem
+              onClick={() => {
+                navigate("/faqs");
+                handleMenuClose();
+              }}
+            >
+              Preguntas Frecuentes
+            </MenuItem>
+            <Divider></Divider>
             <MenuItem
               onClick={() => {
                 onLogout();
