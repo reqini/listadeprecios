@@ -254,10 +254,7 @@ const handleLogout = () => {
                     Guardar Venta
                 </Button>
               </Grid>
-              <Grid item xs={12}>
-                <Divider sx={{mt: 2, mb: 2}}></Divider>
-              </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} style={{display: 'none'}}>
                 <Typography variant="body2" sx={{ mt: 3 }}>
                   Llevás usado el <strong>{porcentajeUsado.toFixed(1)}%</strong> del tope anual de tu categoría.
                 </Typography>
@@ -273,8 +270,7 @@ const handleLogout = () => {
                   Te quedan ${Math.max(tope - totalComision, 0).toLocaleString("es-AR")} antes de pasarte.
                 </Typography>
               </Grid>
-            
-              <Grid xs={12}>
+              <Grid xs={12} style={{display: 'none'}}>
                 <FormControl fullWidth sx={{ mt: 2 }}>
                   <InputLabel>Categoría Monotributo</InputLabel>
                   <Select
@@ -294,11 +290,11 @@ const handleLogout = () => {
                 </FormControl>
               </Grid>
               <Grid xs={12} sx={{ p: 3, background: 'white' }}>
-                <Typography variant="h6" sx={{ color: "green" }}>
+                <Typography variant="h6" sx={{ color: "green", display: 'none' }}>
                   Total comisionable acumulado: ${totalComision.toLocaleString("es-AR")}
                 </Typography>
                 {/* Estimación de ganancia real según categoría */}
-                <Grid item xs={12} sx={{ mt: 2 }}>
+                <Grid item xs={12} sx={{ mt: 2, display: 'none' }}>
                   <Typography variant="body1" sx={{ mt: 1 }}>
                     Estás en categoría <strong>{categoria}</strong>. Te quedarían aprox.:
                   </Typography>

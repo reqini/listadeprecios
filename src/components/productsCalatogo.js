@@ -133,9 +133,14 @@ const ProductsCalatogo = ({ product, selectedCuota, isContado = false, onAddToCa
           size="medium"
           color="secondary"
           onClick={() => onAddToCart(product)}
-          sx={{ marginBottom: '12px' }}
+          sx={{
+            marginBottom: '12px',
+            '@media (max-width: 480px)': {
+              fontSize: '12px!important',
+            }
+           }}
         >
-          Agregar al carrito
+          Sumar al carrito
         </Button>
 
         <Button
