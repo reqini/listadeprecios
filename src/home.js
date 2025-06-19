@@ -30,6 +30,7 @@ import ResponsiveDialog from "./components/dialog";
 import { useAuth } from "./AuthContext";
 import ReviewSlider from "./components/ReviewSlider"; // ajustá la ruta
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { display } from "html2canvas/dist/types/css/property-descriptors/display";
 
 const Home = () => {
   const { logout } = useAuth();
@@ -378,7 +379,7 @@ const productosFiltrados = productos.filter(
             onClearCart={clearCart}
           />
         {/* Modal de promociones bancarias */}
-        <ResponsiveDialog open={openDialog} onClose={handleCloseDialog} />
+        <ResponsiveDialog open={openDialog} onClose={handleCloseDialog} style={{display: 'none'}} />
 
         <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
           <Alert onClose={handleSnackbarClose} severity="success">
