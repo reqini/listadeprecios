@@ -8,7 +8,7 @@ import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Snackbar, Alert, Typography } from "@mui/material";
-import { formatPrice } from './utils/priceUtils';
+import ShoppingCartCatalogo from "./components/ShoppingCartCatalogo";
 
 const Catalogo10 = () => {
   const [cart, setCart] = useState([]);
@@ -217,7 +217,7 @@ const Catalogo10 = () => {
           </ul>
         </div>
       ))}
-
+      <ShoppingCartCatalogo cart={cart} setCart={setCart} cuotaKey="diez_sin_interes" cuotasTexto="10 cuotas" />
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}

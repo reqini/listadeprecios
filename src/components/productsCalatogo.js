@@ -7,7 +7,8 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { Button, CardActions } from '@mui/material';
 import { formatPrice } from '../utils/priceUtils';
 
-const ProductsCalatogo = ({ product, selectedCuota, isContado = false }) => {
+const ProductsCalatogo = ({ product, selectedCuota, isContado = false, onAddToCart }) => {
+
   const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
   const aplicaEnvio = ['Bazar', 'Repuestos'].includes(product.linea);
 
@@ -125,6 +126,18 @@ const ProductsCalatogo = ({ product, selectedCuota, isContado = false }) => {
         >
           Compartir
         </Button>
+
+        <Button
+          fullWidth
+          variant="contained"
+          size="medium"
+          color="secondary"
+          onClick={() => onAddToCart(product)}
+          sx={{ marginBottom: '12px' }}
+        >
+          Agregar al carrito
+        </Button>
+
         <Button
           fullWidth
           target="_blank"

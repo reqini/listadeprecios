@@ -6,9 +6,9 @@ import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
 import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
+import ShoppingCartCatalogo from "./components/ShoppingCartCatalogo";
 import logo from './assets/logo.png';
 import { Snackbar, Alert, Typography } from "@mui/material";
-import { formatPrice } from './utils/priceUtils';
 
 const Catalogo6 = () => {
   const [cart, setCart] = useState([]);
@@ -207,7 +207,7 @@ const Catalogo6 = () => {
           </ul>
         </div>
       ))}
-
+      <ShoppingCartCatalogo cart={cart} setCart={setCart} cuotaKey="seis_sin_interes" cuotasTexto="6 cuotas" />
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}

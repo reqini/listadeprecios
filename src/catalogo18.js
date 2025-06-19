@@ -8,6 +8,7 @@ import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Snackbar, Alert, Typography } from "@mui/material";
+import ShoppingCartCatalogo from "./components/ShoppingCartCatalogo";
 
 const Catalogo18 = () => {
   const [cart, setCart] = useState([]);
@@ -83,7 +84,7 @@ const Catalogo18 = () => {
 
   // Uso de useMemo para mantener cuotasMap sin cambios en cada render
   const cuotasMap = useMemo(() => ({
-    "18 cuotas sin interés": 'doce_sin_interes',
+    "18 cuotas sin interés": 'dieciocho_sin_interes',
   }), []);
 
   // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir los productos con línea "Repuestos"
@@ -213,7 +214,7 @@ const Catalogo18 = () => {
           </ul>
         </div>
       ))}
-
+      <ShoppingCartCatalogo cart={cart} setCart={setCart} cuotaKey="dieciocho_sin_interes" cuotasTexto="18 cuotas" />
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}

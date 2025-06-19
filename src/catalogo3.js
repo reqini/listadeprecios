@@ -8,8 +8,8 @@ import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from "./assets/logo.png";
 import { Snackbar, Alert, Typography } from "@mui/material";
-/* import { Button } from "@mui/material"; */
-/* import exportCatalogoToPDF from "./utils/exportCatalogoToPDF"; */
+import ShoppingCartCatalogo from "./components/ShoppingCartCatalogo";
+
 
 const Catalogo3 = () => {
   const [cart, setCart] = useState([]);
@@ -29,11 +29,6 @@ const Catalogo3 = () => {
   const cuotasMap = useMemo(() => ({
     "3 cuotas sin interés": 'tres_sin_interes',
   }), []);
-
-  /* const handleExportarPDF = () => {
-    const productosExport = Object.values(productosAMostrar).flat();
-    exportCatalogoToPDF(productosExport, "3 cuotas sin interés");
-  }; */
 
 
   // Eliminar duplicados por código
@@ -235,7 +230,7 @@ const Catalogo3 = () => {
           </ul>
         </div>
       ))}
-
+      <ShoppingCartCatalogo cart={cart} setCart={setCart} cuotaKey="tres_sin_interes" cuotasTexto="3 cuotas" />
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}
