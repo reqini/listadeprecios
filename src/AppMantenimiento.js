@@ -11,6 +11,7 @@ import Catalogo14 from "./catalogo14";
 import Catalogo18 from "./catalogo18";
 import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
+import Preferencial from "./Preferencial";
 import Home from "./home";
 import { AuthProvider } from './AuthContext';
 
