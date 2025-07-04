@@ -30,7 +30,6 @@ import ResponsiveDialog from "./components/dialog";
 import { useAuth } from "./AuthContext";
 import ReviewSlider from "./components/ReviewSlider"; // ajustá la ruta
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { display } from "html2canvas/dist/types/css/property-descriptors/display";
 
 const Home = () => {
   const { logout } = useAuth();
