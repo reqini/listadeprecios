@@ -18,10 +18,14 @@ const MaintenancePage = () => {
     >
       <img src={Image} alt="Estamos tranajando"  style={{maxWidth: 350, width: '100%'}}/>
       <Typography variant="h4" gutterBottom>
-        Estamos actualizando los datos
+        Lamentamos informarte que la app dejará de funcionar.
       </Typography>
       <Typography variant="body1" sx={{ mb: 4 }}>
-        Disculpa las molestias, estamos trabajando para mejorar tu experiencia. Por favor, vuelve más tarde.
+      Solo seguirán disponibles los catálogos, que continúan siendo gratuitos.
+
+La decisión de cerrar la herramienta fue tomada por el desarrollador. Sin embargo, gracias a una líder empática y comprometida con este negocio, los catálogos seguirán disponibles para que nuevas emprendedoras puedan descubrir que vender puede ser simple y práctico.
+
+@cocinatyy - Emprendedora Oficial Essen
       </Typography>
     </Container>
   );
