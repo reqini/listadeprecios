@@ -7,12 +7,12 @@ import Skeleton from "@mui/material/Skeleton";
 import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
-import { Snackbar, Alert, Typography } from "@mui/material";
+import { Snackbar, Alert, Typography, Dialog, DialogTitle, DialogContent, Button } from "@mui/material";
 import ShoppingCartCatalogo from "./components/ShoppingCartCatalogo";
 
 const Catalogo18 = () => {
   const [cart, setCart] = useState([]);
-  const [loading, setLoading] = useState(true);  // Carga inicial
+  const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
   const [filtro, setFiltro] = useState("");
   const [productosAgrupados, setProductosAgrupados] = useState({});
@@ -22,20 +22,18 @@ const Catalogo18 = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [openModal, setOpenModal] = useState(false);
   const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
 
-  // Eliminar productos duplicados por código o ID
   const eliminarDuplicados = (productos) => {
-    const productosUnicos = productos.reduce((acc, producto) => {
+    return productos.reduce((acc, producto) => {
       if (!acc.some(item => item.codigo === producto.codigo)) {
         acc.push(producto);
       }
       return acc;
     }, []);
-    return productosUnicos;
   };
 
-  // Cargar productos desde la API (sin paginación ni scroll)
   const getData = async () => {
     const result = await axios.get(`/api/productos`);
     return result.data;
@@ -44,20 +42,19 @@ const Catalogo18 = () => {
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
-      const productosData = await getData();  // Cargar todos los productos de una vez
+      const productosData = await getData();
       const productosFiltrados = productosData.filter(
         (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
       );
-      const productosUnicos = eliminarDuplicados(productosFiltrados);  // Eliminar duplicados
+      const productosUnicos = eliminarDuplicados(productosFiltrados);
       setProductos(productosUnicos);
       agruparProductosPorLinea(productosUnicos);
-      setLoading(false);  // Terminar la carga cuando los productos están completamente cargados
+      setLoading(false);
     };
 
     loadInitialData();
   }, []);
 
-  // Agrupar productos por línea
   const agruparProductosPorLinea = (productos) => {
     const productosPorLinea = productos.reduce((acc, producto) => {
       const { linea } = producto;
@@ -68,26 +65,18 @@ const Catalogo18 = () => {
     setProductosAgrupados(productosPorLinea);
   };
 
-  // Manejar scroll para hacer sticky el header
   useEffect(() => {
     const handleScroll = () => {
-      const offset = window.scrollY;
-      setIsSticky(offset > 100);
+      setIsSticky(window.scrollY > 100);
     };
-
     window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Uso de useMemo para mantener cuotasMap sin cambios en cada render
   const cuotasMap = useMemo(() => ({
     "18 cuotas sin interés": 'dieciocho_sin_interes',
   }), []);
 
-  // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir los productos con línea "Repuestos"
   useEffect(() => {
     let productosFiltrados = productos.filter((producto) =>
       (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
@@ -103,47 +92,33 @@ const Catalogo18 = () => {
     agruparProductosPorLinea(productosFiltrados);
   }, [filtro, productos, cuotasMap]);
 
-  // Añadir producto al carrito
-  const addToCart = (product) => {
-    setCart([...cart, product]);
-  };
+  const addToCart = (product) => setCart([...cart, product]);
 
-  // Manejar el agregado y eliminación de favoritos
   const toggleFavorite = (product) => {
-    let updatedFavorites;
-    let message;
-
-    if (favorites.some(fav => fav.id === product.id)) {
-      updatedFavorites = favorites.filter(fav => fav.id !== product.id);
-      message = `${product.descripcion} ha sido eliminado de tus favoritos`;
-      setSnackbarSeverity('warning');
-    } else {
-      updatedFavorites = [...favorites, product];
-      message = `${product.descripcion} ha sido agregado a tus favoritos`;
-      setSnackbarSeverity('success');
-    }
-
+    const exists = favorites.some(fav => fav.id === product.id);
+    const updatedFavorites = exists
+      ? favorites.filter(fav => fav.id !== product.id)
+      : [...favorites, product];
+    const message = exists
+      ? `${product.descripcion} ha sido eliminado de tus favoritos`
+      : `${product.descripcion} ha sido agregado a tus favoritos`;
     setFavorites(updatedFavorites);
     localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
     setSnackbarMessage(message);
+    setSnackbarSeverity(exists ? 'warning' : 'success');
     setSnackbarOpen(true);
-
-    // Si no quedan favoritos, volver a mostrar todos los productos
-    if (updatedFavorites.length === 0) {
+    if (!updatedFavorites.length) {
       setShowFavorites(false);
       agruparProductosPorLinea(productos);
     }
   };
 
-  // Filtrar los productos que se deben mostrar (favoritos o todos)
   const productosAMostrar = showFavorites
     ? Object.keys(productosAgrupados).reduce((acc, linea) => {
-        const productosFavoritos = productosAgrupados[linea].filter(product =>
+        const favoritos = productosAgrupados[linea].filter(product =>
           favorites.some(fav => fav.id === product.id)
         );
-        if (productosFavoritos.length) {
-          acc[linea] = productosFavoritos;
-        }
+        if (favoritos.length) acc[linea] = favoritos;
         return acc;
       }, {})
     : productosAgrupados;
@@ -151,15 +126,29 @@ const Catalogo18 = () => {
   return (
     <Container maxWidth="lg" className="conteiner-list">
       <Helmet>
-      <title>Catalogo Simple - Catálogo</title>
+        <title>Catalogo Simple - Catálogo</title>
       </Helmet>
+
+      {/* Botón Donar */}
+      <div className="mar-t10 mar-b20 flex justify-center">
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => setOpenModal(true)}
+        >
+          Donar 💖
+        </Button>
+      </div>
+
       <div className="w-100 flex justify-center items-center flex-direction mar-t10">
-          <Typography fontSize={13} margin={'6px 0 12px 0'} style={{textAlign: 'center'}}>
-            <b>Desarrollado por:</b><br></br>
-            <b>
-              <a href="https://www.instagram.com/lrecchini/" rel="noreferrer"> Luciano Recchini</a>
-            </b>
-          </Typography>
+        <Typography fontSize={13} margin={'6px 0 12px 0'} style={{ textAlign: 'center' }}>
+          <b>Desarrollado por:</b><br />
+          <b>
+            <a href="https://www.instagram.com/lrecchini/" rel="noreferrer">
+              Luciano Recchini
+            </a>
+          </b>
+        </Typography>
         <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
       </div>
 
@@ -168,7 +157,6 @@ const Catalogo18 = () => {
           style={{ maxWidth: 450 }}
           fullWidth
           className="search"
-          id="outlined-basic"
           label="Buscar Producto"
           variant="outlined"
           value={filtro}
@@ -176,7 +164,6 @@ const Catalogo18 = () => {
         />
       </div>
 
-      {/* Skeleton para la carga inicial */}
       {loading && (
         <ul className="lista-prod-catalog w-100">
           {[...Array(8)].map((_, idx) => (
@@ -191,7 +178,6 @@ const Catalogo18 = () => {
         </ul>
       )}
 
-      {/* Productos cargados */}
       {Object.keys(productosAMostrar).map((linea) => (
         <div key={linea} className="linea-section">
           <Typography variant="h5" gutterBottom margin="20px 0">
@@ -214,7 +200,14 @@ const Catalogo18 = () => {
           </ul>
         </div>
       ))}
-      <ShoppingCartCatalogo cart={cart} setCart={setCart} cuotaKey="dieciocho_sin_interes" cuotasTexto="18 cuotas" />
+
+      <ShoppingCartCatalogo
+        cart={cart}
+        setCart={setCart}
+        cuotaKey="dieciocho_sin_interes"
+        cuotasTexto="18 cuotas"
+      />
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}
@@ -224,6 +217,37 @@ const Catalogo18 = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
+      {/* Modal Donar */}
+      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
+        <DialogTitle>¡Gracias por tu apoyo!</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" paragraph>
+            Este desarrollo ayuda a muchas emprendedoras a realizar su trabajo de forma más simple y rápida.
+            Los clientes ven de manera clara, simple y transparente lo que quieren comprar.
+          </Typography>
+          <Typography variant="body2" paragraph>
+            Todos los datos se cargan a pulmón, gracias a una líder inspiradora 💪.
+          </Typography>
+          <a
+            href="https://link.mercadopago.com.ar/empalejandra"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-block',
+              marginTop: '12px',
+              backgroundColor: '#00c853',
+              color: 'white',
+              padding: '10px 15px',
+              textDecoration: 'none',
+              borderRadius: '5px',
+              fontWeight: 'bold'
+            }}
+          >
+            Donar ahora
+          </a>
+        </DialogContent>
+      </Dialog>
     </Container>
   );
 };

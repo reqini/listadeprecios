@@ -7,13 +7,14 @@ import Typography from "@mui/material/Typography";
 import { Helmet } from "react-helmet";
 import ProductCatalogoNegocio from "./components/productCalatogoNegocio";
 import logo from "./assets/logo.png";
+import { Dialog, DialogTitle, DialogContent, Button } from "@mui/material";
 
 const Contado = () => {
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
   const [filtro, setFiltro] = useState("");
+  const [openModal, setOpenModal] = useState(false);
 
-  // Eliminar productos duplicados por código o ID
   const eliminarDuplicados = (productos) => {
     return productos.reduce((acc, producto) => {
       if (!acc.some((item) => item.codigo === producto.codigo)) {
@@ -23,7 +24,6 @@ const Contado = () => {
     }, []);
   };
 
-  // Cargar productos desde la API
   const getData = async () => {
     try {
       const result = await axios.get(`/api/productos`);
@@ -40,7 +40,7 @@ const Contado = () => {
       const productosData = await getData();
       const productosFiltrados = productosData.filter(
         (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
-      ); // cambio 1
+      );
       const productosUnicos = eliminarDuplicados(productosFiltrados);
       setProductos(productosUnicos);
       setLoading(false);
@@ -59,8 +59,22 @@ const Contado = () => {
       <Helmet>
         <title>Catálogo Contado - Contado</title>
       </Helmet>
+
+      {/* Botón Donar */}
+      <div className="mar-t10 mar-b20 flex justify-center">
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => setOpenModal(true)}
+        >
+          Donar 💖
+        </Button>
+      </div>
+
       <div className="w-100 flex justify-center items-center flex-direction mar-t10">
-        <Typography fontSize={13} margin={'6px 0 12px 0'}>Desarrollado por: <b><a href="https://www.instagram.com/lrecchini/" rel="noreferrer">Luciano Recchini</a></b></Typography>
+        <Typography fontSize={13} margin={'6px 0 12px 0'}>
+          Desarrollado por: <b><a href="https://www.instagram.com/lrecchini/" rel="noreferrer">Luciano Recchini</a></b>
+        </Typography>
         <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
       </div>
 
@@ -93,11 +107,42 @@ const Contado = () => {
         <ul className="lista-prod-catalog w-100">
           {productosFiltrados.map((product) => (
             <li className="grid-item" key={product.id}>
-              <ProductCatalogoNegocio product={product} costoEnvio={17362}/>
+              <ProductCatalogoNegocio product={product} costoEnvio={17362} />
             </li>
           ))}
         </ul>
       )}
+
+      {/* Modal Donar */}
+      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
+        <DialogTitle>¡Gracias por tu apoyo!</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" paragraph>
+            Este desarrollo ayuda a muchas emprendedoras a realizar su trabajo de forma más simple y rápida.
+            Los clientes ven de manera clara, simple y transparente lo que quieren comprar.
+          </Typography>
+          <Typography variant="body2" paragraph>
+            Todos los datos se cargan a pulmón, gracias a una líder inspiradora 💪.
+          </Typography>
+          <a
+            href="https://link.mercadopago.com.ar/empalejandra"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-block',
+              marginTop: '12px',
+              backgroundColor: '#00c853',
+              color: 'white',
+              padding: '10px 15px',
+              textDecoration: 'none',
+              borderRadius: '5px',
+              fontWeight: 'bold'
+            }}
+          >
+            Donar ahora
+          </a>
+        </DialogContent>
+      </Dialog>
     </Container>
   );
 };
