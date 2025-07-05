@@ -162,7 +162,7 @@ const Catalogo3 = () => {
         <Typography fontSize={13} margin={'6px 0 12px 0'} style={{textAlign: 'center'}}>
             <b>Desarrollado por:</b><br></br>
             <b>
-              <a href="https://www.instagram.com/lrecchini/" rel="noreferrer"> Luciano Recchini</a>
+              <a href="https://www.instagram.com/cocinatyy/" rel="noreferrer"> @Cocinatyy</a>
             </b>
           </Typography>
         <img src={logo} alt="logo" width="150" className="mar-t10 mar-b20" />
