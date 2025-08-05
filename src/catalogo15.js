@@ -74,7 +74,7 @@ const Catalogo15 = () => {
   }, []);
 
   const cuotasMap = useMemo(() => ({
-    "15 cuotas sin interés": 'quice_sin_interes',
+    "15 cuotas sin interés": 'quince_sin_interes',
   }), []);
 
   useEffect(() => {
