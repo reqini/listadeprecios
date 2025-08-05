@@ -258,6 +258,7 @@ const ShoppingCart = ({ cart, onClearCart, setCart, /* onRemoveFromCart */ }) =>
                           "veinte_sin_interes",
                           "dieciocho_sin_interes",
                           "doce_sin_interes",
+                          "quince_sin_interes",
                           "catorce_sin_interes",
                           "diez_sin_interes",
                           "nueve_sin_interes",
