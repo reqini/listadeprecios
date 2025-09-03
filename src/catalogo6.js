@@ -8,7 +8,7 @@ import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import ShoppingCartCatalogo from "./components/ShoppingCartCatalogo";
 import logo from './assets/logo.png';
-import { Snackbar, Alert, Typography, Dialog, DialogTitle, DialogContent, Button } from "@mui/material";
+import { Snackbar, Alert, Typography } from "@mui/material";
 
 const Catalogo6 = () => {
   const [cart, setCart] = useState([]);
@@ -22,7 +22,7 @@ const Catalogo6 = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const [openModal, setOpenModal] = useState(false);
+
   const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
 
   const cuotasMap = useMemo(() => ({
@@ -143,16 +143,7 @@ const Catalogo6 = () => {
         <title>Catálogo 6 Cuotas - Catálogo</title>
       </Helmet>
 
-      {/* Botón Donar */}
-      <div className="mar-t10 mar-b20 flex justify-center">
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => setOpenModal(true)}
-        >
-          Donar 💖
-        </Button>
-      </div>
+
 
       <div className="w-100 flex justify-center items-center flex-direction mar-t10">
         <Typography fontSize={13} margin={'6px 0 12px 0'} style={{ textAlign: 'center' }}>
@@ -227,36 +218,7 @@ const Catalogo6 = () => {
         </Alert>
       </Snackbar>
 
-      {/* Modal Donar */}
-      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
-        <DialogTitle>¡Gracias por tu apoyo!</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" paragraph>
-            Este desarrollo ayuda a muchas emprendedoras a realizar su trabajo de forma más simple y rápida.
-            Los clientes ven de manera clara, simple y transparente lo que quieren comprar.
-          </Typography>
-          <Typography variant="body2" paragraph>
-            Todos los datos se cargan a pulmón, gracias a una líder inspiradora 💪.
-          </Typography>
-          <a
-            href="https://link.mercadopago.com.ar/empalejandra"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-block',
-              marginTop: '12px',
-              backgroundColor: '#00c853',
-              color: 'white',
-              padding: '10px 15px',
-              textDecoration: 'none',
-              borderRadius: '5px',
-              fontWeight: 'bold'
-            }}
-          >
-            Donar ahora
-          </a>
-        </DialogContent>
-      </Dialog>
+
     </Container>
   );
 };

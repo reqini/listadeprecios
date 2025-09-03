@@ -8,7 +8,7 @@ import Dialog from "@mui/material/Dialog";
 import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
-import { Snackbar, Alert, Typography, Button, DialogTitle, DialogContent } from "@mui/material";
+import { Snackbar, Alert, Typography } from "@mui/material";
 import ShoppingCartCatalogo from "./components/ShoppingCartCatalogo";
 
 const Catalogo12 = () => {
@@ -24,7 +24,7 @@ const Catalogo12 = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
-  const [openModal, setOpenModal] = useState(false);
+
 
   const eliminarDuplicados = (productos) => {
     return productos.reduce((acc, producto) => {
@@ -127,16 +127,7 @@ const Catalogo12 = () => {
         <title>Catalogo Simple - Catálogo</title>
       </Helmet>
 
-      {/* BOTÓN DONAR */}
-      <div className="mar-t10 mar-b20 flex justify-center">
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => setOpenModal(true)}
-        >
-          Donar 💖
-        </Button>
-      </div>
+
 
       {/* INFO DE DESARROLLADOR */}
       <div className="w-100 flex justify-center items-center flex-direction mar-t10">
@@ -214,36 +205,7 @@ const Catalogo12 = () => {
         </Alert>
       </Snackbar>
 
-      {/* MODAL DONACIÓN */}
-      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
-        <DialogTitle>¡Gracias por tu apoyo!</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" paragraph>
-            Este desarrollo ayuda a muchas emprendedoras a realizar su trabajo de forma más simple y rápida.
-            Los clientes ven de manera clara, simple y transparente lo que quieren comprar.
-          </Typography>
-          <Typography variant="body2" paragraph>
-            Todos los datos se cargan a pulmón, gracias a una líder inspiradora 💪.
-          </Typography>
-          <a
-            href="https://link.mercadopago.com.ar/empalejandra"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-block',
-              marginTop: '12px',
-              backgroundColor: '#00c853',
-              color: 'white',
-              padding: '10px 15px',
-              textDecoration: 'none',
-              borderRadius: '5px',
-              fontWeight: 'bold'
-            }}
-          >
-            Donar ahora
-          </a>
-        </DialogContent>
-      </Dialog>
+
     </Container>
   );
 };

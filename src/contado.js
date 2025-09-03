@@ -7,13 +7,13 @@ import Typography from "@mui/material/Typography";
 import { Helmet } from "react-helmet";
 import ProductCatalogoNegocio from "./components/productCalatogoNegocio";
 import logo from "./assets/logo.png";
-import { Dialog, DialogTitle, DialogContent, Button } from "@mui/material";
+
 
 const Contado = () => {
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
   const [filtro, setFiltro] = useState("");
-  const [openModal, setOpenModal] = useState(false);
+
 
   const eliminarDuplicados = (productos) => {
     return productos.reduce((acc, producto) => {
@@ -60,16 +60,7 @@ const Contado = () => {
         <title>Catálogo Contado - Contado</title>
       </Helmet>
 
-      {/* Botón Donar */}
-      <div className="mar-t10 mar-b20 flex justify-center">
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => setOpenModal(true)}
-        >
-          Donar 💖
-        </Button>
-      </div>
+
 
       <div className="w-100 flex justify-center items-center flex-direction mar-t10">
         <Typography fontSize={13} margin={'6px 0 12px 0'}>
@@ -113,36 +104,7 @@ const Contado = () => {
         </ul>
       )}
 
-      {/* Modal Donar */}
-      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
-        <DialogTitle>¡Gracias por tu apoyo!</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" paragraph>
-            Este desarrollo ayuda a muchas emprendedoras a realizar su trabajo de forma más simple y rápida.
-            Los clientes ven de manera clara, simple y transparente lo que quieren comprar.
-          </Typography>
-          <Typography variant="body2" paragraph>
-            Todos los datos se cargan a pulmón, gracias a una líder inspiradora 💪.
-          </Typography>
-          <a
-            href="https://link.mercadopago.com.ar/empalejandra"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-block',
-              marginTop: '12px',
-              backgroundColor: '#00c853',
-              color: 'white',
-              padding: '10px 15px',
-              textDecoration: 'none',
-              borderRadius: '5px',
-              fontWeight: 'bold'
-            }}
-          >
-            Donar ahora
-          </a>
-        </DialogContent>
-      </Dialog>
+
     </Container>
   );
 };
