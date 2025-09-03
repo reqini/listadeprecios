@@ -118,7 +118,7 @@ const Login = () => {
                 fullWidth
                 type={showPassword ? "text" : "password"}
                 id="filled-required-code"
-                label="Contraseña"
+                label="Código de emprendedora"
                 value={password}
                 variant="filled"
                 onChange={(e) => setPassword(e.target.value)}
@@ -138,12 +138,12 @@ const Login = () => {
               </Button>
             </Grid>
             <Grid item xs={12} style={{ margin: "10px 0", textAlign: 'center' }}>
-              <Typography fontSize={16} variant="body2">
+              {/* <Typography fontSize={16} variant="body2">
                 ¿No sos parte aún? <a href="/registro" style={{ color: 'black', fontWeight: 'bold' }}>Registrate</a>
-              </Typography>
-              <Typography fontSize={14} variant="body2">
+              </Typography> */}
+              {/* <Typography fontSize={14} variant="body2">
                 o charlemos por <a href="https://wa.me/5491151347453" rel="noopener" style={{ color: 'black' }}>Whatsapp</a>
-              </Typography>
+              </Typography> */}
             </Grid>
           </Grid>
         </form>
