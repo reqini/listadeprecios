@@ -14,8 +14,6 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  useTheme,
-  useMediaQuery,
   LinearProgress,
   Alert,
   Snackbar
@@ -201,7 +199,6 @@ const levelColors = {
 };
 
 const CapacitacionesSection = () => {
-  const theme = useTheme();
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('Todas');
   const [courses, setCourses] = useState(capacitaciones);
