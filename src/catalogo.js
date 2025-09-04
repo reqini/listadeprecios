@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "./utils/axios";
-import { Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, TextField, Container, Typography } from "@mui/material";
 import CardGenerator from "./components/CardGenerator";
+import PlanRestriction from "./components/PlanRestriction";
+import { usePlanPermissions } from "./hooks/usePlanPermissions";
 
 const GeneradorDePlacas = () => {
   const [products, setProducts] = useState([]);
@@ -9,6 +11,9 @@ const GeneradorDePlacas = () => {
   const [selectedQuota, setSelectedQuota] = useState(null);
   /* const [selectedBank, setSelectedBank] = useState(null); */
   const [banks, setBanks] = useState([]);
+  
+  // Hook para manejar permisos de plan
+  const { canAccess, getRestrictionMessage, redirectToSubscription } = usePlanPermissions();
   const cuotasMap = {
     "3 cuotas": "tres_sin_interes",
     "6 cuotas": "seis_sin_interes",
@@ -75,6 +80,19 @@ const GeneradorDePlacas = () => {
   /* const handleBankChange = (event, newValue) => {
     setSelectedBank(newValue);
   }; */
+
+  // Verificar si el usuario puede acceder a los catálogos
+  if (!canAccess('canAccessCatalogs')) {
+    return (
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <PlanRestriction 
+          feature="canAccessCatalogs"
+          message={getRestrictionMessage('canAccessCatalogs')}
+          onUpgrade={redirectToSubscription}
+        />
+      </Container>
+    );
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "20px" }}>
