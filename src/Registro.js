@@ -11,8 +11,8 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
+// import Card from '@mui/material/Card'; // No utilizado después de convertir a modal
+// import CardContent from '@mui/material/CardContent'; // No utilizado después de convertir a modal
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import List from '@mui/material/List';
@@ -22,6 +22,11 @@ import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import InfoIcon from '@mui/icons-material/Info';
 import axios from "./utils/axios";
 import { mercadopagoService } from './utils/mercadopago';
 import { Typography } from '@mui/material';
@@ -43,6 +48,7 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [planInfo, setPlanInfo] = useState(null);
+  const [planModalOpen, setPlanModalOpen] = useState(false);
 
   const rangos = [
     "Demostrador/a",
@@ -173,7 +179,14 @@ const handleSubmit = async (e) => {
   return (
     <div
       className="full-width background-image"
-      style={{ backgroundImage: `url(${Image})` }}
+      style={{ 
+        backgroundImage: `url(${Image})`,
+        backgroundAttachment: 'fixed',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        minHeight: '100vh'
+      }}
     >
       <Container
         className="flex justify-center items-center flex-direction"
@@ -189,58 +202,30 @@ const handleSubmit = async (e) => {
           Registro de usuarios nuevos
         </Typography>
 
-        {/* Información del Plan Seleccionado */}
+        {/* Botón para ver información del Plan */}
         {planInfo && (
-          <Card sx={{ mb: 3, bgcolor: 'rgba(255,255,255,0.95)' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h6" fontWeight="bold">
-                  {planInfo.name}
-                </Typography>
-                <Chip 
-                  label={planInfo.price === 0 ? 'Gratis' : `$${planInfo.price}`}
-                  color={planInfo.price === 0 ? 'success' : 'primary'}
-                  variant="filled"
-                />
-              </Box>
-              
-              <List dense>
-                {planInfo.features.map((feature, index) => (
-                  <ListItem key={index} sx={{ px: 0, py: 0.5 }}>
-                    <ListItemIcon sx={{ minWidth: 32 }}>
-                      <CheckIcon color="success" fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary={feature} />
-                  </ListItem>
-                ))}
-                {planInfo.limitations && planInfo.limitations.length > 0 && (
-                  <>
-                    <Divider sx={{ my: 1 }} />
-                    <Typography variant="subtitle2" color="text.secondary" sx={{ px: 2, mb: 1 }}>
-                      Limitaciones:
-                    </Typography>
-                    {planInfo.limitations.map((limitation, index) => (
-                      <ListItem key={`limitation-${index}`} sx={{ px: 0, py: 0.5 }}>
-                        <ListItemIcon sx={{ minWidth: 32 }}>
-                          <CloseIcon color="error" fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText 
-                          primary={limitation} 
-                          sx={{ 
-                            '& .MuiListItemText-primary': { 
-                              color: 'text.secondary',
-                              textDecoration: 'line-through',
-                              fontSize: '0.875rem'
-                            } 
-                          }} 
-                        />
-                      </ListItem>
-                    ))}
-                  </>
-                )}
-              </List>
-            </CardContent>
-          </Card>
+          <Box sx={{ mb: 3, textAlign: 'center' }}>
+            <Button
+              variant="contained"
+              color="secondary"
+              startIcon={<InfoIcon />}
+              onClick={() => setPlanModalOpen(true)}
+              sx={{
+                borderRadius: 3,
+                px: 3,
+                py: 1.5,
+                fontWeight: 'bold',
+                boxShadow: '0 4px 20px rgba(156, 39, 176, 0.3)',
+                '&:hover': {
+                  boxShadow: '0 8px 32px rgba(156, 39, 176, 0.4)',
+                  transform: 'translateY(-2px)'
+                },
+                transition: 'all 0.3s ease'
+              }}
+            >
+              Ver detalles del {planInfo.name}
+            </Button>
+          </Box>
         )}
         <form onSubmit={handleSubmit}>
           <Grid container spacing={0} className="card">
@@ -401,6 +386,121 @@ const handleSubmit = async (e) => {
           </Grid>
         </form>
       </Container>
+
+      {/* Modal de Información del Plan */}
+      <Dialog 
+        open={planModalOpen} 
+        onClose={() => setPlanModalOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+          }
+        }}
+      >
+        <DialogTitle>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h5" fontWeight="bold">
+              {planInfo?.name}
+            </Typography>
+            <IconButton onClick={() => setPlanModalOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        
+        <DialogContent>
+          {planInfo && (
+            <>
+              <Box sx={{ textAlign: 'center', mb: 3 }}>
+                <Chip 
+                  label={planInfo.price === 0 ? 'Gratis' : `$${planInfo.price}`}
+                  color={planInfo.price === 0 ? 'success' : 'primary'}
+                  variant="filled"
+                  sx={{ 
+                    fontSize: '1.1rem', 
+                    py: 2, 
+                    px: 3,
+                    fontWeight: 'bold'
+                  }}
+                />
+              </Box>
+              
+              <Typography variant="h6" gutterBottom>
+                Características incluidas:
+              </Typography>
+              
+              <List dense>
+                {planInfo.features.map((feature, index) => (
+                  <ListItem key={index} sx={{ px: 0, py: 0.5 }}>
+                    <ListItemIcon sx={{ minWidth: 36 }}>
+                      <CheckIcon color="success" />
+                    </ListItemIcon>
+                    <ListItemText primary={feature} />
+                  </ListItem>
+                ))}
+              </List>
+
+              {planInfo.limitations && planInfo.limitations.length > 0 && (
+                <>
+                  <Divider sx={{ my: 2 }} />
+                  
+                  <Typography variant="h6" gutterBottom color="error">
+                    Limitaciones:
+                  </Typography>
+                  
+                  <List dense>
+                    {planInfo.limitations.map((limitation, index) => (
+                      <ListItem key={`limitation-${index}`} sx={{ px: 0, py: 0.5 }}>
+                        <ListItemIcon sx={{ minWidth: 36 }}>
+                          <CloseIcon color="error" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={limitation}
+                          sx={{
+                            '& .MuiListItemText-primary': {
+                              color: 'text.secondary',
+                              textDecoration: 'line-through',
+                              fontSize: '0.875rem'
+                            }
+                          }}
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                </>
+              )}
+            </>
+          )}
+        </DialogContent>
+        
+        <DialogActions sx={{ p: 3 }}>
+          <Button 
+            onClick={() => setPlanModalOpen(false)}
+            color="inherit"
+            sx={{ mr: 1 }}
+          >
+            Cerrar
+          </Button>
+          <Button 
+            onClick={() => {
+              setPlanModalOpen(false);
+              // Aquí podrías agregar lógica para cambiar de plan si es necesario
+            }}
+            variant="contained"
+            color="primary"
+            sx={{ 
+              borderRadius: 3,
+              px: 4,
+              fontWeight: 'bold'
+            }}
+          >
+            Continuar con este Plan
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
