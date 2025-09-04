@@ -17,7 +17,6 @@ import {
   useTheme,
   useMediaQuery,
   LinearProgress,
-  Badge,
   Alert,
   Snackbar
 } from '@mui/material';
@@ -203,7 +202,6 @@ const levelColors = {
 
 const CapacitacionesSection = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('Todas');
   const [courses, setCourses] = useState(capacitaciones);

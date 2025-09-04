@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Typography, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import CapacitacionesSection from '../components/CapacitacionesSection';
 import Navbar from '../components/Navbar';
 
