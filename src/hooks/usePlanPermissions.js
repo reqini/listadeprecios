@@ -7,7 +7,6 @@ export const usePlanPermissions = () => {
 
   useEffect(() => {
     // Obtener el plan del usuario desde localStorage o del token
-    const token = localStorage.getItem('token');
     const tipoUsuario = localStorage.getItem('tipoUsuario');
     
     if (tipoUsuario === 'full') {

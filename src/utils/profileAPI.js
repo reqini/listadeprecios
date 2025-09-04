@@ -97,6 +97,7 @@ export const profileAPI = {
         success: true,
         message: 'Contraseña actualizada exitosamente'
       };
+      // eslint-disable-next-line no-unreachable
     } catch (error) {
       console.error('Error al cambiar contraseña:', error);
       return {

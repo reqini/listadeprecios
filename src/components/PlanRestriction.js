@@ -14,12 +14,10 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Chip,
   Divider
 } from '@mui/material';
 import {
   Lock as LockIcon,
-  Star as StarIcon,
   Check as CheckIcon,
   Close as CloseIcon,
   Upgrade as UpgradeIcon,
