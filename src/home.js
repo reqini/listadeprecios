@@ -54,7 +54,7 @@ const Home = () => {
 
   // Nuevo estado para los colores
   const [primaryColor, setPrimaryColor] = useState(localStorage.getItem("userPrimary") || "#A47A9E");
-  const [secondaryColor, setSecondaryColor] = useState(localStorage.getItem("userSecondary") || "#FBE5B2");
+  const [secondaryColor, setSecondaryColor] = useState(localStorage.getItem("userSecondary") || "#FFC43C");
 
   // =============== NUEVO: validación de sesión ===============
   const [sessionChecked, setSessionChecked] = useState(false);
@@ -458,7 +458,7 @@ const productosFiltrados = productos.filter(
                   variant="outlined"
                   onClick={() => {
                     setPrimaryColor("#A47A9E");
-                    setSecondaryColor("#FBE5B2");
+                    setSecondaryColor("#FFC43Co");
                   }}
                 >
                   Colores originales

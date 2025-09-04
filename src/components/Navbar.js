@@ -7,21 +7,21 @@ import {
   Menu,
   MenuItem,
   Box,
-  Dialog,
+  // Dialog, // Temporalmente oculto - modal reemplazado por pantalla dedicada
   Divider,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Alert,
-  useMediaQuery,
-  InputAdornment,
+  // DialogTitle, // Temporalmente oculto
+  // DialogContent, // Temporalmente oculto
+  // DialogActions, // Temporalmente oculto
+  // Button, // Temporalmente oculto
+  // TextField, // Temporalmente oculto
+  // Alert, // Temporalmente oculto
+  // useMediaQuery, // Temporalmente oculto
+  // InputAdornment, // Temporalmente oculto
   Badge
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import axios from "../utils/axios";
+// import { useTheme } from "@mui/material/styles"; // Temporalmente oculto
+// import { Visibility, VisibilityOff } from "@mui/icons-material"; // Temporalmente oculto
+// import axios from "../utils/axios"; // Temporalmente oculto
 import { useNavigate, useLocation } from "react-router-dom";
 import Logo from '../assets/logo512.png'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -29,15 +29,16 @@ import MenuIcon from '@mui/icons-material/Menu';
 
 const Navbar = ({ user, onLogout, title }) => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [password, setPassword] = useState("");
-  const [edited, setEdited] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [alertState, setAlertState] = useState(null);
-  const [openDialog, setOpenDialog] = useState(null);
+  // Estados del modal de perfil - temporalmente ocultos
+  // const [password, setPassword] = useState("");
+  // const [edited, setEdited] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
+  // const [alertState, setAlertState] = useState(null);
+  // const [openDialog, setOpenDialog] = useState(null);
 
-  const theme = useTheme();
+  // const theme = useTheme(); // Temporalmente oculto
   const location = useLocation();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  // const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Temporalmente oculto
   const navigate = useNavigate(); // Hook para la navegación
 
   // Menú
@@ -45,37 +46,37 @@ const Navbar = ({ user, onLogout, title }) => {
   const handleMenuClose = () => setAnchorEl(null);
 
   // Cambios de contraseña
-  const handleChangePassword = (e) => {
-    setPassword(e.target.value);
-    setEdited(true);
-  };
+  // const handleChangePassword = (e) => {
+  //   setPassword(e.target.value);
+  //   setEdited(true);
+  // };
 
-  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  // const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
-  const handleSaveChanges = async () => {
-    if (!password.trim()) {
-      setAlertState({ type: "error", message: "La contraseña no puede estar vacía" });
-      return;
-    }
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.post(
-        "/api/user/update-password",
-        { username: user.username, password },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+  // const handleSaveChanges = async () => {
+  //   if (!password.trim()) {
+  //     setAlertState({ type: "error", message: "La contraseña no puede estar vacía" });
+  //     return;
+  //   }
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     const response = await axios.post(
+  //       "/api/user/update-password",
+  //       { username: user.username, password },
+  //       { headers: { Authorization: `Bearer ${token}` } }
+  //     );
 
-      if (response.data.success) {
-        setAlertState({ type: "success", message: "Contraseña actualizada correctamente" });
-        setPassword("");
-        setEdited(false);
-      } else {
-        setAlertState({ type: "error", message: response.data.message || "Error desconocido" });
-      }
-    } catch (error) {
-      setAlertState({ type: "error", message: "Error al actualizar la contraseña" });
-    }
-  };
+  //     if (response.data.success) {
+  //       setAlertState({ type: "success", message: "Contraseña actualizada correctamente" });
+  //       setPassword("");
+  //       setEdited(false);
+  //     } else {
+  //       setAlertState({ type: "error", message: response.data.message || "Error desconocido" });
+  //     }
+  //   } catch (error) {
+  //     setAlertState({ type: "error", message: "Error al actualizar la contraseña" });
+  //   }
+  // };
 
   return (
     <>
@@ -121,8 +122,7 @@ const Navbar = ({ user, onLogout, title }) => {
             <Divider />
             <MenuItem
               onClick={() => {
-                // Ejemplo: abrir el modal de perfil
-                setOpenDialog("profile");
+                navigate("/perfil");
                 handleMenuClose();
               }}
             >
@@ -178,8 +178,8 @@ const Navbar = ({ user, onLogout, title }) => {
         </Toolbar>
       </AppBar>
 
-      {/* MODAL PERFIL */}
-      <Dialog open={openDialog === "profile"} onClose={() => setOpenDialog(null)} fullScreen={isMobile}>
+      {/* MODAL PERFIL - REEMPLAZADO POR PANTALLA DEDICADA */}
+      {/* <Dialog open={openDialog === "profile"} onClose={() => setOpenDialog(null)} fullScreen={isMobile}>
         <DialogTitle>Perfil de usuario</DialogTitle>
         <DialogContent>
           {alertState && <Alert severity={alertState.type}>{alertState.message}</Alert>}
@@ -214,7 +214,7 @@ const Navbar = ({ user, onLogout, title }) => {
             Guardar cambios
           </Button>
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
     </>
   );
 };

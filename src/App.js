@@ -7,7 +7,7 @@ import ReactGA from "react-ga4";
 import Login from "./Login";
 import Home from "./home";
 import FaqScreen from "./components/FaqScreen";
-/* import Catalogo3 from "./catalogo3";
+import Catalogo3 from "./catalogo3";
 import Catalogo6 from "./catalogo6";
 import Catalogo9 from "./catalogo9";
 import Catalogo10 from "./catalogo10";
@@ -16,14 +16,16 @@ import Catalogo14 from "./catalogo14";
 import Catalogo18 from "./catalogo18";
 import Catalogo20 from "./catalogo20";
 import Catalogo24 from "./catalogo24";
-import Preferencial from "./Preferencial";
-import Contado from "./contado"; */
 import Register from "./Registro";
 import Ventas from "./Ventas";
+import Preferencial from "./Preferencial";
+import Contado from "./contado";
 import Activos from "./Activos";
 import Emprendedoras from "./Emprendedoras";
 import GeneradorDePlacas from "./GeneradorDePlacas";
-import { AuthProvider, useAuth } from "./AuthContext";
+import PerfilEmprendedora from "./pages/PerfilEmprendedora";
+import LandingPage from "./pages/LandingPage";
+import { AuthProvider, useAuth } from "./AuthContext"; 
 
 // Google Analytics
 const TRACKING_ID = "G-5S2G3FYSPS";
@@ -52,7 +54,7 @@ const AnalyticsTracker = () => {
 const AppContent = () => {
   const theme = useMemo(() => {
     const primary = localStorage.getItem("userPrimary") || "#A47A9E";
-    const secondary = localStorage.getItem("userSecondary") || "#FBE5B2";
+    const secondary = localStorage.getItem("userSecondary") || "#FFC43C";
     return createTheme({
       palette: {
         primary: { main: primary },
@@ -71,7 +73,7 @@ const AppContent = () => {
           <Route path="/registro" element={< Register/>} />
           <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
           <Route path="/faqs" element={<PrivateRoute><FaqScreen /></PrivateRoute>} />
-          {/* <Route path="/preferencial" element={<Preferencial />} />
+          <Route path="/preferencial" element={<Preferencial />} />
           <Route path="/catalogo3" element={<Catalogo3 />} />
           <Route path="/catalogo6" element={<Catalogo6 />} />
           <Route path="/catalogo9" element={<Catalogo9 />} />
@@ -81,11 +83,12 @@ const AppContent = () => {
           <Route path="/catalogo18" element={<Catalogo18 />} />
           <Route path="/catalogo20" element={<Catalogo20 />} />
           <Route path="/catalogo24" element={<Catalogo24 />} />
-          <Route path="/contado" element={<Contado />} /> */}
+          <Route path="/contado" element={<Contado />} />
           <Route path="/generarPlaca" element={<PrivateRoute><GeneradorDePlacas /></PrivateRoute>} />
           <Route path="/emprendedoras" element={<PrivateRoute><Emprendedoras /></PrivateRoute>} />
           <Route path="/ventas" element={<PrivateRoute><Ventas /></PrivateRoute>} />
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/perfil" element={<PrivateRoute><PerfilEmprendedora /></PrivateRoute>} />
+          <Route path="/" element={<LandingPage />} />
         </Routes>
       </Router>
     </ThemeProvider>

@@ -81,7 +81,7 @@ const Login = () => {
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("activeSession", response.data.username);
-        localStorage.setItem("tipoUsuario", response.data.tipo_usuario); // 👈 Aca el tipo
+        localStorage.setItem("tipoUsuario", response.data.tipo_usuario);
         window.location.href = "/home";
       } else {
         alert("Usuario o contraseña incorrectos");

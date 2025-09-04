@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
@@ -10,11 +11,27 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Divider from '@mui/material/Divider';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 import axios from "./utils/axios";
+import { mercadopagoService } from './utils/mercadopago';
 import { Typography } from '@mui/material';
 import Image from './assets/background.jpg';
 
 const Register = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const selectedPlan = searchParams.get('plan') || 'limitado';
+  
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -25,7 +42,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
-  //const [tipoUsuario, setTipoUsuario] = useState("limitado"); // por defecto gratuito
+  const [planInfo, setPlanInfo] = useState(null);
 
   const rangos = [
     "Demostrador/a",
@@ -40,6 +57,12 @@ const Register = () => {
     "Empresario/a",
     "Empresario/a VIP",
   ];
+
+  useEffect(() => {
+    // Cargar información del plan seleccionado
+    const plan = mercadopagoService.getPlanInfo(selectedPlan);
+    setPlanInfo(plan);
+  }, [selectedPlan]);
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
 
@@ -105,7 +128,7 @@ const handleSubmit = async (e) => {
       password,
       rango,
       codigo_emprendedora: codigoEmprendedora,
-      //tipo_usuario: tipoUsuario,
+      plan: selectedPlan, // Agregar el plan seleccionado
     };
 
     const response = await axios.post(`/auth/register`, payload);
@@ -113,8 +136,25 @@ const handleSubmit = async (e) => {
     if (response.data.success) {
       localStorage.setItem("registeredUsername", username);
 
-      const mercadoPagoUrl = "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c93808494f9e81b01952fe6e9e01a76&back_url=https://catalogosimple.ar/login";
-      window.location.href = mercadoPagoUrl;
+      if (selectedPlan === 'full') {
+        // Plan de pago - crear suscripción en Mercado Pago
+        const userData = {
+          username,
+          email: username + '@ejemplo.com', // En producción esto vendría del formulario
+        };
+
+        const subscriptionResponse = await mercadopagoService.createSubscription(userData, 'full');
+        
+        if (subscriptionResponse.success) {
+          // Redirigir a Mercado Pago
+          window.location.href = subscriptionResponse.initPoint;
+        } else {
+          setError('Error al procesar el pago. Intenta de nuevo.');
+        }
+      } else {
+        // Plan gratuito - ir directo al login
+        navigate('/login?registered=true');
+      }
 
     } else {
       setCodigoError(response.data.message || 'Hubo un problema durante el registro.');
@@ -148,6 +188,60 @@ const handleSubmit = async (e) => {
         >
           Registro de usuarios nuevos
         </Typography>
+
+        {/* Información del Plan Seleccionado */}
+        {planInfo && (
+          <Card sx={{ mb: 3, bgcolor: 'rgba(255,255,255,0.95)' }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                <Typography variant="h6" fontWeight="bold">
+                  {planInfo.name}
+                </Typography>
+                <Chip 
+                  label={planInfo.price === 0 ? 'Gratis' : `$${planInfo.price}`}
+                  color={planInfo.price === 0 ? 'success' : 'primary'}
+                  variant="filled"
+                />
+              </Box>
+              
+              <List dense>
+                {planInfo.features.map((feature, index) => (
+                  <ListItem key={index} sx={{ px: 0, py: 0.5 }}>
+                    <ListItemIcon sx={{ minWidth: 32 }}>
+                      <CheckIcon color="success" fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary={feature} />
+                  </ListItem>
+                ))}
+                {planInfo.limitations && planInfo.limitations.length > 0 && (
+                  <>
+                    <Divider sx={{ my: 1 }} />
+                    <Typography variant="subtitle2" color="text.secondary" sx={{ px: 2, mb: 1 }}>
+                      Limitaciones:
+                    </Typography>
+                    {planInfo.limitations.map((limitation, index) => (
+                      <ListItem key={`limitation-${index}`} sx={{ px: 0, py: 0.5 }}>
+                        <ListItemIcon sx={{ minWidth: 32 }}>
+                          <CloseIcon color="error" fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary={limitation} 
+                          sx={{ 
+                            '& .MuiListItemText-primary': { 
+                              color: 'text.secondary',
+                              textDecoration: 'line-through',
+                              fontSize: '0.875rem'
+                            } 
+                          }} 
+                        />
+                      </ListItem>
+                    ))}
+                  </>
+                )}
+              </List>
+            </CardContent>
+          </Card>
+        )}
         <form onSubmit={handleSubmit}>
           <Grid container spacing={0} className="card">
             <Grid item xs={12} style={{ margin: '10px 0' }}>
@@ -294,8 +388,14 @@ const handleSubmit = async (e) => {
                 variant="contained"
                 size="large"
                 disabled={!isFormValid || loading}
+                color={selectedPlan === 'full' ? 'secondary' : 'primary'}
               >
-                {loading ? 'Registrando...' : 'Registrar'}
+                {loading 
+                  ? 'Procesando...' 
+                  : selectedPlan === 'full' 
+                    ? 'Registrarse y Pagar $2.990' 
+                    : 'Registrarse Gratis'
+                }
               </Button>
             </Grid>
           </Grid>

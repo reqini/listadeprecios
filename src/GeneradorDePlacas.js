@@ -39,10 +39,13 @@ import {
   Visibility as PreviewIcon,
   Shuffle as ShuffleIcon,
   Speed as SpeedIcon,
+  // Star as StarIcon, // Temporalmente oculto
 } from "@mui/icons-material";
 import CardGenerator from "./components/CardGenerator";
+// import PlacaGeneratorPro from "./components/PlacaGeneratorPro"; // Temporalmente oculto hasta estar al 100%
 import WebFont from "webfontloader";
 import Navbar from "./components/Navbar";
+import { buildComboTitle, composeCombo } from "./utils/aiComposer";
 
 const GeneradorDePlacas = () => {
   // Estados principales
@@ -79,7 +82,7 @@ const GeneradorDePlacas = () => {
   // Estados para combos y IA avanzada
   const [comboMode, setComboMode] = useState(false);
   const [aiComboSuggestions, setAiComboSuggestions] = useState(() => []);
-  const [realisticMode, setRealisticMode] = useState(true);
+  const [realisticMode, setRealisticMode] = useState(false); // Siempre arranca en false
   const [aiLayoutOptimization, setAiLayoutOptimization] = useState(false);
   const [aiColorHarmony, setAiColorHarmony] = useState(false);
   
@@ -88,6 +91,13 @@ const GeneradorDePlacas = () => {
   const [comboLayout, setComboLayout] = useState("auto"); // auto, horizontal, vertical, grid
   const [comboSpacing, setComboSpacing] = useState(15);
   const [comboAnimation] = useState(true);
+  const [comboTitle, setComboTitle] = useState("");
+  const [comboLayers, setComboLayers] = useState([]);
+  const [comboTotalQuota, setComboTotalQuota] = useState(0);
+  
+  // Estados para modo PRO - Temporalmente oculto
+  // const [proMode, setProMode] = useState(false);
+  // const [showProFeatures, setShowProFeatures] = useState(false);
   
   // Estados de UI
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -262,6 +272,64 @@ const GeneradorDePlacas = () => {
     // Asegurar que selectedProducts siempre sea un array
     setSelectedProducts(prev => prev || []);
   }, []);
+
+  // Actualizar combo title y capas cuando cambien los productos seleccionados
+  useEffect(() => {
+    if (comboMode && safeSelectedProducts.length > 0) {
+      // Generar título del combo
+      const title = buildComboTitle(safeSelectedProducts);
+      setComboTitle(title);
+
+      // Generar capas compuestas
+      const productImages = safeSelectedProducts.map(p => p.imagen || p.imagen_url).filter(Boolean);
+      if (productImages.length > 0) {
+        composeCombo(productImages, { layout: comboLayout })
+          .then(layers => setComboLayers(layers))
+          .catch(error => console.error("Error generando capas:", error));
+      }
+    } else {
+      setComboTitle("");
+      setComboLayers([]);
+    }
+  }, [comboMode, safeSelectedProducts, comboLayout]);
+
+  // Función para calcular el total de cuotas en modo combo
+  const calculateComboTotalQuota = useCallback((products, quota) => {
+    if (!comboMode || !products || products.length === 0 || !quota) return 0;
+    
+    let total = 0;
+    products.forEach(product => {
+      const cuotaKey = cuotasMap[quota];
+      if (cuotaKey && product[cuotaKey] && product[cuotaKey] !== "NO") {
+        try {
+          // Limpiar el valor y convertir a número
+          const cleanValue = product[cuotaKey].toString()
+            .replace(/[^\d.,]/g, '') // Remover todo excepto dígitos, comas y puntos
+            .replace(',', '.'); // Convertir coma decimal a punto
+          
+          const numericValue = parseFloat(cleanValue);
+          if (!isNaN(numericValue) && numericValue > 0) {
+            total += numericValue;
+          }
+        } catch (error) {
+          console.warn('Error parsing quota value:', product[cuotaKey], error);
+        }
+      }
+    });
+    
+    // Redondear a 2 decimales para evitar errores de precisión
+    return Math.round(total * 100) / 100;
+  }, [comboMode, cuotasMap]);
+
+  // Actualizar total de cuotas del combo
+  useEffect(() => {
+    if (comboMode && safeSelectedProducts.length > 0 && selectedQuota) {
+      const total = calculateComboTotalQuota(safeSelectedProducts, selectedQuota);
+      setComboTotalQuota(total);
+    } else {
+      setComboTotalQuota(0);
+    }
+  }, [comboMode, safeSelectedProducts, selectedQuota, calculateComboTotalQuota]);
 
   // Funciones auxiliares (definidas primero para evitar errores de hoisting)
   const formatPrice = useCallback((value) => {
@@ -675,6 +743,25 @@ const GeneradorDePlacas = () => {
     navigate("/login");
   };
 
+  // Modo PRO temporalmente oculto hasta estar al 100%
+  // if (proMode) {
+  //   return (
+  //     <>
+  //       <Navbar
+  //         title="🎨 Placa Generator PRO - Herramienta Revolucionaria"
+  //         onLogout={handleLogout}
+  //         user={{ username: localStorage.getItem("activeSession") || "" }}
+  //       />
+  //       <PlacaGeneratorPro 
+  //         products={products}
+  //         banks={banks}
+  //         onSave={() => showSnackbar("Placa guardada exitosamente", "success")}
+  //         onExport={() => showSnackbar("Placa exportada exitosamente", "success")}
+  //       />
+  //     </>
+  //   );
+  // }
+
   return (
     <>
       <Navbar
@@ -688,10 +775,48 @@ const GeneradorDePlacas = () => {
           {/* Panel de Control */}
           <Grid item xs={12} md={5}>
             <Paper elevation={3} sx={{ p: 3, height: "fit-content" }}>
-              <Typography variant="h5" gutterBottom sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <AutoAwesomeIcon color="primary" />
-                Panel de Control
-              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+                <Typography variant="h5" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <AutoAwesomeIcon color="primary" />
+                  Panel de Control
+                </Typography>
+                {/* Botón PRO temporalmente oculto */}
+                {/* <Button
+                  variant={proMode ? "contained" : "outlined"}
+                  color="warning"
+                  startIcon={<StarIcon />}
+                  onClick={() => setProMode(!proMode)}
+                  sx={{
+                    bgcolor: proMode ? "linear-gradient(45deg, #FFD700 30%, #FFA500 90%)" : "transparent",
+                    color: proMode ? "white" : "warning.main",
+                    fontWeight: "bold",
+                    "&:hover": {
+                      bgcolor: proMode ? "linear-gradient(45deg, #FFA500 30%, #FF8C00 90%)" : "warning.50"
+                    }
+                  }}
+                >
+                  {proMode ? "MODO PRO ACTIVO" : "ACTIVAR MODO PRO"}
+                </Button> */}
+              </Box>
+
+              {/* Alert PRO temporalmente oculto */}
+              {/* {proMode && (
+                <Alert 
+                  severity="success" 
+                  sx={{ mb: 2, bgcolor: "linear-gradient(45deg, #4CAF50 30%, #45a049 90%)", color: "white" }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }}>
+                    🚀 MODO PRO ACTIVADO - EXPERIENCIA REVOLUCIONARIA
+                  </Typography>
+                  <Typography variant="body2">
+                    • IA Avanzada para composición automática<br/>
+                    • Efectos visuales profesionales<br/>
+                    • Templates premium<br/>
+                    • Herramientas de diseño avanzadas<br/>
+                    • Exportación en alta calidad
+                  </Typography>
+                </Alert>
+              )} */}
               
               <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)} sx={{ mb: 2 }}>
                 <Tab label="Producto" />
@@ -764,11 +889,11 @@ const GeneradorDePlacas = () => {
                   {comboMode ? (
                     // Modo combo - selección múltiple mejorada
                     <Box>
-                      <Autocomplete
+          <Autocomplete
                         multiple
-                        options={products || []}
-                        fullWidth
-                        getOptionLabel={(option) => option?.descripcion || ""}
+            options={products || []}
+            fullWidth
+            getOptionLabel={(option) => option?.descripcion || ""}
                         onChange={handleSelectMultipleProducts}
                         value={safeSelectedProducts}
                         renderInput={(params) => (
@@ -801,7 +926,7 @@ const GeneradorDePlacas = () => {
                         <Paper elevation={1} sx={{ p: 2, mt: 2, bgcolor: "#F8F9FA" }}>
                           <Typography variant="subtitle2" gutterBottom color="primary">
                             Productos en el Combo ({safeSelectedProducts.length})
-                          </Typography>
+            </Typography>
                           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                             {safeSelectedProducts.map((product, index) => (
                               <Box 
@@ -1470,6 +1595,9 @@ const GeneradorDePlacas = () => {
                        comboLayout={comboLayout}
                        comboSpacing={comboSpacing}
                        comboAnimation={comboAnimation}
+                       comboTitle={comboTitle}
+                       comboLayers={comboLayers}
+                       comboTotalQuota={comboTotalQuota}
                      />
                   </Box>
                 )}
@@ -1557,6 +1685,9 @@ const GeneradorDePlacas = () => {
                        comboLayout={comboLayout}
                        comboSpacing={comboSpacing}
                        comboAnimation={comboAnimation}
+                       comboTitle={comboTitle}
+                       comboLayers={comboLayers}
+                       comboTotalQuota={comboTotalQuota}
     />
   ]}
 />
