@@ -1,10 +1,8 @@
 
 import axios from "axios";
+import { API_CONFIG } from "../config/api";
 
-const url =
-  process.env.NODE_ENV === "development"
-    ? `http://localhost:3001`
-    : "https://backtest-production-7f88.up.railway.app";
+const url = API_CONFIG.baseURL;
 
 const instance = axios.create({
   baseURL: `${url}`,
