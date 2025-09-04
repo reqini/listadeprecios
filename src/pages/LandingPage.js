@@ -52,6 +52,7 @@ import {
   LocationOn as LocationIcon
 } from '@mui/icons-material';
 import logo from '../assets/logo.png';
+import ModernReviewCarousel from '../components/ModernReviewCarousel';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -302,6 +303,17 @@ const LandingPage = () => {
         }} />
         
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <img 
+              src={logo} 
+              alt="Logo Lista de Precios" 
+              style={{ 
+                height: 100, 
+                filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.2))',
+                marginBottom: '20px'
+              }} 
+            />
+          </Box>
           <Typography variant="h1" component="h1" gutterBottom sx={{ 
             fontWeight: 900, 
             mb: 3,
@@ -525,7 +537,14 @@ const LandingPage = () => {
                     <Chip 
                       label="Más Popular" 
                       color="primary" 
-                      sx={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)' }}
+                      sx={{ 
+                        position: 'absolute', 
+                        top: -12, 
+                        left: '50%', 
+                        transform: 'translateX(-50%)',
+                        zIndex: 10,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                      }}
                     />
                   )}
                   
@@ -624,81 +643,11 @@ const LandingPage = () => {
           </Typography>
         </Box>
         
-        <Grid container spacing={4}>
-          {[
-            {
-              name: "Mejia Jara",
-              review: "Me encantó! Es mi mejor aliado desde que tengo la app! Práctica y funcional.",
-              rating: 5
-            },
-            {
-              name: "Elizabeth Martínez",
-              review: "Un mil! Súper sencillo poder asesorar al cliente con toda la info a un solo toque.",
-              rating: 4.5
-            },
-            {
-              name: "Marisel Chamorro",
-              review: "La app está buenísima. Lo mejor: la calculadora de cuotas. También le sumaría poder elegir color de fondo en las placas.",
-              rating: 5
-            },
-            {
-              name: "Solu de Essen",
-              review: "La app es un 1000! Súper útil para emprendedoras: combos, catálogos detallados y placas para clientes. Increíble. ❤️",
-              rating: 5
-            },
-            {
-              name: "Pau Amarilla",
-              review: "Una app intuitiva, veloz y actualizada, ideal para emprendedores que buscan agilizar sus respuestas. ¡Una herramienta indispensable!",
-              rating: 5
-            },
-            {
-              name: "ig: Aracabralok",
-              review: "Es util, te ayuda a tener a mano los valores,promos bancarias etc, es facil de usar.",
-              rating: 5
-            }
-          ].map((testimonial, index) => (
-            <Grid item xs={12} md={4} key={index}>
-              <Card sx={{ 
-                height: '100%', 
-                p: 3,
-                borderRadius: 3,
-                border: '1px solid rgba(0,0,0,0.05)',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)'
-                }
-              }}>
-                <CardContent>
-                  <Box sx={{ display: 'flex', mb: 2 }}>
-                    {Array(Math.floor(testimonial.rating)).fill().map((_, i) => (
-                      <StarIcon key={i} color="warning" />
-                    ))}
-                    {testimonial.rating % 1 !== 0 && (
-                      <StarIcon sx={{ color: '#ffb400', opacity: 0.5 }} />
-                    )}
-                  </Box>
-                  <Typography variant="body1" sx={{ mb: 3, fontStyle: 'italic', lineHeight: 1.6 }}>
-                    "{testimonial.review}"
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Avatar sx={{ bgcolor: 'primary.main', mr: 2, width: 40, height: 40 }}>
-                      {testimonial.name.charAt(0)}
-                    </Avatar>
-                    <Typography variant="h6" fontWeight="bold" color="primary.main">
-                      {testimonial.name}
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        <ModernReviewCarousel />
       </Container>
 
       {/* Footer */}
-      <Box sx={{ bgcolor: 'primary.main', color: 'white', py: 6 }}>
+      <Box sx={{ bgcolor: '#000000', color: 'white', py: 6 }}>
         <Container maxWidth="lg">
           <Grid container spacing={4}>
             <Grid item xs={12} md={4}>
