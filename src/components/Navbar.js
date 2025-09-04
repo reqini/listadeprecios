@@ -167,6 +167,18 @@ const Navbar = ({ user, onLogout, title }) => {
             <Divider></Divider>
             <MenuItem
               onClick={() => {
+                navigate("/capacitaciones");
+                handleMenuClose();
+              }}
+            >
+              <Box display="flex" alignItems="center" gap={1}>
+                <Typography fontWeight="bold">Capacitaciones</Typography>
+                <Typography color="secondary" fontSize={12}>🎓 Gratis</Typography>
+              </Box>
+            </MenuItem>
+            <Divider></Divider>
+            <MenuItem
+              onClick={() => {
                 onLogout();
                 handleMenuClose();
               }}

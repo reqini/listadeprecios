@@ -25,6 +25,7 @@ import Emprendedoras from "./Emprendedoras";
 import GeneradorDePlacas from "./GeneradorDePlacas";
 import PerfilEmprendedora from "./pages/PerfilEmprendedora";
 import LandingPage from "./pages/LandingPage";
+import Capacitaciones from "./pages/Capacitaciones";
 import { AuthProvider, useAuth } from "./AuthContext"; 
 
 // Google Analytics
@@ -88,6 +89,7 @@ const AppContent = () => {
           <Route path="/emprendedoras" element={<PrivateRoute><Emprendedoras /></PrivateRoute>} />
           <Route path="/ventas" element={<PrivateRoute><Ventas /></PrivateRoute>} />
           <Route path="/perfil" element={<PrivateRoute><PerfilEmprendedora /></PrivateRoute>} />
+          <Route path="/capacitaciones" element={<PrivateRoute><Capacitaciones /></PrivateRoute>} />
           <Route path="/" element={<LandingPage />} />
         </Routes>
       </Router>
