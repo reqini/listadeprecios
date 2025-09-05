@@ -222,6 +222,22 @@ const capacitaciones = [
     tags: ["crecimiento", "empresarial", "escalabilidad", "estrategias", "negocios"],
     progress: 0,
     status: "pending"
+  },
+  {
+    id: 12,
+    title: "Google Nano Banana - Tutorial Completo",
+    description: "Aprende todo sobre Google Nano Banana, la nueva herramienta de Google para emprendedores. Descubre sus características, funcionalidades y cómo puede potenciar tu negocio.",
+    category: "Herramientas",
+    duration: "1h 20min",
+    level: "Intermedio",
+    thumbnail: "https://img.youtube.com/vi/pJMO_Gw3h5A/maxresdefault.jpg",
+    videoUrl: "https://www.youtube.com/embed/pJMO_Gw3h5A",
+    instructor: "Especialista en Google Tools",
+    views: 125000,
+    likes: 4500,
+    tags: ["google", "nano banana", "herramientas", "tutorial", "productividad"],
+    progress: 0,
+    status: "pending"
   }
 ];
 
