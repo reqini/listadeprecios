@@ -2,8 +2,6 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "./utils/axios";
 import DialogResponsive from "./components/DialogResponsive";
-import PlanRestriction from "./components/PlanRestriction";
-import { usePlanPermissions } from "./hooks/usePlanPermissions";
 import { 
   Autocomplete, 
   TextField, 
@@ -51,7 +49,6 @@ import { buildComboTitle, composeCombo } from "./utils/aiComposer";
 
 const GeneradorDePlacas = () => {
   // Hook para manejar permisos de plan
-  const { canAccess, getRestrictionMessage, redirectToSubscription } = usePlanPermissions();
   
   // Estados principales
   const [products, setProducts] = useState(() => []);
@@ -767,23 +764,6 @@ const GeneradorDePlacas = () => {
   //   );
   // }
 
-  // Verificar si el usuario puede generar placas
-  if (!canAccess('canGeneratePlacas')) {
-  return (
-    <>
-      <Navbar
-          title="Generador de Placas Inteligente"
-        onLogout={handleLogout}
-        user={{ username: localStorage.getItem("activeSession") || "" }}
-      />
-        <PlanRestriction 
-          feature="canGeneratePlacas"
-          message={getRestrictionMessage('canGeneratePlacas')}
-          onUpgrade={redirectToSubscription}
-        />
-      </>
-    );
-  }
 
   return (
     <>

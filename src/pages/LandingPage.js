@@ -346,15 +346,15 @@ const LandingPage = () => {
 
       {/* Hero Section */}
       <Box sx={{ 
-        pt: { xs: 10, md: 12 }, 
-        pb: { xs: 6, md: 8 }, 
-        px: { xs: 2, md: 0 },
+        pt: { xs: 8, sm: 10, md: 12 }, 
+        pb: { xs: 4, sm: 6, md: 8 }, 
+        px: { xs: 1, sm: 2, md: 0 },
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         color: 'white',
         textAlign: 'center',
         position: 'relative',
         overflow: 'hidden',
-        minHeight: { xs: '100vh', md: 'auto' }
+        minHeight: { xs: '90vh', sm: '100vh', md: 'auto' }
       }}>
         {/* Elementos decorativos de fondo */}
         <Box sx={{
@@ -377,34 +377,35 @@ const LandingPage = () => {
               src={logo} 
               alt="Logo Lista de Precios" 
               style={{ 
-                height: 100, 
+                height: isMobile ? 60 : 100, 
                 filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.2))',
-                marginBottom: '20px'
+                marginBottom: isMobile ? '15px' : '20px'
               }} 
             />
           </Box>
           <Typography variant="h1" component="h1" gutterBottom sx={{ 
             fontWeight: 900, 
-            mb: { xs: 2, md: 3 },
-            fontSize: { xs: '2rem', sm: '2.5rem', md: '4rem' },
+            mb: { xs: 1.5, sm: 2, md: 3 },
+            fontSize: { xs: '1.8rem', sm: '2.5rem', md: '4rem' },
             background: 'linear-gradient(45deg, #fff 30%, #f0f0f0 90%)',
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             textShadow: '0 4px 8px rgba(0,0,0,0.3)',
-            lineHeight: { xs: 1.2, md: 1.1 }
+            lineHeight: { xs: 1.1, sm: 1.2, md: 1.1 },
+            px: { xs: 1, sm: 0 }
           }}>
             La Revolución para Emprendedoras
           </Typography>
           <Typography variant="h4" sx={{ 
-            mb: { xs: 3, md: 4 }, 
+            mb: { xs: 2.5, sm: 3, md: 4 }, 
             opacity: 0.95, 
             maxWidth: { xs: '100%', md: 900 }, 
             mx: 'auto',
-            fontSize: { xs: '1rem', sm: '1.2rem', md: '1.5rem' },
-            lineHeight: { xs: 1.4, md: 1.6 },
+            fontSize: { xs: '0.9rem', sm: '1.2rem', md: '1.5rem' },
+            lineHeight: { xs: 1.3, sm: 1.4, md: 1.6 },
             textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-            px: { xs: 1, md: 0 }
+            px: { xs: 0.5, sm: 1, md: 0 }
           }}>
             🚀 Crea catálogos profesionales, genera placas con IA y gestiona tus ventas 
             desde una sola plataforma. Únete a más de <strong>{stats.emprendedoras.toLocaleString()}</strong> emprendedoras exitosas.
@@ -412,12 +413,12 @@ const LandingPage = () => {
           
           <Box sx={{ 
             display: 'flex', 
-            gap: { xs: 2, md: 3 }, 
+            gap: { xs: 1.5, sm: 2, md: 3 }, 
             justifyContent: 'center', 
             flexDirection: { xs: 'column', sm: 'row' },
             alignItems: 'center',
-            mb: { xs: 4, md: 6 },
-            px: { xs: 2, md: 0 }
+            mb: { xs: 3, sm: 4, md: 6 },
+            px: { xs: 1, sm: 2, md: 0 }
           }}>
             <Button 
               variant="contained" 
@@ -427,15 +428,16 @@ const LandingPage = () => {
               sx={{ 
                 bgcolor: 'white', 
                 color: 'primary.main',
-                px: { xs: 3, md: 4 },
-                py: { xs: 1.5, md: 1.5 },
-                fontSize: { xs: '1rem', md: '1.1rem' },
+                px: { xs: 2, sm: 3, md: 4 },
+                py: { xs: 1.2, sm: 1.5, md: 1.5 },
+                fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
                 fontWeight: 'bold',
                 borderRadius: 3,
                 boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
                 transform: 'translateY(0)',
                 transition: 'all 0.3s ease',
                 maxWidth: { xs: '100%', sm: '300px' },
+                minHeight: { xs: '44px', sm: '48px' },
                 '&:hover': { 
                   bgcolor: 'grey.100',
                   transform: 'translateY(-2px)',
@@ -477,7 +479,7 @@ const LandingPage = () => {
           </Box>
 
           {/* Estadísticas */}
-          <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mt: { xs: 4, md: 6 } }}>
+          <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} sx={{ mt: { xs: 3, sm: 4, md: 6 } }}>
             <Grid item xs={6} md={3}>
               <StatCard 
                 icon={PeopleIcon} 
@@ -515,8 +517,8 @@ const LandingPage = () => {
       </Box>
 
       {/* Características */}
-      <Container maxWidth="lg" sx={{ py: { xs: 6, md: 10 }, px: { xs: 2, md: 0 } }}>
-        <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
+      <Container maxWidth="lg" sx={{ py: { xs: 4, sm: 6, md: 10 }, px: { xs: 1, sm: 2, md: 0 } }}>
+        <Box sx={{ textAlign: 'center', mb: { xs: 4, sm: 6, md: 8 } }}>
           <Typography variant="h2" component="h2" gutterBottom sx={{ 
             fontWeight: 800,
             background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
@@ -524,21 +526,24 @@ const LandingPage = () => {
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             mb: 2,
-            fontSize: { xs: '1.8rem', sm: '2.2rem', md: '3rem' }
+            fontSize: { xs: '1.5rem', sm: '2.2rem', md: '3rem' },
+            lineHeight: { xs: 1.2, sm: 1.3, md: 1.4 },
+            px: { xs: 1, sm: 0 }
           }}>
             Todo lo que necesitas para triunfar
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ 
             maxWidth: { xs: '100%', md: 600 }, 
             mx: 'auto',
-            fontSize: { xs: '1rem', md: '1.25rem' },
-            px: { xs: 2, md: 0 }
+            fontSize: { xs: '0.9rem', sm: '1rem', md: '1.25rem' },
+            px: { xs: 1, sm: 2, md: 0 },
+            lineHeight: { xs: 1.4, sm: 1.5, md: 1.6 }
           }}>
             Herramientas profesionales diseñadas específicamente para emprendedoras que quieren crecer
           </Typography>
         </Box>
         
-        <Grid container spacing={{ xs: 3, md: 4 }}>
+        <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
           <Grid item xs={12} md={4}>
             <FeatureCard
               icon={PaletteIcon}
@@ -569,7 +574,7 @@ const LandingPage = () => {
       {/* Planes de Suscripción */}
       <Box sx={{ 
         bgcolor: 'grey.50', 
-        py: { xs: 6, md: 10 },
+        py: { xs: 4, sm: 6, md: 10 },
         position: 'relative',
         '&::before': {
           content: '""',
@@ -582,8 +587,8 @@ const LandingPage = () => {
           zIndex: 0
         }
       }}>
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, px: { xs: 2, md: 0 } }}>
-          <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, px: { xs: 1, sm: 2, md: 0 } }}>
+          <Box sx={{ textAlign: 'center', mb: { xs: 4, sm: 6, md: 8 } }}>
             <Typography variant="h2" component="h2" gutterBottom sx={{ 
               fontWeight: 800,
               background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
@@ -591,21 +596,24 @@ const LandingPage = () => {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               mb: 2,
-              fontSize: { xs: '1.8rem', sm: '2.2rem', md: '3rem' }
+              fontSize: { xs: '1.5rem', sm: '2.2rem', md: '3rem' },
+              lineHeight: { xs: 1.2, sm: 1.3, md: 1.4 },
+              px: { xs: 1, sm: 0 }
             }}>
               Elige tu Plan
             </Typography>
             <Typography variant="h6" color="text.secondary" sx={{ 
               maxWidth: { xs: '100%', md: 600 }, 
               mx: 'auto',
-              fontSize: { xs: '1rem', md: '1.25rem' },
-              px: { xs: 2, md: 0 }
+              fontSize: { xs: '0.9rem', sm: '1rem', md: '1.25rem' },
+              px: { xs: 1, sm: 2, md: 0 },
+              lineHeight: { xs: 1.4, sm: 1.5, md: 1.6 }
             }}>
               Comienza gratis y escala cuando estés lista para crecer
             </Typography>
           </Box>
           
-          <Grid container spacing={{ xs: 2, md: 3 }} justifyContent="center">
+          <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} justifyContent="center">
             {plans.map((plan) => (
               <Grid item xs={12} md={4} key={plan.name}>
                 <Card 
@@ -643,7 +651,7 @@ const LandingPage = () => {
                     />
                   )}
                   
-                  <CardContent sx={{ p: { xs: 3, md: 4 }, textAlign: 'center' }}>
+                  <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 }, textAlign: 'center' }}>
                     <Typography variant="h5" component="h3" gutterBottom fontWeight="bold">
                       {plan.name}
                     </Typography>
