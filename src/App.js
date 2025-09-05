@@ -26,6 +26,7 @@ import GeneradorDePlacas from "./GeneradorDePlacas";
 import PerfilEmprendedora from "./pages/PerfilEmprendedora";
 import LandingPage from "./pages/LandingPage";
 import Capacitaciones from "./pages/Capacitaciones";
+import PWAInstallToast from "./components/PWAInstallToast";
 import { AuthProvider, useAuth } from "./AuthContext"; 
 
 // Google Analytics
@@ -92,6 +93,7 @@ const AppContent = () => {
           <Route path="/capacitaciones" element={<PrivateRoute><Capacitaciones /></PrivateRoute>} />
           <Route path="/" element={<LandingPage />} />
         </Routes>
+        <PWAInstallToast />
       </Router>
     </ThemeProvider>
   );
