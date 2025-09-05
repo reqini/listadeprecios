@@ -174,6 +174,22 @@ const capacitaciones = [
     tags: ["emprendimiento", "digital", "negocios", "estrategias"],
     progress: 0,
     status: "pending"
+  },
+  {
+    id: 9,
+    title: "Nuevo Tutorial de Capacitación",
+    description: "Descubre las últimas técnicas y estrategias para mejorar tu negocio. Un tutorial completo con consejos prácticos y herramientas útiles.",
+    category: "Herramientas",
+    duration: "1h 30min",
+    level: "Intermedio",
+    thumbnail: "https://img.youtube.com/vi/X3rW-DEA7dM/maxresdefault.jpg",
+    videoUrl: "https://www.youtube.com/embed/X3rW-DEA7dM",
+    instructor: "Especialista en Negocios",
+    views: 89000,
+    likes: 3200,
+    tags: ["tutorial", "negocios", "estrategias", "herramientas"],
+    progress: 0,
+    status: "pending"
   }
 ];
 

@@ -57,10 +57,13 @@ import {
   Warning as WarningIcon
 } from '@mui/icons-material';
 import Navbar from '../components/Navbar';
+import FreePlanWelcome from '../components/FreePlanWelcome';
 import { profileAPI } from '../utils/profileAPI';
+import { usePlanPermissions } from '../hooks/usePlanPermissions';
 
 const PerfilEmprendedora = () => {
   const navigate = useNavigate();
+  const { userPlan, canAccess } = usePlanPermissions();
   
   // Estados principales
   const [user, setUser] = useState({
@@ -222,6 +225,10 @@ const PerfilEmprendedora = () => {
     navigate('/login');
   };
 
+  const handleUpgrade = () => {
+    navigate('/registro?plan=full');
+  };
+
   const StatCard = ({ title, value, icon: Icon, color = 'primary', trend = null }) => (
     <Card sx={{ height: '100%', position: 'relative', overflow: 'visible' }}>
       <CardContent>
@@ -261,6 +268,20 @@ const PerfilEmprendedora = () => {
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
+
+  // Si es plan gratuito, mostrar solo el componente de bienvenida
+  if (userPlan === 'limitado') {
+    return (
+      <>
+        <Navbar
+          title="👤 Perfil de Emprendedora"
+          onLogout={handleLogout}
+          user={{ username: user.username }}
+        />
+        <FreePlanWelcome onUpgrade={handleUpgrade} />
+      </>
+    );
+  }
 
   return (
     <>

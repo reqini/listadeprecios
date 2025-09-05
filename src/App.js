@@ -26,6 +26,7 @@ import GeneradorDePlacas from "./GeneradorDePlacas";
 import PerfilEmprendedora from "./pages/PerfilEmprendedora";
 import LandingPage from "./pages/LandingPage";
 import Capacitaciones from "./pages/Capacitaciones";
+import PremiumRoute from "./components/PremiumRoute";
 import { AuthProvider, useAuth } from "./AuthContext"; 
 
 // Google Analytics
@@ -72,24 +73,96 @@ const AppContent = () => {
           <Route path="/activos" element={<Activos />} />
           <Route path="/login" element={<LoginRoute />} />
           <Route path="/registro" element={< Register/>} />
-          <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
-          <Route path="/faqs" element={<PrivateRoute><FaqScreen /></PrivateRoute>} />
+          <Route path="/home" element={
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canAccessHome">
+                <Home />
+              </PremiumRoute>
+            </PrivateRoute>
+          } />
+          <Route path="/faqs" element={
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canAccessFaqs">
+                <FaqScreen />
+              </PremiumRoute>
+            </PrivateRoute>
+          } />
           <Route path="/preferencial" element={<Preferencial />} />
-          <Route path="/catalogo3" element={<Catalogo3 />} />
-          <Route path="/catalogo6" element={<Catalogo6 />} />
-          <Route path="/catalogo9" element={<Catalogo9 />} />
-          <Route path="/catalogo10" element={<Catalogo10 />} />
-          <Route path="/catalogo12" element={<Catalogo12 />} />
-          <Route path="/catalogo14" element={<Catalogo14 />} />
-          <Route path="/catalogo18" element={<Catalogo18 />} />
-          <Route path="/catalogo20" element={<Catalogo20 />} />
-          <Route path="/catalogo24" element={<Catalogo24 />} />
+          <Route path="/catalogo3" element={
+            <PremiumRoute requiredPermission="canAccessCatalogs">
+              <Catalogo3 />
+            </PremiumRoute>
+          } />
+          <Route path="/catalogo6" element={
+            <PremiumRoute requiredPermission="canAccessCatalogs">
+              <Catalogo6 />
+            </PremiumRoute>
+          } />
+          <Route path="/catalogo9" element={
+            <PremiumRoute requiredPermission="canAccessCatalogs">
+              <Catalogo9 />
+            </PremiumRoute>
+          } />
+          <Route path="/catalogo10" element={
+            <PremiumRoute requiredPermission="canAccessCatalogs">
+              <Catalogo10 />
+            </PremiumRoute>
+          } />
+          <Route path="/catalogo12" element={
+            <PremiumRoute requiredPermission="canAccessCatalogs">
+              <Catalogo12 />
+            </PremiumRoute>
+          } />
+          <Route path="/catalogo14" element={
+            <PremiumRoute requiredPermission="canAccessCatalogs">
+              <Catalogo14 />
+            </PremiumRoute>
+          } />
+          <Route path="/catalogo18" element={
+            <PremiumRoute requiredPermission="canAccessCatalogs">
+              <Catalogo18 />
+            </PremiumRoute>
+          } />
+          <Route path="/catalogo20" element={
+            <PremiumRoute requiredPermission="canAccessCatalogs">
+              <Catalogo20 />
+            </PremiumRoute>
+          } />
+          <Route path="/catalogo24" element={
+            <PremiumRoute requiredPermission="canAccessCatalogs">
+              <Catalogo24 />
+            </PremiumRoute>
+          } />
           <Route path="/contado" element={<Contado />} />
-          <Route path="/generarPlaca" element={<PrivateRoute><GeneradorDePlacas /></PrivateRoute>} />
-          <Route path="/emprendedoras" element={<PrivateRoute><Emprendedoras /></PrivateRoute>} />
-          <Route path="/ventas" element={<PrivateRoute><Ventas /></PrivateRoute>} />
+          <Route path="/generarPlaca" element={
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canGeneratePlacas">
+                <GeneradorDePlacas />
+              </PremiumRoute>
+            </PrivateRoute>
+          } />
+          <Route path="/emprendedoras" element={
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canAccessEmprendedoras">
+                <Emprendedoras />
+              </PremiumRoute>
+            </PrivateRoute>
+          } />
+          <Route path="/ventas" element={
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canAccessVentas">
+                <Ventas />
+              </PremiumRoute>
+            </PrivateRoute>
+          } />
           <Route path="/perfil" element={<PrivateRoute><PerfilEmprendedora /></PrivateRoute>} />
-          <Route path="/capacitaciones" element={<PrivateRoute><Capacitaciones /></PrivateRoute>} />
+          <Route path="/capacitaciones" element={
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canAccessCapacitaciones">
+                <Capacitaciones />
+              </PremiumRoute>
+            </PrivateRoute>
+          } />
           <Route path="/" element={<LandingPage />} />
         </Routes>
       </Router>

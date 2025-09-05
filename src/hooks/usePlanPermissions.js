@@ -21,21 +21,33 @@ export const usePlanPermissions = () => {
   // Definir permisos por plan
   const permissions = {
     limitado: {
+      // Plan gratuito - Solo acceso al perfil
+      canAccessProfile: true,
+      canAccessHome: false,
       canAccessCatalogs: false,
       canGeneratePlacas: false,
       canManageClients: false,
       canViewStats: false,
-      canAccessHome: true,
+      canAccessCapacitaciones: false,
+      canAccessEmprendedoras: false,
+      canAccessVentas: false,
+      canAccessFaqs: false,
       canRecoverPassword: true,
-      canViewBasicProducts: true,
+      canViewBasicProducts: false,
       canContactSupport: true
     },
     full: {
+      // Plan premium - Acceso completo
+      canAccessProfile: true,
+      canAccessHome: true,
       canAccessCatalogs: true,
       canGeneratePlacas: true,
       canManageClients: true,
       canViewStats: true,
-      canAccessHome: true,
+      canAccessCapacitaciones: true,
+      canAccessEmprendedoras: true,
+      canAccessVentas: true,
+      canAccessFaqs: true,
       canRecoverPassword: true,
       canViewBasicProducts: true,
       canContactSupport: true
@@ -52,13 +64,18 @@ export const usePlanPermissions = () => {
   // Función para obtener el mensaje de restricción
   const getRestrictionMessage = (feature) => {
     const messages = {
-      canAccessCatalogs: 'Acceso a catálogos completos disponible solo en Plan Full',
-      canGeneratePlacas: 'Generación de placas disponible solo en Plan Full',
-      canManageClients: 'Gestión de clientes disponible solo en Plan Full',
-      canViewStats: 'Estadísticas avanzadas disponibles solo en Plan Full'
+      canAccessHome: 'Acceso al panel principal disponible solo en Plan Premium',
+      canAccessCatalogs: 'Acceso a catálogos completos disponible solo en Plan Premium',
+      canGeneratePlacas: 'Generación de placas disponible solo en Plan Premium',
+      canManageClients: 'Gestión de clientes disponible solo en Plan Premium',
+      canViewStats: 'Estadísticas avanzadas disponibles solo en Plan Premium',
+      canAccessCapacitaciones: 'Capacitaciones disponibles solo en Plan Premium',
+      canAccessEmprendedoras: 'Panel de emprendedoras disponible solo en Plan Premium',
+      canAccessVentas: 'Panel de ventas disponible solo en Plan Premium',
+      canAccessFaqs: 'Preguntas frecuentes disponibles solo en Plan Premium'
     };
     
-    return messages[feature] || 'Esta funcionalidad requiere Plan Full';
+    return messages[feature] || 'Esta funcionalidad requiere Plan Premium';
   };
 
   // Función para redirigir a la suscripción
