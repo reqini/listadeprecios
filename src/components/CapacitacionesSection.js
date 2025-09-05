@@ -206,6 +206,22 @@ const capacitaciones = [
     tags: ["marketing", "digital", "estrategias", "avanzado", "crecimiento"],
     progress: 0,
     status: "pending"
+  },
+  {
+    id: 11,
+    title: "Masterclass de Crecimiento Empresarial",
+    description: "Descubre los secretos del crecimiento empresarial sostenible. Técnicas avanzadas, casos de éxito y estrategias para escalar tu negocio.",
+    category: "Emprendimiento",
+    duration: "2h 10min",
+    level: "Avanzado",
+    thumbnail: "https://img.youtube.com/vi/2oyVpvKHIFI/maxresdefault.jpg",
+    videoUrl: "https://www.youtube.com/embed/2oyVpvKHIFI",
+    instructor: "Consultor Empresarial",
+    views: 198000,
+    likes: 7800,
+    tags: ["crecimiento", "empresarial", "escalabilidad", "estrategias", "negocios"],
+    progress: 0,
+    status: "pending"
   }
 ];
 
@@ -378,20 +394,27 @@ const CapacitacionesSection = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 10 }}>
+    <Container maxWidth="lg" sx={{ py: { xs: 4, md: 10 }, px: { xs: 2, md: 0 } }}>
       {/* Header */}
-      <Box sx={{ textAlign: 'center', mb: 8 }}>
+      <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 8 } }}>
         <Typography variant="h2" component="h2" gutterBottom sx={{ 
           fontWeight: 800,
           background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
           backgroundClip: 'text',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
-          mb: 2
+          mb: 2,
+          fontSize: { xs: '1.8rem', sm: '2.2rem', md: '3rem' }
         }}>
           Capacitaciones Gratuitas
         </Typography>
-        <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto', mb: 4 }}>
+        <Typography variant="h6" color="text.secondary" sx={{ 
+          maxWidth: 600, 
+          mx: 'auto', 
+          mb: 4,
+          fontSize: { xs: '1rem', md: '1.25rem' },
+          px: { xs: 2, md: 0 }
+        }}>
           Aprende de expertos con videos originales diseñados específicamente para emprendedoras
         </Typography>
 
@@ -400,21 +423,28 @@ const CapacitacionesSection = () => {
           maxWidth: 800, 
           mx: 'auto', 
           mb: 4, 
-          p: 3, 
+          p: { xs: 2, md: 3 }, 
           borderRadius: 3,
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
           color: 'white',
           boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)'
         }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            mb: 2,
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 2, sm: 0 }
+          }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <TrophyIcon sx={{ fontSize: 28, color: '#FFD700' }} />
-              <Typography variant="h6" fontWeight="bold">
+              <TrophyIcon sx={{ fontSize: { xs: 24, md: 28 }, color: '#FFD700' }} />
+              <Typography variant="h6" fontWeight="bold" sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
                 Tu Progreso de Aprendizaje
               </Typography>
             </Box>
-            <Box sx={{ textAlign: 'right' }}>
-              <Typography variant="h6" fontWeight="bold">
+            <Box sx={{ textAlign: { xs: 'center', sm: 'right' } }}>
+              <Typography variant="h6" fontWeight="bold" sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}>
                 {completedCourses}/{totalCourses} Completados
               </Typography>
               <Typography variant="caption" sx={{ opacity: 0.8, fontSize: '0.7rem' }}>
@@ -438,23 +468,34 @@ const CapacitacionesSection = () => {
             }} 
           />
           
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 1, sm: 0 }
+          }}>
+            <Typography variant="body2" sx={{ opacity: 0.9, fontSize: { xs: '0.8rem', md: '0.875rem' } }}>
               {overallProgress.toFixed(0)}% Completado
             </Typography>
-            <Box sx={{ display: 'flex', gap: 1 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 1,
+              flexWrap: 'wrap',
+              justifyContent: { xs: 'center', sm: 'flex-end' }
+            }}>
               {completedCourses > 0 && (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <StarIcon sx={{ fontSize: 16, color: '#FFD700' }} />
-                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  <StarIcon sx={{ fontSize: { xs: 14, md: 16 }, color: '#FFD700' }} />
+                  <Typography variant="body2" sx={{ opacity: 0.9, fontSize: { xs: '0.7rem', md: '0.875rem' } }}>
                     {completedCourses} Estrella{completedCourses > 1 ? 's' : ''}
                   </Typography>
                 </Box>
               )}
               {inProgressCourses > 0 && (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <PlayCircleIcon sx={{ fontSize: 16, color: '#FFA500' }} />
-                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  <PlayCircleIcon sx={{ fontSize: { xs: 14, md: 16 }, color: '#FFA500' }} />
+                  <Typography variant="body2" sx={{ opacity: 0.9, fontSize: { xs: '0.7rem', md: '0.875rem' } }}>
                     {inProgressCourses} En Curso
                   </Typography>
                 </Box>
@@ -464,19 +505,28 @@ const CapacitacionesSection = () => {
         </Box>
 
         {/* Filtros por categoría */}
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 1 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          flexWrap: 'wrap', 
+          justifyContent: 'center', 
+          gap: { xs: 0.5, md: 1 },
+          px: { xs: 1, md: 0 }
+        }}>
           {categories.map((category) => {
             const IconComponent = categoryIcons[category] || SchoolIcon;
             return (
               <Chip
                 key={category}
-                icon={<IconComponent />}
+                icon={<IconComponent sx={{ fontSize: { xs: 16, md: 20 } }} />}
                 label={category}
                 onClick={() => setSelectedCategory(category)}
                 variant={selectedCategory === category ? 'filled' : 'outlined'}
                 color={selectedCategory === category ? 'primary' : 'default'}
+                size={window.innerWidth < 600 ? 'small' : 'medium'}
                 sx={{
                   mb: 1,
+                  fontSize: { xs: '0.7rem', md: '0.875rem' },
+                  height: { xs: 28, md: 32 },
                   '&:hover': {
                     transform: 'translateY(-2px)',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
@@ -490,19 +540,19 @@ const CapacitacionesSection = () => {
       </Box>
 
       {/* Grid de Videos */}
-      <Grid container spacing={4}>
+      <Grid container spacing={{ xs: 2, md: 4 }}>
         {filteredCapacitaciones.map((video) => {
           const CategoryIcon = categoryIcons[video.category];
           return (
-            <Grid item xs={12} md={6} lg={4} key={video.id}>
+            <Grid item xs={12} sm={6} md={6} lg={4} key={video.id}>
               <Card sx={{ 
                 height: '100%',
-                borderRadius: 3,
+                borderRadius: { xs: 2, md: 3 },
                 border: '1px solid rgba(0,0,0,0.05)',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                 transition: 'all 0.3s ease',
                 '&:hover': {
-                  transform: 'translateY(-8px)',
+                  transform: { xs: 'translateY(-4px)', md: 'translateY(-8px)' },
                   boxShadow: '0 12px 40px rgba(0,0,0,0.15)'
                 }
               }}>
@@ -510,7 +560,7 @@ const CapacitacionesSection = () => {
                 <Box sx={{ position: 'relative' }}>
                   <CardMedia
                     component="img"
-                    height="200"
+                    height={{ xs: 160, md: 200 }}
                     image={video.thumbnail}
                     alt={video.title}
                     sx={{ objectFit: 'cover' }}
@@ -543,8 +593,8 @@ const CapacitacionesSection = () => {
                       sx={{
                         bgcolor: 'grey.500',
                         color: 'white',
-                        width: 80,
-                        height: 80,
+                        width: { xs: 60, md: 80 },
+                        height: { xs: 60, md: 80 },
                         '&:hover': {
                           bgcolor: 'grey.600',
                           transform: 'scale(1.05)'
@@ -552,7 +602,7 @@ const CapacitacionesSection = () => {
                         transition: 'all 0.3s ease'
                       }}
                     >
-                      <PlayIcon sx={{ fontSize: 40 }} />
+                      <PlayIcon sx={{ fontSize: { xs: 30, md: 40 } }} />
                     </IconButton>
                   </Box>
                   
@@ -571,21 +621,23 @@ const CapacitacionesSection = () => {
                   />
                 </Box>
 
-                <CardContent sx={{ p: 3 }}>
+                <CardContent sx={{ p: { xs: 2, md: 3 } }}>
                   {/* Categoría, nivel y estado */}
-                  <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                  <Box sx={{ display: 'flex', gap: { xs: 0.5, md: 1 }, mb: 2, flexWrap: 'wrap' }}>
                     <Chip
-                      icon={<CategoryIcon />}
+                      icon={<CategoryIcon sx={{ fontSize: { xs: 14, md: 16 } }} />}
                       label={video.category}
                       size="small"
                       color="primary"
                       variant="outlined"
+                      sx={{ fontSize: { xs: '0.65rem', md: '0.75rem' } }}
                     />
                     <Chip
                       label={video.level}
                       size="small"
                       color={levelColors[video.level]}
                       variant="filled"
+                      sx={{ fontSize: { xs: '0.65rem', md: '0.75rem' } }}
                     />
                     <Chip
                       icon={getStatusIcon(video.status)}
@@ -593,6 +645,7 @@ const CapacitacionesSection = () => {
                       size="small"
                       color={getStatusColor(video.status)}
                       variant="filled"
+                      sx={{ fontSize: { xs: '0.65rem', md: '0.75rem' } }}
                     />
                   </Box>
 
@@ -602,7 +655,8 @@ const CapacitacionesSection = () => {
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical',
                     overflow: 'hidden',
-                    minHeight: '3.6em'
+                    minHeight: { xs: '3em', md: '3.6em' },
+                    fontSize: { xs: '1rem', md: '1.25rem' }
                   }}>
                     {video.title}
                   </Typography>
@@ -614,17 +668,21 @@ const CapacitacionesSection = () => {
                     sx={{ 
                       mb: 2,
                       display: '-webkit-box',
-                      WebkitLineClamp: 3,
+                      WebkitLineClamp: { xs: 2, md: 3 },
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
-                      minHeight: '4.5em'
+                      minHeight: { xs: '3em', md: '4.5em' },
+                      fontSize: { xs: '0.8rem', md: '0.875rem' }
                     }}
                   >
                     {video.description}
                   </Typography>
 
                   {/* Instructor */}
-                  <Typography variant="body2" color="primary.main" fontWeight="bold" sx={{ mb: 2 }}>
+                  <Typography variant="body2" color="primary.main" fontWeight="bold" sx={{ 
+                    mb: 2,
+                    fontSize: { xs: '0.75rem', md: '0.875rem' }
+                  }}>
                     Por: {video.instructor}
                   </Typography>
 
@@ -651,12 +709,19 @@ const CapacitacionesSection = () => {
                   )}
 
                   {/* Stats y acciones */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Box sx={{ display: 'flex', gap: 2 }}>
-                      <Typography variant="body2" color="text.secondary">
+                  <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center', 
+                    mb: 2,
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: { xs: 1, sm: 0 }
+                  }}>
+                    <Box sx={{ display: 'flex', gap: { xs: 1, md: 2 } }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.7rem', md: '0.875rem' } }}>
                         👁️ {video.views.toLocaleString()}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.7rem', md: '0.875rem' } }}>
                         ❤️ {video.likes}
                       </Typography>
                     </Box>
@@ -666,23 +731,28 @@ const CapacitacionesSection = () => {
                       onClick={() => handleShare(video)}
                       sx={{ color: 'primary.main' }}
                     >
-                      <ShareIcon />
+                      <ShareIcon sx={{ fontSize: { xs: 18, md: 20 } }} />
                     </IconButton>
                   </Box>
 
                   {/* Botones de estado */}
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  <Box sx={{ display: 'flex', gap: { xs: 0.5, md: 1 }, flexWrap: 'wrap' }}>
                     {video.status === 'pending' && (
                       <Button
                         size="small"
                         variant="contained"
                         color="primary"
-                        startIcon={<PlayCircleIcon />}
+                        startIcon={<PlayCircleIcon sx={{ fontSize: { xs: 16, md: 18 } }} />}
                         onClick={() => {
                           updateCourseProgress(video.id, 'in_progress', 25);
                           handleVideoOpen(video, true);
                         }}
-                        sx={{ borderRadius: 2, fontSize: '0.75rem' }}
+                        sx={{ 
+                          borderRadius: 2, 
+                          fontSize: { xs: '0.65rem', md: '0.75rem' },
+                          px: { xs: 1, md: 2 },
+                          py: { xs: 0.5, md: 1 }
+                        }}
                       >
                         Comenzar Curso
                       </Button>
@@ -693,12 +763,17 @@ const CapacitacionesSection = () => {
                           size="small"
                           variant="contained"
                           color="warning"
-                          startIcon={<PlayCircleIcon />}
+                          startIcon={<PlayCircleIcon sx={{ fontSize: { xs: 16, md: 18 } }} />}
                           onClick={() => {
                             updateCourseProgress(video.id, 'in_progress', Math.min(video.progress + 25, 75));
                             handleVideoOpen(video, true);
                           }}
-                          sx={{ borderRadius: 2, fontSize: '0.75rem' }}
+                          sx={{ 
+                            borderRadius: 2, 
+                            fontSize: { xs: '0.65rem', md: '0.75rem' },
+                            px: { xs: 1, md: 2 },
+                            py: { xs: 0.5, md: 1 }
+                          }}
                         >
                           Continuar Curso
                         </Button>
@@ -706,9 +781,14 @@ const CapacitacionesSection = () => {
                           size="small"
                           variant="contained"
                           color="success"
-                          startIcon={<CheckCircleIcon />}
+                          startIcon={<CheckCircleIcon sx={{ fontSize: { xs: 16, md: 18 } }} />}
                           onClick={() => updateCourseProgress(video.id, 'completed', 100)}
-                          sx={{ borderRadius: 2, fontSize: '0.75rem' }}
+                          sx={{ 
+                            borderRadius: 2, 
+                            fontSize: { xs: '0.65rem', md: '0.75rem' },
+                            px: { xs: 1, md: 2 },
+                            py: { xs: 0.5, md: 1 }
+                          }}
                         >
                           Marcar Completado
                         </Button>
@@ -720,9 +800,14 @@ const CapacitacionesSection = () => {
                           size="small"
                           variant="outlined"
                           color="success"
-                          startIcon={<PlayCircleIcon />}
+                          startIcon={<PlayCircleIcon sx={{ fontSize: { xs: 16, md: 18 } }} />}
                           onClick={() => handleVideoOpen(video, true)}
-                          sx={{ borderRadius: 2, fontSize: '0.75rem' }}
+                          sx={{ 
+                            borderRadius: 2, 
+                            fontSize: { xs: '0.65rem', md: '0.75rem' },
+                            px: { xs: 1, md: 2 },
+                            py: { xs: 0.5, md: 1 }
+                          }}
                         >
                           Ver de Nuevo
                         </Button>
@@ -730,9 +815,14 @@ const CapacitacionesSection = () => {
                           size="small"
                           variant="contained"
                           color="success"
-                          startIcon={<CheckCircleIcon />}
+                          startIcon={<CheckCircleIcon sx={{ fontSize: { xs: 16, md: 18 } }} />}
                           disabled
-                          sx={{ borderRadius: 2, fontSize: '0.75rem' }}
+                          sx={{ 
+                            borderRadius: 2, 
+                            fontSize: { xs: '0.65rem', md: '0.75rem' },
+                            px: { xs: 1, md: 2 },
+                            py: { xs: 0.5, md: 1 }
+                          }}
                         >
                           ¡Completado! 🎉
                         </Button>
@@ -753,32 +843,37 @@ const CapacitacionesSection = () => {
         onClose={handleVideoClose}
         maxWidth="md"
         fullWidth
+        fullScreen={window.innerWidth < 600}
         PaperProps={{
           sx: {
-            borderRadius: 3,
-            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+            borderRadius: { xs: 0, md: 3 },
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            m: { xs: 0, md: 2 }
           }
         }}
       >
         {selectedVideo && (
           <>
-            <DialogTitle>
+            <DialogTitle sx={{ p: { xs: 2, md: 3 } }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h5" fontWeight="bold">
+                <Typography variant="h5" fontWeight="bold" sx={{ 
+                  fontSize: { xs: '1.1rem', md: '1.5rem' },
+                  pr: 2
+                }}>
                   {selectedVideo.title}
                 </Typography>
-                <IconButton onClick={handleVideoClose}>
+                <IconButton onClick={handleVideoClose} sx={{ flexShrink: 0 }}>
                   <CloseIcon />
                 </IconButton>
               </Box>
             </DialogTitle>
             
-            <DialogContent>
+            <DialogContent sx={{ p: { xs: 2, md: 3 } }}>
               {/* Video */}
               <Box sx={{ mb: 3 }}>
                 <iframe
                   width="100%"
-                  height="400"
+                  height={window.innerWidth < 600 ? "200" : "400"}
                   src={selectedVideo.videoUrl}
                   title={selectedVideo.title}
                   frameBorder="0"
@@ -789,38 +884,54 @@ const CapacitacionesSection = () => {
               </Box>
 
               {/* Información del video */}
-              <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+              <Box sx={{ 
+                display: 'flex', 
+                gap: { xs: 0.5, md: 1 }, 
+                mb: 2,
+                flexWrap: 'wrap'
+              }}>
                 <Chip
                   icon={React.createElement(categoryIcons[selectedVideo.category])}
                   label={selectedVideo.category}
                   color="primary"
                   variant="outlined"
+                  size="small"
+                  sx={{ fontSize: { xs: '0.7rem', md: '0.75rem' } }}
                 />
                 <Chip
                   label={selectedVideo.level}
                   color={levelColors[selectedVideo.level]}
                   variant="filled"
+                  size="small"
+                  sx={{ fontSize: { xs: '0.7rem', md: '0.75rem' } }}
                 />
                 <Chip
                   label={selectedVideo.duration}
                   variant="outlined"
+                  size="small"
+                  sx={{ fontSize: { xs: '0.7rem', md: '0.75rem' } }}
                 />
               </Box>
 
-              <Typography variant="body1" sx={{ mb: 2 }}>
+              <Typography variant="body1" sx={{ 
+                mb: 2,
+                fontSize: { xs: '0.9rem', md: '1rem' }
+              }}>
                 {selectedVideo.description}
               </Typography>
 
-              <Typography variant="body2" color="primary.main" fontWeight="bold">
+              <Typography variant="body2" color="primary.main" fontWeight="bold" sx={{
+                fontSize: { xs: '0.8rem', md: '0.875rem' }
+              }}>
                 Instructor: {selectedVideo.instructor}
               </Typography>
             </DialogContent>
             
-            <DialogActions sx={{ p: 3 }}>
+            <DialogActions sx={{ p: { xs: 2, md: 3 } }}>
               <Button 
                 onClick={handleVideoClose}
                 color="inherit"
-                sx={{ mr: 1 }}
+                sx={{ mr: 1, fontSize: { xs: '0.8rem', md: '0.875rem' } }}
               >
                 Cerrar
               </Button>
@@ -828,11 +939,12 @@ const CapacitacionesSection = () => {
                 onClick={() => handleShare(selectedVideo)}
                 variant="contained"
                 color="primary"
-                startIcon={<ShareIcon />}
+                startIcon={<ShareIcon sx={{ fontSize: { xs: 16, md: 18 } }} />}
                 sx={{ 
                   borderRadius: 3,
-                  px: 4,
-                  fontWeight: 'bold'
+                  px: { xs: 2, md: 4 },
+                  fontWeight: 'bold',
+                  fontSize: { xs: '0.8rem', md: '0.875rem' }
                 }}
               >
                 Compartir
