@@ -76,15 +76,15 @@ const AppContent = () => {
           <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
           <Route path="/faqs" element={<PrivateRoute><FaqScreen /></PrivateRoute>} />
           <Route path="/preferencial" element={<PrivateRoute><Preferencial /></PrivateRoute>} />
-          <Route path="/catalogo3" element={<PrivateRoute><Catalogo3 /></PrivateRoute>} />
-          <Route path="/catalogo6" element={<PrivateRoute><Catalogo6 /></PrivateRoute>} />
-          <Route path="/catalogo9" element={<PrivateRoute><Catalogo9 /></PrivateRoute>} />
-          <Route path="/catalogo10" element={<PrivateRoute><Catalogo10 /></PrivateRoute>} />
-          <Route path="/catalogo12" element={<PrivateRoute><Catalogo12 /></PrivateRoute>} />
-          <Route path="/catalogo14" element={<PrivateRoute><Catalogo14 /></PrivateRoute>} />
-          <Route path="/catalogo18" element={<PrivateRoute><Catalogo18 /></PrivateRoute>} />
-          <Route path="/catalogo20" element={<PrivateRoute><Catalogo20 /></PrivateRoute>} />
-          <Route path="/catalogo24" element={<PrivateRoute><Catalogo24 /></PrivateRoute>} />
+          <Route path="/catalogo3" element={<Catalogo3 />} />
+          <Route path="/catalogo6" element={<Catalogo6 />} />
+          <Route path="/catalogo9" element={<Catalogo9 />} />
+          <Route path="/catalogo10" element={<Catalogo10 />} />
+          <Route path="/catalogo12" element={<Catalogo12 />} />
+          <Route path="/catalogo14" element={<Catalogo14 />} />
+          <Route path="/catalogo18" element={<Catalogo18 />} />
+          <Route path="/catalogo20" element={<Catalogo20 />} />
+          <Route path="/catalogo24" element={<Catalogo24 />} />
           <Route path="/contado" element={<PrivateRoute><Contado /></PrivateRoute>} />
           <Route path="/generarPlaca" element={<PrivateRoute><GeneradorDePlacas /></PrivateRoute>} />
           <Route path="/emprendedoras" element={<PrivateRoute><Emprendedoras /></PrivateRoute>} />
