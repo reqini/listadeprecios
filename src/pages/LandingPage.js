@@ -60,7 +60,7 @@ const LandingPage = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
   // Estados
-  // const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // No utilizado por ahora
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [contactDialogOpen, setContactDialogOpen] = useState(false);
   const [installPrompt, setInstallPrompt] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
@@ -105,7 +105,7 @@ const LandingPage = () => {
     },
     {
       name: 'Full',
-      price: '$2.990',
+      price: '$25.000',
       period: 'por mes',
       features: [
         'Acceso completo a todos los catálogos',
@@ -270,22 +270,91 @@ const LandingPage = () => {
           )}
           
           {isMobile && (
-            <IconButton onClick={() => navigate('/login')}>
+            <IconButton onClick={() => setMobileMenuOpen(true)}>
               <MenuIcon />
             </IconButton>
           )}
         </Toolbar>
       </AppBar>
 
+      {/* Menú Móvil */}
+      <Dialog 
+        open={mobileMenuOpen} 
+        onClose={() => setMobileMenuOpen(false)}
+        fullScreen
+        PaperProps={{
+          sx: {
+            bgcolor: 'white',
+            color: 'text.primary'
+          }
+        }}
+      >
+        <DialogTitle>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <img src={logo} alt="Logo" style={{ height: 32, marginRight: 12 }} />
+              <Typography variant="h6" fontWeight="bold">
+                Lista de Precios
+              </Typography>
+            </Box>
+            <IconButton onClick={() => setMobileMenuOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+            <Button 
+              variant="outlined" 
+              fullWidth 
+              size="large"
+              onClick={() => {
+                navigate('/login');
+                setMobileMenuOpen(false);
+              }}
+              sx={{ py: 1.5, fontSize: '1.1rem' }}
+            >
+              Iniciar Sesión
+            </Button>
+            <Button 
+              variant="contained" 
+              fullWidth 
+              size="large"
+              onClick={() => {
+                navigate('/registro');
+                setMobileMenuOpen(false);
+              }}
+              sx={{ py: 1.5, fontSize: '1.1rem' }}
+            >
+              Registrarse
+            </Button>
+            <Button 
+              variant="text" 
+              fullWidth 
+              size="large"
+              onClick={() => {
+                setContactDialogOpen(true);
+                setMobileMenuOpen(false);
+              }}
+              sx={{ py: 1.5, fontSize: '1.1rem' }}
+            >
+              Contacto
+            </Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
+
       {/* Hero Section */}
       <Box sx={{ 
-        pt: 12, 
-        pb: 8, 
+        pt: { xs: 10, md: 12 }, 
+        pb: { xs: 6, md: 8 }, 
+        px: { xs: 2, md: 0 },
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         color: 'white',
         textAlign: 'center',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        minHeight: { xs: '100vh', md: 'auto' }
       }}>
         {/* Elementos decorativos de fondo */}
         <Box sx={{
@@ -316,45 +385,57 @@ const LandingPage = () => {
           </Box>
           <Typography variant="h1" component="h1" gutterBottom sx={{ 
             fontWeight: 900, 
-            mb: 3,
-            fontSize: { xs: '2.5rem', md: '4rem' },
+            mb: { xs: 2, md: 3 },
+            fontSize: { xs: '2rem', sm: '2.5rem', md: '4rem' },
             background: 'linear-gradient(45deg, #fff 30%, #f0f0f0 90%)',
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            textShadow: '0 4px 8px rgba(0,0,0,0.3)'
+            textShadow: '0 4px 8px rgba(0,0,0,0.3)',
+            lineHeight: { xs: 1.2, md: 1.1 }
           }}>
             La Revolución para Emprendedoras
           </Typography>
           <Typography variant="h4" sx={{ 
-            mb: 4, 
+            mb: { xs: 3, md: 4 }, 
             opacity: 0.95, 
-            maxWidth: 900, 
+            maxWidth: { xs: '100%', md: 900 }, 
             mx: 'auto',
-            fontSize: { xs: '1.2rem', md: '1.5rem' },
-            lineHeight: 1.6,
-            textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+            fontSize: { xs: '1rem', sm: '1.2rem', md: '1.5rem' },
+            lineHeight: { xs: 1.4, md: 1.6 },
+            textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+            px: { xs: 1, md: 0 }
           }}>
             🚀 Crea catálogos profesionales, genera placas con IA y gestiona tus ventas 
             desde una sola plataforma. Únete a más de <strong>{stats.emprendedoras.toLocaleString()}</strong> emprendedoras exitosas.
           </Typography>
           
-          <Box sx={{ display: 'flex', gap: 3, justifyContent: 'center', flexWrap: 'wrap', mb: 6 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            gap: { xs: 2, md: 3 }, 
+            justifyContent: 'center', 
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: 'center',
+            mb: { xs: 4, md: 6 },
+            px: { xs: 2, md: 0 }
+          }}>
             <Button 
               variant="contained" 
               size="large" 
+              fullWidth={isMobile}
               onClick={() => navigate('/registro')}
               sx={{ 
                 bgcolor: 'white', 
                 color: 'primary.main',
-                px: 4,
-                py: 1.5,
-                fontSize: '1.1rem',
+                px: { xs: 3, md: 4 },
+                py: { xs: 1.5, md: 1.5 },
+                fontSize: { xs: '1rem', md: '1.1rem' },
                 fontWeight: 'bold',
                 borderRadius: 3,
                 boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
                 transform: 'translateY(0)',
                 transition: 'all 0.3s ease',
+                maxWidth: { xs: '100%', sm: '300px' },
                 '&:hover': { 
                   bgcolor: 'grey.100',
                   transform: 'translateY(-2px)',
@@ -367,20 +448,22 @@ const LandingPage = () => {
             <Button 
               variant="outlined" 
               size="large"
+              fullWidth={isMobile}
               onClick={() => setContactDialogOpen(true)}
               sx={{ 
                 borderColor: 'white', 
                 color: 'white',
                 borderWidth: 2,
-                px: 4,
-                py: 1.5,
-                fontSize: '1.1rem',
+                px: { xs: 3, md: 4 },
+                py: { xs: 1.5, md: 1.5 },
+                fontSize: { xs: '1rem', md: '1.1rem' },
                 fontWeight: 'bold',
                 borderRadius: 3,
                 backdropFilter: 'blur(10px)',
                 bgcolor: 'rgba(255,255,255,0.1)',
                 transform: 'translateY(0)',
                 transition: 'all 0.3s ease',
+                maxWidth: { xs: '100%', sm: '300px' },
                 '&:hover': { 
                   borderColor: 'white', 
                   bgcolor: 'rgba(255,255,255,0.2)',
@@ -394,7 +477,7 @@ const LandingPage = () => {
           </Box>
 
           {/* Estadísticas */}
-          <Grid container spacing={3} sx={{ mt: 6 }}>
+          <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mt: { xs: 4, md: 6 } }}>
             <Grid item xs={6} md={3}>
               <StatCard 
                 icon={PeopleIcon} 
@@ -432,24 +515,30 @@ const LandingPage = () => {
       </Box>
 
       {/* Características */}
-      <Container maxWidth="lg" sx={{ py: 10 }}>
-        <Box sx={{ textAlign: 'center', mb: 8 }}>
+      <Container maxWidth="lg" sx={{ py: { xs: 6, md: 10 }, px: { xs: 2, md: 0 } }}>
+        <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
           <Typography variant="h2" component="h2" gutterBottom sx={{ 
             fontWeight: 800,
             background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            mb: 2
+            mb: 2,
+            fontSize: { xs: '1.8rem', sm: '2.2rem', md: '3rem' }
           }}>
             Todo lo que necesitas para triunfar
           </Typography>
-          <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
+          <Typography variant="h6" color="text.secondary" sx={{ 
+            maxWidth: { xs: '100%', md: 600 }, 
+            mx: 'auto',
+            fontSize: { xs: '1rem', md: '1.25rem' },
+            px: { xs: 2, md: 0 }
+          }}>
             Herramientas profesionales diseñadas específicamente para emprendedoras que quieren crecer
           </Typography>
         </Box>
         
-        <Grid container spacing={4}>
+        <Grid container spacing={{ xs: 3, md: 4 }}>
           <Grid item xs={12} md={4}>
             <FeatureCard
               icon={PaletteIcon}
@@ -480,7 +569,7 @@ const LandingPage = () => {
       {/* Planes de Suscripción */}
       <Box sx={{ 
         bgcolor: 'grey.50', 
-        py: 10,
+        py: { xs: 6, md: 10 },
         position: 'relative',
         '&::before': {
           content: '""',
@@ -493,24 +582,30 @@ const LandingPage = () => {
           zIndex: 0
         }
       }}>
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-          <Box sx={{ textAlign: 'center', mb: 8 }}>
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, px: { xs: 2, md: 0 } }}>
+          <Box sx={{ textAlign: 'center', mb: { xs: 6, md: 8 } }}>
             <Typography variant="h2" component="h2" gutterBottom sx={{ 
               fontWeight: 800,
               background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              mb: 2
+              mb: 2,
+              fontSize: { xs: '1.8rem', sm: '2.2rem', md: '3rem' }
             }}>
               Elige tu Plan
             </Typography>
-            <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
+            <Typography variant="h6" color="text.secondary" sx={{ 
+              maxWidth: { xs: '100%', md: 600 }, 
+              mx: 'auto',
+              fontSize: { xs: '1rem', md: '1.25rem' },
+              px: { xs: 2, md: 0 }
+            }}>
               Comienza gratis y escala cuando estés lista para crecer
             </Typography>
           </Box>
           
-          <Grid container spacing={3} justifyContent="center">
+          <Grid container spacing={{ xs: 2, md: 3 }} justifyContent="center">
             {plans.map((plan) => (
               <Grid item xs={12} md={4} key={plan.name}>
                 <Card 
@@ -519,14 +614,14 @@ const LandingPage = () => {
                     position: 'relative',
                     border: plan.popular ? 3 : 1,
                     borderColor: plan.popular ? 'primary.main' : 'divider',
-                    transform: plan.popular ? 'scale(1.05)' : 'scale(1)',
+                    transform: plan.popular ? { xs: 'scale(1)', md: 'scale(1.05)' } : 'scale(1)',
                     transition: 'all 0.3s ease',
                     borderRadius: 4,
                     boxShadow: plan.popular 
                       ? '0 20px 60px rgba(102, 126, 234, 0.3)' 
                       : '0 8px 32px rgba(0,0,0,0.1)',
                     '&:hover': {
-                      transform: plan.popular ? 'scale(1.08)' : 'scale(1.02)',
+                      transform: plan.popular ? { xs: 'scale(1.02)', md: 'scale(1.08)' } : 'scale(1.02)',
                       boxShadow: plan.popular 
                         ? '0 25px 80px rgba(102, 126, 234, 0.4)' 
                         : '0 12px 40px rgba(0,0,0,0.15)'
@@ -548,7 +643,7 @@ const LandingPage = () => {
                     />
                   )}
                   
-                  <CardContent sx={{ p: 4, textAlign: 'center' }}>
+                  <CardContent sx={{ p: { xs: 3, md: 4 }, textAlign: 'center' }}>
                     <Typography variant="h5" component="h3" gutterBottom fontWeight="bold">
                       {plan.name}
                     </Typography>

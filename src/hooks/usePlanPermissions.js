@@ -21,9 +21,9 @@ export const usePlanPermissions = () => {
   // Definir permisos por plan
   const permissions = {
     limitado: {
-      // Plan gratuito - Solo acceso al perfil
+      // Plan gratuito - Acceso limitado: Home, Perfil y FAQs
       canAccessProfile: true,
-      canAccessHome: false,
+      canAccessHome: true,
       canAccessCatalogs: false,
       canGeneratePlacas: false,
       canManageClients: false,
@@ -31,10 +31,11 @@ export const usePlanPermissions = () => {
       canAccessCapacitaciones: false,
       canAccessEmprendedoras: false,
       canAccessVentas: false,
-      canAccessFaqs: false,
+      canAccessFaqs: true,
       canRecoverPassword: true,
       canViewBasicProducts: false,
-      canContactSupport: true
+      canContactSupport: true,
+      canAccessHomeCatalogs: false // Nueva restricción para catálogos en Home
     },
     full: {
       // Plan premium - Acceso completo
@@ -50,7 +51,8 @@ export const usePlanPermissions = () => {
       canAccessFaqs: true,
       canRecoverPassword: true,
       canViewBasicProducts: true,
-      canContactSupport: true
+      canContactSupport: true,
+      canAccessHomeCatalogs: true // Acceso completo a catálogos en Home
     }
   };
 
@@ -66,6 +68,7 @@ export const usePlanPermissions = () => {
     const messages = {
       canAccessHome: 'Acceso al panel principal disponible solo en Plan Premium',
       canAccessCatalogs: 'Acceso a catálogos completos disponible solo en Plan Premium',
+      canAccessHomeCatalogs: 'Selección de catálogos disponible solo en Plan Premium',
       canGeneratePlacas: 'Generación de placas disponible solo en Plan Premium',
       canManageClients: 'Gestión de clientes disponible solo en Plan Premium',
       canViewStats: 'Estadísticas avanzadas disponibles solo en Plan Premium',
