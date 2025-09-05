@@ -378,7 +378,7 @@ const handleSubmit = async (e) => {
                 {loading 
                   ? 'Procesando...' 
                   : selectedPlan === 'full' 
-                    ? 'Registrarse y Pagar $2.990' 
+                    ? 'Registrarse y Pagar $25.000' 
                     : 'Registrarse Gratis'
                 }
               </Button>

@@ -12,7 +12,7 @@ export const mercadopagoService = {
         planId: planId,
         userId: userData.username,
         email: userData.email,
-        amount: 2990, // $2.990 ARS
+        amount: 25000, // $25.000 ARS
         currency: 'ARS',
         description: 'Suscripción Plan Full - Lista de Precios',
         frequency: 'monthly',
@@ -106,7 +106,7 @@ export const mercadopagoService = {
       full: {
         id: 'full',
         name: 'Plan Full',
-        price: 2990,
+        price: 25000,
         currency: 'ARS',
         features: [
           'Acceso completo a todos los catálogos',

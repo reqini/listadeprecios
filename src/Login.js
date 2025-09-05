@@ -82,6 +82,13 @@ const Login = () => {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("activeSession", response.data.username);
         localStorage.setItem("tipoUsuario", response.data.tipo_usuario);
+        
+        // Debug: Log para verificar qué se está guardando
+        console.log('🔍 Debug Login:');
+        console.log('- response.data.tipo_usuario:', response.data.tipo_usuario);
+        console.log('- response.data.tipo_usuario type:', typeof response.data.tipo_usuario);
+        console.log('- Guardado en localStorage como:', localStorage.getItem('tipoUsuario'));
+        
         window.location.href = "/home";
       } else {
         alert("Usuario o contraseña incorrectos");

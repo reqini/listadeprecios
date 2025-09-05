@@ -139,7 +139,7 @@ const FreePlanWelcome = ({ onUpgrade }) => {
                   Plan Premium
                 </Typography>
                 <Typography variant="h4" color="primary.main" fontWeight="bold">
-                  $2.990
+                  $25.000
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   por mes

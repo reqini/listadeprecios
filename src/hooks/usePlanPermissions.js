@@ -9,9 +9,17 @@ export const usePlanPermissions = () => {
     // Obtener el plan del usuario desde localStorage o del token
     const tipoUsuario = localStorage.getItem('tipoUsuario');
     
+    // Debug: Log para verificar el valor
+    console.log('🔍 Debug usePlanPermissions:');
+    console.log('- tipoUsuario from localStorage:', tipoUsuario);
+    console.log('- tipoUsuario type:', typeof tipoUsuario);
+    console.log('- tipoUsuario === "full":', tipoUsuario === 'full');
+    
     if (tipoUsuario === 'full') {
+      console.log('✅ Usuario con plan FULL detectado');
       setUserPlan('full');
     } else {
+      console.log('❌ Usuario con plan LIMITADO detectado');
       setUserPlan('limitado');
     }
     
