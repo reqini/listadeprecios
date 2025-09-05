@@ -177,7 +177,7 @@ const capacitaciones = [
   },
   {
     id: 9,
-    title: "Nuevo Tutorial de Capacitación",
+    title: "Tutorial Completo de Herramientas de Negocio",
     description: "Descubre las últimas técnicas y estrategias para mejorar tu negocio. Un tutorial completo con consejos prácticos y herramientas útiles.",
     category: "Herramientas",
     duration: "1h 30min",
@@ -188,6 +188,22 @@ const capacitaciones = [
     views: 89000,
     likes: 3200,
     tags: ["tutorial", "negocios", "estrategias", "herramientas"],
+    progress: 0,
+    status: "pending"
+  },
+  {
+    id: 10,
+    title: "Curso Avanzado de Estrategias Digitales",
+    description: "Aprende las técnicas más avanzadas para hacer crecer tu negocio en el mundo digital. Estrategias probadas y herramientas profesionales.",
+    category: "Marketing",
+    duration: "1h 45min",
+    level: "Avanzado",
+    thumbnail: "https://img.youtube.com/vi/R-sats-1b6U/maxresdefault.jpg",
+    videoUrl: "https://www.youtube.com/embed/R-sats-1b6U",
+    instructor: "Experto en Marketing Digital",
+    views: 145000,
+    likes: 5200,
+    tags: ["marketing", "digital", "estrategias", "avanzado", "crecimiento"],
     progress: 0,
     status: "pending"
   }
