@@ -26,7 +26,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Logo from '../assets/logo512.png'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MenuIcon from '@mui/icons-material/Menu';
-import { usePlanPermissions } from '../hooks/usePlanPermissions';
 
 const Navbar = ({ user, onLogout, title }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -41,7 +40,6 @@ const Navbar = ({ user, onLogout, title }) => {
   const location = useLocation();
   // const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Temporalmente oculto
   const navigate = useNavigate(); // Hook para la navegación
-  const { canAccess, userPlan } = usePlanPermissions(); // Hook para permisos de plan
 
   // Menú
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
@@ -112,23 +110,19 @@ const Navbar = ({ user, onLogout, title }) => {
             </Badge>
           </IconButton>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-            {/* Home - Solo plan premium */}
-            {canAccess('canAccessHome') && (
-              <>
-                <MenuItem
-                  onClick={() => {
-                    navigate("/home");
-                    handleMenuClose();
-                  }}
-                  disabled={location.pathname === "/home"}
-                >
-                  Home
-                </MenuItem>
-                <Divider />
-              </>
-            )}
+            {/* Home */}
+            <MenuItem
+              onClick={() => {
+                navigate("/home");
+                handleMenuClose();
+              }}
+              disabled={location.pathname === "/home"}
+            >
+              Home
+            </MenuItem>
+            <Divider />
             
-            {/* Perfil - Accesible para todos los planes */}
+            {/* Perfil */}
             <MenuItem
               onClick={() => {
                 navigate("/perfil");
@@ -139,94 +133,62 @@ const Navbar = ({ user, onLogout, title }) => {
             </MenuItem>
             <Divider></Divider>
             
-            {/* Catálogos y Clientes - Solo plan premium */}
-            {canAccess('canAccessEmprendedoras') && (
-              <>
-                <MenuItem
-                  onClick={() => {
-                    navigate("/emprendedoras");
-                    handleMenuClose();
-                  }}
-                >
-                  Catálogos y Clientes
-                </MenuItem>
-                <Divider></Divider>
-              </>
-            )}
+            {/* Catálogos y Clientes */}
+            <MenuItem
+              onClick={() => {
+                navigate("/emprendedoras");
+                handleMenuClose();
+              }}
+            >
+              Catálogos y Clientes
+            </MenuItem>
+            <Divider></Divider>
             
-            {/* Ventas - Solo plan premium */}
-            {canAccess('canAccessVentas') && (
-              <>
-                <MenuItem onClick={() => navigate("/ventas")}>
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <Typography fontWeight="bold">Ventas</Typography>
-                    <Typography color="primary" fontSize={12}>🚀 Lanzamiento</Typography>
-                  </Box>
-                </MenuItem>
-                <Divider></Divider>
-              </>
-            )}
-            
-            {/* Crear Placas - Solo plan premium */}
-            {canAccess('canGeneratePlacas') && (
-              <>
-                <MenuItem
-                  onClick={() => {
-                    navigate("/generarPlaca");
-                    handleMenuClose();
-                  }}
-                >
-                  Crear Placas
-                </MenuItem>
-                <Divider></Divider>
-              </>
-            )}
-            
-            {/* Preguntas Frecuentes - Solo plan premium */}
-            {canAccess('canAccessFaqs') && (
-              <>
-                <MenuItem
-                  onClick={() => {
-                    navigate("/faqs");
-                    handleMenuClose();
-                  }}
-                >
-                  Preguntas Frecuentes
-                </MenuItem>
-                <Divider></Divider>
-              </>
-            )}
-            
-            {/* Capacitaciones - Solo plan premium */}
-            {canAccess('canAccessCapacitaciones') && (
-              <>
-                <MenuItem
-                  onClick={() => {
-                    navigate("/capacitaciones");
-                    handleMenuClose();
-                  }}
-                >
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <Typography fontWeight="bold">Capacitaciones</Typography>
-                    <Typography color="secondary" fontSize={12}>🎓 Gratis</Typography>
-                  </Box>
-                </MenuItem>
-                <Divider></Divider>
-              </>
-            )}
-            
-            {/* Información del plan actual */}
-            <MenuItem disabled>
+            {/* Ventas */}
+            <MenuItem onClick={() => navigate("/ventas")}>
               <Box display="flex" alignItems="center" gap={1}>
-                <Typography fontSize={12} color="text.secondary">
-                  Plan: {userPlan === 'full' ? 'Premium' : 'Gratuito'}
-                </Typography>
-                {userPlan === 'limitado' && (
-                  <Typography color="primary" fontSize={12}>🔒</Typography>
-                )}
+                <Typography fontWeight="bold">Ventas</Typography>
+                <Typography color="primary" fontSize={12}>🚀 Lanzamiento</Typography>
               </Box>
             </MenuItem>
             <Divider></Divider>
+            
+            {/* Crear Placas */}
+            <MenuItem
+              onClick={() => {
+                navigate("/generarPlaca");
+                handleMenuClose();
+              }}
+            >
+              Crear Placas
+            </MenuItem>
+            <Divider></Divider>
+            
+            {/* Preguntas Frecuentes */}
+            <MenuItem
+              onClick={() => {
+                navigate("/faqs");
+                handleMenuClose();
+              }}
+            >
+              Preguntas Frecuentes
+            </MenuItem>
+            <Divider></Divider>
+            
+            {/* Capacitaciones */}
+            <MenuItem
+              onClick={() => {
+                navigate("/capacitaciones");
+                handleMenuClose();
+              }}
+            >
+              <Box display="flex" alignItems="center" gap={1}>
+                <Typography fontWeight="bold">Capacitaciones</Typography>
+                <Typography color="secondary" fontSize={12}>🎓 Gratis</Typography>
+              </Box>
+            </MenuItem>
+            <Divider></Divider>
+            
             
             <MenuItem
               onClick={() => {

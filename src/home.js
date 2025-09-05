@@ -30,12 +30,9 @@ import ResponsiveDialog from "./components/dialog";
 import { useAuth } from "./AuthContext";
 import ReviewSlider from "./components/ReviewSlider"; // ajustá la ruta
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { usePlanPermissions } from "./hooks/usePlanPermissions";
-import PlanRestriction from "./components/PlanRestriction";
 
 const Home = () => {
   const { logout } = useAuth();
-  const { canAccess, getRestrictionMessage, redirectToSubscription } = usePlanPermissions();
   const [openThemeDialog, setOpenThemeDialog] = useState(false);
   const isMobile = useMediaQuery('(max-width:600px)');
 
@@ -322,44 +319,36 @@ const productosFiltrados = productos.filter(
           <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100">
             <Typography style={{maxWidth: 350}} textAlign={'center'} variant="h6">Por este medio podes generar la url y enviar el catálogo que tu cliente quiera</Typography>
           </div>
-        {/* Sección de catálogos con restricciones de plan */}
-        {canAccess('canAccessHomeCatalogs') ? (
-          <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100" style={{ gap: 12 }}>
-            <FormControl size="small" sx={{ minWidth: 200, width: '100%', maxWidth: 400, background: 'white' }}>
-              <InputLabel>Seleccioná un catálogo</InputLabel>
-              <Select
-                value={selectedCatalog}
-                fullWidth
-                size="large"
-                variant="outlined"
-                onChange={(e) => setSelectedCatalog(e.target.value)}
-                label="Seleccioná un catálogo"
-              >
-                <MenuItem value="">-- Elegí uno --</MenuItem>
-                {catalogos.map((cat) => (
-                  <MenuItem key={cat.url} value={cat.url}>{cat.nombre}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <Button
-              variant="contained"
-              disabled={!selectedCatalog}
-              onClick={() => {
-                const url = `${window.location.origin}${selectedCatalog}`;
-                navigator.clipboard.writeText(url);
-                setSnackbarOpen(true);
-              }}
+        {/* Sección de catálogos - Acceso libre para todos los usuarios */}
+        <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100" style={{ gap: 12 }}>
+          <FormControl size="small" sx={{ minWidth: 200, width: '100%', maxWidth: 400, background: 'white' }}>
+            <InputLabel>Seleccioná un catálogo</InputLabel>
+            <Select
+              value={selectedCatalog}
+              fullWidth
+              size="large"
+              variant="outlined"
+              onChange={(e) => setSelectedCatalog(e.target.value)}
+              label="Seleccioná un catálogo"
             >
-              Copiar URL
-            </Button>
-          </div>
-        ) : (
-          <PlanRestriction
-            feature="canAccessHomeCatalogs"
-            message={getRestrictionMessage('canAccessHomeCatalogs')}
-            onUpgrade={redirectToSubscription}
-          />
-        )}
+              <MenuItem value="">-- Elegí uno --</MenuItem>
+              {catalogos.map((cat) => (
+                <MenuItem key={cat.url} value={cat.url}>{cat.nombre}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button
+            variant="contained"
+            disabled={!selectedCatalog}
+            onClick={() => {
+              const url = `${window.location.origin}${selectedCatalog}`;
+              navigator.clipboard.writeText(url);
+              setSnackbarOpen(true);
+            }}
+          >
+            Copiar URL
+          </Button>
+        </div>
 
         <ul className="lista-prod w-100">
           {loading ? (
