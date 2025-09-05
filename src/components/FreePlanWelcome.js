@@ -13,9 +13,7 @@ import {
   ListItemText
 } from '@mui/material';
 import {
-  Lock as LockIcon,
   Check as CheckIcon,
-  Close as CloseIcon,
   Upgrade as UpgradeIcon,
   Person as PersonIcon,
   Star as StarIcon

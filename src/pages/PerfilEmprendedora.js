@@ -63,7 +63,7 @@ import { usePlanPermissions } from '../hooks/usePlanPermissions';
 
 const PerfilEmprendedora = () => {
   const navigate = useNavigate();
-  const { userPlan, canAccess } = usePlanPermissions();
+  const { userPlan } = usePlanPermissions();
   
   // Estados principales
   const [user, setUser] = useState({
