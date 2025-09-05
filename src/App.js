@@ -87,51 +87,75 @@ const AppContent = () => {
               </PremiumRoute>
             </PrivateRoute>
           } />
-          <Route path="/preferencial" element={<Preferencial />} />
+          <Route path="/preferencial" element={
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canAccessCatalogs">
+                <Preferencial />
+              </PremiumRoute>
+            </PrivateRoute>
+          } />
           <Route path="/catalogo3" element={
-            <PremiumRoute requiredPermission="canAccessCatalogs">
-              <Catalogo3 />
-            </PremiumRoute>
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canAccessCatalogs">
+                <Catalogo3 />
+              </PremiumRoute>
+            </PrivateRoute>
           } />
           <Route path="/catalogo6" element={
-            <PremiumRoute requiredPermission="canAccessCatalogs">
-              <Catalogo6 />
-            </PremiumRoute>
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canAccessCatalogs">
+                <Catalogo6 />
+              </PremiumRoute>
+            </PrivateRoute>
           } />
           <Route path="/catalogo9" element={
-            <PremiumRoute requiredPermission="canAccessCatalogs">
-              <Catalogo9 />
-            </PremiumRoute>
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canAccessCatalogs">
+                <Catalogo9 />
+              </PremiumRoute>
+            </PrivateRoute>
           } />
           <Route path="/catalogo10" element={
-            <PremiumRoute requiredPermission="canAccessCatalogs">
-              <Catalogo10 />
-            </PremiumRoute>
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canAccessCatalogs">
+                <Catalogo10 />
+              </PremiumRoute>
+            </PrivateRoute>
           } />
           <Route path="/catalogo12" element={
-            <PremiumRoute requiredPermission="canAccessCatalogs">
-              <Catalogo12 />
-            </PremiumRoute>
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canAccessCatalogs">
+                <Catalogo12 />
+              </PremiumRoute>
+            </PrivateRoute>
           } />
           <Route path="/catalogo14" element={
-            <PremiumRoute requiredPermission="canAccessCatalogs">
-              <Catalogo14 />
-            </PremiumRoute>
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canAccessCatalogs">
+                <Catalogo14 />
+              </PremiumRoute>
+            </PrivateRoute>
           } />
           <Route path="/catalogo18" element={
-            <PremiumRoute requiredPermission="canAccessCatalogs">
-              <Catalogo18 />
-            </PremiumRoute>
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canAccessCatalogs">
+                <Catalogo18 />
+              </PremiumRoute>
+            </PrivateRoute>
           } />
           <Route path="/catalogo20" element={
-            <PremiumRoute requiredPermission="canAccessCatalogs">
-              <Catalogo20 />
-            </PremiumRoute>
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canAccessCatalogs">
+                <Catalogo20 />
+              </PremiumRoute>
+            </PrivateRoute>
           } />
           <Route path="/catalogo24" element={
-            <PremiumRoute requiredPermission="canAccessCatalogs">
-              <Catalogo24 />
-            </PremiumRoute>
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canAccessCatalogs">
+                <Catalogo24 />
+              </PremiumRoute>
+            </PrivateRoute>
           } />
           <Route path="/contado" element={<Contado />} />
           <Route path="/generarPlaca" element={
@@ -155,7 +179,13 @@ const AppContent = () => {
               </PremiumRoute>
             </PrivateRoute>
           } />
-          <Route path="/perfil" element={<PrivateRoute><PerfilEmprendedora /></PrivateRoute>} />
+          <Route path="/perfil" element={
+            <PrivateRoute>
+              <PremiumRoute requiredPermission="canAccessProfile">
+                <PerfilEmprendedora />
+              </PremiumRoute>
+            </PrivateRoute>
+          } />
           <Route path="/capacitaciones" element={
             <PrivateRoute>
               <PremiumRoute requiredPermission="canAccessCapacitaciones">

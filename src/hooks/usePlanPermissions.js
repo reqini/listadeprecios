@@ -9,17 +9,9 @@ export const usePlanPermissions = () => {
     // Obtener el plan del usuario desde localStorage o del token
     const tipoUsuario = localStorage.getItem('tipoUsuario');
     
-    // Debug: Log para verificar el valor
-    console.log('🔍 Debug usePlanPermissions:');
-    console.log('- tipoUsuario from localStorage:', tipoUsuario);
-    console.log('- tipoUsuario type:', typeof tipoUsuario);
-    console.log('- tipoUsuario === "full":', tipoUsuario === 'full');
-    
     if (tipoUsuario === 'full') {
-      console.log('✅ Usuario con plan FULL detectado');
       setUserPlan('full');
     } else {
-      console.log('❌ Usuario con plan LIMITADO detectado');
       setUserPlan('limitado');
     }
     
@@ -29,9 +21,9 @@ export const usePlanPermissions = () => {
   // Definir permisos por plan
   const permissions = {
     limitado: {
-      // Plan gratuito - Acceso limitado: Home, Perfil y FAQs
-      canAccessProfile: true,
-      canAccessHome: true,
+      // Plan gratuito - SIN ACCESO (solo para usuarios no registrados)
+      canAccessProfile: false,
+      canAccessHome: false,
       canAccessCatalogs: false,
       canGeneratePlacas: false,
       canManageClients: false,
@@ -39,14 +31,14 @@ export const usePlanPermissions = () => {
       canAccessCapacitaciones: false,
       canAccessEmprendedoras: false,
       canAccessVentas: false,
-      canAccessFaqs: true,
-      canRecoverPassword: true,
+      canAccessFaqs: false,
+      canRecoverPassword: false,
       canViewBasicProducts: false,
-      canContactSupport: true,
-      canAccessHomeCatalogs: false // Nueva restricción para catálogos en Home
+      canContactSupport: false,
+      canAccessHomeCatalogs: false
     },
     full: {
-      // Plan premium - Acceso completo
+      // Plan premium - ACCESO COMPLETO A TODO
       canAccessProfile: true,
       canAccessHome: true,
       canAccessCatalogs: true,
@@ -60,7 +52,7 @@ export const usePlanPermissions = () => {
       canRecoverPassword: true,
       canViewBasicProducts: true,
       canContactSupport: true,
-      canAccessHomeCatalogs: true // Acceso completo a catálogos en Home
+      canAccessHomeCatalogs: true
     }
   };
 
@@ -74,19 +66,20 @@ export const usePlanPermissions = () => {
   // Función para obtener el mensaje de restricción
   const getRestrictionMessage = (feature) => {
     const messages = {
-      canAccessHome: 'Acceso al panel principal disponible solo en Plan Premium',
-      canAccessCatalogs: 'Acceso a catálogos completos disponible solo en Plan Premium',
-      canAccessHomeCatalogs: 'Selección de catálogos disponible solo en Plan Premium',
-      canGeneratePlacas: 'Generación de placas disponible solo en Plan Premium',
-      canManageClients: 'Gestión de clientes disponible solo en Plan Premium',
-      canViewStats: 'Estadísticas avanzadas disponibles solo en Plan Premium',
-      canAccessCapacitaciones: 'Capacitaciones disponibles solo en Plan Premium',
-      canAccessEmprendedoras: 'Panel de emprendedoras disponible solo en Plan Premium',
-      canAccessVentas: 'Panel de ventas disponible solo en Plan Premium',
-      canAccessFaqs: 'Preguntas frecuentes disponibles solo en Plan Premium'
+      canAccessProfile: 'Acceso al perfil requiere Plan Premium ($25.000/mes)',
+      canAccessHome: 'Acceso al panel principal requiere Plan Premium ($25.000/mes)',
+      canAccessCatalogs: 'Acceso a catálogos requiere Plan Premium ($25.000/mes)',
+      canAccessHomeCatalogs: 'Selección de catálogos requiere Plan Premium ($25.000/mes)',
+      canGeneratePlacas: 'Generación de placas requiere Plan Premium ($25.000/mes)',
+      canManageClients: 'Gestión de clientes requiere Plan Premium ($25.000/mes)',
+      canViewStats: 'Estadísticas avanzadas requieren Plan Premium ($25.000/mes)',
+      canAccessCapacitaciones: 'Capacitaciones requieren Plan Premium ($25.000/mes)',
+      canAccessEmprendedoras: 'Panel de emprendedoras requiere Plan Premium ($25.000/mes)',
+      canAccessVentas: 'Panel de ventas requiere Plan Premium ($25.000/mes)',
+      canAccessFaqs: 'Preguntas frecuentes requieren Plan Premium ($25.000/mes)'
     };
     
-    return messages[feature] || 'Esta funcionalidad requiere Plan Premium';
+    return messages[feature] || 'Esta funcionalidad requiere Plan Premium ($25.000/mes)';
   };
 
   // Función para redirigir a la suscripción
