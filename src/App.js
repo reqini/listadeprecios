@@ -22,7 +22,7 @@ import Preferencial from "./Preferencial";
 import Contado from "./contado";
 import Activos from "./Activos";
 import Emprendedoras from "./Emprendedoras";
-import GeneradorDePlacas from "./GeneradorDePlacas";
+import UltraMinimalPlacaGenerator from "./components/UltraMinimalPlacaGenerator";
 import PerfilEmprendedora from "./pages/PerfilEmprendedora";
 import LandingPage from "./pages/LandingPage";
 import Capacitaciones from "./pages/Capacitaciones";
@@ -86,7 +86,7 @@ const AppContent = () => {
           <Route path="/catalogo20" element={<Catalogo20 />} />
           <Route path="/catalogo24" element={<Catalogo24 />} />
           <Route path="/contado" element={<PrivateRoute><Contado /></PrivateRoute>} />
-          <Route path="/generarPlaca" element={<GeneradorDePlacas />} />
+          <Route path="/generarPlaca" element={<UltraMinimalPlacaGenerator />} />
           <Route path="/emprendedoras" element={<PrivateRoute><Emprendedoras /></PrivateRoute>} />
           <Route path="/ventas" element={<PrivateRoute><Ventas /></PrivateRoute>} />
           <Route path="/perfil" element={<PrivateRoute><PerfilEmprendedora /></PrivateRoute>} />
