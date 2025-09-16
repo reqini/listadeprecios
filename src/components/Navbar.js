@@ -153,8 +153,8 @@ const Navbar = ({ user, onLogout, title }) => {
             </MenuItem>
             <Divider></Divider>
             
-            {/* Crear Placas */}
-            <MenuItem
+            {/* Crear Placas - OCULTO TEMPORALMENTE */}
+            {/* <MenuItem
               onClick={() => {
                 navigate("/generarPlaca");
                 handleMenuClose();
@@ -162,7 +162,7 @@ const Navbar = ({ user, onLogout, title }) => {
             >
               Crear Placas
             </MenuItem>
-            <Divider></Divider>
+            <Divider></Divider> */}
             
             {/* Preguntas Frecuentes */}
             <MenuItem

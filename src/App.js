@@ -101,6 +101,13 @@ const AppContent = () => {
 
 const App = () => {
   useEffect(() => {
+    // Forzar HTTPS en producción
+    if (process.env.NODE_ENV === 'production' && window.location.protocol !== 'https:') {
+      window.location.replace('https:' + window.location.href.substring(window.location.protocol.length));
+      return;
+    }
+
+    // Service Worker
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistration().then((registration) => {
         if (registration) {
