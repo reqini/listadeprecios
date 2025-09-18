@@ -46,6 +46,7 @@ const Home = () => {
     { nombre: "10 Cuotas", url: "/catalogo10" },
     { nombre: "12 Cuotas", url: "/catalogo12" },
     { nombre: "14 Cuotas", url: "/catalogo14" },
+    { nombre: "15 Cuotas", url: "/catalogo15" },
     { nombre: "18 Cuotas", url: "/catalogo18" }
   ]);
 
