@@ -1,0 +1,5 @@
+username,email,phone,address,businessName,businessType,avatar,rango,fechaRegistro,totalVentas,clientesActivos,placasGeneradas,rating,notifications,darkMode,language,theme
+cocinaty,cocinaty@ejemplo.com,+54 9 11 1234-5678,"Buenos Aires, Argentina",Cocina TY - Productos de Cocina,Venta de productos de cocina,,Demostrador/a,2024-01-15,1247,89,156,4.8,true,false,es,default
+lucho,lucho@ejemplo.com,+54 9 11 9876-5432,"Córdoba, Argentina",Lucho Emprendimientos,Consultoría empresarial,,Supervisor/a,2024-02-10,2350,142,89,4.9,true,true,es,dark
+maria,maria@ejemplo.com,+54 9 11 5555-1234,"Rosario, Argentina",María's Kitchen,Gastronomía,,Demostrador/a,2024-03-05,890,67,234,4.7,false,false,es,default
+ana,ana@ejemplo.com,+54 9 11 7777-8888,"Mendoza, Argentina",Ana Creativa,Diseño y marketing,,Líder Regional,2024-01-20,3200,198,312,4.9,true,false,es,modern

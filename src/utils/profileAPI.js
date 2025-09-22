@@ -1,7 +1,7 @@
-// API local para manejo de datos de perfil
-// import axios from './axios'; // No utilizado por ahora
+// API para manejo de datos de perfil con Google Sheets
+import axios from './axios';
 
-// Simular datos de perfil desde Google Sheets
+// Simular datos de perfil desde Google Sheets (fallback)
 const MOCK_PROFILE_DATA = {
   cocinaty: {
     username: 'cocinaty',
@@ -30,25 +30,33 @@ export const profileAPI = {
   // Obtener datos del perfil
   async getProfile(username) {
     try {
-      // En producción, esto haría una llamada real a Google Sheets
-      // const response = await axios.get(`/api/profile/${username}`);
-      // return response.data;
+      // Llamada real a Google Sheets a través del backend
+      const response = await axios.get(`/api/profile/${username}`);
       
-      // Por ahora, usar datos mock
-      const profileData = MOCK_PROFILE_DATA[username];
-      if (profileData) {
+      if (response.data.success) {
         return {
           success: true,
-          data: profileData
+          data: response.data.data
         };
       } else {
         return {
           success: false,
-          message: 'Usuario no encontrado'
+          message: response.data.message || 'Usuario no encontrado'
         };
       }
     } catch (error) {
       console.error('Error al obtener perfil:', error);
+      
+      // Fallback a datos mock si el servidor no responde
+      const profileData = MOCK_PROFILE_DATA[username];
+      if (profileData) {
+        console.warn('Usando datos mock para perfil:', username);
+        return {
+          success: true,
+          data: profileData
+        };
+      }
+      
       return {
         success: false,
         message: 'Error al cargar datos del perfil'
@@ -59,25 +67,33 @@ export const profileAPI = {
   // Actualizar datos del perfil
   async updateProfile(username, profileData) {
     try {
-      // En producción, esto haría una llamada real a Google Sheets
-      // const response = await axios.put(`/api/profile/${username}`, profileData);
-      // return response.data;
+      // Llamada real a Google Sheets a través del backend
+      const response = await axios.put(`/api/profile/${username}`, profileData);
       
-      // Por ahora, simular actualización
-      if (MOCK_PROFILE_DATA[username]) {
-        MOCK_PROFILE_DATA[username] = { ...MOCK_PROFILE_DATA[username], ...profileData };
+      if (response.data.success) {
         return {
           success: true,
-          message: 'Perfil actualizado exitosamente'
+          message: response.data.message || 'Perfil actualizado exitosamente'
         };
       } else {
         return {
           success: false,
-          message: 'Usuario no encontrado'
+          message: response.data.message || 'Error al actualizar el perfil'
         };
       }
     } catch (error) {
       console.error('Error al actualizar perfil:', error);
+      
+      // Fallback a simulación local si el servidor no responde
+      if (MOCK_PROFILE_DATA[username]) {
+        MOCK_PROFILE_DATA[username] = { ...MOCK_PROFILE_DATA[username], ...profileData };
+        console.warn('Usando actualización mock para perfil:', username);
+        return {
+          success: true,
+          message: 'Perfil actualizado exitosamente (modo offline)'
+        };
+      }
+      
       return {
         success: false,
         message: 'Error al actualizar el perfil'
@@ -88,21 +104,27 @@ export const profileAPI = {
   // Cambiar contraseña
   async changePassword(username, passwordData) {
     try {
-      // En producción, esto haría una llamada real a la API
-      // const response = await axios.post(`/api/profile/${username}/change-password`, passwordData);
-      // return response.data;
+      // Llamada real a la API para cambiar contraseña
+      const response = await axios.post(`/api/profile/${username}/change-password`, passwordData);
       
-      // Por ahora, simular cambio de contraseña
-      return {
-        success: true,
-        message: 'Contraseña actualizada exitosamente'
-      };
-      // eslint-disable-next-line no-unreachable
+      if (response.data.success) {
+        return {
+          success: true,
+          message: response.data.message || 'Contraseña actualizada exitosamente'
+        };
+      } else {
+        return {
+          success: false,
+          message: response.data.message || 'Error al cambiar la contraseña'
+        };
+      }
     } catch (error) {
       console.error('Error al cambiar contraseña:', error);
+      
+      // En caso de error de conexión, no simular cambio de contraseña por seguridad
       return {
         success: false,
-        message: 'Error al cambiar la contraseña'
+        message: 'Error de conexión. No se pudo cambiar la contraseña.'
       };
     }
   },
@@ -110,8 +132,27 @@ export const profileAPI = {
   // Obtener estadísticas del usuario
   async getUserStats(username) {
     try {
+      // Llamada real a Google Sheets para estadísticas
+      const response = await axios.get(`/api/profile/${username}/stats`);
+      
+      if (response.data.success) {
+        return {
+          success: true,
+          data: response.data.data
+        };
+      } else {
+        return {
+          success: false,
+          message: response.data.message || 'Error al cargar estadísticas'
+        };
+      }
+    } catch (error) {
+      console.error('Error al obtener estadísticas:', error);
+      
+      // Fallback a datos mock para estadísticas
       const profileData = MOCK_PROFILE_DATA[username];
       if (profileData) {
+        console.warn('Usando estadísticas mock para:', username);
         return {
           success: true,
           data: {
@@ -121,14 +162,8 @@ export const profileAPI = {
             rating: profileData.rating
           }
         };
-      } else {
-        return {
-          success: false,
-          message: 'Usuario no encontrado'
-        };
       }
-    } catch (error) {
-      console.error('Error al obtener estadísticas:', error);
+      
       return {
         success: false,
         message: 'Error al cargar estadísticas'
