@@ -71,30 +71,7 @@ const Login = () => {
     setShowModal(false);
     setErrorMsg("");
 
-    // ⚠️ MODO QA TEMPORAL - REMOVER ANTES DE PRODUCCIÓN
-    console.log('🔧 MODO QA: Backend caído, usando login temporal');
-    
-    // Usuarios válidos para QA
-    const validUsers = {
-      'cocinaty': '279323',
-      'lucho': '123456',
-      'admin': 'admin123',
-      'test': 'test'
-    };
-    
-    // Simular delay de red
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    if (validUsers[username] && validUsers[username] === password) {
-      // Login exitoso con mock
-      localStorage.setItem("token", "mock-jwt-token-for-qa");
-      localStorage.setItem("activeSession", username);
-      localStorage.setItem("tipoUsuario", username === 'admin' ? 'admin' : 'full');
-      console.log('✅ Login QA exitoso para:', username);
-      window.location.href = "/home";
-      setLoading(false);
-      return;
-    }
+    // ✅ Backend de Render funcionando - Login real
 
     try {
       const response = await axios.post(`/auth/login`, {
@@ -117,8 +94,7 @@ const Login = () => {
         setShowModal(true);
       } else {
         console.error("Error durante la autenticación:", error.message);
-        console.log('ℹ️ Backend no disponible, usa credenciales QA: cocinaty/279323, lucho/123456, admin/admin123, test/test');
-        alert("Backend no disponible. Usa credenciales de QA: cocinaty/279323, lucho/123456, admin/admin123, test/test");
+        alert("Usuario o contraseña incorrectos. Verifica tus credenciales.");
       }
     } finally {
       setLoading(false);

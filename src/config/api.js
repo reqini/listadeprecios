@@ -2,14 +2,19 @@
 export const API_CONFIG = {
   // Cambiar aquí para usar diferentes servidores
   USE_PRODUCTION: true, // Cambiar a false para usar local
+  USE_RENDER: true, // Cambiar a false para usar Railway
   
   // URLs de los servidores
   LOCAL: "http://localhost:3001",
-  PRODUCTION: "https://backtest-production-7f88.up.railway.app",
+  RAILWAY: "https://backtest-production-7f88.up.railway.app",
+  RENDER: "https://backend-catalogosimple.onrender.com", // ✅ URL REAL DE RENDER
   
   // URL activa
   get baseURL() {
-    return this.USE_PRODUCTION ? this.PRODUCTION : this.LOCAL;
+    if (!this.USE_PRODUCTION) {
+      return this.LOCAL;
+    }
+    return this.USE_RENDER ? this.RENDER : this.RAILWAY;
   }
 };
 
