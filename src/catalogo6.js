@@ -9,6 +9,7 @@ import ProductsCalatogo from "./components/productsCalatogo";
 import ShoppingCartCatalogo from "./components/ShoppingCartCatalogo";
 import logo from './assets/logo.png';
 import { Snackbar, Alert, Typography } from "@mui/material";
+import { trackCatalogView, trackCatalogSearch, trackAddToCart, trackToggleFavorite } from "./utils/analytics";
 
 const Catalogo6 = () => {
   const [cart, setCart] = useState([]);
@@ -49,6 +50,9 @@ const Catalogo6 = () => {
   };
 
   useEffect(() => {
+    // GA: vista de catálogo
+    trackCatalogView("Catálogo", "6 cuotas sin interés");
+
     const loadInitialData = async () => {
       setLoading(true);
       const productosData = await getData();
@@ -86,6 +90,9 @@ const Catalogo6 = () => {
       (producto?.linea || '').toLowerCase() !== 'repuestos'
     );
 
+    // GA: búsqueda
+    trackCatalogSearch("Catálogo 6", filtro);
+
     if (cuotasMap["6 cuotas sin interés"]) {
       const cuotaKey = cuotasMap["6 cuotas sin interés"];
       productosFiltrados = productosFiltrados.filter(
@@ -98,6 +105,8 @@ const Catalogo6 = () => {
 
   const addToCart = (product) => {
     setCart([...cart, product]);
+    // GA: agregar al carrito
+    trackAddToCart("Catálogo 6", product);
   };
 
   const toggleFavorite = (product) => {
@@ -108,10 +117,12 @@ const Catalogo6 = () => {
       updatedFavorites = favorites.filter(fav => fav.id !== product.id);
       message = `${product.descripcion} ha sido eliminado de tus favoritos`;
       setSnackbarSeverity('warning');
+      trackToggleFavorite("Catálogo 6", product, false);
     } else {
       updatedFavorites = [...favorites, product];
       message = `${product.descripcion} ha sido agregado a tus favoritos`;
       setSnackbarSeverity('success');
+      trackToggleFavorite("Catálogo 6", product, true);
     }
 
     setFavorites(updatedFavorites);
