@@ -2,7 +2,7 @@
 export const API_CONFIG = {
   // Cambiar aquí para usar diferentes servidores
   USE_PRODUCTION: true, // Cambiar a false para usar local
-  USE_RENDER: true, // Cambiar a false para usar Railway
+  USE_RENDER: true, // Usar Render (necesita CORS configurado)
   
   // URLs de los servidores
   LOCAL: "http://localhost:3001",

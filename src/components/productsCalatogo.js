@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
@@ -8,13 +8,32 @@ import { Button, CardActions } from '@mui/material';
 import { formatPrice } from '../utils/priceUtils';
 
 const ProductsCalatogo = ({ product, selectedCuota, isContado = false, onAddToCart }) => {
+  const [shippingCost, setShippingCost] = useState(21036);
 
   const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
   const aplicaEnvio = ['Bazar', 'Repuestos'].includes(product.linea);
 
  /*  const aplicaEnvio = product.puntos && parseFloat(product.puntos) < 140; */
 
-  const SHIPPING_COST = 17362;
+  // Cargar costo de envío dinámico
+  useEffect(() => {
+    const loadShippingCost = () => {
+      const costo = localStorage.getItem('costoEnvio');
+      if (costo) {
+        setShippingCost(parseFloat(costo));
+      }
+    };
+
+    loadShippingCost();
+
+    // Escuchar cambios en tiempo real
+    const handleCostosUpdate = (event) => {
+      setShippingCost(event.detail.costoEnvio);
+    };
+
+    window.addEventListener('costosUpdated', handleCostosUpdate);
+    return () => window.removeEventListener('costosUpdated', handleCostosUpdate);
+  }, []);
 
   // Mapeo de cuotas con sus respectivos campos
   const cuotasMap = {
@@ -108,7 +127,7 @@ const ProductsCalatogo = ({ product, selectedCuota, isContado = false, onAddToCa
         )}
         {sumarEnvio && aplicaEnvio && (
           <Typography variant="caption" color="error" style={{ marginTop: 4 }}>
-            ¡A esta compra le tenes que sumar de envio: <b>{formatPrice(SHIPPING_COST)}!</b>
+            ¡A esta compra le tenes que sumar de envio: <b>{formatPrice(shippingCost)}!</b>
           </Typography>
         )}
       </CardContent>

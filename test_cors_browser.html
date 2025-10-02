@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test CORS - Catálogos</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Test CORS - Backend de Render</h1>
+    
+    <div class="info">
+        <strong>Objetivo:</strong> Probar si el frontend puede conectarse al backend de Render
+    </div>
+    
+    <button onclick="testRenderBackend()">🚀 Probar Backend Render</button>
+    <button onclick="testLocalBackend()">🏠 Probar Backend Local</button>
+    <button onclick="clearResults()">🧹 Limpiar Resultados</button>
+    
+    <div id="results"></div>
+    
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        async function testRenderBackend() {
+            addResult('🔄 Probando backend de Render...', 'info');
+            
+            try {
+                const response = await fetch('https://backend-catalogosimple.onrender.com/api/productos', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`
+                        ✅ <strong>Backend Render: CONECTADO</strong><br>
+                        Status: ${response.status}<br>
+                        Productos: ${Array.isArray(data) ? data.length : 'No es array'}<br>
+                        Content-Type: ${response.headers.get('content-type')}
+                    `, 'success');
+                    
+                    // Verificar productos faltantes
+                    if (Array.isArray(data)) {
+                        const missingProducts = ['90050509', '90050510', '9005011', '9005012'];
+                        const foundProducts = data.filter(p => missingProducts.includes(p.codigo));
+                        addResult(`
+                            📦 <strong>Productos faltantes:</strong><br>
+                            Encontrados: ${foundProducts.length}/4<br>
+                            Faltantes: ${missingProducts.filter(code => !data.some(p => p.codigo === code)).join(', ')}
+                        `, foundProducts.length === 4 ? 'success' : 'error');
+                    }
+                } else {
+                    addResult(`
+                        ❌ <strong>Backend Render: ERROR</strong><br>
+                        Status: ${response.status}<br>
+                        Status Text: ${response.statusText}
+                    `, 'error');
+                }
+            } catch (error) {
+                addResult(`
+                    ❌ <strong>Backend Render: FALLO DE CONEXIÓN</strong><br>
+                    Error: ${error.message}<br>
+                    Tipo: ${error.name}
+                `, 'error');
+            }
+        }
+        
+        async function testLocalBackend() {
+            addResult('🔄 Probando backend local...', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:3001/api/productos', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`
+                        ✅ <strong>Backend Local: CONECTADO</strong><br>
+                        Status: ${response.status}<br>
+                        Productos: ${Array.isArray(data) ? data.length : 'No es array'}
+                    `, 'success');
+                } else {
+                    addResult(`
+                        ❌ <strong>Backend Local: ERROR</strong><br>
+                        Status: ${response.status}<br>
+                        Status Text: ${response.statusText}
+                    `, 'error');
+                }
+            } catch (error) {
+                addResult(`
+                    ❌ <strong>Backend Local: FALLO DE CONEXIÓN</strong><br>
+                    Error: ${error.message}<br>
+                    Tipo: ${error.name}
+                `, 'error');
+            }
+        }
+        
+        // Auto-test al cargar
+        window.onload = function() {
+            addResult('🚀 Página cargada. Haz clic en "Probar Backend Render" para verificar CORS.', 'info');
+        };
+    </script>
+</body>
+</html>

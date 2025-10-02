@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Accordion,
   AccordionSummary,
@@ -21,6 +21,27 @@ const ShoppingCartCatalogo = ({
   cuotasTexto = "3 cuotas",
 }) => {
   const theme = useTheme();
+  const [shippingCost, setShippingCost] = useState(21036);
+
+  // Cargar costo de envío dinámico
+  useEffect(() => {
+    const loadShippingCost = () => {
+      const costo = localStorage.getItem('costoEnvio');
+      if (costo) {
+        setShippingCost(parseFloat(costo));
+      }
+    };
+
+    loadShippingCost();
+
+    // Escuchar cambios en tiempo real
+    const handleCostosUpdate = (event) => {
+      setShippingCost(event.detail.costoEnvio);
+    };
+
+    window.addEventListener('costosUpdated', handleCostosUpdate);
+    return () => window.removeEventListener('costosUpdated', handleCostosUpdate);
+  }, []);
 
   const getCuotaSeleccionada = (product) => {
     const raw = product[cuotaKey];

@@ -27,6 +27,7 @@ import UltraMinimalPlacaGenerator from "./components/UltraMinimalPlacaGenerator"
 import PerfilEmprendedora from "./pages/PerfilEmprendedora";
 import LandingPage from "./pages/LandingPage";
 import Capacitaciones from "./pages/Capacitaciones";
+import AdminPanel from "./pages/AdminPanel";
 import PWAInstallToast from "./components/PWAInstallToast";
 import { AuthProvider, useAuth } from "./AuthContext"; 
 
@@ -38,6 +39,18 @@ ReactGA.initialize(TRACKING_ID);
 const PrivateRoute = ({ children }) => {
   const { auth } = useAuth();
   return auth?.token ? children : <Navigate to="/login" replace />;
+};
+
+// 🔐 Ruta de administrador (solo cocinaty)
+const AdminRoute = ({ children }) => {
+  const { auth } = useAuth();
+  if (!auth?.token) {
+    return <Navigate to="/login" replace />;
+  }
+  if (auth?.username !== 'cocinaty') {
+    return <Navigate to="/home" replace />;
+  }
+  return children;
 };
 
 const LoginRoute = () => {
@@ -93,6 +106,7 @@ const AppContent = () => {
           <Route path="/ventas" element={<PrivateRoute><Ventas /></PrivateRoute>} />
           <Route path="/perfil" element={<PrivateRoute><PerfilEmprendedora /></PrivateRoute>} />
           <Route path="/capacitaciones" element={<PrivateRoute><Capacitaciones /></PrivateRoute>} />
+          <Route path="/administrador" element={<AdminRoute><AdminPanel /></AdminRoute>} />
           <Route path="/" element={<LandingPage />} />
         </Routes>
         <PWAInstallToast />
