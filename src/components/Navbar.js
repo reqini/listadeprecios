@@ -189,6 +189,20 @@ const Navbar = ({ user, onLogout, title }) => {
             </MenuItem>
             <Divider></Divider>
             
+            {/* Búsqueda IA */}
+            <MenuItem
+              onClick={() => {
+                navigate("/busqueda-ia");
+                handleMenuClose();
+              }}
+            >
+              <Box display="flex" alignItems="center" gap={1}>
+                <Typography fontWeight="bold">Búsqueda IA</Typography>
+                <Typography color="primary" fontSize={12}>🤖 IA</Typography>
+              </Box>
+            </MenuItem>
+            <Divider></Divider>
+            
             
             <MenuItem
               onClick={() => {

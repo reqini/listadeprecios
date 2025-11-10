@@ -19,6 +19,9 @@ export const AuthProvider = ({ children }) => {
     setAuth(null);
     localStorage.removeItem("token"); // Eliminar el token de localStorage
     localStorage.removeItem("deviceId"); // Eliminar el deviceId de localStorage
+    localStorage.removeItem("activeSession"); // Eliminar la sesión activa
+    localStorage.removeItem("tipoUsuario"); // Eliminar el tipo de usuario
+    localStorage.removeItem("user"); // Eliminar datos del usuario
   };
 
   // Validar token y detectar si fue deslogueado desde otro dispositivo

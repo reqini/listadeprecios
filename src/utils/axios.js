@@ -1,11 +1,13 @@
 
 import axios from "axios";
-import { API_CONFIG } from "../config/api";
 
-const url = API_CONFIG.baseURL;
+const baseURL = process.env.REACT_APP_API_BASE || "/api";
 
 const instance = axios.create({
-  baseURL: `${url}`,
+  baseURL,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 // Interceptor para agregar el token solo si existe
@@ -33,9 +35,20 @@ instance.interceptors.response.use(
     const isProtected = !requestURL.includes("/api/productos");
 
     if (error.response && error.response.status === 401 && isProtected) {
-      console.warn("⚠️ Token inválido. Solo rutas protegidas redirigen.");
+      console.warn("⚠️ Token inválido. Redirigiendo al login.");
+      // Limpiar localStorage completamente
       localStorage.removeItem("token");
+      localStorage.removeItem("deviceId");
+      localStorage.removeItem("activeSession");
+      localStorage.removeItem("tipoUsuario");
+      localStorage.removeItem("user");
+      // Redirigir al login
       window.location.href = "/login";
+    }
+
+    // Manejar errores de red
+    if (error.code === 'NETWORK_ERROR' || !error.response) {
+      console.error("Error de red:", error.message);
     }
 
     return Promise.reject(error);

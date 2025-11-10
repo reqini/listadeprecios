@@ -28,6 +28,7 @@ import PerfilEmprendedora from "./pages/PerfilEmprendedora";
 import LandingPage from "./pages/LandingPage";
 import Capacitaciones from "./pages/Capacitaciones";
 import AdminPanel from "./pages/AdminPanel";
+import BusquedaIA from "./components/BusquedaIA";
 import PWAInstallToast from "./components/PWAInstallToast";
 import { AuthProvider, useAuth } from "./AuthContext"; 
 
@@ -106,6 +107,7 @@ const AppContent = () => {
           <Route path="/ventas" element={<PrivateRoute><Ventas /></PrivateRoute>} />
           <Route path="/perfil" element={<PrivateRoute><PerfilEmprendedora /></PrivateRoute>} />
           <Route path="/capacitaciones" element={<PrivateRoute><Capacitaciones /></PrivateRoute>} />
+          <Route path="/busqueda-ia" element={<PrivateRoute><BusquedaIA /></PrivateRoute>} />
           <Route path="/administrador" element={<AdminRoute><AdminPanel /></AdminRoute>} />
           <Route path="/" element={<LandingPage />} />
         </Routes>

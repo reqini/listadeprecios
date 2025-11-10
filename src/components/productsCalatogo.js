@@ -66,6 +66,9 @@ const ProductsCalatogo = ({ product, selectedCuota, isContado = false, onAddToCa
     ? parseFloat(product.precio_negocio.replace(/[^0-9.-]/g, '')) || null
     : null;
 
+  // Costo de envío
+  const SHIPPING_COST = 18697;
+
   // Determinar precio final según el contexto
   const precioFinal = isContado
   ? (precioNegocio || 0) + (sumarEnvio && aplicaEnvio ? SHIPPING_COST : 0)

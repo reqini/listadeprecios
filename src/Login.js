@@ -89,12 +89,20 @@ const Login = () => {
         alert("Usuario o contraseña incorrectos");
       }
     } catch (error) {
+      console.error("Error durante la autenticación:", error);
+      
       if (error.response?.status === 403 && error.response.data.showModal) {
         setErrorMsg(error.response.data.message || "Máximo de sesiones activas alcanzado.");
         setShowModal(true);
+      } else if (error.response?.status === 401) {
+        setErrorMsg("Usuario o contraseña incorrectos. Verifica tus credenciales.");
+        setShowModal(true);
+      } else if (error.code === 'NETWORK_ERROR' || !error.response) {
+        setErrorMsg("Error de conexión. Verifica tu conexión a internet e intenta nuevamente.");
+        setShowModal(true);
       } else {
-        console.error("Error durante la autenticación:", error.message);
-        alert("Usuario o contraseña incorrectos. Verifica tus credenciales.");
+        setErrorMsg("Error inesperado. Intenta nuevamente en unos momentos.");
+        setShowModal(true);
       }
     } finally {
       setLoading(false);
