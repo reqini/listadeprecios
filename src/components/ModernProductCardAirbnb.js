@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Card,
   CardContent,
@@ -9,10 +9,17 @@ import {
   IconButton,
   Dialog,
   DialogContent,
+  FormControl,
+  Select,
+  MenuItem,
+  InputLabel,
+  Divider,
 } from '@mui/material';
 import { FaWhatsapp } from 'react-icons/fa';
 import { Close as CloseIcon, ZoomIn as ZoomInIcon, Favorite, FavoriteBorder } from '@mui/icons-material';
-import { formatPrice } from '../utils/priceUtils';
+import { formatPrice, parsePrice } from '../utils/priceUtils';
+import BankPromoBadge from './BankPromoBadge';
+import BankLogosRow from './BankLogosRow';
 
 /**
  * Card moderna estilo Airbnb - Mantiene TODA la funcionalidad de ProductsCalatogo
@@ -31,14 +38,18 @@ const ModernProductCardAirbnb = ({
   isBestSeller = false,
   stockLow = false,
   onToggleFavorite, // Función callback para manejar favoritos
+  bankPromo, // Promo de banco asociada (opcional) - DEPRECATED: usar bankLogos
+  bankLogos = [], // Array de logos de bancos para mostrar como miniaturas
+  showAllData = false, // Prop para mostrar todos los datos (precio negocio, PSVP, puntos, todas las cuotas, etc.)
 }) => {
   const [shippingCost, setShippingCost] = useState(21036);
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [imageZoom, setImageZoom] = useState(1);
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
-  const [touchStart, setTouchStart] = useState(null);
+  // touchStart removido - no se usa actualmente
   const [lastTouchDistance, setLastTouchDistance] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [selectedCuotaHome, setSelectedCuotaHome] = useState(''); // Para selector de cuotas en home
 
   const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
   const aplicaEnvio = ['Bazar', 'Repuestos'].includes(product.linea);
@@ -76,13 +87,18 @@ const ModernProductCardAirbnb = ({
     "3 cuotas sin interés": 'tres_sin_interes',
   };
 
-  const cuotaKey = cuotasMap[selectedCuota];
+  // Si showAllData está activo y hay una cuota seleccionada desde el selector, usar esa
+  let cuotaKeyToUse = cuotasMap[selectedCuota];
+  if (showAllData && selectedCuotaHome) {
+    cuotaKeyToUse = selectedCuotaHome;
+  }
+  
   let cuotaValue = null;
 
   // Validar y procesar cuota seleccionada (MANTENER LÓGICA ORIGINAL)
-  if (cuotaKey && product[cuotaKey] && product[cuotaKey] !== 'NO') {
+  if (cuotaKeyToUse && product[cuotaKeyToUse] && product[cuotaKeyToUse] !== 'NO') {
     try {
-      cuotaValue = parseFloat(product[cuotaKey].replace(/[^0-9.-]/g, '')) || null;
+      cuotaValue = parseFloat(product[cuotaKeyToUse].replace(/[^0-9.-]/g, '')) || null;
     } catch {
       cuotaValue = null;
     }
@@ -95,11 +111,28 @@ const ModernProductCardAirbnb = ({
 
   const SHIPPING_COST = 18697;
 
-  // Determinar precio final según el contexto (MANTENER LÓGICA ORIGINAL)
-  const precioFinal = isContado
-    ? (precioNegocio || 0) + (sumarEnvio && aplicaEnvio ? SHIPPING_COST : 0)
-    : (cuotaValue || parseFloat(product.psvp_lista?.replace(/[^0-9.-]/g, '')) || 0) +
+  // Determinar precio final según el contexto - ACTUALIZADO para recalcular cuando cambia selectedCuotaHome
+  // Recalcular cuotaValue cuando cambia selectedCuotaHome
+  const cuotaValueDynamic = useMemo(() => {
+    if (showAllData && selectedCuotaHome && product[selectedCuotaHome] && product[selectedCuotaHome] !== 'NO') {
+      try {
+        return parseFloat(product[selectedCuotaHome].replace(/[^0-9.-]/g, '')) || null;
+      } catch {
+        return null;
+      }
+    }
+    return cuotaValue;
+  }, [showAllData, selectedCuotaHome, product, cuotaValue]);
+
+  const precioFinal = useMemo(() => {
+    if (isContado) {
+      return (precioNegocio || 0) + (sumarEnvio && aplicaEnvio ? SHIPPING_COST : 0);
+    }
+    
+    // Usar cuotaValueDynamic que se recalcula cuando cambia selectedCuotaHome
+    return (cuotaValueDynamic || parseFloat(product.psvp_lista?.replace(/[^0-9.-]/g, '')) || 0) +
       (sumarEnvio && aplicaEnvio ? SHIPPING_COST : 0);
+  }, [isContado, precioNegocio, sumarEnvio, aplicaEnvio, cuotaValueDynamic, product]);
 
   // Manejo del modal de imagen con zoom
   const handleImageClick = () => {
@@ -114,14 +147,6 @@ const ModernProductCardAirbnb = ({
     setImagePosition({ x: 0, y: 0 });
   };
 
-  const handleWheel = (e) => {
-    if (imageModalOpen) {
-      e.preventDefault();
-      const delta = e.deltaY > 0 ? -0.1 : 0.1;
-      setImageZoom((prev) => Math.max(1, Math.min(3, prev + delta)));
-    }
-  };
-
   // Manejo de pinch-to-zoom para mobile
   const handleTouchStart = (e) => {
     if (e.touches.length === 2) {
@@ -132,7 +157,6 @@ const ModernProductCardAirbnb = ({
         touch2.clientY - touch1.clientY
       );
       setLastTouchDistance(distance);
-      setTouchStart({ distance, centerX: (touch1.clientX + touch2.clientX) / 2, centerY: (touch1.clientY + touch2.clientY) / 2 });
     }
   };
 
@@ -154,56 +178,130 @@ const ModernProductCardAirbnb = ({
 
   const handleTouchEnd = () => {
     setLastTouchDistance(null);
-    setTouchStart(null);
   };
 
   useEffect(() => {
-    if (imageModalOpen) {
-      window.addEventListener('wheel', handleWheel, { passive: false });
-      return () => window.removeEventListener('wheel', handleWheel);
-    }
+    if (!imageModalOpen) return;
+    
+    const handleWheel = (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      setImageZoom((prev) => Math.max(1, Math.min(3, prev + delta)));
+    };
+    
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    return () => window.removeEventListener('wheel', handleWheel);
   }, [imageModalOpen]);
 
-  // Cargar favoritos desde localStorage al montar
+  // Función helper para verificar si un producto está en favoritos
+  const checkIfFavorite = (favList, product) => {
+    if (!favList || !Array.isArray(favList)) return false;
+    return favList.some(fav => {
+      // Comparar por id o codigo (el que exista)
+      if (product.id && fav.id) {
+        return String(fav.id) === String(product.id);
+      }
+      if (product.codigo && fav.codigo) {
+        return String(fav.codigo) === String(product.codigo);
+      }
+      return false;
+    });
+  };
+
+  // Cargar favoritos desde localStorage al montar y sincronizar
   useEffect(() => {
-    const savedFavorites = localStorage.getItem('favorites');
-    if (savedFavorites) {
+    const loadFavorites = () => {
       try {
-        const favorites = JSON.parse(savedFavorites);
-        const isProductFavorite = favorites.some(fav => fav.id === product.id || fav.codigo === product.codigo);
-        setIsFavorite(isProductFavorite);
+        const savedFavorites = localStorage.getItem('favorites');
+        if (savedFavorites) {
+          const favorites = JSON.parse(savedFavorites);
+          // Eliminar duplicados por id o codigo
+          const uniqueFavorites = favorites.filter((fav, index, self) =>
+            index === self.findIndex(f => 
+              (f.id && fav.id && String(f.id) === String(fav.id)) ||
+              (f.codigo && fav.codigo && String(f.codigo) === String(fav.codigo))
+            )
+          );
+          
+          // Si había duplicados, actualizar localStorage
+          if (uniqueFavorites.length !== favorites.length) {
+            localStorage.setItem('favorites', JSON.stringify(uniqueFavorites));
+          }
+          
+          const isProductFavorite = checkIfFavorite(uniqueFavorites, product);
+          setIsFavorite(isProductFavorite);
+        } else {
+          setIsFavorite(false);
+        }
       } catch (error) {
         console.error('Error loading favorites:', error);
+        setIsFavorite(false);
       }
-    }
-  }, [product.id, product.codigo]);
+    };
 
-  // Manejar toggle de favoritos
+    loadFavorites();
+    
+    // Escuchar cambios en localStorage desde otras pestañas/ventanas
+    const handleStorageChange = (e) => {
+      if (e.key === 'favorites') {
+        loadFavorites();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.id, product.codigo]); // Solo necesitamos id y codigo, no el objeto completo
+
+  // Manejar toggle de favoritos - CORREGIDO para evitar duplicados
   const handleToggleFavorite = (e) => {
     e.stopPropagation(); // Evitar que se abra el modal de imagen
     
-    const savedFavorites = localStorage.getItem('favorites');
-    let favorites = savedFavorites ? JSON.parse(savedFavorites) : [];
-    
-    const existingIndex = favorites.findIndex(fav => 
-      (fav.id && fav.id === product.id) || (fav.codigo && fav.codigo === product.codigo)
-    );
+    try {
+      const savedFavorites = localStorage.getItem('favorites');
+      let favorites = savedFavorites ? JSON.parse(savedFavorites) : [];
+      
+      // Eliminar duplicados existentes antes de agregar/quitar
+      favorites = favorites.filter((fav, index, self) =>
+        index === self.findIndex(f => 
+          (f.id && fav.id && String(f.id) === String(fav.id)) ||
+          (f.codigo && fav.codigo && String(f.codigo) === String(fav.codigo))
+        )
+      );
+      
+      const isCurrentlyFavorite = checkIfFavorite(favorites, product);
+      
+      if (isCurrentlyFavorite) {
+        // Eliminar de favoritos - comparación robusta
+        favorites = favorites.filter(fav => {
+          if (product.id && fav.id) {
+            return String(fav.id) !== String(product.id);
+          }
+          if (product.codigo && fav.codigo) {
+            return String(fav.codigo) !== String(product.codigo);
+          }
+          return true; // Mantener si no coincide
+        });
+        setIsFavorite(false);
+      } else {
+        // Agregar a favoritos - asegurar que no esté ya
+        if (!checkIfFavorite(favorites, product)) {
+          favorites.push(product);
+          setIsFavorite(true);
+        }
+      }
 
-    if (existingIndex >= 0) {
-      // Eliminar de favoritos
-      favorites = favorites.filter((_, index) => index !== existingIndex);
-      setIsFavorite(false);
-    } else {
-      // Agregar a favoritos
-      favorites.push(product);
-      setIsFavorite(true);
-    }
-
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-    
-    // Llamar al callback si existe (para notificaciones, etc.)
-    if (onToggleFavorite) {
-      onToggleFavorite(product, !isFavorite);
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      
+      // Disparar evento personalizado para sincronizar entre componentes
+      window.dispatchEvent(new CustomEvent('favoritesUpdated', { detail: favorites }));
+      
+      // Llamar al callback si existe (para notificaciones, etc.)
+      if (onToggleFavorite) {
+        onToggleFavorite(product, !isCurrentlyFavorite);
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
     }
   };
 
@@ -307,6 +405,22 @@ const ModernProductCardAirbnb = ({
               zIndex: 2,
             }}
           >
+            {/* Oferta relámpago - Administrable desde datos */}
+            {product.oferta_relampago && 
+             (product.oferta_relampago === 'si' || product.oferta_relampago === 'Sí' || product.oferta_relampago === true) && (
+              <Chip
+                label="⚡ Oferta relámpago"
+                size="small"
+                sx={{
+                  backgroundColor: '#FF6B35',
+                  color: 'white',
+                  fontWeight: 700,
+                  fontSize: '0.7rem',
+                  boxShadow: '0 2px 4px rgba(255, 107, 53, 0.3)',
+                }}
+              />
+            )}
+            
             {isNew && (
               <Chip
                 label="Nuevo"
@@ -404,13 +518,13 @@ const ModernProductCardAirbnb = ({
           )}
         </Box>
 
-        {/* Contenido - Estilo minimalista */}
+        {/* Contenido - Estilo minimalista - Espacios reducidos */}
         <CardContent
           sx={{
-            padding: { xs: '16px', sm: '20px' },
+            padding: { xs: '12px', sm: '16px' }, // Reducido de 16px/20px
             display: 'flex',
             flexDirection: 'column',
-            gap: 1, // Reducido de 1.5 a 1 para acercar elementos
+            gap: 0.5, // Reducido de 1 a 0.5 para acercar elementos aún más
           }}
         >
           {/* Línea del producto */}
@@ -418,11 +532,11 @@ const ModernProductCardAirbnb = ({
             variant="caption"
             sx={{
               color: '#717171',
-              fontSize: '0.875rem',
+              fontSize: '0.75rem', // Reducido de 0.875rem
               fontWeight: 500,
               textTransform: 'uppercase',
               letterSpacing: '0.5px',
-              marginBottom: 0.5, // Reducido para acercar al título
+              marginBottom: 0.25, // Reducido de 0.5 a 0.25
             }}
           >
             Línea {product.linea}
@@ -432,24 +546,24 @@ const ModernProductCardAirbnb = ({
           <Typography
             variant="h6"
             sx={{
-              fontSize: { xs: '1.25rem', sm: '1.375rem' }, // Aumentado de 1.125/1.25 a 1.25/1.375
+              fontSize: { xs: '1.125rem', sm: '1.25rem' }, // Reducido ligeramente
               fontWeight: 700,
               color: '#222222',
-              lineHeight: 1.3,
+              lineHeight: 1.2, // Reducido de 1.3 a 1.2
               display: '-webkit-box',
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
-              marginBottom: 0, // Sin margen inferior para acercar más
-              marginTop: 0, // Eliminado margen superior para acercar más a línea
-              minHeight: { xs: '3.2rem', sm: '3.6rem' }, // Ajustado por el tamaño mayor
+              marginBottom: 0,
+              marginTop: 0,
+              minHeight: { xs: '2.7rem', sm: '3rem' }, // Reducido
             }}
           >
             {product.descripcion}
           </Typography>
 
           {/* Precio destacado */}
-          <Box sx={{ marginTop: 0 }}> {/* Sin margen superior para acercar máximo */}
+          <Box sx={{ marginTop: 0.25 }}> {/* Mínimo margen para separar del título */}
             {isContado ? (
               <Box>
                 <Typography
@@ -475,18 +589,20 @@ const ModernProductCardAirbnb = ({
                   {formatPrice(precioFinal)}
                 </Typography>
               </Box>
-            ) : selectedCuota && cuotaValue ? (
+            ) : (selectedCuota || (showAllData && selectedCuotaHome)) && cuotaValueDynamic ? (
               <Box>
                 <Typography
                   variant="caption"
                   sx={{
                     color: '#717171',
-                    fontSize: '0.875rem',
+                    fontSize: '0.75rem', // Reducido de 0.875rem
                     display: 'block',
-                    marginBottom: 0.5,
+                    marginBottom: 0.25, // Reducido de 0.5
                   }}
                 >
-                  {selectedCuota}
+                  {showAllData && selectedCuotaHome
+                    ? `${selectedCuotaHome.match(/\d+/)?.[0] || ''} cuotas sin interés`
+                    : selectedCuota || 'Cuota'}
                 </Typography>
                 <Typography
                   variant="h5"
@@ -498,6 +614,32 @@ const ModernProductCardAirbnb = ({
                   }}
                 >
                   {formatPrice(precioFinal)}
+                </Typography>
+              </Box>
+            ) : showAllData && precioNegocio ? (
+              // Cuando showAllData está activo y no hay cuota seleccionada, mostrar precio de negocio
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: '#717171',
+                    fontSize: '0.875rem',
+                    display: 'block',
+                    marginBottom: 0.5,
+                  }}
+                >
+                  Precio de Negocio
+                </Typography>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontSize: { xs: '1.5rem', sm: '1.75rem' },
+                    fontWeight: 800,
+                    color: '#222222',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {formatPrice(precioNegocio)}
                 </Typography>
               </Box>
             ) : (
@@ -528,19 +670,166 @@ const ModernProductCardAirbnb = ({
             )}
           </Box>
 
+          {/* Logos de bancos - Nueva lógica por catálogo */}
+          {bankLogos && bankLogos.length > 0 ? (
+            <BankLogosRow bankLogos={bankLogos} maxVisible={4} />
+          ) : bankPromo ? (
+            // Fallback al badge antiguo si no hay logos nuevos
+            <BankPromoBadge bankPromo={bankPromo} />
+          ) : null}
+
+          {/* Sección de datos adicionales cuando showAllData es true */}
+          {showAllData && (
+            <Box
+              sx={{
+                marginTop: 1.5,
+                padding: 2,
+                backgroundColor: '#F9F9F9',
+                borderRadius: 2,
+                border: '1px solid rgba(0,0,0,0.08)',
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  color: '#717171',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  marginBottom: 1.5,
+                  display: 'block',
+                }}
+              >
+                Información del Producto
+              </Typography>
+
+              {/* Precio de Negocio */}
+              {product.precio_negocio && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: '#222222',
+                    fontSize: '0.875rem',
+                    marginBottom: 1,
+                  }}
+                >
+                  Precio de Negocio: <strong>{formatPrice(parsePrice(product.precio_negocio))}</strong>
+                </Typography>
+              )}
+
+              {/* PSVP Lista */}
+              {product.psvp_lista && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: '#222222',
+                    fontSize: '0.875rem',
+                    marginBottom: 1,
+                  }}
+                >
+                  PSVP Lista: <strong>{formatPrice(parsePrice(product.psvp_lista))}</strong>
+                </Typography>
+              )}
+
+              {/* Puntos */}
+              {product.puntos && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: '#222222',
+                    fontSize: '0.875rem',
+                    marginBottom: 1,
+                  }}
+                >
+                  Puntos: <strong>{product.puntos}</strong>
+                </Typography>
+              )}
+
+              {/* Precio Preferencial */}
+              {product.precio_preferencial && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: '#222222',
+                    fontSize: '0.875rem',
+                    marginBottom: 1.5,
+                  }}
+                >
+                  Precio Preferencial: <strong style={{ color: '#FF385C' }}>{formatPrice(parsePrice(product.precio_preferencial))}</strong>
+                </Typography>
+              )}
+
+              <Divider sx={{ my: 1.5 }} />
+
+              {/* Selector de cuotas - Todas las cuotas disponibles */}
+              <FormControl fullWidth sx={{ marginTop: 1 }}>
+                <InputLabel sx={{ fontSize: '0.875rem' }}>Selecciona una cuota</InputLabel>
+                <Select
+                  value={selectedCuotaHome || ''}
+                  onChange={(e) => {
+                    setSelectedCuotaHome(e.target.value);
+                  }}
+                  label="Selecciona una cuota"
+                  sx={{ fontSize: '0.875rem' }}
+                >
+                  {[
+                    'veinticuatro_sin_interes',
+                    'veinte_sin_interes',
+                    'dieciocho_sin_interes',
+                    'doce_sin_interes',
+                    'catorce_sin_interes',
+                    'diez_sin_interes',
+                    'nueve_sin_interes',
+                    'seis_sin_interes',
+                    'tres_sin_interes',
+                  ].map((cuotaKey) => {
+                    const cuotaValue = product[cuotaKey];
+                    if (!cuotaValue || cuotaValue === 'NO') return null;
+                    const parsedValue = parsePrice(cuotaValue);
+                    if (parsedValue <= 0) return null;
+                    
+                    const cuotaNumero = cuotaKey.match(/\d+/);
+                    const label = cuotaNumero
+                      ? `${cuotaNumero[0]} cuotas sin interés`
+                      : cuotaKey.replace(/_/g, ' ');
+                    
+                    return (
+                      <MenuItem key={cuotaKey} value={cuotaKey}>
+                        {label} de {formatPrice(parsedValue)}
+                      </MenuItem>
+                    );
+                  }).filter(Boolean)}
+                </Select>
+              </FormControl>
+            </Box>
+          )}
+
           {/* Botones de acción - Mejor alineados y proporcionales */}
           <Box
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              gap: 1.5,
-              marginTop: 2,
+              gap: 1, // Reducido de 1.5 a 1
+              marginTop: 1, // Reducido de 2 a 1
             }}
           >
             <Button
               fullWidth
               variant="contained"
-              onClick={() => onAddToCart(product)}
+              onClick={() => {
+                // Si hay cuota seleccionada en Home, incluirla en el producto
+                const productToAdd = showAllData && selectedCuotaHome 
+                  ? { 
+                      ...product, 
+                      selectedCuotaKey: selectedCuotaHome,
+                      selectedCuotaValue: cuotaValueDynamic || cuotaValue,
+                      selectedCuotaLabel: `${selectedCuotaHome.match(/\d+/)?.[0] || ''} cuotas sin interés`
+                    }
+                  : product;
+                onAddToCart(productToAdd);
+              }}
+              disabled={showAllData && !selectedCuotaHome && !precioNegocio}
               sx={{
                 backgroundColor: '#222222',
                 color: 'white',
@@ -554,10 +843,16 @@ const ModernProductCardAirbnb = ({
                   backgroundColor: '#000000',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                 },
+                '&:disabled': {
+                  backgroundColor: '#cccccc',
+                  color: '#888888',
+                },
                 transition: 'all 0.3s ease',
               }}
             >
-              Agregar al carrito
+              {showAllData && !selectedCuotaHome && !precioNegocio 
+                ? 'Selecciona una cuota' 
+                : 'Agregar al carrito'}
             </Button>
 
             <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'stretch' }}>

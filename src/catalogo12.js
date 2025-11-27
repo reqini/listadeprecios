@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React, { useEffect, useState, useMemo } from "react";
+import { filterProducts, normalizeString } from "./utils/searchUtils";
 import axios from "./utils/axios";
 import Container from "@mui/material/Container";
 import Skeleton from "@mui/material/Skeleton";
@@ -8,10 +9,13 @@ import { Helmet } from "react-helmet";
 import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
 import StickySearchBar from "./components/StickySearchBar";
 import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
+import Navbar from "./components/Navbar";
 import { Snackbar, Alert, Typography, Box } from "@mui/material";
 import { trackCatalogView, trackCatalogSearch, trackAddToCart, trackToggleFavorite } from "./utils/analytics";
+import { useAuth } from "./AuthContext";
 
 const Catalogo12 = () => {
+  const { logout } = useAuth();
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
@@ -23,6 +27,7 @@ const Catalogo12 = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [bankLogos, setBankLogos] = useState([]); // Logos de bancos para promociones
   const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
 
 
@@ -76,19 +81,45 @@ const Catalogo12 = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Cargar logos de bancos por catálogo (nueva lógica)
+  useEffect(() => {
+    const loadBankLogos = async () => {
+      try {
+        const { getBankLogosForCatalogo } = await import('./utils/catalogoPromosAPI');
+        const logos = await getBankLogosForCatalogo('/catalogo12');
+        setBankLogos(logos);
+      } catch (error) {
+        console.warn('No se pudieron cargar logos de bancos para catálogo12:', error);
+        setBankLogos([]);
+      }
+    };
+    
+    loadBankLogos();
+    
+    // Escuchar actualizaciones de promos
+    const handlePromosUpdate = () => {
+      loadBankLogos();
+    };
+    window.addEventListener('catalogoPromosUpdated', handlePromosUpdate);
+    return () => window.removeEventListener('catalogoPromosUpdated', handlePromosUpdate);
+  }, []);
+
   const cuotasMap = useMemo(() => ({
     "12 cuotas sin interés": 'doce_sin_interes',
   }), []);
 
   useEffect(() => {
-    let productosFiltrados = productos.filter((producto) =>
-      (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
-      (producto?.linea || '').toLowerCase() !== 'repuestos'
+    // Filtrar por búsqueda y vigencia (excluyendo repuestos)
+    let productosFiltrados = filterProducts(productos, filtro, true).filter(
+      (producto) => normalizeString(producto?.linea) !== 'repuestos'
     );
     
     // GA: búsqueda
-    trackCatalogSearch("Catálogo 12", filtro);
+    if (filtro) {
+      trackCatalogSearch("Catálogo 12", filtro);
+    }
 
+    // Filtrar por cuotas disponibles
     if (cuotasMap["12 cuotas sin interés"]) {
       const cuotaKey = cuotasMap["12 cuotas sin interés"];
       productosFiltrados = productosFiltrados.filter(
@@ -99,7 +130,25 @@ const Catalogo12 = () => {
   }, [filtro, productos, cuotasMap]);
 
   const addToCart = (product) => {
-    setCart([...cart, product]);
+    setCart((prevCart) => {
+      // Buscar si el producto ya existe en el carrito (por código)
+      const existingIndex = prevCart.findIndex(
+        (item) => item.codigo === product.codigo
+      );
+      
+      if (existingIndex >= 0) {
+        // Si existe, incrementar la cantidad
+        const updatedCart = [...prevCart];
+        updatedCart[existingIndex] = {
+          ...updatedCart[existingIndex],
+          cantidad: (updatedCart[existingIndex].cantidad || 1) + 1,
+        };
+        return updatedCart;
+      } else {
+        // Si no existe, agregarlo con cantidad 1
+        return [...prevCart, { ...product, cantidad: 1 }];
+      }
+    });
     // GA: agregar al carrito
     trackAddToCart("Catálogo 12", product);
   };
@@ -141,8 +190,15 @@ const Catalogo12 = () => {
       <Helmet>
         <title>Catálogo 12 Cuotas - Catálogo</title>
       </Helmet>
+
+      {/* Header siempre visible */}
+      <Navbar
+        title="Catálogo 12 Cuotas"
+        onLogout={logout}
+        user={{ username: localStorage.getItem("activeSession") || "" }}
+      />
       
-      {/* Buscador sticky moderno */}
+      {/* Buscador sticky moderno fixed top: 0 */}
       <StickySearchBar
         value={filtro}
         onChange={(e) => {
@@ -156,7 +212,7 @@ const Catalogo12 = () => {
         maxWidth="lg" 
         className="conteiner-list"
         sx={{
-          paddingTop: { xs: 1, sm: 2 }, // Reducido porque el buscador ya tiene spacer
+          paddingTop: { xs: 12, sm: 13 }, // Espacio para header (~64px) + search bar fixed (~80px)
           paddingBottom: { xs: 4, sm: 5 },
         }}
       >
@@ -236,6 +292,7 @@ const Catalogo12 = () => {
                 isNew={false}
                 isBestSeller={false}
                 stockLow={false}
+                bankLogos={bankLogos}
               />
             ))}
           </Box>

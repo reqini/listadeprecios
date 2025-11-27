@@ -45,12 +45,17 @@ const PrivateRoute = ({ children }) => {
 // 🔐 Ruta de administrador (solo cocinaty)
 const AdminRoute = ({ children }) => {
   const { auth } = useAuth();
+  const username = localStorage.getItem('activeSession');
+  
   if (!auth?.token) {
     return <Navigate to="/login" replace />;
   }
-  if (auth?.username !== 'cocinaty') {
+  
+  // Verificar username desde localStorage
+  if (username !== 'cocinaty') {
     return <Navigate to="/home" replace />;
   }
+  
   return children;
 };
 

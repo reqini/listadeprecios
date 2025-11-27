@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { TextField, Box, InputAdornment } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { styled } from '@mui/material/styles';
 
 /**
- * Buscador sticky estilo Airbnb - SIEMPRE FIXED Y VISIBLE
+ * Buscador fixed estilo Airbnb - SIEMPRE FIXED EN TOP: 0
  * Diseño moderno y elegante, siempre visible en la parte superior
  */
 const StickySearchBar = ({ value, onChange, placeholder = "Buscar Producto" }) => {
@@ -15,11 +15,10 @@ const StickySearchBar = ({ value, onChange, placeholder = "Buscar Producto" }) =
     top: 0,
     left: 0,
     right: 0,
-    zIndex: 999, // Menor que el carrito (1000) pero mayor que otros elementos
+    zIndex: 999, // Debajo del carrito (1000)
     padding: theme.spacing(1.5, 2),
-    backgroundColor: 'rgba(255, 255, 255, 0.98)',
-    backdropFilter: 'blur(20px)',
-    boxShadow: '0 2px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04)',
+    backgroundColor: '#fff',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.08)',
     borderBottom: '1px solid rgba(0,0,0,0.06)',
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   }));
@@ -36,7 +35,7 @@ const StickySearchBar = ({ value, onChange, placeholder = "Buscar Producto" }) =
       {/* Spacer para que el contenido no quede debajo del buscador fixed */}
       <Box
         sx={{
-          height: { xs: '88px', sm: '88px' }, // Altura del buscador fixed
+          height: { xs: '80px', sm: '80px' }, // Altura del buscador fixed
         }}
       />
       
@@ -48,6 +47,12 @@ const StickySearchBar = ({ value, onChange, placeholder = "Buscar Producto" }) =
             onChange={onChange}
             placeholder={placeholder}
             variant="outlined"
+            autoComplete="off"
+            inputProps={{
+              autoCapitalize: 'off',
+              autoCorrect: 'off',
+              spellCheck: 'false',
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">

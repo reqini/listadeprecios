@@ -375,18 +375,19 @@ const BusquedaIA = () => {
       
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 600 }}>
-            Buscador Inteligente Essen
+          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 600, mb: 1 }}>
+            Buscador inteligente de contenido Essen
           </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            Encuentra videos, PDFs, imágenes y más material de productos Essen usando inteligencia artificial
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: 600, mx: 'auto' }}>
+            Encontrá ideas reales y contenido gratuito basado en productos Essen.
+            Los resultados se basan en contenido real y gratuito disponible sobre Essen.
           </Typography>
           
           <Box sx={{ display: 'flex', gap: 2, maxWidth: 600, mx: 'auto' }}>
             <TextField
               fullWidth
               variant="outlined"
-              placeholder="Ej: Sartén Express, Cacerola, Wok..."
+              placeholder="Buscá recetas, tips y artículos reales de Essen..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={handleKeyPress}
@@ -399,7 +400,7 @@ const BusquedaIA = () => {
               size="large"
               onClick={handleSearch}
               disabled={!searchTerm.trim() || loading}
-              startIcon={loading ? <CircularProgress size={20} /> : <SearchIcon />}
+              startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SearchIcon />}
               sx={{ minWidth: 120 }}
             >
               {loading ? 'Buscando...' : 'Buscar'}
@@ -414,16 +415,24 @@ const BusquedaIA = () => {
         )}
 
         {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-            <CircularProgress size={60} />
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 6 }}>
+            <CircularProgress size={60} sx={{ mb: 2 }} />
+            <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
+              Buscando ideas en el mundo Essen...
+            </Typography>
           </Box>
         )}
 
         {searchResults.length > 0 && !loading && (
           <>
-            <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
-              Resultados para "{searchTerm}" ({searchResults.length} encontrados)
-            </Typography>
+            <Box sx={{ mb: 3, pb: 2, borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                Resultados para "{searchTerm}" ({searchResults.length} encontrados)
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                Los resultados se basan en contenido real y gratuito disponible sobre Essen.
+              </Typography>
+            </Box>
             
             <Grid container spacing={3}>
               {searchResults.map(renderMediaCard)}
@@ -432,29 +441,52 @@ const BusquedaIA = () => {
         )}
 
         {searchResults.length === 0 && !loading && searchTerm && (
-          <Box sx={{ textAlign: 'center', py: 4 }}>
-            <Typography variant="h6" color="text.secondary">
-              No se encontraron resultados para "{searchTerm}"
+          <Box sx={{ textAlign: 'center', py: 6, maxWidth: 600, mx: 'auto' }}>
+            <Typography variant="h6" color="text.secondary" gutterBottom sx={{ mb: 2 }}>
+              No encontramos nada con ese término
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Intenta con otros términos de búsqueda
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Probá buscando por nombre de pieza, tipo de receta o categoría (ej: sartén, wok, horno, dulce, salado).
             </Typography>
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', flexWrap: 'wrap', mt: 3 }}>
+              {['Recetas con Sartén Essen', 'Ideas para Cacerola 24cm', 'Postres en Essen', 'Platos salados Essen'].map((suggestion) => {
+                const searchTermClean = suggestion.replace(/^(Recetas con |Ideas para |Postres en |Platos salados )/i, '');
+                return (
+                  <Chip
+                    key={suggestion}
+                    label={suggestion}
+                    onClick={() => {
+                      setSearchTerm(searchTermClean);
+                      performSearch(searchTermClean.trim());
+                    }}
+                    variant="outlined"
+                    sx={{ cursor: 'pointer', '&:hover': { backgroundColor: 'rgba(0,0,0,0.05)' } }}
+                  />
+                );
+              })}
+            </Box>
           </Box>
         )}
 
         {!searchTerm && !loading && (
-          <Box sx={{ textAlign: 'center', py: 4 }}>
-            <Typography variant="h6" color="text.secondary" gutterBottom>
-              💡 Sugerencias de búsqueda
+          <Box sx={{ textAlign: 'center', py: 6, maxWidth: 600, mx: 'auto' }}>
+            <Typography variant="h6" color="text.secondary" gutterBottom sx={{ mb: 1 }}>
+              💡 ¿Qué podés buscar?
             </Typography>
-            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', flexWrap: 'wrap', mt: 2 }}>
-              {['Sartén Express', 'Cacerola 24cm', 'Wok Essen', 'Plancha Grill', 'Olla Express'].map((suggestion) => (
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Buscá por nombre de pieza, tipo de receta o categoría
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', flexWrap: 'wrap', mt: 3 }}>
+              {['Sartén Express', 'Cacerola 24cm', 'Wok Essen', 'Plancha Grill', 'Olla Express', 'Recetas dulces', 'Recetas saladas'].map((suggestion) => (
                 <Chip
                   key={suggestion}
                   label={suggestion}
-                  onClick={() => setSearchTerm(suggestion)}
+                  onClick={() => {
+                    setSearchTerm(suggestion);
+                    performSearch(suggestion.trim());
+                  }}
                   variant="outlined"
-                  sx={{ cursor: 'pointer' }}
+                  sx={{ cursor: 'pointer', '&:hover': { backgroundColor: 'rgba(0,0,0,0.05)' } }}
                 />
               ))}
             </Box>

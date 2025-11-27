@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React, { useEffect, useState, useMemo } from "react";
+import { filterProducts, normalizeString } from "./utils/searchUtils";
 import axios from "./utils/axios";
 import Container from "@mui/material/Container";
 import Skeleton from "@mui/material/Skeleton";
@@ -8,10 +9,13 @@ import { Helmet } from "react-helmet";
 import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
 import StickySearchBar from "./components/StickySearchBar";
 import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
+import Navbar from "./components/Navbar";
 import { Snackbar, Alert, Typography, Box } from "@mui/material";
 import { trackCatalogView, trackCatalogSearch, trackAddToCart, trackToggleFavorite } from "./utils/analytics";
+import { useAuth } from "./AuthContext";
 
 const Catalogo6 = () => {
+  const { logout } = useAuth();
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
@@ -23,6 +27,7 @@ const Catalogo6 = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [bankLogos, setBankLogos] = useState([]); // Logos de bancos para promociones
 
   const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
 
@@ -84,15 +89,41 @@ const Catalogo6 = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Cargar logos de bancos por catálogo (nueva lógica)
   useEffect(() => {
-    let productosFiltrados = productos.filter((producto) =>
-      (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
-      (producto?.linea || '').toLowerCase() !== 'repuestos'
+    const loadBankLogos = async () => {
+      try {
+        const { getBankLogosForCatalogo } = await import('./utils/catalogoPromosAPI');
+        const logos = await getBankLogosForCatalogo('/catalogo6');
+        setBankLogos(logos);
+      } catch (error) {
+        console.warn('No se pudieron cargar logos de bancos para catálogo6:', error);
+        setBankLogos([]);
+      }
+    };
+    
+    loadBankLogos();
+    
+    // Escuchar actualizaciones de promos
+    const handlePromosUpdate = () => {
+      loadBankLogos();
+    };
+    window.addEventListener('catalogoPromosUpdated', handlePromosUpdate);
+    return () => window.removeEventListener('catalogoPromosUpdated', handlePromosUpdate);
+  }, []);
+
+  useEffect(() => {
+    // Filtrar por búsqueda y vigencia (excluyendo repuestos)
+    let productosFiltrados = filterProducts(productos, filtro, true).filter(
+      (producto) => normalizeString(producto?.linea) !== 'repuestos'
     );
 
     // GA: búsqueda
-    trackCatalogSearch("Catálogo 6", filtro);
+    if (filtro) {
+      trackCatalogSearch("Catálogo 6", filtro);
+    }
 
+    // Filtrar por cuotas disponibles
     if (cuotasMap["6 cuotas sin interés"]) {
       const cuotaKey = cuotasMap["6 cuotas sin interés"];
       productosFiltrados = productosFiltrados.filter(
@@ -104,7 +135,25 @@ const Catalogo6 = () => {
   }, [filtro, productos, cuotasMap]);
 
   const addToCart = (product) => {
-    setCart([...cart, product]);
+    setCart((prevCart) => {
+      // Buscar si el producto ya existe en el carrito (por código)
+      const existingIndex = prevCart.findIndex(
+        (item) => item.codigo === product.codigo
+      );
+      
+      if (existingIndex >= 0) {
+        // Si existe, incrementar la cantidad
+        const updatedCart = [...prevCart];
+        updatedCart[existingIndex] = {
+          ...updatedCart[existingIndex],
+          cantidad: (updatedCart[existingIndex].cantidad || 1) + 1,
+        };
+        return updatedCart;
+      } else {
+        // Si no existe, agregarlo con cantidad 1
+        return [...prevCart, { ...product, cantidad: 1 }];
+      }
+    });
     // GA: agregar al carrito
     trackAddToCart("Catálogo 6", product);
   };
@@ -153,10 +202,17 @@ const Catalogo6 = () => {
       <Helmet>
         <title>Catálogo 6 Cuotas - Catálogo</title>
       </Helmet>
-      
-      {/* Buscador sticky moderno */}
+
+      {/* Header siempre visible */}
+      <Navbar
+        title="Catálogo 6 Cuotas"
+        onLogout={logout}
+        user={{ username: localStorage.getItem("activeSession") || "" }}
+      />
+
+      {/* Buscador sticky moderno fixed top: 0 */}
       <StickySearchBar
-        value={filtro}
+          value={filtro}
         onChange={(e) => {
           setFiltro(e.target.value);
           trackCatalogSearch("Catálogo 6", e.target.value);
@@ -168,7 +224,7 @@ const Catalogo6 = () => {
         maxWidth="lg" 
         className="conteiner-list"
         sx={{
-          paddingTop: { xs: 1, sm: 2 }, // Reducido porque el buscador ya tiene spacer
+          paddingTop: { xs: 12, sm: 13 }, // Espacio para header (~64px) + search bar fixed (~80px)
           paddingBottom: { xs: 4, sm: 5 },
         }}
       >
@@ -189,16 +245,16 @@ const Catalogo6 = () => {
             }}
           >
             {[...Array(6)].map((_, idx) => (
-              <Skeleton
-                key={idx}
-                variant="rectangular"
+            <Skeleton
+              key={idx}
+              variant="rectangular"
                 height={400}
                 sx={{
                   borderRadius: 3,
                   animation: 'wave',
                 }}
-              />
-            ))}
+            />
+          ))}
           </Box>
         </Box>
       )}
@@ -235,6 +291,7 @@ const Catalogo6 = () => {
               <ModernProductCardAirbnb
                 key={product.id || product.codigo}
                 product={product}
+                bankLogos={bankLogos}
                 onAddToCart={(prod) => {
                   addToCart(prod);
                   trackAddToCart("Catálogo 6", prod);
@@ -242,13 +299,13 @@ const Catalogo6 = () => {
                 onToggleFavorite={(prod, isFavorite) => {
                   toggleFavorite(prod);
                 }}
-                selectedCuota={'6 cuotas sin interés'}
+                  selectedCuota={'6 cuotas sin interés'}
                 isContado={false}
                 // Badges opcionales
                 isNew={false}
                 isBestSeller={false}
                 stockLow={false}
-              />
+                />
             ))}
           </Box>
         </Box>

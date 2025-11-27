@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { filterProducts } from "./utils/searchUtils";
 import axios from "./utils/axios";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {
@@ -20,15 +21,17 @@ import {
   MenuItem,
   Accordion,
   AccordionSummary,
-  AccordionDetails
+  AccordionDetails,
+  Box
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import Product from "./components/products";
-import ShoppingCart from "./components/cart";
+import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
+import StickySearchBarWithScroll from "./components/StickySearchBarWithScroll";
+import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
 import Navbar from "./components/Navbar";
 import ResponsiveDialog from "./components/dialog";
 import { useAuth } from "./AuthContext";
-import ReviewSlider from "./components/ReviewSlider"; // ajustá la ruta
+import ReviewSlider from "./components/ReviewSlider";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const Home = () => {
@@ -65,8 +68,8 @@ const Home = () => {
   const [extras, setExtras] = useState(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [loading, setLoading] = useState(true);
-  const [productos, setProductos] = useState([]);
-  const [filtro, setFiltro] = useState("");
+  const [productos, setProductos] = useState([]); // Lista ORIGINAL de productos - NUNCA modificar
+  const [searchTerm, setSearchTerm] = useState(""); // Estado SOLO para el input - independiente
   const [username, setUsername] = useState("");
   const [timeOfDay, setTimeOfDay] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -74,6 +77,7 @@ const Home = () => {
   const [cart, setCart] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [bankLogos, setBankLogos] = useState([]); // Logos de bancos para Home
 
   useEffect(() => {
     const handleScroll = () => {
@@ -100,10 +104,28 @@ const Home = () => {
   };
 
   const onAddToCart = (product) => {
-    setCart((prevCart) => [...prevCart, product]);
+    setCart((prevCart) => {
+      // Buscar si el producto ya existe en el carrito (por código)
+      const existingIndex = prevCart.findIndex(
+        (item) => item.codigo === product.codigo
+      );
+      
+      if (existingIndex >= 0) {
+        // Si existe, incrementar la cantidad
+        const updatedCart = [...prevCart];
+        updatedCart[existingIndex] = {
+          ...updatedCart[existingIndex],
+          cantidad: (updatedCart[existingIndex].cantidad || 1) + 1,
+        };
+        return updatedCart;
+      } else {
+        // Si no existe, agregarlo con cantidad 1
+        return [...prevCart, { ...product, cantidad: 1 }];
+      }
+    });
   };
 
-  const clearCart = () => setCart([]);
+  // clearCart removido - no se usa actualmente
 
   // Tu función original para determinar saludo según la hora
   const getTimeOfDay = useCallback(() => {
@@ -208,12 +230,45 @@ const Home = () => {
     fetchData("extras", setExtras);
   }, [sessionValid, fetchData]);
 
-  // Filtra tus productos
-const productosFiltrados = productos.filter(
-  (producto) =>
-    (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
-    producto?.vigencia === "SI"
-);
+  // Cargar logos de bancos para Home desde Google Sheets
+  useEffect(() => {
+    if (!sessionValid) return;
+    
+    const loadBankLogos = async () => {
+      try {
+        const { getBankLogosForCatalogo } = await import('./utils/catalogoPromosAPI');
+        const logos = await getBankLogosForCatalogo('/home');
+        setBankLogos(logos);
+      } catch (error) {
+        console.warn('No se pudieron cargar logos de bancos para Home:', error);
+        setBankLogos([]);
+      }
+    };
+    
+    loadBankLogos();
+    
+    // Escuchar actualizaciones de promos
+    const handlePromosUpdate = () => {
+      loadBankLogos();
+    };
+    window.addEventListener('catalogoPromosUpdated', handlePromosUpdate);
+    return () => window.removeEventListener('catalogoPromosUpdated', handlePromosUpdate);
+  }, [sessionValid]);
+
+  // Filtrado DIRECTO desde searchTerm - SIN estados intermedios
+  // NO modifica productos original, solo filtra para render
+  const productosFiltrados = useMemo(() => {
+    // Si no hay productos, retornar vacío
+    if (!productos || productos.length === 0) return [];
+    
+    // Si no hay término de búsqueda, mostrar todos los productos vigentes
+    if (!searchTerm || !searchTerm.trim()) {
+      return productos.filter((producto) => producto?.vigencia === "SI");
+    }
+    
+    // Filtrar usando la función optimizada
+    return filterProducts(productos, searchTerm.trim(), true);
+  }, [productos, searchTerm]); // Dependencias: productos original y searchTerm
 
 
   // Cerrar snackbar
@@ -292,19 +347,26 @@ const productosFiltrados = productos.filter(
           </p>
         }
         onLogout={logout}
+        user={{ username: username || localStorage.getItem("activeSession") || "" }}
       />
-      <Container maxWidth="lg" className="conteiner-list">
-        <div className="header mar-b30 mar-t30 flex-center pad10">
-          <TextField
-            style={{ maxWidth: 450 }}
-            fullWidth
-            className="search"
-            label="Buscar Producto"
-            variant="outlined"
-            value={filtro}
-            onChange={(e) => setFiltro(e.target.value)}
-          />
-        </div>
+      {/* Buscador fixed en top: 0 */}
+      <StickySearchBarWithScroll
+        value={searchTerm}
+        onChange={(e) => {
+          // SOLO actualizar el estado del input - NADA MÁS
+          setSearchTerm(e.target.value);
+        }}
+        placeholder="Buscar Producto"
+      />
+
+      <Container 
+        maxWidth="lg" 
+        className="conteiner-list"
+        sx={{
+          paddingTop: { xs: 2, sm: 3 }, // Padding normal, search solo fixed al hacer scroll
+          paddingBottom: { xs: 4, sm: 5 },
+        }}
+      >
 
         {getBannerForRango()}
           <Accordion sx={{ marginBottom: 2, display: 'none' }}>
@@ -351,34 +413,103 @@ const productosFiltrados = productos.filter(
           </Button>
         </div>
 
-        <ul className="lista-prod w-100">
-          {loading ? (
-            [...Array(6)].map((_, index) => (
+        {/* Grid responsive estilo Airbnb - Moderno */}
+        {loading ? (
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(2, 1fr)',
+                lg: 'repeat(3, 1fr)',
+              },
+              gap: { xs: 3, sm: 3, md: 4 },
+            }}
+          >
+            {[...Array(6)].map((_, index) => (
               <Skeleton
                 key={index}
-                sx={{ height: 300, margin: 1 }}
-                animation="wave"
                 variant="rectangular"
-                className="grid-item"
+                height={500}
+                sx={{
+                  borderRadius: 3,
+                  animation: 'wave',
+                }}
               />
-            ))
-          ) : (
-            productosFiltrados.map((product) => (
-              <li className="grid-item" key={product.id}>
-                <Product
-                  product={product}
-                  cuotaType="sin_interes"
-                  onAddToCart={onAddToCart}
-                />
-              </li>
-            ))
-          )}
-        </ul>
-          <ShoppingCart
-            cart={cart}
-            setCart={setCart}
-            onClearCart={clearCart}
-          />
+            ))}
+          </Box>
+        ) : productosFiltrados.length === 0 && searchTerm && searchTerm.trim() !== '' ? (
+          <Box
+            sx={{
+              textAlign: 'center',
+              padding: { xs: 4, sm: 6 },
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                color: '#717171',
+                fontSize: { xs: '1.125rem', sm: '1.25rem' },
+                fontWeight: 500,
+                mb: 1,
+              }}
+            >
+              No se encontraron productos
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: '#999',
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+              }}
+            >
+              No hay productos que coincidan con "{searchTerm}". Intenta con otro término de búsqueda.
+            </Typography>
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr', // Mobile: 1 card por fila
+                sm: 'repeat(2, 1fr)', // Tablet: 2 columnas
+                md: 'repeat(2, 1fr)', // Desktop: 2 columnas
+                lg: 'repeat(3, 1fr)', // Large: 3 columnas
+              },
+              gap: { xs: 3, sm: 3, md: 4 },
+            }}
+          >
+            {productosFiltrados.map((product) => (
+              <ModernProductCardAirbnb
+                key={product.id || product.codigo}
+                product={product}
+                onAddToCart={(prod) => onAddToCart(prod)}
+                selectedCuota={null} // Sin cuota específica, se selecciona en el selector
+                isContado={false}
+                showAllData={true} // Mostrar TODOS los datos: precio negocio, PSVP, puntos, precio preferencial, todas las cuotas
+                // Badges opcionales desde datos
+                isNew={product.nuevo === 'si' || product.nuevo === true || product.nuevo === 'Sí'}
+                isBestSeller={product.mas_vendida === 'si' || product.mas_vendida === true || product.mas_vendida === 'Sí'}
+                stockLow={
+                  product.stock_actual && product.stock_total &&
+                  parseFloat(product.stock_actual) > 0 && parseFloat(product.stock_total) > 0 &&
+                  (parseFloat(product.stock_actual) / parseFloat(product.stock_total)) < 0.2
+                }
+                bankLogos={bankLogos} // Pasar logos de bancos desde Google Sheets
+              />
+            ))}
+          </Box>
+        )}
+
+        {/* Carrito moderno con bottom sheet */}
+        <ModernCartBottomSheet 
+          cart={cart} 
+          setCart={setCart} 
+          cuotaKey="tres_sin_interes" 
+          cuotasTexto="3 cuotas"
+        />
+        
         {/* Modal de promociones bancarias */}
         <ResponsiveDialog open={openDialog} onClose={handleCloseDialog} style={{display: 'none'}} />
 

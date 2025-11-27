@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -23,12 +23,14 @@ import {
 // import { Visibility, VisibilityOff } from "@mui/icons-material"; // Temporalmente oculto
 // import axios from "../utils/axios"; // Temporalmente oculto
 import { useNavigate, useLocation } from "react-router-dom";
+import { isCatalogRoute } from "../utils/isCatalogRoute";
 import Logo from '../assets/logo512.png'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MenuIcon from '@mui/icons-material/Menu';
 
 const Navbar = ({ user, onLogout, title }) => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   // Estados del modal de perfil - temporalmente ocultos
   // const [password, setPassword] = useState("");
   // const [edited, setEdited] = useState(false);
@@ -38,8 +40,27 @@ const Navbar = ({ user, onLogout, title }) => {
 
   // const theme = useTheme(); // Temporalmente oculto
   const location = useLocation();
+  const isCatalog = isCatalogRoute(location.pathname);
   // const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Temporalmente oculto
   const navigate = useNavigate(); // Hook para la navegación
+
+  // Detectar scroll solo si NO es catálogo
+  useEffect(() => {
+    if (isCatalog) {
+      setIsScrolled(false); // En catálogos siempre relative
+      return;
+    }
+
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      setIsScrolled(scrollTop > 100); // Cambiar a fixed después de 100px de scroll
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Verificar estado inicial
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isCatalog]);
 
   // Menú
   const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
@@ -78,10 +99,27 @@ const Navbar = ({ user, onLogout, title }) => {
   //   }
   // };
 
+  // Determinar posición según si es catálogo o no
+  const appBarPosition = isCatalog ? 'relative' : (isScrolled ? 'fixed' : 'relative');
+  const appBarZIndex = isCatalog ? 1 : (isScrolled ? 1000 : 1);
+  const appBarBoxShadow = isCatalog || !isScrolled ? 'none' : '0 2px 8px rgba(0,0,0,0.1)';
+
   return (
     <>
-      <AppBar position="static">
-        <Toolbar style={{fdisplay: 'flex', justifyContent: 'space-between'}}>
+      {/* Spacer solo cuando está fixed (no catálogo y scrolled) */}
+      {!isCatalog && isScrolled && (
+        <Box sx={{ height: { xs: '64px', sm: '64px' } }} />
+      )}
+      
+      <AppBar 
+        position={appBarPosition} 
+        sx={{ 
+          zIndex: appBarZIndex,
+          boxShadow: appBarBoxShadow,
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
+      >
+        <Toolbar style={{display: 'flex', justifyContent: 'space-between'}}>
           <div className="flex items-center">
               {location.pathname !== "/home" ? (
                 <IconButton size="small" color="secondary" onClick={() => navigate(-1)}>
@@ -203,6 +241,24 @@ const Navbar = ({ user, onLogout, title }) => {
             </MenuItem>
             <Divider></Divider>
             
+            {/* Panel de Administración - Solo para cocinaty */}
+            {(user?.username === 'cocinaty' || localStorage.getItem('activeSession') === 'cocinaty') && (
+              <>
+                <MenuItem
+                  onClick={() => {
+                    navigate("/administrador");
+                    handleMenuClose();
+                  }}
+                  disabled={location.pathname === "/administrador"}
+                >
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Typography fontWeight="bold">Panel de Administración</Typography>
+                    <Typography color="secondary" fontSize={12}>🔧 Admin</Typography>
+                  </Box>
+                </MenuItem>
+                <Divider></Divider>
+              </>
+            )}
             
             <MenuItem
               onClick={() => {

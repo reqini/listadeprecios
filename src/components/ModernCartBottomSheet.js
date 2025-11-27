@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Drawer,
   Box,
@@ -10,7 +10,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { FaWhatsapp, FaTrashAlt } from "react-icons/fa";
-import { Close as CloseIcon } from "@mui/icons-material";
+import { Close as CloseIcon, Add as AddIcon, Remove as RemoveIcon } from "@mui/icons-material";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { formatPrice, parsePrice } from "../utils/priceUtils";
 
@@ -29,24 +29,73 @@ const ModernCartBottomSheet = ({
   const [open, setOpen] = useState(false);
 
   const getCuotaSeleccionada = (product) => {
+    // Si el producto tiene una cuota seleccionada desde Home (selectedCuotaValue), usarla
+    if (product.selectedCuotaValue !== undefined && product.selectedCuotaValue !== null) {
+      return product.selectedCuotaValue;
+    }
+    
+    // Si tiene selectedCuotaKey, buscar el valor del producto
+    if (product.selectedCuotaKey && product[product.selectedCuotaKey]) {
+      const raw = product[product.selectedCuotaKey];
+      if (raw && typeof raw === "string" && raw.toLowerCase() !== "no") {
+        return parsePrice(raw);
+      }
+    }
+    
+    // Fallback: usar el cuotaKey por defecto
     const raw = product[cuotaKey];
     if (!raw || typeof raw !== "string" || raw.toLowerCase() === "no") return 0;
     return parsePrice(raw);
   };
 
   const calcularTotal = () => {
-    return cart.reduce((acc, item) => acc + getCuotaSeleccionada(item), 0);
+    return cart.reduce((acc, item) => {
+      const cantidad = item.cantidad || 1;
+      return acc + (getCuotaSeleccionada(item) * cantidad);
+    }, 0);
   };
 
   const total = calcularTotal();
 
   const limpiarCarrito = () => {
     setCart([]);
+    // El carrito se cerrará automáticamente por el useEffect cuando cart.length === 0
   };
 
   const eliminarItem = (codigo) => {
-    setCart((prev) => prev.filter((item) => item.codigo !== codigo));
+    setCart((prev) => {
+      const nuevoCart = prev.filter((item) => item.codigo !== codigo);
+      // Si queda vacío, el useEffect se encargará de cerrarlo
+      return nuevoCart;
+    });
   };
+
+  const actualizarCantidad = (codigo, nuevaCantidad) => {
+    if (nuevaCantidad <= 0) {
+      eliminarItem(codigo);
+      return;
+    }
+    
+    setCart((prev) =>
+      prev.map((item) =>
+        item.codigo === codigo
+          ? { ...item, cantidad: nuevaCantidad }
+          : item
+      )
+    );
+  };
+
+  // Abrir carrito automáticamente cuando se agrega un producto
+  // Cerrar automáticamente cuando se vacía (con pequeña animación)
+  useEffect(() => {
+    if (cart.length > 0 && !open) {
+      // Abrir cuando hay productos y está cerrado
+      setOpen(true);
+    } else if (cart.length === 0 && open) {
+      // Cerrar cuando está vacío (Drawer de MUI maneja la animación)
+      setOpen(false);
+    }
+  }, [cart.length, open]); // Incluir 'open' para evitar warnings de eslint
 
   const generarLinkWhatsApp = () => {
     if (cart.length === 0) {
@@ -55,8 +104,11 @@ const ModernCartBottomSheet = ({
 
     const mensaje = cart
       .map((item) => {
-        const precio = formatPrice(getCuotaSeleccionada(item));
-        return `🛍️ ${item.descripcion} - ${precio} en ${cuotasTexto}`;
+        const cantidad = item.cantidad || 1;
+        const precioUnitario = formatPrice(getCuotaSeleccionada(item));
+        const precioTotal = formatPrice(getCuotaSeleccionada(item) * cantidad);
+        const cantidadTexto = cantidad > 1 ? ` x${cantidad}` : '';
+        return `🛍️ ${item.descripcion}${cantidadTexto} - ${cantidad > 1 ? `${precioUnitario} c/u = ${precioTotal}` : precioUnitario} en ${cuotasTexto}`;
       })
       .join("%0A");
 
@@ -194,6 +246,7 @@ const ModernCartBottomSheet = ({
             marginBottom: 2,
           }}
         >
+          {/* Siempre mostrar contenido, incluso si está vacío */}
           {cart.length > 0 ? (
             cart.map((item, index) => (
               <Box key={item.codigo}>
@@ -245,30 +298,104 @@ const ModernCartBottomSheet = ({
                     >
                       {cuotasTexto}
                     </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontWeight: 600,
-                        color: theme.palette.primary.main,
-                      }}
-                    >
-                      {formatPrice(getCuotaSeleccionada(item))}
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: 600,
+                          color: theme.palette.primary.main,
+                        }}
+                      >
+                        {formatPrice(getCuotaSeleccionada(item))}
+                        {(item.cantidad || 1) > 1 && (
+                          <Typography
+                            component="span"
+                            variant="caption"
+                            sx={{
+                              ml: 1,
+                              color: '#717171',
+                              fontSize: '0.75rem',
+                            }}
+                          >
+                            x{item.cantidad || 1}
+                          </Typography>
+                        )}
+                      </Typography>
+                      {(item.cantidad || 1) > 1 && (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: 600,
+                            color: '#222222',
+                            fontSize: '0.875rem',
+                          }}
+                        >
+                          = {formatPrice(getCuotaSeleccionada(item) * (item.cantidad || 1))}
+                        </Typography>
+                      )}
+                    </Box>
                   </Box>
 
-                  {/* Botón eliminar */}
-                  <IconButton
-                    onClick={() => eliminarItem(item.codigo)}
-                    sx={{
-                      color: '#717171',
-                      '&:hover': {
-                        color: '#FF385C',
-                        backgroundColor: 'rgba(255, 56, 92, 0.1)',
-                      },
-                    }}
-                  >
-                    <FaTrashAlt />
-                  </IconButton>
+                  {/* Controles de cantidad y eliminar */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                    {/* Controles de cantidad */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, border: '1px solid rgba(0,0,0,0.12)', borderRadius: 1 }}>
+                      <IconButton
+                        size="small"
+                        onClick={() => actualizarCantidad(item.codigo, (item.cantidad || 1) - 1)}
+                        sx={{
+                          padding: '4px',
+                          color: '#717171',
+                          '&:hover': {
+                            backgroundColor: 'rgba(0,0,0,0.05)',
+                          },
+                        }}
+                      >
+                        <RemoveIcon fontSize="small" />
+                      </IconButton>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          minWidth: '24px',
+                          textAlign: 'center',
+                          fontWeight: 600,
+                          fontSize: '0.875rem',
+                        }}
+                      >
+                        {item.cantidad || 1}
+                      </Typography>
+                      <IconButton
+                        size="small"
+                        onClick={() => actualizarCantidad(item.codigo, (item.cantidad || 1) + 1)}
+                        sx={{
+                          padding: '4px',
+                          color: '#717171',
+                          '&:hover': {
+                            backgroundColor: 'rgba(0,0,0,0.05)',
+                          },
+                        }}
+                      >
+                        <AddIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                    
+                    {/* Botón eliminar */}
+                    <IconButton
+                      size="small"
+                      onClick={() => eliminarItem(item.codigo)}
+                      sx={{
+                        color: '#717171',
+                        padding: '4px',
+                        '&:hover': {
+                          color: '#FF385C',
+                          backgroundColor: 'rgba(255, 56, 92, 0.1)',
+                        },
+                      }}
+                      title="Eliminar producto"
+                    >
+                      <FaTrashAlt size={14} />
+                    </IconButton>
+                  </Box>
                 </Box>
                 {index < cart.length - 1 && <Divider />}
               </Box>
@@ -300,7 +427,7 @@ const ModernCartBottomSheet = ({
           )}
         </Box>
 
-        {/* Footer con acciones */}
+        {/* Footer con acciones - Solo mostrar si hay productos */}
         {cart.length > 0 && (
           <>
             <Divider sx={{ marginBottom: 2 }} />
