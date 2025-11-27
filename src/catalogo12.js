@@ -2,14 +2,14 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "./utils/axios";
 import Container from "@mui/material/Container";
-import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
-import Dialog from "@mui/material/Dialog";
+import LinearProgress from "@mui/material/LinearProgress";
 import { Helmet } from "react-helmet";
-import ProductsCalatogo from "./components/productsCalatogo";
-import logo from './assets/logo.png';
-import { Snackbar, Alert, Typography } from "@mui/material";
-import ShoppingCartCatalogo from "./components/ShoppingCartCatalogo";
+import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
+import StickySearchBar from "./components/StickySearchBar";
+import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
+import { Snackbar, Alert, Typography, Box } from "@mui/material";
+import { trackCatalogView, trackCatalogSearch, trackAddToCart, trackToggleFavorite } from "./utils/analytics";
 
 const Catalogo12 = () => {
   const [cart, setCart] = useState([]);
@@ -41,6 +41,9 @@ const Catalogo12 = () => {
   };
 
   useEffect(() => {
+    // GA: vista de catálogo
+    trackCatalogView("Catálogo", "12 cuotas sin interés");
+    
     const loadInitialData = async () => {
       setLoading(true);
       const productosData = await getData();
@@ -82,15 +85,24 @@ const Catalogo12 = () => {
       (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
       (producto?.linea || '').toLowerCase() !== 'repuestos'
     );
+    
+    // GA: búsqueda
+    trackCatalogSearch("Catálogo 12", filtro);
+
     if (cuotasMap["12 cuotas sin interés"]) {
+      const cuotaKey = cuotasMap["12 cuotas sin interés"];
       productosFiltrados = productosFiltrados.filter(
-        (producto) => producto[cuotasMap["12 cuotas sin interés"]] !== 'NO'
+        (producto) => producto[cuotaKey] && producto[cuotaKey] !== 'NO'
       );
     }
     agruparProductosPorLinea(productosFiltrados);
   }, [filtro, productos, cuotasMap]);
 
-  const addToCart = (product) => setCart([...cart, product]);
+  const addToCart = (product) => {
+    setCart([...cart, product]);
+    // GA: agregar al carrito
+    trackAddToCart("Catálogo 12", product);
+  };
 
   const toggleFavorite = (product) => {
     const exists = favorites.some(fav => fav.id === product.id);
@@ -100,6 +112,9 @@ const Catalogo12 = () => {
     const message = exists
       ? `${product.descripcion} ha sido eliminado de tus favoritos`
       : `${product.descripcion} ha sido agregado a tus favoritos`;
+    
+    trackToggleFavorite("Catálogo 12", product, !exists);
+    
     setFavorites(updatedFavorites);
     localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
     setSnackbarMessage(message);
@@ -122,77 +137,119 @@ const Catalogo12 = () => {
     : productosAgrupados;
 
   return (
-    <Container maxWidth="lg" className="conteiner-list">
+    <>
       <Helmet>
-        <title>Catalogo Simple - Catálogo</title>
+        <title>Catálogo 12 Cuotas - Catálogo</title>
       </Helmet>
+      
+      {/* Buscador sticky moderno */}
+      <StickySearchBar
+        value={filtro}
+        onChange={(e) => {
+          setFiltro(e.target.value);
+          trackCatalogSearch("Catálogo 12", e.target.value);
+        }}
+        placeholder="Buscar Producto"
+      />
 
-
-
-      {/* INFO DE DESARROLLADOR */}
-      <div className="w-100 flex justify-center items-center flex-direction mar-t10">
-        <Typography fontSize={13} margin={'6px 0 12px 0'} style={{textAlign: 'center'}}>
-            <b>Desarrollado por:</b><br></br>
-            <b>
-              <a href="https://www.instagram.com/lrecchini/" rel="noreferrer"> Luciano Recchini</a>
-            </b>
-          </Typography>
-        <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
-      </div>
-
-      {/* BUSCADOR */}
-      <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
-        <TextField
-          style={{ maxWidth: 450 }}
-          fullWidth
-          className="search"
-          label="Buscar Producto"
-          variant="outlined"
-          value={filtro}
-          onChange={(e) => setFiltro(e.target.value)}
-        />
-      </div>
-
-      {/* LOADING */}
+      <Container 
+        maxWidth="lg" 
+        className="conteiner-list"
+        sx={{
+          paddingTop: { xs: 1, sm: 2 }, // Reducido porque el buscador ya tiene spacer
+          paddingBottom: { xs: 4, sm: 5 },
+        }}
+      >
+      {/* Loading state - Skeleton moderno */}
       {loading && (
-        <ul className="lista-prod-catalog w-100">
-          {[...Array(8)].map((_, idx) => (
-            <Skeleton
-              key={idx}
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-          ))}
-        </ul>
+        <Box>
+          <LinearProgress sx={{ marginBottom: 3 }} />
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(2, 1fr)',
+                lg: 'repeat(3, 1fr)',
+              },
+              gap: { xs: 3, sm: 3, md: 4 },
+            }}
+          >
+            {[...Array(6)].map((_, idx) => (
+              <Skeleton
+                key={idx}
+                variant="rectangular"
+                height={400}
+                sx={{
+                  borderRadius: 3,
+                  animation: 'wave',
+                }}
+              />
+            ))}
+          </Box>
+        </Box>
       )}
 
-      {/* PRODUCTOS */}
-      {Object.keys(productosAMostrar).map((linea) => (
-        <div key={linea} className="linea-section">
-          <Typography variant="h5" gutterBottom margin="20px 0">
-            Línea: <b>{linea}</b>
+      {/* Productos - Layout moderno mobile-first */}
+      {!loading && Object.keys(productosAMostrar).map((linea) => (
+        <Box key={linea} sx={{ marginBottom: { xs: 4, sm: 5 } }}>
+          <Typography 
+            variant="h5" 
+            sx={{
+              fontSize: { xs: '1.25rem', sm: '1.5rem' },
+              fontWeight: 600,
+              marginBottom: { xs: 2, sm: 3 },
+              color: '#222222',
+            }}
+          >
+            Línea: <Box component="span" sx={{ fontWeight: 700 }}>{linea}</Box>
           </Typography>
-          <ul className="lista-prod-catalog w-100">
+          
+          {/* Grid responsive estilo Airbnb */}
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr', // Mobile: 1 card por fila
+                sm: 'repeat(2, 1fr)', // Tablet: 2 columnas
+                md: 'repeat(2, 1fr)', // Desktop: 2 columnas
+                lg: 'repeat(3, 1fr)', // Large: 3 columnas
+              },
+              gap: { xs: 3, sm: 3, md: 4 },
+            }}
+          >
             {productosAMostrar[linea].map((product) => (
-              <li className="grid-item" key={product.id}>
-                <ProductsCalatogo
-                  product={product}
-                  onAddToCart={addToCart}
-                  isFavorite={favorites.some(fav => fav.id === product.id)}
-                  onToggleFavorite={() => toggleFavorite(product)}
-                  selectedCuota={'12 cuotas sin interés'}
-                  sumarEnvio={sumarEnvio}
-                  costoEnvio={17362}
-                />
-              </li>
+              <ModernProductCardAirbnb
+                key={product.id || product.codigo}
+                product={product}
+                onAddToCart={(prod) => {
+                  addToCart(prod);
+                  trackAddToCart("Catálogo 12", prod);
+                }}
+                onToggleFavorite={(prod, isFavorite) => {
+                  toggleFavorite(prod);
+                }}
+                selectedCuota={'12 cuotas sin interés'}
+                isContado={false}
+                // Badges opcionales
+                isNew={false}
+                isBestSeller={false}
+                stockLow={false}
+              />
             ))}
-          </ul>
-        </div>
+          </Box>
+        </Box>
       ))}
 
-      <ShoppingCartCatalogo cart={cart} setCart={setCart} cuotaKey="doce_sin_interes" cuotasTexto="12 cuotas" />
+      {/* Carrito moderno con bottom sheet */}
+      <ModernCartBottomSheet 
+        cart={cart} 
+        setCart={setCart} 
+        cuotaKey="doce_sin_interes" 
+        cuotasTexto="12 cuotas" 
+      />
+      </Container>
 
       {/* SNACKBAR */}
       <Snackbar
@@ -204,9 +261,7 @@ const Catalogo12 = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-
-
-    </Container>
+    </>
   );
 };
 
