@@ -10,6 +10,7 @@ import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
 import StickySearchBar from "./components/StickySearchBar";
 import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
 import Navbar from "./components/Navbar";
+import LaunchProductsCarousel from "./components/LaunchProductsCarousel";
 import { Snackbar, Alert, Typography, Box } from "@mui/material";
 import { trackCatalogView, trackCatalogSearch, trackAddToCart, trackToggleFavorite } from "./utils/analytics";
 import { useAuth } from "./AuthContext";
@@ -19,7 +20,7 @@ const Catalogo12 = () => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
-  const [filtro, setFiltro] = useState("");
+  const [searchTerm, setSearchTerm] = useState(""); // Estado SOLO para el input - independiente
   const [productosAgrupados, setProductosAgrupados] = useState({});
   const [isSticky, setIsSticky] = useState(false);
   const [favorites, setFavorites] = useState([]);
@@ -108,26 +109,37 @@ const Catalogo12 = () => {
     "12 cuotas sin interés": 'doce_sin_interes',
   }), []);
 
-  useEffect(() => {
+  // Filtrado optimizado con useMemo - NO modifica productos original
+  // SOLO filtra para render, permite escritura fluida sin lag
+  const productosFiltrados = useMemo(() => {
+    // Si no hay productos, retornar vacío
+    if (!productos || productos.length === 0) return [];
+    
     // Filtrar por búsqueda y vigencia (excluyendo repuestos)
-    let productosFiltrados = filterProducts(productos, filtro, true).filter(
+    let filtrados = filterProducts(productos, searchTerm, true).filter(
       (producto) => normalizeString(producto?.linea) !== 'repuestos'
     );
-    
-    // GA: búsqueda
-    if (filtro) {
-      trackCatalogSearch("Catálogo 12", filtro);
+
+    // GA: búsqueda (solo si hay término)
+    if (searchTerm && searchTerm.trim()) {
+      trackCatalogSearch("Catálogo 12", searchTerm);
     }
 
     // Filtrar por cuotas disponibles
     if (cuotasMap["12 cuotas sin interés"]) {
       const cuotaKey = cuotasMap["12 cuotas sin interés"];
-      productosFiltrados = productosFiltrados.filter(
+      filtrados = filtrados.filter(
         (producto) => producto[cuotaKey] && producto[cuotaKey] !== 'NO'
       );
     }
+
+    return filtrados;
+  }, [searchTerm, productos, cuotasMap]);
+
+  // Agrupar productos filtrados por línea
+  useEffect(() => {
     agruparProductosPorLinea(productosFiltrados);
-  }, [filtro, productos, cuotasMap]);
+  }, [productosFiltrados]);
 
   const addToCart = (product) => {
     setCart((prevCart) => {
@@ -200,10 +212,11 @@ const Catalogo12 = () => {
       
       {/* Buscador sticky moderno fixed top: 0 */}
       <StickySearchBar
-        value={filtro}
+        value={searchTerm}
         onChange={(e) => {
-          setFiltro(e.target.value);
-          trackCatalogSearch("Catálogo 12", e.target.value);
+          // SOLO actualizar el estado del input - NADA MÁS
+          // El filtrado se hace automáticamente en useMemo
+          setSearchTerm(e.target.value);
         }}
         placeholder="Buscar Producto"
       />
@@ -216,6 +229,17 @@ const Catalogo12 = () => {
           paddingBottom: { xs: 4, sm: 5 },
         }}
       >
+      {/* Carrousel de Lanzamientos / Entrega Inmediata */}
+      {!loading && productos.length > 0 && (
+        <LaunchProductsCarousel
+          productos={productos}
+          onAddToCart={(prod) => addToCart(prod)}
+          onProductClick={(prod) => {
+            console.log('Producto clickeado:', prod);
+          }}
+        />
+      )}
+
       {/* Loading state - Skeleton moderno */}
       {loading && (
         <Box>
