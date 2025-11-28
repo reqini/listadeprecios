@@ -33,6 +33,7 @@ import ResponsiveDialog from "./components/dialog";
 import { useAuth } from "./AuthContext";
 import ReviewSlider from "./components/ReviewSlider";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import LaunchProductsCarousel from "./components/LaunchProductsCarousel";
 
 const Home = () => {
   const { logout } = useAuth();
@@ -369,6 +370,19 @@ const Home = () => {
       >
 
         {getBannerForRango()}
+          
+          {/* Carrousel de Lanzamientos / Entrega Inmediata */}
+          {!loading && productos.length > 0 && (
+            <LaunchProductsCarousel
+              productos={productos}
+              onAddToCart={(prod) => onAddToCart(prod)}
+              onProductClick={(prod) => {
+                // Opcional: abrir modal o navegar al detalle
+                console.log('Producto clickeado:', prod);
+              }}
+            />
+          )}
+
           <Accordion sx={{ marginBottom: 2, display: 'none' }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle1" fontWeight={600}>
