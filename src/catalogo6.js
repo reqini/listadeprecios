@@ -1,6 +1,5 @@
 /* eslint-disable */
 import React, { useEffect, useState, useMemo } from "react";
-import { filterProducts, normalizeString } from "./utils/searchUtils";
 import axios from "./utils/axios";
 import Container from "@mui/material/Container";
 import Skeleton from "@mui/material/Skeleton";
@@ -20,7 +19,7 @@ const Catalogo6 = () => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); // Estado SOLO para el input - independiente
+  const [filtro, setFiltro] = useState("");
   const [productosAgrupados, setProductosAgrupados] = useState({});
   const [isSticky, setIsSticky] = useState(false);
   const [favorites, setFavorites] = useState([]);
@@ -113,37 +112,29 @@ const Catalogo6 = () => {
     return () => window.removeEventListener('catalogoPromosUpdated', handlePromosUpdate);
   }, []);
 
-  // Filtrado optimizado con useMemo - NO modifica productos original
-  // SOLO filtra para render, permite escritura fluida sin lag
-  const productosFiltrados = useMemo(() => {
-    // Si no hay productos, retornar vacío
-    if (!productos || productos.length === 0) return [];
-    
-    // Filtrar por búsqueda y vigencia (excluyendo repuestos)
-    let filtrados = filterProducts(productos, searchTerm, true).filter(
-      (producto) => normalizeString(producto?.linea) !== 'repuestos'
+  // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir repuestos
+  useEffect(() => {
+    let productosFiltrados = productos.filter((producto) =>
+      (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
+      (producto?.linea || '').toLowerCase() !== 'repuestos' &&
+      (producto?.vigencia || '').toLowerCase() !== 'no'
     );
 
-    // GA: búsqueda (solo si hay término)
-    if (searchTerm && searchTerm.trim()) {
-      trackCatalogSearch("Catálogo 6", searchTerm);
+    // GA: búsqueda
+    if (filtro) {
+      trackCatalogSearch("Catálogo 6", filtro);
     }
 
     // Filtrar por cuotas disponibles
     if (cuotasMap["6 cuotas sin interés"]) {
       const cuotaKey = cuotasMap["6 cuotas sin interés"];
-      filtrados = filtrados.filter(
+      productosFiltrados = productosFiltrados.filter(
         (producto) => producto[cuotaKey] && producto[cuotaKey] !== 'NO'
       );
     }
 
-    return filtrados;
-  }, [searchTerm, productos, cuotasMap]);
-
-  // Agrupar productos filtrados por línea
-  useEffect(() => {
     agruparProductosPorLinea(productosFiltrados);
-  }, [productosFiltrados]);
+  }, [filtro, productos, cuotasMap]);
 
   const addToCart = (product) => {
     setCart((prevCart) => {
@@ -223,12 +214,8 @@ const Catalogo6 = () => {
 
       {/* Buscador sticky moderno fixed top: 0 */}
       <StickySearchBar
-        value={searchTerm}
-        onChange={(e) => {
-          // SOLO actualizar el estado del input - NADA MÁS
-          // El filtrado se hace automáticamente en useMemo
-          setSearchTerm(e.target.value);
-        }}
+        value={filtro}
+        onChange={(e) => setFiltro(e.target.value)}
         placeholder="Buscar Producto"
       />
 
