@@ -140,8 +140,8 @@ const Catalogo15 = () => {
         <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
       </div>
 
-      {/* BUSCADOR */}
-      <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
+      {/* BUSCADOR oculto */}
+      {/* <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
         <TextField
           style={{ maxWidth: 450 }}
           fullWidth
@@ -151,7 +151,7 @@ const Catalogo15 = () => {
           value={filtro}
           onChange={(e) => setFiltro(e.target.value)}
         />
-      </div>
+      </div> */}
 
       {/* LOADING */}
       {loading && (

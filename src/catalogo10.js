@@ -166,7 +166,8 @@ const Catalogo10 = () => {
         <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
       </div>
 
-      <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
+      {/* Header y buscador ocultos */}
+      {/* <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
         <TextField
           style={{ maxWidth: 450 }}
           fullWidth
@@ -177,7 +178,7 @@ const Catalogo10 = () => {
           value={filtro}
           onChange={(e) => setFiltro(e.target.value)}
         />
-      </div>
+      </div> */}
 
       {/* Skeleton para la carga inicial */}
       {loading && (

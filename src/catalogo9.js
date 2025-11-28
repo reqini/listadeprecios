@@ -181,7 +181,8 @@ const productosFiltrados = productosData.filter(
         <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
       </div>
 
-      <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
+      {/* Header y buscador ocultos */}
+      {/* <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
         <TextField
           style={{ maxWidth: 450 }}
           fullWidth
@@ -202,7 +203,7 @@ const productosFiltrados = productosData.filter(
             spellCheck: 'false',
           }}
         />
-      </div>
+      </div> */}
 
       {/* Carrousel de Lanzamientos / Entrega Inmediata */}
       {!loading && productos.length > 0 && (

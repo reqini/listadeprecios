@@ -347,27 +347,27 @@ const Catalogo3 = () => {
         <title>Catálogo 3 Cuotas - Catálogo</title>
       </Helmet>
       
-      {/* Header siempre visible */}
-      <Navbar
+      {/* Header oculto */}
+      {/* <Navbar
         title="Catálogo 3 Cuotas"
         onLogout={logout}
         user={{ username: localStorage.getItem("activeSession") || "" }}
-      />
+      /> */}
       
-      {/* Buscador sticky moderno fixed top: 0 */}
-      <StickySearchBar
+      {/* Buscador oculto */}
+      {/* <StickySearchBar
         value={searchTerm}
         onChange={(e) => {
           setSearchTerm(e.target.value); // Actualizar inmediatamente el input (sin debounce)
         }}
         placeholder="Buscar Producto"
-      />
+      /> */}
 
       <Container 
         maxWidth="lg" 
         className="conteiner-list"
         sx={{
-          paddingTop: { xs: 12, sm: 13 }, // Espacio para header (~64px) + search bar fixed (~80px)
+          paddingTop: { xs: 2, sm: 3 }, // Espacio reducido ya que header y search están ocultos
           paddingBottom: { xs: 4, sm: 5 },
         }}
       >
