@@ -154,20 +154,23 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
             )}
           </Box>
           
-          {/* Buscador (si showSearch es true) */}
+          {/* Buscador (si showSearch es true) - Centrado con max-width 360px */}
           {showSearch && (
             <Box sx={{ 
-              width: { xs: '100%', sm: '100%' },
-              maxWidth: { sm: '600px' },
+              width: { xs: '100%', sm: 'auto' },
+              maxWidth: { xs: '100%', sm: '360px' },
               marginX: { xs: 0, sm: 'auto' },
               order: { xs: 2, sm: 2 },
-              flex: { sm: '1 1 auto' },
+              flex: { sm: '0 0 auto' },
+              display: 'flex',
+              justifyContent: 'center',
             }}>
               <ModernSearchBar
                 value={searchValue || ''}
                 onChange={onSearchChange || (() => {})}
                 placeholder="Buscar productos por nombre, categoría o banco..."
                 sx={{
+                  width: '100%',
                   paddingX: { xs: 2, sm: 0 },
                   paddingY: { xs: 0, sm: 0 },
                   marginBottom: 0,
