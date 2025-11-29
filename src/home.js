@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { filterAllProducts } from "./utils/filterProducts";
+import ModernSearchBar from "./components/ModernSearchBar";
 import axios from "./utils/axios";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {
@@ -270,7 +271,7 @@ const Home = () => {
     return () => window.removeEventListener('catalogoPromosUpdated', handlePromosUpdate);
   }, [sessionValid]);
 
-  // Filtrado sólido y robusto - filtra en tiempo real mientras el usuario escribe
+  // Filtrado usando la misma lógica que los catálogos
   const productosFiltrados = useMemo(() => {
     // Usar productosOriginales si existe y tiene datos, sino usar productos como fallback
     const productosBase = (productosOriginales && productosOriginales.length > 0) 
@@ -282,22 +283,9 @@ const Home = () => {
       return [];
     }
     
-    // Filtrar productos válidos (sin repuestos, vigentes)
-    let productosValidos = productosBase.filter((producto) => {
-      const linea = (producto?.linea || '').toLowerCase();
-      const vigencia = (producto?.vigencia || '').toLowerCase();
-      // Excluir repuestos y productos con vigencia 'no'
-      return linea !== 'repuestos' && vigencia !== 'no';
-    });
-    
-    // Si no hay término de búsqueda, retornar todos los productos válidos
-    const searchTrimmed = searchTerm ? searchTerm.trim() : '';
-    if (!searchTrimmed) {
-      return productosValidos;
-    }
-    
-    // Si hay búsqueda, aplicar filtrado por término
-    return filterAllProducts(productosValidos, searchTrimmed);
+    // Usar filterAllProducts directamente como en los catálogos
+    // Esta función ya incluye validación de repuestos y vigencia
+    return filterAllProducts(productosBase, searchTerm);
   }, [productosOriginales, productos, searchTerm]);
 
 
@@ -378,15 +366,11 @@ const Home = () => {
         }
         onLogout={logout}
         user={{ username: username || localStorage.getItem("activeSession") || "" }}
-      />
-      {/* Buscador fixed en top: 0 */}
-      <StickySearchBarWithScroll
-        value={searchTerm}
-        onChange={(e) => {
-          // SOLO actualizar el estado del input - NADA MÁS
-          setSearchTerm(e.target.value);
+        showSearch={true}
+        searchValue={searchTerm}
+        onSearchChange={(value) => {
+          setSearchTerm(value); // Actualizar directamente el estado
         }}
-        placeholder="Buscar Producto"
       />
 
       <Container 
