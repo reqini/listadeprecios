@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { 
   LocalShipping as ShippingIcon,
+  ErrorOutline as ErrorOutlineIcon,
 } from '@mui/icons-material';
 import { formatPrice } from '../utils/priceUtils';
 
@@ -271,6 +272,48 @@ const CarouselEntregaInmediata = ({ productos = [], cuotaActual = 12, nombreUsua
                           boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
                         }}
                       />
+                      
+                      {/* Badge Última Unidad - Mostrar si stock es 1 o última unidad */}
+                      {(() => {
+                        const stock = producto.stock || producto.stock_actual || producto.unidades_disponibles;
+                        const ultimasUnidades = producto.ultimas_unidades || producto.solo_queda_uno;
+                        const isLastUnit = 
+                          stock === 1 || 
+                          stock === '1' ||
+                          ultimasUnidades === 'si' || 
+                          ultimasUnidades === 'Sí' ||
+                          ultimasUnidades === true ||
+                          producto.solo_queda_uno === 'si' ||
+                          producto.solo_queda_uno === 'Sí' ||
+                          producto.solo_queda_uno === true;
+                        
+                        if (!isLastUnit) return null;
+                        
+                        return (
+                          <Chip
+                            icon={<ErrorOutlineIcon sx={{ fontSize: 16, color: 'white' }} />}
+                            label="Última unidad"
+                            size="small"
+                            sx={{
+                              position: 'absolute',
+                              top: 8,
+                              left: 8,
+                              zIndex: 3,
+                              backgroundColor: '#FF385C',
+                              color: 'white',
+                              fontWeight: 700,
+                              fontSize: '0.7rem',
+                              height: 28,
+                              boxShadow: '0 4px 12px rgba(255, 56, 92, 0.4)',
+                              '& .MuiChip-icon': {
+                                color: 'white',
+                                marginLeft: '6px',
+                              },
+                              padding: '0 8px',
+                            }}
+                          />
+                        );
+                      })()}
                     </Box>
 
                     {/* Contenido */}
