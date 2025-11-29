@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { filterProducts } from "./utils/searchUtils";
+import { filterAllProducts } from "./utils/filterProducts";
 import axios from "./utils/axios";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {
@@ -256,20 +256,35 @@ const Home = () => {
     return () => window.removeEventListener('catalogoPromosUpdated', handlePromosUpdate);
   }, [sessionValid]);
 
-  // Filtrado DIRECTO desde searchTerm - SIN estados intermedios
-  // NO modifica productos original, solo filtra para render
+  // Filtrado sólido y robusto - filtra en tiempo real mientras el usuario escribe
   const productosFiltrados = useMemo(() => {
-    // Si no hay productos, retornar vacío
-    if (!productos || productos.length === 0) return [];
+    // Usar productosOriginales si existe y tiene datos, sino usar productos como fallback
+    const productosBase = (productosOriginales && productosOriginales.length > 0) 
+      ? productosOriginales 
+      : (productos && productos.length > 0 ? productos : []);
     
-    // Si no hay término de búsqueda, mostrar todos los productos vigentes
-    if (!searchTerm || !searchTerm.trim()) {
-      return productos.filter((producto) => producto?.vigencia === "SI");
+    // Si no hay productos base, retornar vacío
+    if (!productosBase || productosBase.length === 0) {
+      return [];
     }
     
-    // Filtrar usando la función optimizada
-    return filterProducts(productos, searchTerm.trim(), true);
-  }, [productos, searchTerm]); // Dependencias: productos original y searchTerm
+    // Filtrar productos válidos (sin repuestos, vigentes)
+    let productosValidos = productosBase.filter((producto) => {
+      const linea = (producto?.linea || '').toLowerCase();
+      const vigencia = (producto?.vigencia || '').toLowerCase();
+      // Excluir repuestos y productos con vigencia 'no'
+      return linea !== 'repuestos' && vigencia !== 'no';
+    });
+    
+    // Si no hay término de búsqueda, retornar todos los productos válidos
+    const searchTrimmed = searchTerm ? searchTerm.trim() : '';
+    if (!searchTrimmed) {
+      return productosValidos;
+    }
+    
+    // Si hay búsqueda, aplicar filtrado por término
+    return filterAllProducts(productosValidos, searchTrimmed);
+  }, [productosOriginales, productos, searchTerm]);
 
 
   // Cerrar snackbar
@@ -453,7 +468,7 @@ const Home = () => {
               />
             ))}
           </Box>
-        ) : productosFiltrados.length === 0 && searchTerm && searchTerm.trim() !== '' ? (
+        ) : productosFiltrados.length === 0 && searchTerm && searchTerm.trim() ? (
           <Box
             sx={{
               textAlign: 'center',
@@ -481,7 +496,7 @@ const Home = () => {
               No hay productos que coincidan con "{searchTerm}". Intenta con otro término de búsqueda.
             </Typography>
           </Box>
-        ) : (
+        ) : productosFiltrados.length > 0 ? (
           <Box
             sx={{
               display: 'grid',
@@ -513,6 +528,23 @@ const Home = () => {
                 bankLogos={bankLogos} // Pasar logos de bancos desde Google Sheets
               />
             ))}
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              textAlign: 'center',
+              padding: { xs: 4, sm: 6 },
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{
+                color: '#999',
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+              }}
+            >
+              No hay productos disponibles en este momento.
+            </Typography>
           </Box>
         )}
 

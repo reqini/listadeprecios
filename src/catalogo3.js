@@ -10,10 +10,13 @@ import StickySearchBar from "./components/StickySearchBar";
 import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
 import Navbar from "./components/Navbar";
 import FeaturedProductsBanner from "./components/FeaturedProductsBanner";
+import FeaturedProductsCarousel from "./components/FeaturedProductsCarousel";
+import CarouselSwitch from "./components/CarouselSwitch";
 import { Snackbar, Alert, Typography, Box, Button } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { trackCatalogView, trackCatalogSearch, trackAddToCart, trackToggleFavorite } from "./utils/analytics";
 import { useAuth } from "./AuthContext";
+import { parsePrice } from "./utils/priceUtils";
 
 
 const Catalogo3 = () => {
@@ -197,6 +200,23 @@ const Catalogo3 = () => {
 
   // Añadir producto al carrito
   const addToCart = (product) => {
+    // Obtener información de cuota del catálogo actual
+    const cuotaKeyCatalogo = cuotasMap["3 cuotas sin interés"]; // 'tres_sin_interes'
+    const cuotaValueRaw = product[cuotaKeyCatalogo] && product[cuotaKeyCatalogo] !== 'NO' 
+      ? product[cuotaKeyCatalogo] 
+      : null;
+    const cuotaValue = cuotaValueRaw ? parsePrice(cuotaValueRaw) : null;
+    
+    // Preparar producto con información de cuota
+    const productWithCuota = {
+      ...product,
+      // Si el producto ya tiene información de cuota (desde Home), mantenerla
+      // Si no, usar la del catálogo actual
+      selectedCuotaKey: product.selectedCuotaKey || cuotaKeyCatalogo,
+      selectedCuotaValue: product.selectedCuotaValue || cuotaValue,
+      selectedCuotaLabel: product.selectedCuotaLabel || "3 cuotas sin interés",
+    };
+
     setCart((prevCart) => {
       // Buscar si el producto ya existe en el carrito (por código)
       const existingIndex = prevCart.findIndex(
@@ -209,11 +229,15 @@ const Catalogo3 = () => {
         updatedCart[existingIndex] = {
           ...updatedCart[existingIndex],
           cantidad: (updatedCart[existingIndex].cantidad || 1) + 1,
+          // Actualizar información de cuota si no tenía
+          selectedCuotaKey: updatedCart[existingIndex].selectedCuotaKey || productWithCuota.selectedCuotaKey,
+          selectedCuotaValue: updatedCart[existingIndex].selectedCuotaValue || productWithCuota.selectedCuotaValue,
+          selectedCuotaLabel: updatedCart[existingIndex].selectedCuotaLabel || productWithCuota.selectedCuotaLabel,
         };
         return updatedCart;
       } else {
-        // Si no existe, agregarlo con cantidad 1
-        return [...prevCart, { ...product, cantidad: 1 }];
+        // Si no existe, agregarlo con cantidad 1 y información de cuota
+        return [...prevCart, { ...productWithCuota, cantidad: 1 }];
       }
     });
     // GA: agregar al carrito
@@ -381,6 +405,12 @@ const Catalogo3 = () => {
           Exportar catálogo a PDF (tabla)
         </Button>
       </div> */}
+
+      {/* Switch para habilitar carrusel (solo visible para cocinaty) */}
+      <CarouselSwitch />
+      
+      {/* Carrusel de Productos Destacados - Solo visible si está habilitado por el switch */}
+      <FeaturedProductsCarousel />
 
       {/* Banner de productos destacados */}
       {!loading && productos.length > 0 && (

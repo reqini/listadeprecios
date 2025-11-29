@@ -188,7 +188,7 @@ const LaunchProductsCarousel = ({
               color: '#222222',
             }}
           >
-            Lanzamientos
+            Entrega Inmediata - Aprovechá
           </Typography>
         </Box>
 

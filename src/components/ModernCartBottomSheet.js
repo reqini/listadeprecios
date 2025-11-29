@@ -27,6 +27,7 @@ const ModernCartBottomSheet = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [open, setOpen] = useState(false);
+  const [userClosedManually, setUserClosedManually] = useState(false);
 
   const getCuotaSeleccionada = (product) => {
     // Si el producto tiene una cuota seleccionada desde Home (selectedCuotaValue), usarla
@@ -46,6 +47,58 @@ const ModernCartBottomSheet = ({
     const raw = product[cuotaKey];
     if (!raw || typeof raw !== "string" || raw.toLowerCase() === "no") return 0;
     return parsePrice(raw);
+  };
+
+  /**
+   * Obtiene el texto de cuotas dinámicamente desde el producto
+   * Prioridad: selectedCuotaLabel > selectedCuotaKey > cuotasTexto prop
+   * MEJORADO: Ahora siempre muestra la cuota correcta del producto
+   */
+  const getCuotaTexto = (product) => {
+    // Si el producto tiene un label de cuota seleccionada, usarlo (más confiable)
+    if (product.selectedCuotaLabel && product.selectedCuotaLabel.trim()) {
+      return product.selectedCuotaLabel;
+    }
+    
+    // Si tiene selectedCuotaKey, intentar derivar el texto
+    if (product.selectedCuotaKey) {
+      // Mapeo completo de keys a textos comunes
+      const cuotaKeyMap = {
+        'tres_sin_interes': '3 cuotas sin interés',
+        'seis_sin_interes': '6 cuotas sin interés',
+        'nueve_sin_interes': '9 cuotas sin interés',
+        'diez_sin_interes': '10 cuotas sin interés',
+        'doce_sin_interes': '12 cuotas sin interés',
+        'catorce_sin_interes': '14 cuotas sin interés',
+        'quince_sin_interes': '15 cuotas sin interés',
+        'dieciocho_sin_interes': '18 cuotas sin interés',
+        'veinte_sin_interes': '20 cuotas sin interés',
+        'veinticuatro_sin_interes': '24 cuotas sin interés',
+        // Con interés (si aplica)
+        'tres_con_interes': '3 cuotas con interés',
+        'seis_con_interes': '6 cuotas con interés',
+      };
+      
+      if (cuotaKeyMap[product.selectedCuotaKey]) {
+        return cuotaKeyMap[product.selectedCuotaKey];
+      }
+      
+      // Si el key tiene formato "X_sin_interes", extraer el número
+      const matchSinInteres = product.selectedCuotaKey.match(/(\d+)_sin_interes/);
+      if (matchSinInteres) {
+        return `${matchSinInteres[1]} cuotas sin interés`;
+      }
+      
+      // Si el key tiene formato "X_con_interes", extraer el número
+      const matchConInteres = product.selectedCuotaKey.match(/(\d+)_con_interes/);
+      if (matchConInteres) {
+        return `${matchConInteres[1]} cuotas con interés`;
+      }
+    }
+    
+    // Fallback: usar el prop cuotasTexto solo si no hay información del producto
+    // Esto mantiene compatibilidad pero prioriza la información del producto
+    return cuotasTexto || 'Cuotas disponibles';
   };
 
   const calcularTotal = () => {
@@ -85,17 +138,58 @@ const ModernCartBottomSheet = ({
     );
   };
 
+  // Función para cerrar el carrito
+  const handleClose = () => {
+    setOpen(false);
+    setUserClosedManually(true); // Marcar que el usuario cerró manualmente
+  };
+
+  // Función para abrir el carrito
+  const handleOpen = () => {
+    setOpen(true);
+    setUserClosedManually(false); // Resetear el flag al abrir manualmente
+  };
+
   // Abrir carrito automáticamente cuando se agrega un producto
   // Cerrar automáticamente cuando se vacía (con pequeña animación)
   useEffect(() => {
-    if (cart.length > 0 && !open) {
-      // Abrir cuando hay productos y está cerrado
-      setOpen(true);
+    if (cart.length > 0 && !open && !userClosedManually) {
+      // Abrir cuando hay productos y está cerrado, SOLO si el usuario no lo cerró manualmente
+      // Pequeño delay para mejor UX (evita abrir/cerrar muy rápido)
+      const timer = setTimeout(() => {
+        handleOpen();
+        setUserClosedManually(false); // Resetear el flag al abrir
+      }, 100);
+      return () => clearTimeout(timer);
     } else if (cart.length === 0 && open) {
       // Cerrar cuando está vacío (Drawer de MUI maneja la animación)
       setOpen(false);
+      setUserClosedManually(false); // Resetear el flag cuando se vacía
     }
-  }, [cart.length, open]); // Incluir 'open' para evitar warnings de eslint
+  }, [cart.length, open, userClosedManually]); // Incluir dependencias
+
+  // Cerrar con tecla ESC
+  useEffect(() => {
+    const handleEscKey = (event) => {
+      if (event.key === 'Escape' && open) {
+        handleClose();
+      }
+    };
+
+    if (open) {
+      document.addEventListener('keydown', handleEscKey);
+      // Bloquear scroll del body cuando el carrito está abierto
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Restaurar scroll cuando se cierra
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscKey);
+      document.body.style.overflow = 'unset';
+    };
+  }, [open]);
 
   const generarLinkWhatsApp = () => {
     if (cart.length === 0) {
@@ -108,7 +202,8 @@ const ModernCartBottomSheet = ({
         const precioUnitario = formatPrice(getCuotaSeleccionada(item));
         const precioTotal = formatPrice(getCuotaSeleccionada(item) * cantidad);
         const cantidadTexto = cantidad > 1 ? ` x${cantidad}` : '';
-        return `🛍️ ${item.descripcion}${cantidadTexto} - ${cantidad > 1 ? `${precioUnitario} c/u = ${precioTotal}` : precioUnitario} en ${cuotasTexto}`;
+        const cuotaTextoItem = getCuotaTexto(item);
+        return `🛍️ ${item.descripcion}${cantidadTexto} - ${cantidad > 1 ? `${precioUnitario} c/u = ${precioTotal}` : precioUnitario} en ${cuotaTextoItem}`;
       })
       .join("%0A");
 
@@ -132,7 +227,7 @@ const ModernCartBottomSheet = ({
         >
           <Button
             variant="contained"
-            onClick={() => setOpen(true)}
+            onClick={handleOpen}
             startIcon={<AddShoppingCartIcon />}
             sx={{
               borderRadius: 3,
@@ -173,18 +268,22 @@ const ModernCartBottomSheet = ({
       <Drawer
         anchor="bottom"
         open={open}
-        onClose={() => setOpen(false)}
-      PaperProps={{
-        sx: {
-          maxHeight: isMobile ? '90vh' : '80vh',
-          borderTopLeftRadius: isMobile ? 16 : 0,
-          borderTopRightRadius: isMobile ? 16 : 0,
-        },
-      }}
-      ModalProps={{
-        keepMounted: true,
-      }}
-    >
+        onClose={handleClose}
+        PaperProps={{
+          sx: {
+            maxHeight: isMobile ? '90vh' : '80vh',
+            borderTopLeftRadius: isMobile ? 16 : 0,
+            borderTopRightRadius: isMobile ? 16 : 0,
+          },
+        }}
+        ModalProps={{
+          keepMounted: true,
+          // Permitir cerrar con overlay/backdrop click y ESC
+          disableEscapeKeyDown: false,
+          // Asegurar que el backdrop cierre el drawer
+          onBackdropClick: handleClose,
+        }}
+      >
       <Box
         sx={{
           padding: { xs: 2, sm: 3 },
@@ -193,43 +292,90 @@ const ModernCartBottomSheet = ({
           width: '100%',
         }}
       >
-        {/* Header */}
+        {/* Header con mejor jerarquía visual */}
         <Box
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: 2,
+            paddingBottom: 1,
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <AddShoppingCartIcon sx={{ color: theme.palette.primary.main }} />
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 600,
-                fontSize: { xs: '1.125rem', sm: '1.25rem' },
-              }}
-            >
-              Tu selección
-            </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <AddShoppingCartIcon 
+              sx={{ 
+                color: theme.palette.primary.main,
+                fontSize: { xs: '1.5rem', sm: '1.75rem' },
+              }} 
+            />
+            <Box>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 700,
+                  fontSize: { xs: '1.125rem', sm: '1.25rem' },
+                  color: '#222222',
+                  lineHeight: 1.2,
+                }}
+              >
+                Tu carrito
+              </Typography>
+              {cart.length > 0 && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: '#717171',
+                    fontSize: '0.75rem',
+                    fontWeight: 500,
+                  }}
+                >
+                  {cart.length} {cart.length === 1 ? 'producto' : 'productos'}
+                </Typography>
+              )}
+            </Box>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 700,
-                fontSize: { xs: '1.125rem', sm: '1.25rem' },
-                color: theme.palette.primary.main,
-              }}
-            >
-              {formatPrice(total)}
-            </Typography>
+            {cart.length > 0 && (
+              <Box sx={{ textAlign: 'right' }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: '#717171',
+                    fontSize: '0.75rem',
+                    fontWeight: 500,
+                    display: 'block',
+                    marginBottom: 0.25,
+                  }}
+                >
+                  Total
+                </Typography>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: { xs: '1.125rem', sm: '1.25rem' },
+                    color: theme.palette.primary.main,
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {formatPrice(total)}
+                </Typography>
+              </Box>
+            )}
             <IconButton
-              onClick={() => setOpen(false)}
+              onClick={handleClose}
               sx={{
                 color: '#717171',
+                padding: 1,
+                '&:hover': {
+                  backgroundColor: 'rgba(0,0,0,0.05)',
+                  color: '#222222',
+                },
+                transition: 'all 0.2s ease',
               }}
+              aria-label="Cerrar carrito"
+              title="Cerrar (ESC)"
             >
               <CloseIcon />
             </IconButton>
@@ -271,66 +417,100 @@ const ModernCartBottomSheet = ({
                     }}
                   />
 
-                  {/* Info del producto */}
+                  {/* Info del producto - Mejorada jerarquía */}
                   <Box sx={{ flex: 1, minWidth: 0 }}>
+                    {/* Nombre del producto */}
                     <Typography
                       variant="body1"
                       sx={{
                         fontWeight: 600,
                         fontSize: { xs: '0.9375rem', sm: '1rem' },
-                        marginBottom: 0.5,
+                        marginBottom: 0.75,
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
+                        color: '#222222',
+                        lineHeight: 1.4,
                       }}
                     >
                       {item.descripcion}
                     </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: '#717171',
-                        fontSize: '0.875rem',
-                        marginBottom: 0.5,
+                    
+                    {/* Información de cuotas - Más visible y destacada */}
+                    <Box 
+                      sx={{ 
+                        marginBottom: 1,
+                        padding: '6px 10px',
+                        backgroundColor: 'rgba(0, 0, 0, 0.03)',
+                        borderRadius: 1,
+                        display: 'inline-block',
                       }}
                     >
-                      {cuotasTexto}
-                    </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
                       <Typography
-                        variant="body1"
+                        variant="body2"
                         sx={{
-                          fontWeight: 600,
                           color: theme.palette.primary.main,
+                          fontSize: '0.8125rem',
+                          fontWeight: 700,
+                          letterSpacing: '0.02em',
                         }}
                       >
-                        {formatPrice(getCuotaSeleccionada(item))}
-                        {(item.cantidad || 1) > 1 && (
-                          <Typography
-                            component="span"
-                            variant="caption"
-                            sx={{
-                              ml: 1,
-                              color: '#717171',
-                              fontSize: '0.75rem',
-                            }}
-                          >
-                            x{item.cantidad || 1}
-                          </Typography>
-                        )}
+                        💳 {getCuotaTexto(item)}
                       </Typography>
-                      {(item.cantidad || 1) > 1 && (
+                    </Box>
+                    
+                    {/* Precio - Mejor estructura */}
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, flexWrap: 'wrap' }}>
                         <Typography
-                          variant="body2"
+                          variant="body1"
                           sx={{
-                            fontWeight: 600,
-                            color: '#222222',
-                            fontSize: '0.875rem',
+                            fontWeight: 700,
+                            color: theme.palette.primary.main,
+                            fontSize: { xs: '1rem', sm: '1.125rem' },
                           }}
                         >
-                          = {formatPrice(getCuotaSeleccionada(item) * (item.cantidad || 1))}
+                          {formatPrice(getCuotaSeleccionada(item))}
+                        </Typography>
+                        {(item.cantidad || 1) > 1 && (
+                          <>
+                            <Typography
+                              component="span"
+                              variant="body2"
+                              sx={{
+                                color: '#717171',
+                                fontSize: '0.875rem',
+                                fontWeight: 500,
+                              }}
+                            >
+                              x {item.cantidad || 1}
+                            </Typography>
+                            <Typography
+                              variant="body1"
+                              sx={{
+                                fontWeight: 700,
+                                color: '#222222',
+                                fontSize: { xs: '1rem', sm: '1.125rem' },
+                                marginLeft: 'auto',
+                              }}
+                            >
+                              = {formatPrice(getCuotaSeleccionada(item) * (item.cantidad || 1))}
+                            </Typography>
+                          </>
+                        )}
+                      </Box>
+                      {(item.cantidad || 1) > 1 && (
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: '#717171',
+                            fontSize: '0.75rem',
+                            fontStyle: 'italic',
+                          }}
+                        >
+                          Precio unitario: {formatPrice(getCuotaSeleccionada(item))}
                         </Typography>
                       )}
                     </Box>
@@ -431,6 +611,52 @@ const ModernCartBottomSheet = ({
         {cart.length > 0 && (
           <>
             <Divider sx={{ marginBottom: 2 }} />
+            
+            {/* Resumen de totales - Más claro */}
+            <Box 
+              sx={{ 
+                backgroundColor: '#f8f8f8',
+                borderRadius: 2,
+                padding: 2,
+                marginBottom: 2,
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 1 }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontWeight: 600,
+                    color: '#222222',
+                    fontSize: '0.9375rem',
+                  }}
+                >
+                  Total
+                </Typography>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 700,
+                    color: theme.palette.primary.main,
+                    fontSize: { xs: '1.25rem', sm: '1.5rem' },
+                  }}
+                >
+                  {formatPrice(total)}
+                </Typography>
+              </Box>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: '#717171',
+                  fontSize: '0.75rem',
+                  display: 'block',
+                  textAlign: 'right',
+                }}
+              >
+                {cart.reduce((acc, item) => acc + (item.cantidad || 1), 0)} {cart.reduce((acc, item) => acc + (item.cantidad || 1), 0) === 1 ? 'producto' : 'productos'}
+              </Typography>
+            </Box>
+            
+            {/* Botones de acción */}
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
               <Button
                 fullWidth
@@ -441,14 +667,18 @@ const ModernCartBottomSheet = ({
                 sx={{
                   backgroundColor: '#25D366',
                   color: 'white',
-                  padding: { xs: '12px 24px', sm: '14px 28px' },
+                  padding: { xs: '14px 24px', sm: '16px 28px' },
                   fontSize: { xs: '0.9375rem', sm: '1rem' },
                   fontWeight: 600,
                   textTransform: 'none',
                   borderRadius: 2,
+                  boxShadow: '0 2px 8px rgba(37, 211, 102, 0.3)',
                   '&:hover': {
                     backgroundColor: '#1da851',
+                    boxShadow: '0 4px 12px rgba(37, 211, 102, 0.4)',
+                    transform: 'translateY(-1px)',
                   },
+                  transition: 'all 0.2s ease',
                 }}
               >
                 Enviar por WhatsApp
@@ -458,17 +688,19 @@ const ModernCartBottomSheet = ({
                 variant="outlined"
                 onClick={limpiarCarrito}
                 sx={{
-                  borderColor: '#717171',
-                  color: '#222222',
-                  padding: { xs: '10px 24px', sm: '12px 28px' },
-                  fontSize: { xs: '0.9375rem', sm: '1rem' },
-                  fontWeight: 600,
+                  borderColor: '#d0d0d0',
+                  color: '#717171',
+                  padding: { xs: '12px 24px', sm: '14px 28px' },
+                  fontSize: { xs: '0.875rem', sm: '0.9375rem' },
+                  fontWeight: 500,
                   textTransform: 'none',
                   borderRadius: 2,
                   '&:hover': {
-                    borderColor: '#222222',
-                    backgroundColor: 'rgba(0,0,0,0.05)',
+                    borderColor: '#FF385C',
+                    color: '#FF385C',
+                    backgroundColor: 'rgba(255, 56, 92, 0.05)',
                   },
+                  transition: 'all 0.2s ease',
                 }}
               >
                 Limpiar carrito

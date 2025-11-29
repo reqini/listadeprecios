@@ -24,6 +24,7 @@ import Contado from "./contado";
 import Activos from "./Activos";
 import Emprendedoras from "./Emprendedoras";
 import GeneradorDePlacas from "./GeneradorDePlacas";
+import CatalogoIndividual from "./pages/CatalogoIndividual";
 import { AuthProvider, useAuth } from "./AuthContext";
 
 // Google Analytics
@@ -73,6 +74,8 @@ const AppContent = () => {
           <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
           <Route path="/faqs" element={<PrivateRoute><FaqScreen /></PrivateRoute>} />
           <Route path="/preferencial" element={<Preferencial />} />
+          
+          {/* Rutas normales sin switch (NO muestran carrusel) */}
           <Route path="/catalogo3" element={<Catalogo3 />} />
           <Route path="/catalogo6" element={<Catalogo6 />} />
           <Route path="/catalogo9" element={<Catalogo9 />} />
@@ -84,9 +87,16 @@ const AppContent = () => {
           <Route path="/catalogo20" element={<Catalogo20 />} />
           <Route path="/catalogo24" element={<Catalogo24 />} />
           <Route path="/contado" element={<Contado />} />
+          
           <Route path="/generarPlaca" element={<PrivateRoute><GeneradorDePlacas /></PrivateRoute>} />
           <Route path="/emprendedoras" element={<PrivateRoute><Emprendedoras /></PrivateRoute>} />
           <Route path="/ventas" element={<PrivateRoute><Ventas /></PrivateRoute>} />
+          
+          {/* Ruta dinámica para catálogos individuales: /{slug}/{cuota} */}
+          {/* IMPORTANTE: Esta ruta debe ir DESPUÉS de todas las rutas específicas */}
+          {/* Maneja TODAS las URLs tipo /cocinaty/12, /carlaessen/18, etc. */}
+          <Route path="/:slug/:cuota" element={<CatalogoIndividual />} />
+          
           <Route path="/" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>

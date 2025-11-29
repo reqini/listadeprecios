@@ -9,6 +9,8 @@ import ProductCatalogoNegocio from "./components/productCalatogoNegocio";
 import logo from "./assets/logo.png";
 import { filterProducts, normalizeString } from "./utils/searchUtils";
 import LaunchProductsCarousel from "./components/LaunchProductsCarousel";
+import FeaturedProductsCarousel from "./components/FeaturedProductsCarousel";
+import CarouselSwitch from "./components/CarouselSwitch";
 
 
 const Contado = () => {
@@ -108,6 +110,13 @@ const Contado = () => {
           }}
         />
       </div>
+
+      {/* Carrusel de Productos Destacados - SIEMPRE visible arriba del listado */}
+      {/* Switch para habilitar carrusel (solo visible para cocinaty) */}
+      <CarouselSwitch />
+      
+      {/* Carrusel de Productos Destacados - Solo visible si está habilitado por el switch */}
+      <FeaturedProductsCarousel />
 
       {/* Carrousel de Lanzamientos / Entrega Inmediata */}
       {!loading && productos.length > 0 && (
