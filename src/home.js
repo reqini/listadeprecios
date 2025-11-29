@@ -70,6 +70,7 @@ const Home = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]); // Lista ORIGINAL de productos - NUNCA modificar
+  const [productosOriginales, setProductosOriginales] = useState([]); // Backup de productos originales
   const [searchTerm, setSearchTerm] = useState(""); // Estado SOLO para el input - independiente
   const [username, setUsername] = useState("");
   const [timeOfDay, setTimeOfDay] = useState("");
@@ -225,9 +226,22 @@ const Home = () => {
   }, []);
 
   // =============== Efecto para cargar productos y extras, solo si la sesión es válida ===============
+  // =============== Efecto para cargar productos y extras, solo si la sesión es válida ===============
   useEffect(() => {
     if (!sessionValid) return;
-    fetchData("productos", setProductos);
+    const loadProductos = async () => {
+      try {
+        const { data } = await axios.get('/api/productos');
+        // Guardar productos originales y productos actuales
+        setProductosOriginales(data);
+        setProductos(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error al obtener productos:', error);
+        setLoading(false);
+      }
+    };
+    loadProductos();
     fetchData("extras", setExtras);
   }, [sessionValid, fetchData]);
 
