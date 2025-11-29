@@ -13,7 +13,9 @@ const Catalogo14 = () => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
+  const [filtro, setFiltro] = useState("");
   const [productosAgrupados, setProductosAgrupados] = useState({});
+  const [isSticky, setIsSticky] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
