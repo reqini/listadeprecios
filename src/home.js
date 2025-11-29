@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { filterAllProducts } from "./utils/filterProducts";
+import HomeCenteredSearchBar from "./components/HomeCenteredSearchBar";
 import axios from "./utils/axios";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {
@@ -32,7 +33,6 @@ import ResponsiveDialog from "./components/dialog";
 import { useAuth } from "./AuthContext";
 import ReviewSlider from "./components/ReviewSlider";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import LaunchProductsCarousel from "./components/LaunchProductsCarousel";
 
 const Home = () => {
   const { logout } = useAuth();
@@ -364,35 +364,27 @@ const Home = () => {
         }
         onLogout={logout}
         user={{ username: username || localStorage.getItem("activeSession") || "" }}
-        showSearch={true}
-        searchValue={searchTerm}
-        onSearchChange={(value) => {
+      />
+
+      {/* Buscador centrado y angosto para Home */}
+      <HomeCenteredSearchBar
+        value={searchTerm}
+        onChange={(value) => {
           setSearchTerm(value); // Actualizar directamente el estado
         }}
+        placeholder="Buscar productos por nombre, categoría o banco..."
       />
 
       <Container 
         maxWidth="lg" 
         className="conteiner-list"
         sx={{
-          paddingTop: { xs: 2, sm: 3 }, // Padding normal, search solo fixed al hacer scroll
+          paddingTop: { xs: 1, sm: 2 },
           paddingBottom: { xs: 4, sm: 5 },
         }}
       >
 
         {getBannerForRango()}
-          
-          {/* Carrousel de Lanzamientos / Entrega Inmediata */}
-          {!loading && productos.length > 0 && (
-            <LaunchProductsCarousel
-              productos={productos}
-              onAddToCart={(prod) => onAddToCart(prod)}
-              onProductClick={(prod) => {
-                // Opcional: abrir modal o navegar al detalle
-                console.log('Producto clickeado:', prod);
-              }}
-            />
-          )}
 
           <Accordion sx={{ marginBottom: 2, display: 'none' }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
