@@ -1,25 +1,33 @@
 /* eslint-disable */
 import React, { useEffect, useState, useMemo } from "react";
-import { filterProducts, normalizeString } from "./utils/searchUtils";
 import axios from "./utils/axios";
 import Container from "@mui/material/Container";
 import Skeleton from "@mui/material/Skeleton";
 import LinearProgress from "@mui/material/LinearProgress";
 import { Helmet } from "react-helmet";
 import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
-import StickySearchBar from "./components/StickySearchBar";
+import ModernSearchBar from "./components/ModernSearchBar";
 import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
 import Navbar from "./components/Navbar";
+import LaunchProductsCarousel from "./components/LaunchProductsCarousel";
+import FeaturedProductsCarousel from "./components/FeaturedProductsCarousel";
+import CarouselSwitch from "./components/CarouselSwitch";
 import { Snackbar, Alert, Typography, Box } from "@mui/material";
 import { trackCatalogView, trackCatalogSearch, trackAddToCart, trackToggleFavorite } from "./utils/analytics";
 import { useAuth } from "./AuthContext";
+import { parsePrice } from "./utils/priceUtils";
+import { useIsIndividualCatalog } from "./utils/useCatalogContext";
+import { filterAllProducts } from "./utils/filterProducts";
 
 const Catalogo12 = () => {
+  // Detectar si estamos en una ruta dinámica (catálogo individual)
+  const isIndividualCatalog = useIsIndividualCatalog();
   const { logout } = useAuth();
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
-  const [filtro, setFiltro] = useState("");
+  const [productosOriginales, setProductosOriginales] = useState([]); // Productos originales sin filtrar
+  const [searchTerm, setSearchTerm] = useState(""); // Nuevo estado para búsqueda
   const [productosAgrupados, setProductosAgrupados] = useState({});
   const [isSticky, setIsSticky] = useState(false);
   const [favorites, setFavorites] = useState([]);
@@ -56,6 +64,7 @@ const Catalogo12 = () => {
         (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
       );
       const productosUnicos = eliminarDuplicados(productosFiltrados);
+      setProductosOriginales(productosUnicos); // Guardar productos originales
       setProductos(productosUnicos);
       agruparProductosPorLinea(productosUnicos);
       setLoading(false);
@@ -108,28 +117,53 @@ const Catalogo12 = () => {
     "12 cuotas sin interés": 'doce_sin_interes',
   }), []);
 
-  useEffect(() => {
-    // Filtrar por búsqueda y vigencia (excluyendo repuestos)
-    let productosFiltrados = filterProducts(productos, filtro, true).filter(
-      (producto) => normalizeString(producto?.linea) !== 'repuestos'
-    );
-    
-    // GA: búsqueda
-    if (filtro) {
-      trackCatalogSearch("Catálogo 12", filtro);
+  // Filtrar productos usando useMemo para mejor performance
+  const productosFiltrados = useMemo(() => {
+    // Primero filtrar por búsqueda
+    let productosConBusqueda = filterAllProducts(productosOriginales, searchTerm);
+
+    // GA: búsqueda (solo si hay término)
+    if (searchTerm && searchTerm.trim()) {
+      trackCatalogSearch("Catálogo 12", searchTerm);
     }
 
     // Filtrar por cuotas disponibles
     if (cuotasMap["12 cuotas sin interés"]) {
       const cuotaKey = cuotasMap["12 cuotas sin interés"];
-      productosFiltrados = productosFiltrados.filter(
+      productosConBusqueda = productosConBusqueda.filter(
         (producto) => producto[cuotaKey] && producto[cuotaKey] !== 'NO'
       );
     }
-    agruparProductosPorLinea(productosFiltrados);
-  }, [filtro, productos, cuotasMap]);
+
+    return productosConBusqueda;
+  }, [searchTerm, productosOriginales, cuotasMap]);
+
+  // Agrupar productos filtrados cuando cambian
+  useEffect(() => {
+    if (productosFiltrados && productosFiltrados.length >= 0) {
+      agruparProductosPorLinea(productosFiltrados);
+      setProductos(productosFiltrados); // Actualizar productos mostrados
+    }
+  }, [productosFiltrados]);
 
   const addToCart = (product) => {
+    // Obtener información de cuota del catálogo actual
+    const cuotaKeyCatalogo = cuotasMap["12 cuotas sin interés"]; // 'doce_sin_interes'
+    const cuotaValueRaw = product[cuotaKeyCatalogo] && product[cuotaKeyCatalogo] !== 'NO' 
+      ? product[cuotaKeyCatalogo] 
+      : null;
+    const cuotaValue = cuotaValueRaw ? parsePrice(cuotaValueRaw) : null;
+    
+    // Preparar producto con información de cuota
+    const productWithCuota = {
+      ...product,
+      // Si el producto ya tiene información de cuota (desde Home), mantenerla
+      // Si no, usar la del catálogo actual
+      selectedCuotaKey: product.selectedCuotaKey || cuotaKeyCatalogo,
+      selectedCuotaValue: product.selectedCuotaValue || cuotaValue,
+      selectedCuotaLabel: product.selectedCuotaLabel || "12 cuotas sin interés",
+    };
+
     setCart((prevCart) => {
       // Buscar si el producto ya existe en el carrito (por código)
       const existingIndex = prevCart.findIndex(
@@ -142,11 +176,15 @@ const Catalogo12 = () => {
         updatedCart[existingIndex] = {
           ...updatedCart[existingIndex],
           cantidad: (updatedCart[existingIndex].cantidad || 1) + 1,
+          // Actualizar información de cuota si no tenía
+          selectedCuotaKey: updatedCart[existingIndex].selectedCuotaKey || productWithCuota.selectedCuotaKey,
+          selectedCuotaValue: updatedCart[existingIndex].selectedCuotaValue || productWithCuota.selectedCuotaValue,
+          selectedCuotaLabel: updatedCart[existingIndex].selectedCuotaLabel || productWithCuota.selectedCuotaLabel,
         };
         return updatedCart;
       } else {
-        // Si no existe, agregarlo con cantidad 1
-        return [...prevCart, { ...product, cantidad: 1 }];
+        // Si no existe, agregarlo con cantidad 1 y información de cuota
+        return [...prevCart, { ...productWithCuota, cantidad: 1 }];
       }
     });
     // GA: agregar al carrito
@@ -191,31 +229,54 @@ const Catalogo12 = () => {
         <title>Catálogo 12 Cuotas - Catálogo</title>
       </Helmet>
 
-      {/* Header siempre visible */}
-      <Navbar
+      {/* Header oculto */}
+      {/* <Navbar
         title="Catálogo 12 Cuotas"
         onLogout={logout}
         user={{ username: localStorage.getItem("activeSession") || "" }}
-      />
+      /> */}
       
-      {/* Buscador sticky moderno fixed top: 0 */}
-      <StickySearchBar
-        value={filtro}
-        onChange={(e) => {
-          setFiltro(e.target.value);
-          trackCatalogSearch("Catálogo 12", e.target.value);
-        }}
-        placeholder="Buscar Producto"
-      />
+      {/* Buscador oculto en catálogos individuales */}
+      {!isIndividualCatalog && (
+        <ModernSearchBar
+          value={searchTerm}
+          onChange={(value) => {
+            setSearchTerm(value); // Actualizar directamente el estado
+          }}
+          placeholder="Buscar productos por nombre, categoría o banco..."
+        />
+      )}
 
       <Container 
         maxWidth="lg" 
         className="conteiner-list"
         sx={{
-          paddingTop: { xs: 12, sm: 13 }, // Espacio para header (~64px) + search bar fixed (~80px)
+          paddingTop: { xs: 1, sm: 2 }, // Espacio ajustado
           paddingBottom: { xs: 4, sm: 5 },
         }}
       >
+      {/* Switch y carrusel antiguo - Solo en rutas normales, NO en catálogos individuales */}
+      {!isIndividualCatalog && (
+        <>
+          {/* Switch para habilitar carrusel (solo visible para cocinaty) */}
+          <CarouselSwitch />
+          
+          {/* Carrusel de Productos Destacados - Solo visible si está habilitado por el switch */}
+          <FeaturedProductsCarousel />
+        </>
+      )}
+      
+      {/* Carrousel de Lanzamientos / Entrega Inmediata */}
+      {!loading && productos.length > 0 && (
+        <LaunchProductsCarousel
+          productos={productos}
+          onAddToCart={(prod) => addToCart(prod)}
+          onProductClick={(prod) => {
+            console.log('Producto clickeado:', prod);
+          }}
+        />
+      )}
+
       {/* Loading state - Skeleton moderno */}
       {loading && (
         <Box>

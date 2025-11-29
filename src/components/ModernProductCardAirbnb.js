@@ -182,8 +182,8 @@ const ModernProductCardAirbnb = ({
 
   useEffect(() => {
     if (!imageModalOpen) return;
-    
-    const handleWheel = (e) => {
+
+  const handleWheel = (e) => {
       e.preventDefault();
       const delta = e.deltaY > 0 ? -0.1 : 0.1;
       setImageZoom((prev) => Math.max(1, Math.min(3, prev + delta)));

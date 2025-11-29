@@ -17,7 +17,9 @@ import {
   // Alert, // Temporalmente oculto
   // useMediaQuery, // Temporalmente oculto
   // InputAdornment, // Temporalmente oculto
-  Badge
+  Badge,
+  useMediaQuery,
+  useTheme
 } from "@mui/material";
 // import { useTheme } from "@mui/material/styles"; // Temporalmente oculto
 // import { Visibility, VisibilityOff } from "@mui/icons-material"; // Temporalmente oculto
@@ -27,8 +29,9 @@ import { isCatalogRoute } from "../utils/isCatalogRoute";
 import Logo from '../assets/logo512.png'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MenuIcon from '@mui/icons-material/Menu';
+import ModernSearchBar from "./ModernSearchBar";
 
-const Navbar = ({ user, onLogout, title }) => {
+const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch = false }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
   // Estados del modal de perfil - temporalmente ocultos
@@ -119,34 +122,90 @@ const Navbar = ({ user, onLogout, title }) => {
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
-        <Toolbar style={{display: 'flex', justifyContent: 'space-between'}}>
-          <div className="flex items-center">
-              {location.pathname !== "/home" ? (
-                <IconButton size="small" color="secondary" onClick={() => navigate(-1)}>
-                  <ArrowBackIcon color="secondary" />
-                </IconButton>
-              ) : (
-                <img src={Logo} alt="logo" width="48" />
-              )}
-          </div>
-          <Typography variant="body1" fontSize={16} sx={{ flexGrow: 1, margin: '0 12px' }}>
-            {title}
-          </Typography>
-          <IconButton color="inherit" onClick={handleMenuOpen}>
-            <Badge
-              variant="dot"
-              color="secondary"
-              sx={{
-                "& .MuiBadge-dot": {
-                  height: 15,
-                  minWidth: 15,
-                  borderRadius: "50%",
-                },
-              }}
-            >
-              <MenuIcon />
-            </Badge>
-          </IconButton>
+        <Toolbar 
+          sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexDirection: { xs: showSearch ? 'column' : 'row', sm: 'row' },
+            paddingY: { xs: showSearch ? 1.5 : 0, sm: 0 },
+            gap: { xs: showSearch ? 1 : 0, sm: 0 },
+            flexWrap: 'wrap',
+          }}
+        >
+          {/* Logo/título - Lado izquierdo */}
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            order: { xs: 1, sm: 1 },
+            flex: { sm: showSearch ? '0 0 auto' : '1 1 auto' },
+          }}>
+            <div className="flex items-center">
+                {location.pathname !== "/home" ? (
+                  <IconButton size="small" color="secondary" onClick={() => navigate(-1)}>
+                    <ArrowBackIcon color="secondary" />
+                  </IconButton>
+                ) : (
+                  <img src={Logo} alt="logo" width="48" />
+                )}
+            </div>
+            {!showSearch && (
+              <Typography variant="body1" fontSize={16} sx={{ margin: { sm: '0 12px' }, display: { xs: 'none', sm: 'block' } }}>
+                {title}
+              </Typography>
+            )}
+          </Box>
+          
+          {/* Buscador (si showSearch es true) */}
+          {showSearch && (
+            <Box sx={{ 
+              width: { xs: '100%', sm: '100%' },
+              maxWidth: { sm: '600px' },
+              marginX: { xs: 0, sm: 'auto' },
+              order: { xs: 2, sm: 2 },
+              flex: { sm: '1 1 auto' },
+            }}>
+              <ModernSearchBar
+                value={searchValue || ''}
+                onChange={onSearchChange || (() => {})}
+                placeholder="Buscar productos por nombre, categoría o banco..."
+                sx={{
+                  paddingX: { xs: 2, sm: 0 },
+                  paddingY: { xs: 0, sm: 0 },
+                  marginBottom: 0,
+                  boxShadow: 'none',
+                  backgroundColor: 'transparent',
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  },
+                }}
+              />
+            </Box>
+          )}
+          
+          {/* Menú hamburguesa - Lado derecho */}
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            order: { xs: 3, sm: 3 },
+            marginLeft: { xs: showSearch ? 0 : 'auto', sm: 'auto' },
+          }}>
+            <IconButton color="inherit" onClick={handleMenuOpen}>
+              <Badge
+                variant="dot"
+                color="secondary"
+                sx={{
+                  "& .MuiBadge-dot": {
+                    height: 15,
+                    minWidth: 15,
+                    borderRadius: "50%",
+                  },
+                }}
+              >
+                <MenuIcon />
+              </Badge>
+            </IconButton>
+          </Box>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
             {/* Home */}
             <MenuItem

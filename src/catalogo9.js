@@ -9,12 +9,16 @@ import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Snackbar, Alert, Typography } from "@mui/material";
 import ShoppingCartCatalogo from "./components/ShoppingCartCatalogo";
+import FeaturedProductsCarousel from "./components/FeaturedProductsCarousel";
+import CarouselSwitch from "./components/CarouselSwitch";
+import { filterProducts, normalizeString } from "./utils/searchUtils";
+import LaunchProductsCarousel from "./components/LaunchProductsCarousel";
 
 const Catalogo9 = () => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);  // Carga inicial
-  const [productos, setProductos] = useState([]);
-  const [filtro, setFiltro] = useState("");
+  const [productos, setProductos] = useState([]); // Lista ORIGINAL de productos - NUNCA modificar
+  const [searchTerm, setSearchTerm] = useState(""); // Estado SOLO para el input - independiente
   const [productosAgrupados, setProductosAgrupados] = useState({});
   const [isSticky, setIsSticky] = useState(false);
   const [favorites, setFavorites] = useState([]);
@@ -88,22 +92,36 @@ const productosFiltrados = productosData.filter(
     "9 cuotas sin interés": 'doce_sin_interes',
   }), []);
 
-  // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir los productos con línea "Repuestos"
-  useEffect(() => {
-    let productosFiltrados = productos.filter((producto) =>
-  (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
-  (producto?.linea || '').toLowerCase() !== 'repuestos'
-);
-
+  // Filtrado DIRECTO desde searchTerm usando useMemo - SIN useEffect que cause loops
+  // NO modifica productos original, solo filtra para render
+  // Usa función optimizada con normalización de acentos y búsqueda robusta
+  const productosFiltrados = useMemo(() => {
+    // Si no hay productos, retornar vacío
+    if (!productos || productos.length === 0) return [];
+    
+    // Filtrar usando la función optimizada de searchUtils
+    let filtrados = filterProducts(productos, searchTerm, true);
+    
+    // Excluir repuestos
+    filtrados = filtrados.filter(
+      (producto) => normalizeString(producto?.linea) !== 'repuestos'
+    );
+    
+    // Filtrar por cuotas disponibles
     if (cuotasMap["9 cuotas sin interés"]) {
       const cuotaKey = cuotasMap["9 cuotas sin interés"];
-      productosFiltrados = productosFiltrados.filter(
+      filtrados = filtrados.filter(
         (producto) => producto[cuotaKey] && producto[cuotaKey] !== 'NO'
       );
     }
+    
+    return filtrados;
+  }, [productos, searchTerm, cuotasMap]); // Dependencias: productos original, searchTerm y cuotasMap
 
+  // Agrupar productos por línea cuando cambian los productos filtrados
+  useEffect(() => {
     agruparProductosPorLinea(productosFiltrados);
-  }, [filtro, productos, cuotasMap]);
+  }, [productosFiltrados]);
 
   // Añadir producto al carrito
   const addToCart = (product) => {
@@ -151,7 +169,12 @@ const productosFiltrados = productosData.filter(
     : productosAgrupados;
 
   return (
-    <Container maxWidth="lg" className="conteiner-list">
+      <Container maxWidth="lg" className="conteiner-list">
+        {/* Switch para habilitar carrusel (solo visible para cocinaty) */}
+        <CarouselSwitch />
+        
+        {/* Carrusel de Productos Destacados - Solo visible si está habilitado por el switch */}
+        <FeaturedProductsCarousel />
       <Helmet>
       <title>Catalogo Simple - Catálogo</title>
       </Helmet>
@@ -165,7 +188,8 @@ const productosFiltrados = productosData.filter(
         <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
       </div>
 
-      <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
+      {/* Header y buscador ocultos */}
+      {/* <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
         <TextField
           style={{ maxWidth: 450 }}
           fullWidth
@@ -173,10 +197,31 @@ const productosFiltrados = productosData.filter(
           id="outlined-basic"
           label="Buscar Producto"
           variant="outlined"
-          value={filtro}
-          onChange={(e) => setFiltro(e.target.value)}
+          value={searchTerm}
+          onChange={(e) => {
+            // SOLO actualizar el estado del input - NADA MÁS
+            // El filtrado se hace automáticamente en useMemo
+            setSearchTerm(e.target.value);
+          }}
+          autoComplete="off"
+          inputProps={{
+            autoCapitalize: 'off',
+            autoCorrect: 'off',
+            spellCheck: 'false',
+          }}
         />
-      </div>
+      </div> */}
+
+      {/* Carrousel de Lanzamientos / Entrega Inmediata */}
+      {!loading && productos.length > 0 && (
+        <LaunchProductsCarousel
+          productos={productos}
+          onAddToCart={(prod) => addToCart(prod)}
+          onProductClick={(prod) => {
+            console.log('Producto clickeado:', prod);
+          }}
+        />
+      )}
 
       {/* Skeleton para la carga inicial */}
       {loading && (

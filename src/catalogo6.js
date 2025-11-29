@@ -1,6 +1,5 @@
 /* eslint-disable */
 import React, { useEffect, useState, useMemo } from "react";
-import { filterProducts, normalizeString } from "./utils/searchUtils";
 import axios from "./utils/axios";
 import Container from "@mui/material/Container";
 import Skeleton from "@mui/material/Skeleton";
@@ -10,9 +9,13 @@ import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
 import StickySearchBar from "./components/StickySearchBar";
 import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
 import Navbar from "./components/Navbar";
+import LaunchProductsCarousel from "./components/LaunchProductsCarousel";
+import FeaturedProductsCarousel from "./components/FeaturedProductsCarousel";
+import CarouselSwitch from "./components/CarouselSwitch";
 import { Snackbar, Alert, Typography, Box } from "@mui/material";
 import { trackCatalogView, trackCatalogSearch, trackAddToCart, trackToggleFavorite } from "./utils/analytics";
 import { useAuth } from "./AuthContext";
+import { parsePrice } from "./utils/priceUtils";
 
 const Catalogo6 = () => {
   const { logout } = useAuth();
@@ -112,10 +115,12 @@ const Catalogo6 = () => {
     return () => window.removeEventListener('catalogoPromosUpdated', handlePromosUpdate);
   }, []);
 
+  // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir repuestos
   useEffect(() => {
-    // Filtrar por búsqueda y vigencia (excluyendo repuestos)
-    let productosFiltrados = filterProducts(productos, filtro, true).filter(
-      (producto) => normalizeString(producto?.linea) !== 'repuestos'
+    let productosFiltrados = productos.filter((producto) =>
+      (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
+      (producto?.linea || '').toLowerCase() !== 'repuestos' &&
+      (producto?.vigencia || '').toLowerCase() !== 'no'
     );
 
     // GA: búsqueda
@@ -135,6 +140,23 @@ const Catalogo6 = () => {
   }, [filtro, productos, cuotasMap]);
 
   const addToCart = (product) => {
+    // Obtener información de cuota del catálogo actual
+    const cuotaKeyCatalogo = cuotasMap["6 cuotas sin interés"]; // 'seis_sin_interes'
+    const cuotaValueRaw = product[cuotaKeyCatalogo] && product[cuotaKeyCatalogo] !== 'NO' 
+      ? product[cuotaKeyCatalogo] 
+      : null;
+    const cuotaValue = cuotaValueRaw ? parsePrice(cuotaValueRaw) : null;
+    
+    // Preparar producto con información de cuota
+    const productWithCuota = {
+      ...product,
+      // Si el producto ya tiene información de cuota (desde Home), mantenerla
+      // Si no, usar la del catálogo actual
+      selectedCuotaKey: product.selectedCuotaKey || cuotaKeyCatalogo,
+      selectedCuotaValue: product.selectedCuotaValue || cuotaValue,
+      selectedCuotaLabel: product.selectedCuotaLabel || "6 cuotas sin interés",
+    };
+
     setCart((prevCart) => {
       // Buscar si el producto ya existe en el carrito (por código)
       const existingIndex = prevCart.findIndex(
@@ -147,11 +169,15 @@ const Catalogo6 = () => {
         updatedCart[existingIndex] = {
           ...updatedCart[existingIndex],
           cantidad: (updatedCart[existingIndex].cantidad || 1) + 1,
+          // Actualizar información de cuota si no tenía
+          selectedCuotaKey: updatedCart[existingIndex].selectedCuotaKey || productWithCuota.selectedCuotaKey,
+          selectedCuotaValue: updatedCart[existingIndex].selectedCuotaValue || productWithCuota.selectedCuotaValue,
+          selectedCuotaLabel: updatedCart[existingIndex].selectedCuotaLabel || productWithCuota.selectedCuotaLabel,
         };
         return updatedCart;
       } else {
-        // Si no existe, agregarlo con cantidad 1
-        return [...prevCart, { ...product, cantidad: 1 }];
+        // Si no existe, agregarlo con cantidad 1 y información de cuota
+        return [...prevCart, { ...productWithCuota, cantidad: 1 }];
       }
     });
     // GA: agregar al carrito
@@ -203,31 +229,45 @@ const Catalogo6 = () => {
         <title>Catálogo 6 Cuotas - Catálogo</title>
       </Helmet>
 
-      {/* Header siempre visible */}
-      <Navbar
+      {/* Header oculto */}
+      {/* <Navbar
         title="Catálogo 6 Cuotas"
         onLogout={logout}
         user={{ username: localStorage.getItem("activeSession") || "" }}
-      />
+      /> */}
 
-      {/* Buscador sticky moderno fixed top: 0 */}
-      <StickySearchBar
-          value={filtro}
-        onChange={(e) => {
-          setFiltro(e.target.value);
-          trackCatalogSearch("Catálogo 6", e.target.value);
-        }}
+      {/* Buscador oculto */}
+      {/* <StickySearchBar
+        value={filtro}
+        onChange={(e) => setFiltro(e.target.value)}
         placeholder="Buscar Producto"
-      />
+      /> */}
 
       <Container 
         maxWidth="lg" 
         className="conteiner-list"
         sx={{
-          paddingTop: { xs: 12, sm: 13 }, // Espacio para header (~64px) + search bar fixed (~80px)
+          paddingTop: { xs: 2, sm: 3 }, // Espacio reducido ya que header y search están ocultos
           paddingBottom: { xs: 4, sm: 5 },
         }}
       >
+      {/* Switch para habilitar carrusel (solo visible para cocinaty) */}
+      <CarouselSwitch />
+      
+      {/* Carrusel de Productos Destacados - Solo visible si está habilitado por el switch */}
+      <FeaturedProductsCarousel />
+      
+      {/* Carrousel de Lanzamientos / Entrega Inmediata */}
+      {!loading && productos.length > 0 && (
+        <LaunchProductsCarousel
+          productos={productos}
+          onAddToCart={(prod) => addToCart(prod)}
+          onProductClick={(prod) => {
+            console.log('Producto clickeado:', prod);
+          }}
+        />
+      )}
+
       {/* Loading state - Skeleton moderno */}
       {loading && (
         <Box>

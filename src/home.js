@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { filterProducts } from "./utils/searchUtils";
+import { filterAllProducts } from "./utils/filterProducts";
+import ModernSearchBar from "./components/ModernSearchBar";
 import axios from "./utils/axios";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {
@@ -33,6 +34,7 @@ import ResponsiveDialog from "./components/dialog";
 import { useAuth } from "./AuthContext";
 import ReviewSlider from "./components/ReviewSlider";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import LaunchProductsCarousel from "./components/LaunchProductsCarousel";
 
 const Home = () => {
   const { logout } = useAuth();
@@ -69,6 +71,7 @@ const Home = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]); // Lista ORIGINAL de productos - NUNCA modificar
+  const [productosOriginales, setProductosOriginales] = useState([]); // Backup de productos originales
   const [searchTerm, setSearchTerm] = useState(""); // Estado SOLO para el input - independiente
   const [username, setUsername] = useState("");
   const [timeOfDay, setTimeOfDay] = useState("");
@@ -224,9 +227,22 @@ const Home = () => {
   }, []);
 
   // =============== Efecto para cargar productos y extras, solo si la sesión es válida ===============
+  // =============== Efecto para cargar productos y extras, solo si la sesión es válida ===============
   useEffect(() => {
     if (!sessionValid) return;
-    fetchData("productos", setProductos);
+    const loadProductos = async () => {
+      try {
+        const { data } = await axios.get('/api/productos');
+        // Guardar productos originales y productos actuales
+        setProductosOriginales(data);
+        setProductos(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error al obtener productos:', error);
+        setLoading(false);
+      }
+    };
+    loadProductos();
     fetchData("extras", setExtras);
   }, [sessionValid, fetchData]);
 
@@ -255,20 +271,22 @@ const Home = () => {
     return () => window.removeEventListener('catalogoPromosUpdated', handlePromosUpdate);
   }, [sessionValid]);
 
-  // Filtrado DIRECTO desde searchTerm - SIN estados intermedios
-  // NO modifica productos original, solo filtra para render
+  // Filtrado usando la misma lógica que los catálogos
   const productosFiltrados = useMemo(() => {
-    // Si no hay productos, retornar vacío
-    if (!productos || productos.length === 0) return [];
+    // Usar productosOriginales si existe y tiene datos, sino usar productos como fallback
+    const productosBase = (productosOriginales && productosOriginales.length > 0) 
+      ? productosOriginales 
+      : (productos && productos.length > 0 ? productos : []);
     
-    // Si no hay término de búsqueda, mostrar todos los productos vigentes
-    if (!searchTerm || !searchTerm.trim()) {
-      return productos.filter((producto) => producto?.vigencia === "SI");
+    // Si no hay productos base, retornar vacío
+    if (!productosBase || productosBase.length === 0) {
+      return [];
     }
     
-    // Filtrar usando la función optimizada
-    return filterProducts(productos, searchTerm.trim(), true);
-  }, [productos, searchTerm]); // Dependencias: productos original y searchTerm
+    // Usar filterAllProducts directamente como en los catálogos
+    // Esta función ya incluye validación de repuestos y vigencia
+    return filterAllProducts(productosBase, searchTerm);
+  }, [productosOriginales, productos, searchTerm]);
 
 
   // Cerrar snackbar
@@ -348,15 +366,11 @@ const Home = () => {
         }
         onLogout={logout}
         user={{ username: username || localStorage.getItem("activeSession") || "" }}
-      />
-      {/* Buscador fixed en top: 0 */}
-      <StickySearchBarWithScroll
-        value={searchTerm}
-        onChange={(e) => {
-          // SOLO actualizar el estado del input - NADA MÁS
-          setSearchTerm(e.target.value);
+        showSearch={true}
+        searchValue={searchTerm}
+        onSearchChange={(value) => {
+          setSearchTerm(value); // Actualizar directamente el estado
         }}
-        placeholder="Buscar Producto"
       />
 
       <Container 
@@ -369,6 +383,19 @@ const Home = () => {
       >
 
         {getBannerForRango()}
+          
+          {/* Carrousel de Lanzamientos / Entrega Inmediata */}
+          {!loading && productos.length > 0 && (
+            <LaunchProductsCarousel
+              productos={productos}
+              onAddToCart={(prod) => onAddToCart(prod)}
+              onProductClick={(prod) => {
+                // Opcional: abrir modal o navegar al detalle
+                console.log('Producto clickeado:', prod);
+              }}
+            />
+          )}
+
           <Accordion sx={{ marginBottom: 2, display: 'none' }}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography variant="subtitle1" fontWeight={600}>
@@ -439,7 +466,7 @@ const Home = () => {
               />
             ))}
           </Box>
-        ) : productosFiltrados.length === 0 && searchTerm && searchTerm.trim() !== '' ? (
+        ) : productosFiltrados.length === 0 && searchTerm && searchTerm.trim() ? (
           <Box
             sx={{
               textAlign: 'center',
@@ -467,7 +494,7 @@ const Home = () => {
               No hay productos que coincidan con "{searchTerm}". Intenta con otro término de búsqueda.
             </Typography>
           </Box>
-        ) : (
+        ) : productosFiltrados.length > 0 ? (
           <Box
             sx={{
               display: 'grid',
@@ -499,6 +526,23 @@ const Home = () => {
                 bankLogos={bankLogos} // Pasar logos de bancos desde Google Sheets
               />
             ))}
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              textAlign: 'center',
+              padding: { xs: 4, sm: 6 },
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{
+                color: '#999',
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+              }}
+            >
+              No hay productos disponibles en este momento.
+            </Typography>
           </Box>
         )}
 
