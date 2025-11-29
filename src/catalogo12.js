@@ -10,8 +10,7 @@ import ModernSearchBar from "./components/ModernSearchBar";
 import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
 import Navbar from "./components/Navbar";
 import LaunchProductsCarousel from "./components/LaunchProductsCarousel";
-import FeaturedProductsCarousel from "./components/FeaturedProductsCarousel";
-import CarouselSwitch from "./components/CarouselSwitch";
+// Switch y carrusel antiguo eliminados de catálogos comunes
 import { Snackbar, Alert, Typography, Box } from "@mui/material";
 import { trackCatalogView, trackCatalogSearch, trackAddToCart, trackToggleFavorite } from "./utils/analytics";
 import { useAuth } from "./AuthContext";
@@ -255,16 +254,7 @@ const Catalogo12 = () => {
           paddingBottom: { xs: 4, sm: 5 },
         }}
       >
-      {/* Switch y carrusel antiguo - Solo en rutas normales, NO en catálogos individuales */}
-      {!isIndividualCatalog && (
-        <>
-          {/* Switch para habilitar carrusel (solo visible para cocinaty) */}
-          <CarouselSwitch />
-          
-          {/* Carrusel de Productos Destacados - Solo visible si está habilitado por el switch */}
-          <FeaturedProductsCarousel />
-        </>
-      )}
+      {/* Switch y carrusel antiguo eliminados de catálogos comunes */}
       
       {/* Carrousel de Lanzamientos / Entrega Inmediata */}
       {!loading && productos.length > 0 && (

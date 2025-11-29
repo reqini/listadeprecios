@@ -13,9 +13,8 @@ const Catalogo14 = () => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
-  const [filtro, setFiltro] = useState("");
+  const [filtro] = useState("");
   const [productosAgrupados, setProductosAgrupados] = useState({});
-  const [isSticky, setIsSticky] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -74,18 +73,18 @@ const Catalogo14 = () => {
     setProductosAgrupados(productosPorLinea);
   };
 
-  // Manejar el scroll para sticky header
-  useEffect(() => {
-    const handleScroll = () => {
-      const offset = window.scrollY;
-      setIsSticky(offset > 100);
-    };
+  // Manejar el scroll para sticky header - COMENTADO porque el header está oculto
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     const offset = window.scrollY;
+  //     setIsSticky(offset > 100);
+  //   };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => {
+  //     window.removeEventListener("scroll", handleScroll);
+  //   };
+  // }, []);
 
   // Filtrar productos según descripción, línea y cuota
   useEffect(() => {

@@ -10,19 +10,24 @@ import StickySearchBar from "./components/StickySearchBar";
 import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
 import Navbar from "./components/Navbar";
 import LaunchProductsCarousel from "./components/LaunchProductsCarousel";
-import FeaturedProductsCarousel from "./components/FeaturedProductsCarousel";
-import CarouselSwitch from "./components/CarouselSwitch";
+// Switch y carrusel antiguo eliminados de catálogos comunes
 import { Snackbar, Alert, Typography, Box } from "@mui/material";
 import { trackCatalogView, trackCatalogSearch, trackAddToCart, trackToggleFavorite } from "./utils/analytics";
 import { useAuth } from "./AuthContext";
 import { parsePrice } from "./utils/priceUtils";
+import { useIsIndividualCatalog } from "./utils/useCatalogContext";
+import ModernSearchBar from "./components/ModernSearchBar";
+import { filterAllProducts } from "./utils/filterProducts";
 
 const Catalogo6 = () => {
+  // Detectar si estamos en una ruta dinámica (catálogo individual)
+  const isIndividualCatalog = useIsIndividualCatalog();
   const { logout } = useAuth();
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
-  const [filtro, setFiltro] = useState("");
+  const [productosOriginales, setProductosOriginales] = useState([]); // Productos originales sin filtrar
+  const [searchTerm, setSearchTerm] = useState(""); // Nuevo estado para búsqueda
   const [productosAgrupados, setProductosAgrupados] = useState({});
   const [isSticky, setIsSticky] = useState(false);
   const [favorites, setFavorites] = useState([]);
@@ -69,6 +74,7 @@ const Catalogo6 = () => {
       );
       const productosUnicos = eliminarDuplicados(productosFiltrados);
       setProductos(productosUnicos);
+      setProductosOriginales(productosUnicos); // Guardar productos originales
       agruparProductosPorLinea(productosUnicos);
       setLoading(false);
     };
@@ -115,17 +121,25 @@ const Catalogo6 = () => {
     return () => window.removeEventListener('catalogoPromosUpdated', handlePromosUpdate);
   }, []);
 
-  // Filtrar productos según el filtro de texto, cuotas seleccionadas y excluir repuestos
+  // Filtrar productos según el searchTerm, cuotas seleccionadas y excluir repuestos
   useEffect(() => {
-    let productosFiltrados = productos.filter((producto) =>
-      (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
+    // Usar productosOriginales si están disponibles, sino usar productos
+    const productosBase = productosOriginales.length > 0 ? productosOriginales : productos;
+    
+    // Filtrar por búsqueda usando filterAllProducts
+    let productosFiltrados = searchTerm 
+      ? filterAllProducts(productosBase, searchTerm)
+      : productosBase;
+
+    // Filtrar por repuestos y vigencia
+    productosFiltrados = productosFiltrados.filter((producto) =>
       (producto?.linea || '').toLowerCase() !== 'repuestos' &&
       (producto?.vigencia || '').toLowerCase() !== 'no'
     );
 
     // GA: búsqueda
-    if (filtro) {
-      trackCatalogSearch("Catálogo 6", filtro);
+    if (searchTerm) {
+      trackCatalogSearch("Catálogo 6", searchTerm);
     }
 
     // Filtrar por cuotas disponibles
@@ -137,7 +151,7 @@ const Catalogo6 = () => {
     }
 
     agruparProductosPorLinea(productosFiltrados);
-  }, [filtro, productos, cuotasMap]);
+  }, [searchTerm, productos, productosOriginales, cuotasMap]);
 
   const addToCart = (product) => {
     // Obtener información de cuota del catálogo actual
@@ -236,26 +250,26 @@ const Catalogo6 = () => {
         user={{ username: localStorage.getItem("activeSession") || "" }}
       /> */}
 
-      {/* Buscador oculto */}
-      {/* <StickySearchBar
-        value={filtro}
-        onChange={(e) => setFiltro(e.target.value)}
-        placeholder="Buscar Producto"
-      /> */}
+      {/* Buscador oculto en catálogos individuales */}
+      {!isIndividualCatalog && (
+        <ModernSearchBar
+          value={searchTerm}
+          onChange={(value) => {
+            setSearchTerm(value); // Actualizar directamente el estado
+          }}
+          placeholder="Buscar productos por nombre, categoría o banco..."
+        />
+      )}
 
       <Container 
         maxWidth="lg" 
         className="conteiner-list"
         sx={{
-          paddingTop: { xs: 2, sm: 3 }, // Espacio reducido ya que header y search están ocultos
+          paddingTop: { xs: 1, sm: 2 }, // Espacio ajustado
           paddingBottom: { xs: 4, sm: 5 },
         }}
       >
-      {/* Switch para habilitar carrusel (solo visible para cocinaty) */}
-      <CarouselSwitch />
-      
-      {/* Carrusel de Productos Destacados - Solo visible si está habilitado por el switch */}
-      <FeaturedProductsCarousel />
+      {/* Switch y carrusel antiguo eliminados de catálogos comunes */}
       
       {/* Carrousel de Lanzamientos / Entrega Inmediata */}
       {!loading && productos.length > 0 && (

@@ -136,7 +136,7 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
             display: 'flex', 
             alignItems: 'center', 
             order: { xs: 1, sm: 1 },
-            flex: { sm: showSearch ? '0 0 auto' : '1 1 auto' },
+            flex: { sm: '0 0 auto' },
           }}>
             <div className="flex items-center">
                 {location.pathname !== "/home" ? (
@@ -154,33 +154,36 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
             )}
           </Box>
           
-          {/* Buscador (si showSearch es true) - Centrado con max-width 360px */}
+          {/* Buscador (si showSearch es true) - Centrado con max-width 560px y width 100% */}
           {showSearch && (
             <Box sx={{ 
-              width: { xs: '100%', sm: 'auto' },
-              maxWidth: { xs: '100%', sm: '360px' },
-              marginX: { xs: 0, sm: 'auto' },
+              width: '100%',
+              maxWidth: '560px',
+              marginX: 'auto',
               order: { xs: 2, sm: 2 },
-              flex: { sm: '0 0 auto' },
+              flex: { sm: '1 1 auto' },
               display: 'flex',
               justifyContent: 'center',
+              px: { xs: 2, sm: 2 },
             }}>
-              <ModernSearchBar
-                value={searchValue || ''}
-                onChange={onSearchChange || (() => {})}
-                placeholder="Buscar productos por nombre, categoría o banco..."
-                sx={{
-                  width: '100%',
-                  paddingX: { xs: 2, sm: 0 },
-                  paddingY: { xs: 0, sm: 0 },
-                  marginBottom: 0,
-                  boxShadow: 'none',
-                  backgroundColor: 'transparent',
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                  },
-                }}
-              />
+              <Box sx={{ width: '100%' }}>
+                <ModernSearchBar
+                  value={searchValue || ''}
+                  onChange={onSearchChange || (() => {})}
+                  placeholder="Buscar productos por nombre, categoría o banco..."
+                  sx={{
+                    width: '100%',
+                    paddingX: 0,
+                    paddingY: { xs: 1, sm: 0.5 },
+                    marginBottom: 0,
+                    boxShadow: 'none',
+                    backgroundColor: 'transparent',
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    },
+                  }}
+                />
+              </Box>
             </Box>
           )}
           
@@ -189,7 +192,8 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
             display: 'flex', 
             alignItems: 'center',
             order: { xs: 3, sm: 3 },
-            marginLeft: { xs: showSearch ? 0 : 'auto', sm: 'auto' },
+            flex: { sm: '0 0 auto' },
+            marginLeft: { xs: showSearch ? 0 : 'auto', sm: showSearch ? 0 : 'auto' },
           }}>
             <IconButton color="inherit" onClick={handleMenuOpen}>
               <Badge
@@ -229,7 +233,7 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
             >
               Perfil
             </MenuItem>
-            <Divider></Divider>
+            <Divider />
             
             {/* Catálogos y Clientes */}
             <MenuItem
@@ -240,7 +244,7 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
             >
               Catálogos y Clientes
             </MenuItem>
-            <Divider></Divider>
+            <Divider />
             
             {/* Ventas */}
             <MenuItem onClick={() => navigate("/ventas")}>
@@ -249,18 +253,7 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
                 <Typography color="primary" fontSize={12}>🚀 Lanzamiento</Typography>
               </Box>
             </MenuItem>
-            <Divider></Divider>
-            
-            {/* Crear Placas - OCULTO TEMPORALMENTE */}
-            {/* <MenuItem
-              onClick={() => {
-                navigate("/generarPlaca");
-                handleMenuClose();
-              }}
-            >
-              Crear Placas
-            </MenuItem>
-            <Divider></Divider> */}
+            <Divider />
             
             {/* Preguntas Frecuentes */}
             <MenuItem
@@ -271,7 +264,7 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
             >
               Preguntas Frecuentes
             </MenuItem>
-            <Divider></Divider>
+            <Divider />
             
             {/* Capacitaciones */}
             <MenuItem
@@ -285,7 +278,7 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
                 <Typography color="secondary" fontSize={12}>🎓 Gratis</Typography>
               </Box>
             </MenuItem>
-            <Divider></Divider>
+            <Divider />
             
             {/* Búsqueda IA */}
             <MenuItem
@@ -299,11 +292,10 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
                 <Typography color="primary" fontSize={12}>🤖 IA</Typography>
               </Box>
             </MenuItem>
-            <Divider></Divider>
-            
-            {/* Panel de Administración - Solo para cocinaty */}
             {(user?.username === 'cocinaty' || localStorage.getItem('activeSession') === 'cocinaty') && (
               <>
+                <Divider />
+                {/* Panel de Administración - Solo para cocinaty */}
                 <MenuItem
                   onClick={() => {
                     navigate("/administrador");
@@ -316,9 +308,9 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
                     <Typography color="secondary" fontSize={12}>🔧 Admin</Typography>
                   </Box>
                 </MenuItem>
-                <Divider></Divider>
               </>
             )}
+            <Divider />
             
             <MenuItem
               onClick={() => {

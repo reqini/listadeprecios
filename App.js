@@ -25,6 +25,8 @@ import Activos from "./Activos";
 import Emprendedoras from "./Emprendedoras";
 import GeneradorDePlacas from "./GeneradorDePlacas";
 import CatalogoIndividual from "./pages/CatalogoIndividual";
+import Entregaya from "./pages/Entregaya";
+import UrlRedirect from "./components/UrlRedirect";
 import { AuthProvider, useAuth } from "./AuthContext";
 
 // Google Analytics
@@ -65,8 +67,14 @@ const AppContent = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Router>
+      <Router
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <AnalyticsTracker />
+        <UrlRedirect />
         <Routes>
           <Route path="/activos" element={<Activos />} />
           <Route path="/login" element={<LoginRoute />} />
@@ -92,10 +100,14 @@ const AppContent = () => {
           <Route path="/emprendedoras" element={<PrivateRoute><Emprendedoras /></PrivateRoute>} />
           <Route path="/ventas" element={<PrivateRoute><Ventas /></PrivateRoute>} />
           
+          {/* Catálogo de Entrega Ya - Productos de la hoja entrega-ya */}
+          <Route path="/entregaya" element={<Entregaya />} />
+          
           {/* Ruta dinámica para catálogos individuales: /{slug}/{cuota} */}
           {/* IMPORTANTE: Esta ruta debe ir DESPUÉS de todas las rutas específicas */}
           {/* Maneja TODAS las URLs tipo /cocinaty/12, /carlaessen/18, etc. */}
-          <Route path="/:slug/:cuota" element={<CatalogoIndividual />} />
+          {/* COMENTADA: Rutas de cocinaty eliminadas según solicitud */}
+          {/* <Route path="/:slug/:cuota" element={<CatalogoIndividual />} /> */}
           
           <Route path="/" element={<Navigate to="/login" replace />} />
         </Routes>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { filterProducts, normalizeString } from "./utils/searchUtils";
+import { normalizeString } from "./utils/searchUtils";
 import axios from "./utils/axios";
 import Container from "@mui/material/Container";
 import Skeleton from "@mui/material/Skeleton";
@@ -8,20 +8,24 @@ import { Helmet } from "react-helmet";
 import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
 import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
 import FeaturedProductsBanner from "./components/FeaturedProductsBanner";
-import FeaturedProductsCarousel from "./components/FeaturedProductsCarousel";
-import CarouselSwitch from "./components/CarouselSwitch";
+// Switch y carrusel antiguo eliminados de catálogos comunes
 import { Snackbar, Alert, Typography, Box, Button } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { trackCatalogView, trackCatalogSearch, trackAddToCart, trackToggleFavorite } from "./utils/analytics";
-import { useAuth } from "./AuthContext";
+// import { useAuth } from "./AuthContext"; // No usado actualmente
 import { parsePrice } from "./utils/priceUtils";
-
+import { useIsIndividualCatalog } from "./utils/useCatalogContext";
+import ModernSearchBar from "./components/ModernSearchBar";
+import { filterAllProducts } from "./utils/filterProducts";
 
 const Catalogo3 = () => {
+  // Detectar si estamos en una ruta dinámica (catálogo individual)
+  const isIndividualCatalog = useIsIndividualCatalog();
   const isMobile = useMediaQuery('(max-width:600px)');
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
+  const [productosOriginales, setProductosOriginales] = useState([]); // Productos originales sin filtrar
   const [searchTerm, setSearchTerm] = useState(""); // Estado SOLO para el input - independiente
   const [productosAgrupados, setProductosAgrupados] = useState({});
   const [favorites, setFavorites] = useState([]);
@@ -149,6 +153,7 @@ const Catalogo3 = () => {
       );
       const productosUnicos = eliminarDuplicados(productosFiltrados);
       setProductos(productosUnicos);
+      setProductosOriginales(productosUnicos); // Guardar productos originales
       agruparProductosPorLinea(productosUnicos);
       setLoading(false);
     };
@@ -174,8 +179,16 @@ const Catalogo3 = () => {
   // Optimizado con useMemo para evitar re-renders innecesarios
   // NO modifica productos original, solo filtra para render
   useEffect(() => {
-    // Filtrar por búsqueda y vigencia (excluyendo repuestos)
-    let productosFiltrados = filterProducts(productos, searchTerm, true).filter(
+    // Usar productosOriginales si están disponibles, sino usar productos
+    const productosBase = productosOriginales.length > 0 ? productosOriginales : productos;
+    
+    // Filtrar por búsqueda usando filterAllProducts
+    let productosFiltrados = searchTerm 
+      ? filterAllProducts(productosBase, searchTerm)
+      : productosBase;
+    
+    // Filtrar por repuestos y vigencia
+    productosFiltrados = productosFiltrados.filter(
       (producto) => normalizeString(producto?.linea) !== 'repuestos'
     );
 
@@ -193,7 +206,7 @@ const Catalogo3 = () => {
     }
 
     agruparProductosPorLinea(productosFiltrados);
-  }, [searchTerm, productos, cuotasMap]);
+  }, [searchTerm, productos, productosOriginales, cuotasMap]);
 
   // Añadir producto al carrito
   const addToCart = (product) => {
@@ -375,20 +388,22 @@ const Catalogo3 = () => {
         user={{ username: localStorage.getItem("activeSession") || "" }}
       /> */}
       
-      {/* Buscador oculto */}
-      {/* <StickySearchBar
-        value={searchTerm}
-        onChange={(e) => {
-          setSearchTerm(e.target.value); // Actualizar inmediatamente el input (sin debounce)
-        }}
-        placeholder="Buscar Producto"
-      /> */}
+      {/* Buscador oculto en catálogos individuales */}
+      {!isIndividualCatalog && (
+        <ModernSearchBar
+          value={searchTerm}
+          onChange={(value) => {
+            setSearchTerm(value); // Actualizar directamente el estado
+          }}
+          placeholder="Buscar productos por nombre, categoría o banco..."
+        />
+      )}
 
       <Container 
         maxWidth="lg" 
         className="conteiner-list"
         sx={{
-          paddingTop: { xs: 2, sm: 3 }, // Espacio reducido ya que header y search están ocultos
+          paddingTop: { xs: 1, sm: 2 }, // Espacio ajustado
           paddingBottom: { xs: 4, sm: 5 },
         }}
       >
@@ -403,11 +418,7 @@ const Catalogo3 = () => {
         </Button>
       </div> */}
 
-      {/* Switch para habilitar carrusel (solo visible para cocinaty) */}
-      <CarouselSwitch />
-      
-      {/* Carrusel de Productos Destacados - Solo visible si está habilitado por el switch */}
-      <FeaturedProductsCarousel />
+      {/* Switch y carrusel antiguo eliminados de catálogos comunes */}
 
       {/* Banner de productos destacados */}
       {!loading && productos.length > 0 && (

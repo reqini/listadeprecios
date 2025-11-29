@@ -54,7 +54,9 @@ import {
   ShoppingCart as ShoppingCartIcon,
   PhotoCamera as PhotoCameraIcon,
   CheckCircle as CheckCircleIcon,
-  Warning as WarningIcon
+  Warning as WarningIcon,
+  TableChart as TableChartIcon,
+  OpenInNew as OpenInNewIcon
 } from '@mui/icons-material';
 import Navbar from '../components/Navbar';
 import { profileAPI } from '../utils/profileAPI';
@@ -518,9 +520,56 @@ const PerfilEmprendedora = () => {
 
           {/* Tab 3: Preferencias */}
           <TabPanel value={activeTab} index={2}>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
               Configuración de la Aplicación
             </Typography>
+            
+            {/* Sección de Google Sheets */}
+            <Card sx={{ mb: 3, border: '2px solid', borderColor: 'primary.main' }}>
+              <CardContent>
+                <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+                  <Box display="flex" alignItems="center" gap={2}>
+                    <Avatar sx={{ bgcolor: '#34a853', width: 48, height: 48 }}>
+                      <TableChartIcon />
+                    </Avatar>
+                    <Box>
+                      <Typography variant="h6">
+                        Configuración en Google Sheets
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Edita tu configuración directamente en la hoja de cálculo
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+                <Button
+                  variant="contained"
+                  color="success"
+                  fullWidth
+                  size="large"
+                  startIcon={<TableChartIcon />}
+                  endIcon={<OpenInNewIcon />}
+                  onClick={() => {
+                    // URL de Google Sheets - Puedes configurarla aquí o desde variables de entorno
+                    const googleSheetsUrl = process.env.REACT_APP_CONFIG_SHEET_URL || 'https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit';
+                    window.open(googleSheetsUrl, '_blank');
+                  }}
+                  sx={{ mt: 2 }}
+                >
+                  Abrir Hoja de Configuración
+                </Button>
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                  💡 Tip: Podrás editar tus preferencias, información de contacto y más directamente desde Google Sheets
+                </Typography>
+              </CardContent>
+            </Card>
+
+            <Divider sx={{ my: 3 }} />
+
+            <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+              Preferencias de la Aplicación
+            </Typography>
+            
             <List>
               <ListItem>
                 <ListItemIcon>

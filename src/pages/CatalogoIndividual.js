@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React, { useEffect, useState } from "react";
-import { useParams, Navigate } from "react-router-dom";
+import { useParams, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Container, Box, Typography, LinearProgress, Alert } from "@mui/material";
 import { Helmet } from "react-helmet";
 import axios from "../utils/axios";
@@ -39,10 +39,28 @@ const CATALOGO_COMPONENTS = {
  */
 const CatalogoIndividual = () => {
   const { slug, cuota } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [productosEntrega, setProductosEntrega] = useState([]);
+
+  // Validar y corregir URL mal formada
+  useEffect(() => {
+    const pathname = location.pathname;
+    
+    // Si la URL está mal formada (ej: /cocinaty12), redirigir
+    const malformedMatch = pathname.match(/^\/([^/]+)(\d+)$/);
+    if (malformedMatch && malformedMatch[1] !== 'catalogo') {
+      const correctedSlug = malformedMatch[1];
+      const correctedCuota = malformedMatch[2];
+      const correctUrl = `/${correctedSlug}/${correctedCuota}`;
+      console.log(`URL mal formada detectada: ${pathname} → ${correctUrl}`);
+      navigate(correctUrl, { replace: true });
+      return;
+    }
+  }, [location.pathname, navigate]);
 
   // Obtener componente de catálogo según cuota
   const CatalogoComponent = CATALOGO_COMPONENTS[cuota];

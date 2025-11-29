@@ -31,7 +31,7 @@ const ModernCartBottomSheet = ({
 
   const getCuotaSeleccionada = (product) => {
     // Si el producto tiene una cuota seleccionada desde Home (selectedCuotaValue), usarla
-    if (product.selectedCuotaValue !== undefined && product.selectedCuotaValue !== null) {
+    if (product.selectedCuotaValue !== undefined && product.selectedCuotaValue !== null && product.selectedCuotaValue > 0) {
       return product.selectedCuotaValue;
     }
     
@@ -39,11 +39,23 @@ const ModernCartBottomSheet = ({
     if (product.selectedCuotaKey && product[product.selectedCuotaKey]) {
       const raw = product[product.selectedCuotaKey];
       if (raw && typeof raw === "string" && raw.toLowerCase() !== "no") {
-        return parsePrice(raw);
+        const parsed = parsePrice(raw);
+        if (parsed > 0) return parsed;
       }
     }
     
-    // Fallback: usar el cuotaKey por defecto
+    // Fallback: usar precio_negocio o precio directo (para productos de entregas-ya)
+    if (product.precio_negocio) {
+      const precioNum = typeof product.precio_negocio === 'number' ? product.precio_negocio : parsePrice(String(product.precio_negocio));
+      if (precioNum > 0) return precioNum;
+    }
+    
+    if (product.precio) {
+      const precioNum = typeof product.precio === 'number' ? product.precio : parsePrice(String(product.precio));
+      if (precioNum > 0) return precioNum;
+    }
+    
+    // Último fallback: usar el cuotaKey por defecto
     const raw = product[cuotaKey];
     if (!raw || typeof raw !== "string" || raw.toLowerCase() === "no") return 0;
     return parsePrice(raw);
@@ -715,4 +727,5 @@ const ModernCartBottomSheet = ({
 };
 
 export default ModernCartBottomSheet;
+
 

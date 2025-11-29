@@ -5,7 +5,6 @@ import {
   InputAdornment,
   IconButton,
   useTheme,
-  useMediaQuery,
 } from '@mui/material';
 import {
   Search as SearchIcon,

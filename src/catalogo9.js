@@ -9,8 +9,7 @@ import ProductsCalatogo from "./components/productsCalatogo";
 import logo from './assets/logo.png';
 import { Snackbar, Alert, Typography } from "@mui/material";
 import ShoppingCartCatalogo from "./components/ShoppingCartCatalogo";
-import FeaturedProductsCarousel from "./components/FeaturedProductsCarousel";
-import CarouselSwitch from "./components/CarouselSwitch";
+// Switch y carrusel antiguo eliminados de catálogos comunes
 import { filterProducts, normalizeString } from "./utils/searchUtils";
 import LaunchProductsCarousel from "./components/LaunchProductsCarousel";
 
@@ -170,11 +169,7 @@ const productosFiltrados = productosData.filter(
 
   return (
       <Container maxWidth="lg" className="conteiner-list">
-        {/* Switch para habilitar carrusel (solo visible para cocinaty) */}
-        <CarouselSwitch />
-        
-        {/* Carrusel de Productos Destacados - Solo visible si está habilitado por el switch */}
-        <FeaturedProductsCarousel />
+        {/* Switch y carrusel antiguo eliminados de catálogos comunes */}
       <Helmet>
       <title>Catalogo Simple - Catálogo</title>
       </Helmet>

@@ -43,6 +43,62 @@ const CarouselSwitch = () => {
   const STORAGE_KEY = 'carousel_switch_cocinaty';
   const ONE_HOUR_MS = useMemo(() => 60 * 60 * 1000, []); // 1 hora en milisegundos
 
+  // Función para actualizar la URL - DEBE estar antes de los useEffect que la usan
+  const updateURL = useCallback((isEnabled) => {
+    // Si estamos en una ruta normal (/catalogo12), redirigir a /cocinaty/12
+    // Si estamos en /cocinaty/12, mantener la URL
+    const pathname = location.pathname;
+    let newPath = pathname;
+    
+    // Detectar si estamos en ruta normal y convertir a /cocinaty/:numero
+    const catalogoMatch = pathname.match(/\/catalogo(\d+)/);
+    if (catalogoMatch && isEnabled) {
+      const numero = catalogoMatch[1];
+      newPath = `/cocinaty/${numero}`;
+    } else if (pathname.startsWith('/cocinaty/')) {
+      // Ya estamos en ruta cocinaty, mantener
+      newPath = pathname;
+    }
+    
+    // Agregar query param si está habilitado
+    if (isEnabled) {
+      const searchParams = new URLSearchParams(location.search);
+      searchParams.set('carousel', 'enabled');
+      const newSearch = searchParams.toString();
+      newPath = newSearch ? `${newPath}?${newSearch}` : newPath;
+    }
+
+    navigate(newPath, { replace: true });
+  }, [location.pathname, location.search, navigate]);
+
+  // Manejar cambio del switch - DEBE estar antes de los useEffect que lo usan
+  const handleToggle = useCallback((newValue, updateUrl = true) => {
+    if (newValue) {
+      // Activar: guardar timestamp
+      const data = {
+        enabled: true,
+        timestamp: Date.now(),
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      setEnabled(true);
+      setTimeRemaining(ONE_HOUR_MS);
+      setIsExpired(false);
+      
+      if (updateUrl) {
+        updateURL(true);
+      }
+    } else {
+      // Desactivar: limpiar
+      localStorage.removeItem(STORAGE_KEY);
+      setEnabled(false);
+      setTimeRemaining(null);
+      setIsExpired(false);
+      if (updateUrl) {
+        updateURL(false);
+      }
+    }
+  }, [ONE_HOUR_MS, updateURL]);
+
   // Cargar estado inicial desde localStorage
   useEffect(() => {
     if (!isCocinaty) return;
@@ -124,63 +180,7 @@ const CarouselSwitch = () => {
         setEnabled(false);
       }
     }
-  }, [location.search, isCocinaty, enabled]);
-
-  // Función para actualizar la URL
-  const updateURL = useCallback((isEnabled) => {
-    // Si estamos en una ruta normal (/catalogo12), redirigir a /cocinaty/12
-    // Si estamos en /cocinaty/12, mantener la URL
-    const pathname = location.pathname;
-    let newPath = pathname;
-    
-    // Detectar si estamos en ruta normal y convertir a /cocinaty/:numero
-    const catalogoMatch = pathname.match(/\/catalogo(\d+)/);
-    if (catalogoMatch && isEnabled) {
-      const numero = catalogoMatch[1];
-      newPath = `/cocinaty/${numero}`;
-    } else if (pathname.startsWith('/cocinaty/')) {
-      // Ya estamos en ruta cocinaty, mantener
-      newPath = pathname;
-    }
-    
-    // Agregar query param si está habilitado
-    if (isEnabled) {
-      const searchParams = new URLSearchParams(location.search);
-      searchParams.set('carousel', 'enabled');
-      const newSearch = searchParams.toString();
-      newPath = newSearch ? `${newPath}?${newSearch}` : newPath;
-    }
-
-    navigate(newPath, { replace: true });
-  }, [location.pathname, location.search, navigate]);
-
-  // Manejar cambio del switch
-  const handleToggle = useCallback((newValue, updateUrl = true) => {
-    if (newValue) {
-      // Activar: guardar timestamp
-      const data = {
-        enabled: true,
-        timestamp: Date.now(),
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      setEnabled(true);
-      setTimeRemaining(ONE_HOUR_MS);
-      setIsExpired(false);
-      
-      if (updateUrl) {
-        updateURL(true);
-      }
-    } else {
-      // Desactivar: limpiar
-      localStorage.removeItem(STORAGE_KEY);
-      setEnabled(false);
-      setTimeRemaining(null);
-      setIsExpired(false);
-      if (updateUrl) {
-        updateURL(false);
-      }
-    }
-  }, [ONE_HOUR_MS, updateURL]);
+  }, [location.search, isCocinaty, enabled, handleToggle]);
 
   // Formatear tiempo restante
   const formatTimeRemaining = (ms) => {
