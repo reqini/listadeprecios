@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { filterAllProducts } from "./utils/filterProducts";
-import HomeCenteredSearchBar from "./components/HomeCenteredSearchBar";
 import axios from "./utils/axios";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {
@@ -364,15 +363,11 @@ const Home = () => {
         }
         onLogout={logout}
         user={{ username: username || localStorage.getItem("activeSession") || "" }}
-      />
-
-      {/* Buscador centrado y angosto para Home */}
-      <HomeCenteredSearchBar
-        value={searchTerm}
-        onChange={(value) => {
+        showSearch={true}
+        searchValue={searchTerm}
+        onSearchChange={(value) => {
           setSearchTerm(value); // Actualizar directamente el estado
         }}
-        placeholder="Buscar productos por nombre, categoría o banco..."
       />
 
       <Container 
