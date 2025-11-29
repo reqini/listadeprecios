@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Switch,
@@ -41,7 +41,7 @@ const CarouselSwitch = () => {
 
   // Clave para localStorage
   const STORAGE_KEY = 'carousel_switch_cocinaty';
-  const ONE_HOUR_MS = 60 * 60 * 1000; // 1 hora en milisegundos
+  const ONE_HOUR_MS = useMemo(() => 60 * 60 * 1000, []); // 1 hora en milisegundos
 
   // Cargar estado inicial desde localStorage
   useEffect(() => {
@@ -71,7 +71,7 @@ const CarouselSwitch = () => {
         localStorage.removeItem(STORAGE_KEY);
       }
     }
-  }, [isCocinaty]);
+  }, [isCocinaty, ONE_HOUR_MS]);
 
   // Actualizar tiempo restante cada segundo
   useEffect(() => {
@@ -105,7 +105,7 @@ const CarouselSwitch = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [enabled, timeRemaining]);
+  }, [enabled, timeRemaining, ONE_HOUR_MS, updateURL]);
 
   // Sincronizar con query param de la URL
   useEffect(() => {
@@ -127,7 +127,7 @@ const CarouselSwitch = () => {
   }, [location.search, isCocinaty, enabled]);
 
   // Función para actualizar la URL
-  const updateURL = (isEnabled) => {
+  const updateURL = useCallback((isEnabled) => {
     // Si estamos en una ruta normal (/catalogo12), redirigir a /cocinaty/12
     // Si estamos en /cocinaty/12, mantener la URL
     const pathname = location.pathname;
@@ -152,10 +152,10 @@ const CarouselSwitch = () => {
     }
 
     navigate(newPath, { replace: true });
-  };
+  }, [location.pathname, location.search, navigate]);
 
   // Manejar cambio del switch
-  const handleToggle = (newValue, updateUrl = true) => {
+  const handleToggle = useCallback((newValue, updateUrl = true) => {
     if (newValue) {
       // Activar: guardar timestamp
       const data = {
@@ -176,12 +176,11 @@ const CarouselSwitch = () => {
       setEnabled(false);
       setTimeRemaining(null);
       setIsExpired(false);
-      
       if (updateUrl) {
         updateURL(false);
       }
     }
-  };
+  }, [ONE_HOUR_MS, updateURL]);
 
   // Formatear tiempo restante
   const formatTimeRemaining = (ms) => {

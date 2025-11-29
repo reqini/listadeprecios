@@ -17,9 +17,7 @@ import {
   // Alert, // Temporalmente oculto
   // useMediaQuery, // Temporalmente oculto
   // InputAdornment, // Temporalmente oculto
-  Badge,
-  useMediaQuery,
-  useTheme
+  Badge
 } from "@mui/material";
 // import { useTheme } from "@mui/material/styles"; // Temporalmente oculto
 // import { Visibility, VisibilityOff } from "@mui/icons-material"; // Temporalmente oculto

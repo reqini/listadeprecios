@@ -16,7 +16,6 @@ import {
   ChevronRight,
   LocalShipping,
   RocketLaunch,
-  FlashOn,
 } from '@mui/icons-material';
 import { formatPrice } from '../utils/priceUtils';
 

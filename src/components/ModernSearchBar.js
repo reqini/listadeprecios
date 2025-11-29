@@ -24,7 +24,6 @@ const ModernSearchBar = ({
   sx = {},
 }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [isFocused, setIsFocused] = useState(false);
 
   const handleChange = (event) => {

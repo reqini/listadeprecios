@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -104,7 +104,7 @@ const FeaturedProductsCarousel = () => {
     const interval = setInterval(checkCarouselSwitch, 1000);
     
     return () => clearInterval(interval);
-  }, [location.search]);
+  }, [location.search, location.pathname]);
 
   // Cargar productos desde la hoja "entrega_ya" de Google Sheets
   useEffect(() => {
