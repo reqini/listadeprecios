@@ -6,9 +6,7 @@ import Skeleton from "@mui/material/Skeleton";
 import LinearProgress from "@mui/material/LinearProgress";
 import { Helmet } from "react-helmet";
 import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
-import StickySearchBar from "./components/StickySearchBar";
 import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
-import Navbar from "./components/Navbar";
 import FeaturedProductsBanner from "./components/FeaturedProductsBanner";
 import FeaturedProductsCarousel from "./components/FeaturedProductsCarousel";
 import CarouselSwitch from "./components/CarouselSwitch";
@@ -20,7 +18,6 @@ import { parsePrice } from "./utils/priceUtils";
 
 
 const Catalogo3 = () => {
-  const { logout } = useAuth();
   const isMobile = useMediaQuery('(max-width:600px)');
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);

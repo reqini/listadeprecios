@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "./utils/axios";
 import Container from "@mui/material/Container";
-import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
 import LinearProgress from "@mui/material/LinearProgress";
 import { Helmet } from "react-helmet";
@@ -14,9 +13,7 @@ const Catalogo14 = () => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
-  const [filtro, setFiltro] = useState("");
   const [productosAgrupados, setProductosAgrupados] = useState({});
-  const [isSticky, setIsSticky] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);

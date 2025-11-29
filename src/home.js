@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { filterAllProducts } from "./utils/filterProducts";
-import ModernSearchBar from "./components/ModernSearchBar";
 import axios from "./utils/axios";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {
@@ -27,7 +26,6 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
-import StickySearchBarWithScroll from "./components/StickySearchBarWithScroll";
 import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
 import Navbar from "./components/Navbar";
 import ResponsiveDialog from "./components/dialog";
