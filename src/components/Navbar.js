@@ -156,31 +156,7 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
             )}
           </Box>
           
-          {/* Menú hamburguesa - Lado derecho */}
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center',
-            order: { xs: 3, sm: 3 },
-            marginLeft: { xs: 0, sm: 'auto' },
-          }}>
-            <IconButton color="inherit" onClick={handleMenuOpen}>
-              <Badge
-                variant="dot"
-                color="secondary"
-                sx={{
-                  "& .MuiBadge-dot": {
-                    height: 15,
-                    minWidth: 15,
-                    borderRadius: "50%",
-                  },
-                }}
-              >
-                <MenuIcon />
-              </Badge>
-            </IconButton>
-          </Box>
-          
-          {/* Segunda fila: Buscador (si showSearch es true) */}
+          {/* Buscador (si showSearch es true) */}
           {showSearch && (
             <Box sx={{ 
               width: { xs: '100%', sm: '100%' },
@@ -206,6 +182,30 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
               />
             </Box>
           )}
+          
+          {/* Menú hamburguesa - Lado derecho */}
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            order: { xs: 3, sm: 3 },
+            marginLeft: { xs: showSearch ? 0 : 'auto', sm: 'auto' },
+          }}>
+            <IconButton color="inherit" onClick={handleMenuOpen}>
+              <Badge
+                variant="dot"
+                color="secondary"
+                sx={{
+                  "& .MuiBadge-dot": {
+                    height: 15,
+                    minWidth: 15,
+                    borderRadius: "50%",
+                  },
+                }}
+              >
+                <MenuIcon />
+              </Badge>
+            </IconButton>
+          </Box>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
             {/* Home */}
             <MenuItem
