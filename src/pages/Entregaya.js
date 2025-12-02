@@ -20,6 +20,8 @@ import { filterAllProducts } from "../utils/filterProducts";
 import { trackCatalogView, trackAddToCart, trackToggleFavorite } from "../utils/analytics";
 import { useAuth } from "../AuthContext";
 import { parsePrice } from "../utils/priceUtils";
+import { useColumnLayout } from "../hooks/useColumnLayout";
+import ColumnLayoutToggle from "../components/ColumnLayoutToggle";
 
 /**
  * Catálogo de Entrega Ya
@@ -32,6 +34,9 @@ const Entregaya = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
+  
+  // Hook para manejar el layout de columnas en mobile
+  const { mobileColumns, toggleColumns } = useColumnLayout('entregaya', 1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [productos, setProductos] = useState([]);
@@ -431,10 +436,20 @@ const Entregaya = () => {
         {/* Productos Grid */}
         {!loading && !error && productos.length > 0 && (
           <>
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="body1" color="text.secondary">
                 {productos.length} {productos.length === 1 ? 'producto disponible' : 'productos disponibles'}
               </Typography>
+              
+              {/* Toggle de columnas - Solo visible en mobile */}
+              <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+                <ColumnLayoutToggle
+                  mobileColumns={mobileColumns}
+                  onToggle={toggleColumns}
+                  variant="icons"
+                  size="small"
+                />
+              </Box>
             </Box>
             
             <Grid container spacing={3}>
@@ -452,7 +467,7 @@ const Entregaya = () => {
                 return (
                   <Grid 
                     item 
-                    xs={12} 
+                    xs={mobileColumns === 1 ? 12 : 6}
                     sm={6} 
                     md={4} 
                     lg={4} 

@@ -376,15 +376,22 @@ const EntregaYaCard = ({
       <CardActions sx={{ p: 2, pt: 0, gap: 1 }}>
         <Button
           variant="contained"
-          color="success"
           fullWidth
           startIcon={<WhatsAppIcon />}
           onClick={handleWhatsApp}
           sx={{
+            backgroundColor: '#25D366',
+            color: '#FFFFFF',
             fontWeight: 700,
             textTransform: 'none',
             py: 1.2,
             borderRadius: 2,
+            boxShadow: '0 2px 8px rgba(37, 211, 102, 0.3)',
+            '&:hover': {
+              backgroundColor: '#1da851',
+              boxShadow: '0 4px 12px rgba(37, 211, 102, 0.4)',
+            },
+            transition: 'all 0.3s ease',
           }}
         >
           Consultar

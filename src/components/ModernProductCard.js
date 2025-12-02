@@ -341,19 +341,22 @@ const ModernProductCard = ({
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Button
                 fullWidth
-                variant="outlined"
+                variant="contained"
                 size="medium"
                 startIcon={<FaWhatsapp />}
                 onClick={handleShare}
                 sx={{
                   backgroundColor: '#25D366',
-                  color: 'white',
+                  color: '#FFFFFF',
                   borderColor: '#25D366',
+                  boxShadow: '0 2px 8px rgba(37, 211, 102, 0.3)',
                   '&:hover': {
                     backgroundColor: '#1da851',
                     borderColor: '#1da851',
+                    boxShadow: '0 4px 12px rgba(37, 211, 102, 0.4)',
                   },
                   textTransform: 'none',
+                  transition: 'all 0.3s ease',
                 }}
               >
                 WhatsApp

@@ -30,6 +30,7 @@ import Capacitaciones from "./pages/Capacitaciones";
 import AdminPanel from "./pages/AdminPanel";
 import BusquedaIA from "./components/BusquedaIA";
 import Entregaya from "./pages/Entregaya";
+import GlobalSearchPage from "./pages/GlobalSearchPage";
 import PWAInstallToast from "./components/PWAInstallToast";
 import { AuthProvider, useAuth } from "./AuthContext"; 
 

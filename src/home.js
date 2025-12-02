@@ -32,11 +32,16 @@ import ResponsiveDialog from "./components/dialog";
 import { useAuth } from "./AuthContext";
 import ReviewSlider from "./components/ReviewSlider";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useColumnLayout } from "./hooks/useColumnLayout";
+import ColumnLayoutToggle from "./components/ColumnLayoutToggle";
 
 const Home = () => {
   const { logout } = useAuth();
   const [openThemeDialog, setOpenThemeDialog] = useState(false);
   const isMobile = useMediaQuery('(max-width:600px)');
+  
+  // Hook para manejar el layout de columnas en mobile
+  const { mobileColumns, toggleColumns } = useColumnLayout('home', 1);
 
   const [catalogos] = useState([
   { nombre: "Preferencial", url: "/preferencial" },
@@ -480,19 +485,30 @@ const Home = () => {
             </Typography>
           </Box>
         ) : productosFiltrados.length > 0 ? (
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: {
-                xs: '1fr', // Mobile: 1 card por fila
-                sm: 'repeat(2, 1fr)', // Tablet: 2 columnas
-                md: 'repeat(2, 1fr)', // Desktop: 2 columnas
-                lg: 'repeat(3, 1fr)', // Large: 3 columnas
-              },
-              gap: { xs: 3, sm: 3, md: 4 },
-            }}
-          >
-            {productosFiltrados.map((product) => (
+          <>
+            {/* Toggle de columnas - Solo visible en mobile */}
+            <Box sx={{ display: { xs: 'flex', sm: 'none' }, justifyContent: 'flex-end', mb: 2 }}>
+              <ColumnLayoutToggle
+                mobileColumns={mobileColumns}
+                onToggle={toggleColumns}
+                variant="icons"
+                size="small"
+              />
+            </Box>
+            
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: mobileColumns === 1 ? '1fr' : 'repeat(2, 1fr)', // Mobile: 1 o 2 columnas según preferencia
+                  sm: 'repeat(2, 1fr)', // Tablet: 2 columnas
+                  md: 'repeat(2, 1fr)', // Desktop: 2 columnas
+                  lg: 'repeat(3, 1fr)', // Large: 3 columnas
+                },
+                gap: { xs: mobileColumns === 1 ? 3 : 1.5, sm: 3, md: 4 },
+              }}
+            >
+              {productosFiltrados.map((product) => (
               <ModernProductCardAirbnb
                 key={product.id || product.codigo}
                 product={product}
@@ -509,9 +525,11 @@ const Home = () => {
                   (parseFloat(product.stock_actual) / parseFloat(product.stock_total)) < 0.2
                 }
                 bankLogos={bankLogos} // Pasar logos de bancos desde Google Sheets
+                isCompactMode={mobileColumns === 2}
               />
             ))}
-          </Box>
+            </Box>
+          </>
         ) : (
           <Box
             sx={{

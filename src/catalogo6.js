@@ -18,6 +18,8 @@ import { parsePrice } from "./utils/priceUtils";
 import { useIsIndividualCatalog } from "./utils/useCatalogContext";
 import ModernSearchBar from "./components/ModernSearchBar";
 import { filterAllProducts } from "./utils/filterProducts";
+import { useColumnLayout } from "./hooks/useColumnLayout";
+import ColumnLayoutToggle from "./components/ColumnLayoutToggle";
 
 const Catalogo6 = () => {
   // Detectar si estamos en una ruta dinámica (catálogo individual)
@@ -36,8 +38,11 @@ const Catalogo6 = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [bankLogos, setBankLogos] = useState([]); // Logos de bancos para promociones
-
+  
   const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
+  
+  // Hook para manejar el layout de columnas en mobile
+  const { mobileColumns, toggleColumns } = useColumnLayout('catalogo6', 1);
 
   const cuotasMap = useMemo(() => ({
     "6 cuotas sin interés": 'seis_sin_interes',
@@ -316,29 +321,40 @@ const Catalogo6 = () => {
       {/* Productos - Layout moderno mobile-first */}
       {!loading && Object.keys(productosAMostrar).map((linea) => (
         <Box key={linea} sx={{ marginBottom: { xs: 4, sm: 5 } }}>
-          <Typography 
-            variant="h5" 
-            sx={{
-              fontSize: { xs: '1.25rem', sm: '1.5rem' },
-              fontWeight: 600,
-              marginBottom: { xs: 2, sm: 3 },
-              color: '#222222',
-            }}
-          >
-            Línea: <Box component="span" sx={{ fontWeight: 700 }}>{linea}</Box>
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: { xs: 2, sm: 3 } }}>
+            <Typography 
+              variant="h5" 
+              sx={{
+                fontSize: { xs: '1.25rem', sm: '1.5rem' },
+                fontWeight: 600,
+                color: '#222222',
+              }}
+            >
+              Línea: <Box component="span" sx={{ fontWeight: 700 }}>{linea}</Box>
+            </Typography>
+            
+            {/* Toggle de columnas - Solo visible en mobile */}
+            <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+              <ColumnLayoutToggle
+                mobileColumns={mobileColumns}
+                onToggle={toggleColumns}
+                variant="icons"
+                size="small"
+              />
+            </Box>
+          </Box>
           
           {/* Grid responsive estilo Airbnb */}
           <Box
             sx={{
               display: 'grid',
               gridTemplateColumns: {
-                xs: '1fr', // Mobile: 1 card por fila
+                xs: mobileColumns === 1 ? '1fr' : 'repeat(2, 1fr)', // Mobile: 1 o 2 columnas según preferencia
                 sm: 'repeat(2, 1fr)', // Tablet: 2 columnas
                 md: 'repeat(2, 1fr)', // Desktop: 2 columnas
                 lg: 'repeat(3, 1fr)', // Large: 3 columnas
               },
-              gap: { xs: 3, sm: 3, md: 4 },
+              gap: { xs: mobileColumns === 1 ? 3 : 1.5, sm: 3, md: 4 },
             }}
           >
             {productosAMostrar[linea].map((product) => (
@@ -359,6 +375,7 @@ const Catalogo6 = () => {
                 isNew={false}
                 isBestSeller={false}
                 stockLow={false}
+                isCompactMode={mobileColumns === 2}
                 />
             ))}
           </Box>

@@ -41,6 +41,7 @@ const ModernProductCardAirbnb = ({
   bankPromo, // Promo de banco asociada (opcional) - DEPRECATED: usar bankLogos
   bankLogos = [], // Array de logos de bancos para mostrar como miniaturas
   showAllData = false, // Prop para mostrar todos los datos (precio negocio, PSVP, puntos, todas las cuotas, etc.)
+  isCompactMode = false, // Modo compacto para vista de 2 columnas en mobile
 }) => {
   const [shippingCost, setShippingCost] = useState(21036);
   const [imageModalOpen, setImageModalOpen] = useState(false);
@@ -329,7 +330,10 @@ const ModernProductCardAirbnb = ({
           sx={{
             position: 'relative',
             width: '100%',
-            paddingTop: { xs: '80%', sm: '75%' }, // Ratio 4:5 en mobile, 4:3 en desktop - Más proporcionado
+            paddingTop: { 
+              xs: isCompactMode ? '70%' : '80%', // Ratio más pequeño en modo compacto
+              sm: '75%' 
+            },
             overflow: 'hidden',
             backgroundColor: '#f5f5f5',
             cursor: 'pointer',
@@ -342,14 +346,15 @@ const ModernProductCardAirbnb = ({
               label={product.discount}
               sx={{
                 position: 'absolute',
-                top: 12,
-                left: 12,
+                top: isCompactMode ? 8 : 12,
+                left: isCompactMode ? 8 : 12,
                 zIndex: 2,
                 backgroundColor: '#FF385C',
                 color: 'white',
                 fontWeight: 600,
-                fontSize: '0.75rem',
-                height: 28,
+                fontSize: isCompactMode ? '0.65rem' : '0.75rem',
+                height: isCompactMode ? 24 : 28,
+                padding: isCompactMode ? '0 6px' : '0 8px',
               }}
             />
           )}
@@ -360,13 +365,13 @@ const ModernProductCardAirbnb = ({
               onClick={handleToggleFavorite}
               sx={{
                 position: 'absolute',
-                top: 12,
-                right: 12,
+                top: isCompactMode ? 8 : 12,
+                right: isCompactMode ? 8 : 12,
                 zIndex: 3,
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 backdropFilter: 'blur(10px)',
-                width: { xs: '40px', sm: '44px' },
-                height: { xs: '40px', sm: '44px' },
+                width: isCompactMode ? '32px' : { xs: '40px', sm: '44px' },
+                height: isCompactMode ? '32px' : { xs: '40px', sm: '44px' },
                 boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
                 '&:hover': {
                   backgroundColor: 'rgba(255, 255, 255, 1)',
@@ -379,14 +384,14 @@ const ModernProductCardAirbnb = ({
                 <Favorite 
                   sx={{ 
                     color: '#FF385C',
-                    fontSize: { xs: '1.5rem', sm: '1.75rem' },
+                    fontSize: isCompactMode ? '1.2rem' : { xs: '1.5rem', sm: '1.75rem' },
                   }} 
                 />
               ) : (
                 <FavoriteBorder 
                   sx={{ 
                     color: '#222222',
-                    fontSize: { xs: '1.5rem', sm: '1.75rem' },
+                    fontSize: isCompactMode ? '1.2rem' : { xs: '1.5rem', sm: '1.75rem' },
                   }} 
                 />
               )}
@@ -397,11 +402,11 @@ const ModernProductCardAirbnb = ({
           <Box
             sx={{
               position: 'absolute',
-              top: 12,
-              left: 12,
+              top: isCompactMode ? 8 : 12,
+              left: isCompactMode ? 8 : 12,
               display: 'flex',
               flexDirection: 'column',
-              gap: 1,
+              gap: isCompactMode ? 0.5 : 1,
               zIndex: 2,
             }}
           >
@@ -429,7 +434,9 @@ const ModernProductCardAirbnb = ({
                   backgroundColor: '#000000',
                   color: 'white',
                   fontWeight: 600,
-                  fontSize: '0.7rem',
+                  fontSize: isCompactMode ? '0.6rem' : '0.7rem',
+                  height: isCompactMode ? 20 : 24,
+                  padding: isCompactMode ? '0 4px' : '0 6px',
                 }}
               />
             )}
@@ -441,7 +448,9 @@ const ModernProductCardAirbnb = ({
                   backgroundColor: '#000000',
                   color: 'white',
                   fontWeight: 600,
-                  fontSize: '0.7rem',
+                  fontSize: isCompactMode ? '0.6rem' : '0.7rem',
+                  height: isCompactMode ? 20 : 24,
+                  padding: isCompactMode ? '0 4px' : '0 6px',
                 }}
               />
             )}
@@ -453,7 +462,9 @@ const ModernProductCardAirbnb = ({
                   backgroundColor: '#FF385C',
                   color: 'white',
                   fontWeight: 600,
-                  fontSize: '0.7rem',
+                  fontSize: isCompactMode ? '0.6rem' : '0.7rem',
+                  height: isCompactMode ? 20 : 24,
+                  padding: isCompactMode ? '0 4px' : '0 6px',
                 }}
               />
             )}
@@ -521,10 +532,10 @@ const ModernProductCardAirbnb = ({
         {/* Contenido - Estilo minimalista - Espacios reducidos */}
         <CardContent
           sx={{
-            padding: { xs: '12px', sm: '16px' }, // Reducido de 16px/20px
+            padding: isCompactMode ? '8px' : { xs: '12px', sm: '16px' },
             display: 'flex',
             flexDirection: 'column',
-            gap: 0.5, // Reducido de 1 a 0.5 para acercar elementos aún más
+            gap: isCompactMode ? 0.25 : 0.5,
           }}
         >
           {/* Línea del producto */}
@@ -532,11 +543,12 @@ const ModernProductCardAirbnb = ({
             variant="caption"
             sx={{
               color: '#717171',
-              fontSize: '0.75rem', // Reducido de 0.875rem
+              fontSize: isCompactMode ? '0.65rem' : '0.75rem',
               fontWeight: 500,
               textTransform: 'uppercase',
               letterSpacing: '0.5px',
-              marginBottom: 0.25, // Reducido de 0.5 a 0.25
+              marginBottom: isCompactMode ? 0 : 0.25,
+              lineHeight: 1.2,
             }}
           >
             Línea {product.linea}
@@ -546,33 +558,33 @@ const ModernProductCardAirbnb = ({
           <Typography
             variant="h6"
             sx={{
-              fontSize: { xs: '1.125rem', sm: '1.25rem' }, // Reducido ligeramente
+              fontSize: isCompactMode ? '0.875rem' : { xs: '1.125rem', sm: '1.25rem' },
               fontWeight: 700,
               color: '#222222',
-              lineHeight: 1.2, // Reducido de 1.3 a 1.2
+              lineHeight: 1.2,
               display: '-webkit-box',
-              WebkitLineClamp: 2,
+              WebkitLineClamp: isCompactMode ? 2 : 2,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
               marginBottom: 0,
               marginTop: 0,
-              minHeight: { xs: '2.7rem', sm: '3rem' }, // Reducido
+              minHeight: isCompactMode ? '2.2rem' : { xs: '2.7rem', sm: '3rem' },
             }}
           >
             {product.descripcion}
           </Typography>
 
           {/* Precio destacado */}
-          <Box sx={{ marginTop: 0.25 }}> {/* Mínimo margen para separar del título */}
+          <Box sx={{ marginTop: isCompactMode ? 0.125 : 0.25 }}>
             {isContado ? (
               <Box>
                 <Typography
                   variant="caption"
                   sx={{
                     color: '#717171',
-                    fontSize: '0.875rem',
+                    fontSize: isCompactMode ? '0.7rem' : '0.875rem',
                     display: 'block',
-                    marginBottom: 0.5,
+                    marginBottom: isCompactMode ? 0.25 : 0.5,
                   }}
                 >
                   Precio de Negocio
@@ -580,7 +592,7 @@ const ModernProductCardAirbnb = ({
                 <Typography
                   variant="h5"
                   sx={{
-                    fontSize: { xs: '1.5rem', sm: '1.75rem' },
+                    fontSize: isCompactMode ? '1.125rem' : { xs: '1.5rem', sm: '1.75rem' },
                     fontWeight: 800,
                     color: '#222222',
                     lineHeight: 1.2,
@@ -595,9 +607,9 @@ const ModernProductCardAirbnb = ({
                   variant="caption"
                   sx={{
                     color: '#717171',
-                    fontSize: '0.75rem', // Reducido de 0.875rem
+                    fontSize: isCompactMode ? '0.65rem' : '0.75rem',
                     display: 'block',
-                    marginBottom: 0.25, // Reducido de 0.5
+                    marginBottom: isCompactMode ? 0.125 : 0.25,
                   }}
                 >
                   {showAllData && selectedCuotaHome
@@ -607,7 +619,7 @@ const ModernProductCardAirbnb = ({
                 <Typography
                   variant="h5"
                   sx={{
-                    fontSize: { xs: '1.5rem', sm: '1.75rem' },
+                    fontSize: isCompactMode ? '1.125rem' : { xs: '1.5rem', sm: '1.75rem' },
                     fontWeight: 800,
                     color: '#222222',
                     lineHeight: 1.2,
@@ -833,12 +845,13 @@ const ModernProductCardAirbnb = ({
               sx={{
                 backgroundColor: '#222222',
                 color: 'white',
-                padding: { xs: '14px 20px', sm: '16px 24px' },
-                fontSize: { xs: '0.9375rem', sm: '1rem' },
+                padding: isCompactMode ? '10px 14px' : { xs: '14px 20px', sm: '16px 24px' },
+                fontSize: isCompactMode ? '0.75rem' : { xs: '0.9375rem', sm: '1rem' },
                 fontWeight: 700,
                 textTransform: 'none',
                 borderRadius: 2,
                 boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                minHeight: isCompactMode ? '36px' : 'auto',
                 '&:hover': {
                   backgroundColor: '#000000',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
@@ -852,36 +865,36 @@ const ModernProductCardAirbnb = ({
             >
               {showAllData && !selectedCuotaHome && !precioNegocio 
                 ? 'Selecciona una cuota' 
-                : 'Agregar al carrito'}
+                : isCompactMode ? 'Agregar' : 'Agregar al carrito'}
             </Button>
 
-            <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'stretch' }}>
+            <Box sx={{ display: 'flex', gap: isCompactMode ? 1 : 1.5, alignItems: 'stretch' }}>
               <Button
                 fullWidth
-                variant="outlined"
+                variant="contained"
                 href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
                   `¡Quiero este Producto :)!\nProducto: ${product.descripcion}`
                 )}`}
                 target="_blank"
-                startIcon={<FaWhatsapp />}
+                startIcon={!isCompactMode ? <FaWhatsapp style={{ fontSize: '1rem' }} /> : null}
                 sx={{
-                  borderColor: '#25D366',
-                  color: '#25D366',
-                  padding: { xs: '12px 16px', sm: '14px 20px' },
-                  fontSize: { xs: '0.9375rem', sm: '1rem' },
+                  backgroundColor: '#25D366',
+                  color: '#FFFFFF',
+                  padding: isCompactMode ? '8px 10px' : { xs: '12px 16px', sm: '14px 20px' },
+                  fontSize: isCompactMode ? '0.75rem' : { xs: '0.9375rem', sm: '1rem' },
                   fontWeight: 600,
                   textTransform: 'none',
                   borderRadius: 2,
-                  minHeight: { xs: '44px', sm: '48px' },
+                  minHeight: isCompactMode ? '36px' : { xs: '44px', sm: '48px' },
+                  boxShadow: '0 2px 8px rgba(37, 211, 102, 0.3)',
                   '&:hover': {
-                    borderColor: '#1da851',
-                    backgroundColor: 'rgba(37, 211, 102, 0.08)',
-                    borderWidth: '2px',
+                    backgroundColor: '#1da851',
+                    boxShadow: '0 4px 12px rgba(37, 211, 102, 0.4)',
                   },
                   transition: 'all 0.3s ease',
                 }}
               >
-                WhatsApp
+                {isCompactMode ? 'Consultar' : 'WhatsApp'}
               </Button>
 
               {product.ficha_tecnica && (
@@ -893,12 +906,12 @@ const ModernProductCardAirbnb = ({
                   sx={{
                     borderColor: '#717171',
                     color: '#222222',
-                    padding: { xs: '12px 16px', sm: '14px 20px' },
-                    fontSize: { xs: '0.9375rem', sm: '1rem' },
+                    padding: isCompactMode ? '8px 10px' : { xs: '12px 16px', sm: '14px 20px' },
+                    fontSize: isCompactMode ? '0.75rem' : { xs: '0.9375rem', sm: '1rem' },
                     fontWeight: 600,
                     textTransform: 'none',
                     borderRadius: 2,
-                    minHeight: { xs: '44px', sm: '48px' },
+                    minHeight: isCompactMode ? '36px' : { xs: '44px', sm: '48px' },
                     '&:hover': {
                       borderColor: '#222222',
                       backgroundColor: 'rgba(0,0,0,0.05)',
@@ -907,7 +920,7 @@ const ModernProductCardAirbnb = ({
                     transition: 'all 0.3s ease',
                   }}
                 >
-                  Ficha técnica
+                  {isCompactMode ? 'Ficha' : 'Ficha técnica'}
                 </Button>
               )}
             </Box>
