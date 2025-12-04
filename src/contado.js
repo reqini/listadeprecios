@@ -6,7 +6,6 @@ import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
 import { Helmet } from "react-helmet";
 import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
-import logo from "./assets/logo.png";
 import { normalizeString } from "./utils/searchUtils";
 import { filterAllProducts } from "./utils/filterProducts";
 import LaunchProductsCarousel from "./components/LaunchProductsCarousel";
@@ -130,12 +129,6 @@ const Contado = () => {
       </Box>
 
       <Container maxWidth="lg" className="conteiner-list">
-      <div className="w-100 flex justify-center items-center flex-direction mar-t10">
-        <Typography fontSize={13} margin={'6px 0 12px 0'}>
-          Desarrollado por: <b><a href="https://www.instagram.com/lrecchini/" rel="noreferrer">Luciano Recchini</a></b>
-        </Typography>
-        <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
-      </div>
 
       {error && !loading && (
         <Box sx={{ textAlign: 'center', py: 6, px: 2 }}>
