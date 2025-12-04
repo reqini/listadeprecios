@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "./utils/axios";
 import Container from "@mui/material/Container";
 import Skeleton from "@mui/material/Skeleton";
@@ -81,13 +81,109 @@ const Preferencial = () => {
     loadInitialData();
   }, []);
 
-  const productosFiltrados = searchTerm 
-    ? filterAllProducts(productosOriginales.length > 0 ? productosOriginales : productos, searchTerm).filter(
-        (producto) => normalizeString(producto?.linea) !== 'repuestos'
-      )
-    : productos.filter(
-        (producto) => normalizeString(producto?.linea) !== 'repuestos'
+  // Cargar favoritos desde localStorage
+  useEffect(() => {
+    try {
+      const savedFavorites = localStorage.getItem('favorites');
+      if (savedFavorites) {
+        let favorites = JSON.parse(savedFavorites);
+        favorites = favorites.filter((fav, index, self) =>
+          index === self.findIndex(f => {
+            if (fav.id && f.id) {
+              return String(f.id) === String(fav.id);
+            }
+            if (fav.codigo && f.codigo) {
+              return String(f.codigo) === String(fav.codigo);
+            }
+            return false;
+          })
+        );
+        setFavorites(favorites);
+      }
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+    }
+  }, []);
+
+  // Sincronizar favoritos cuando cambian desde otros componentes
+  useEffect(() => {
+    const handleFavoritesUpdate = (e) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setFavorites(e.detail);
+      }
+    };
+    
+    window.addEventListener('favoritesUpdated', handleFavoritesUpdate);
+    return () => window.removeEventListener('favoritesUpdated', handleFavoritesUpdate);
+  }, []);
+
+  // Manejar favoritos
+  const toggleFavorite = (product) => {
+    try {
+      const savedFavorites = localStorage.getItem('favorites');
+      let currentFavorites = savedFavorites ? JSON.parse(savedFavorites) : [];
+      
+      currentFavorites = currentFavorites.filter((fav, index, self) =>
+        index === self.findIndex(f => {
+          if (fav.id && f.id) {
+            return String(f.id) === String(fav.id);
+          }
+          if (fav.codigo && f.codigo) {
+            return String(f.codigo) === String(fav.codigo);
+          }
+          return false;
+        })
       );
+      
+      const isCurrentlyFavorite = currentFavorites.some(fav => {
+        if (product.id && fav.id) {
+          return String(fav.id) === String(product.id);
+        }
+        if (product.codigo && fav.codigo) {
+          return String(fav.codigo) === String(product.codigo);
+        }
+        return false;
+      });
+      
+      let updatedFavorites;
+      
+      if (isCurrentlyFavorite) {
+        updatedFavorites = currentFavorites.filter(fav => {
+          if (product.id && fav.id) {
+            return String(fav.id) !== String(product.id);
+          }
+          if (product.codigo && fav.codigo) {
+            return String(fav.codigo) !== String(product.codigo);
+          }
+          return true;
+        });
+      } else {
+        updatedFavorites = [...currentFavorites, product];
+      }
+
+      setFavorites(updatedFavorites);
+      localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+      window.dispatchEvent(new CustomEvent('favoritesUpdated', { detail: updatedFavorites }));
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
+  };
+
+  // Filtrado optimizado con useMemo
+  const productosFiltrados = useMemo(() => {
+    if (!productos || productos.length === 0) return [];
+    
+    const productosBase = productosOriginales.length > 0 ? productosOriginales : productos;
+    let filtrados = searchTerm 
+      ? filterAllProducts(productosBase, searchTerm)
+      : productosBase;
+    
+    filtrados = filtrados.filter(
+      (producto) => normalizeString(producto?.linea) !== 'repuestos'
+    );
+    
+    return filtrados;
+  }, [productos, productosOriginales, searchTerm]);
 
   return (
     <>
@@ -126,33 +222,25 @@ const Preferencial = () => {
         />
       </Box>
 
-      <Container maxWidth="lg" className="conteiner-list">
+      <Container 
+        maxWidth="lg" 
+        className="conteiner-list"
+        sx={{
+          paddingTop: { xs: 1, sm: 2 },
+          paddingBottom: { xs: 4, sm: 5 },
+        }}
+      >
       {/* Botón Donar */}
-      <div className="mar-t10 mar-b20 flex justify-center">
+      <Box sx={{ display: 'flex', justifyContent: 'center', my: { xs: 2, sm: 3 } }}>
         <Button
           variant="contained"
           color="secondary"
           onClick={() => setOpenModal(true)}
+          sx={{ mb: 2 }}
         >
           Donar 💖
         </Button>
-      </div>
-
-      <div className="w-100 flex justify-center items-center flex-direction mar-t10">
-        <Typography fontSize={13} margin={"6px 0 12px 0"}>
-          Desarrollado por:{" "}
-          <b>
-            <a
-              href="https://www.instagram.com/lrecchini/"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Luciano Recchini
-            </a>
-          </b>
-        </Typography>
-        <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
-      </div>
+      </Box>
 
       {error && !loading && (
         <Box sx={{ textAlign: 'center', py: 6, px: 2 }}>
@@ -261,8 +349,12 @@ const Preferencial = () => {
                   console.log('Producto para agregar:', prod);
                 }}
                 onToggleFavorite={(prod) => {
-                  console.log('Toggle favorite:', prod);
+                  toggleFavorite(prod);
                 }}
+                isFavorite={favorites.some(fav => 
+                  (fav.id && product.id && String(fav.id) === String(product.id)) ||
+                  (fav.codigo && product.codigo && String(fav.codigo) === String(product.codigo))
+                )}
                 selectedCuota={null}
                 isContado={false}
                 isNew={product.nuevo === 'si' || product.nuevo === true || product.nuevo === 'Sí'}
