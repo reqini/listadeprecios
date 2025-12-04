@@ -19,6 +19,7 @@ import ModernSearchBar from "./components/ModernSearchBar";
 import { filterAllProducts } from "./utils/filterProducts";
 import { useColumnLayout } from "./hooks/useColumnLayout";
 import ColumnLayoutToggle from "./components/ColumnLayoutToggle";
+import LoadingFallbackCatalog from "./components/LoadingFallbackCatalog";
 
 const Catalogo3 = () => {
   // Detectar si estamos en una ruta dinámica (catálogo individual)
@@ -528,6 +529,9 @@ const Catalogo3 = () => {
               />
             ))}
           </Box>
+
+          {/* Mensaje elegante si la API está lenta */}
+          <LoadingFallbackCatalog />
         </Box>
       )}
 

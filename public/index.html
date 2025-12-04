@@ -38,7 +38,8 @@
 <script>
   // Config de tu proyecto
   const firebaseConfig = {
-    apiKey: "AIzaSyATq9rkoUDtqLNu3ykydqcSRnKMn9dX1-o",
+    // La configuración real de Firebase se inyecta desde variables de entorno en el código fuente.
+    apiKey: "__FIREBASE_API_KEY_FROM_ENV__",
     authDomain: "catalogo-simple.firebaseapp.com",
     projectId: "catalogo-simple",
     storageBucket: "catalogo-simple.firebasestorage.app",
@@ -65,9 +66,7 @@
   // Pedir permiso
   Notification.requestPermission().then((permission) => {
     if (permission === "granted") {
-      messaging.getToken({
-        vapidKey: "TU_VAPID_KEY"
-      }).then((currentToken) => {
+      messaging.getToken().then((currentToken) => {
         if (currentToken) {
           //console.log("🔐 Token generado:", currentToken);
           // Acá podrías guardarlo en tu backend si querés notificaciones personalizadas

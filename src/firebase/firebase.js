@@ -2,17 +2,37 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging } from "firebase/messaging";
 
+/**
+ * Configuración de Firebase tomada exclusivamente de variables de entorno.
+ * 
+ * IMPORTANTE:
+ * - NUNCA poner valores reales (AIza...) en el código ni en public/.
+ * - Definir las siguientes env vars en Netlify / entorno:
+ *   - REACT_APP_FIREBASE_API_KEY
+ *   - REACT_APP_FIREBASE_AUTH_DOMAIN
+ *   - REACT_APP_FIREBASE_PROJECT_ID
+ *   - REACT_APP_FIREBASE_STORAGE_BUCKET
+ *   - REACT_APP_FIREBASE_MESSAGING_SENDER_ID
+ *   - REACT_APP_FIREBASE_APP_ID
+ *   - REACT_APP_FIREBASE_MEASUREMENT_ID
+ */
 const firebaseConfig = {
-  apiKey: "AIzaSyATq9rkoUDtqLNu3ykydqcSRnKMn9dX1-o",
-  authDomain: "catalogo-simple.firebaseapp.com",
-  projectId: "catalogo-simple",
-  storageBucket: "catalogo-simple.firebasestorage.app",
-  messagingSenderId: "168562961302",
-  appId: "1:168562961302:web:a19002aed0c97802224bb7",
-  measurementId: "G-RC9CE84J3S"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-const messaging = getMessaging(app);
+// Si no hay apiKey configurada, evitamos inicializar Firebase en producción
+let messaging = null;
+
+if (firebaseConfig.apiKey) {
+  const app = initializeApp(firebaseConfig);
+  messaging = getMessaging(app);
+}
 
 export { messaging };
+

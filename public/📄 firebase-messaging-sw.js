@@ -3,13 +3,14 @@ importScripts("https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"
 importScripts("https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js");
 
 firebase.initializeApp({
-  apiKey: "AIzaSyATq9rkoUDtqLNu3ykydqcSRnKMn9dX1-o",
-    authDomain: "catalogo-simple.firebaseapp.com",
-    projectId: "catalogo-simple",
-    storageBucket: "catalogo-simple.firebasestorage.app",
-    messagingSenderId: "168562961302",
-    appId: "1:168562961302:web:a19002aed0c97802224bb7",
-    measurementId: "G-RC9CE84J3S"
+  // La configuración real se gestiona vía variables de entorno en el código fuente.
+  apiKey: "__FIREBASE_API_KEY_FROM_ENV__",
+  authDomain: "catalogo-simple.firebaseapp.com",
+  projectId: "catalogo-simple",
+  storageBucket: "catalogo-simple.firebasestorage.app",
+  messagingSenderId: "168562961302",
+  appId: "1:168562961302:web:a19002aed0c97802224bb7",
+  measurementId: "G-RC9CE84J3S"
 });
 
 const messaging = firebase.messaging();

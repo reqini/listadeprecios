@@ -20,6 +20,7 @@ import ModernSearchBar from "./components/ModernSearchBar";
 import { filterAllProducts } from "./utils/filterProducts";
 import { useColumnLayout } from "./hooks/useColumnLayout";
 import ColumnLayoutToggle from "./components/ColumnLayoutToggle";
+import LoadingFallbackCatalog from "./components/LoadingFallbackCatalog";
 
 const Catalogo6 = () => {
   // Detectar si estamos en una ruta dinámica (catálogo individual)
@@ -362,17 +363,20 @@ const Catalogo6 = () => {
             }}
           >
             {[...Array(6)].map((_, idx) => (
-            <Skeleton
-              key={idx}
-              variant="rectangular"
+              <Skeleton
+                key={idx}
+                variant="rectangular"
                 height={400}
                 sx={{
                   borderRadius: 3,
                   animation: 'wave',
                 }}
-            />
-          ))}
+              />
+            ))}
           </Box>
+
+          {/* Mensaje elegante si la API está lenta */}
+          <LoadingFallbackCatalog />
         </Box>
       )}
 

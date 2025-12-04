@@ -19,6 +19,7 @@ import { useIsIndividualCatalog } from "./utils/useCatalogContext";
 import { filterAllProducts } from "./utils/filterProducts";
 import { useColumnLayout } from "./hooks/useColumnLayout";
 import ColumnLayoutToggle from "./components/ColumnLayoutToggle";
+import LoadingFallbackCatalog from "./components/LoadingFallbackCatalog";
 
 const Catalogo12 = () => {
   // Detectar si estamos en una ruta dinámica (catálogo individual)
@@ -363,6 +364,9 @@ const Catalogo12 = () => {
               />
             ))}
           </Box>
+
+          {/* Mensaje elegante si la API está lenta */}
+          <LoadingFallbackCatalog />
         </Box>
       )}
 
