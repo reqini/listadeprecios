@@ -33,7 +33,6 @@ import Entregaya from "./pages/Entregaya";
 import PWAInstallToast from "./components/PWAInstallToast";
 import { AuthProvider, useAuth } from "./AuthContext";
 import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
-import SantaSleighOverlay from "./components/christmas/SantaSleighOverlay";
 import SnowfallHeader from "./components/christmas/SnowfallHeader"; 
 
 // Google Analytics
@@ -93,10 +92,7 @@ const AppContent = () => {
     <ThemeProvider theme={theme}>
       {/* Decoraciones Navideñas Globales */}
       {IS_CHRISTMAS_MODE && (
-        <>
-          <SnowfallHeader />
-          <SantaSleighOverlay />
-        </>
+        <SnowfallHeader />
       )}
       <Router
         future={{

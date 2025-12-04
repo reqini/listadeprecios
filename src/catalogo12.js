@@ -19,6 +19,7 @@ import { useIsIndividualCatalog } from "./utils/useCatalogContext";
 import { filterAllProducts } from "./utils/filterProducts";
 import { useColumnLayout } from "./hooks/useColumnLayout";
 import ColumnLayoutToggle from "./components/ColumnLayoutToggle";
+import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
 import LoadingFallbackCatalog from "./components/LoadingFallbackCatalog";
 
 const Catalogo12 = () => {
@@ -259,6 +260,28 @@ const Catalogo12 = () => {
         onLogout={logout}
         user={{ username: localStorage.getItem("activeSession") || "" }}
       /> */}
+      
+      {/* Banner Navideño Superior */}
+      {IS_CHRISTMAS_MODE && (
+        <Alert
+          severity="info"
+          icon={false}
+          sx={{
+            backgroundColor: '#C62828',
+            color: '#FFFFFF',
+            textAlign: 'center',
+            py: 0.5,
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+            fontWeight: 600,
+            borderRadius: 0,
+            '& .MuiAlert-message': {
+              width: '100%',
+            },
+          }}
+        >
+          🎄 Especial Navidad: promociones y cuotas
+        </Alert>
+      )}
       
       {/* Buscador oculto en catálogos individuales */}
       {!isIndividualCatalog && (

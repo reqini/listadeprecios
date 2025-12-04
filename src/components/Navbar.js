@@ -127,7 +127,7 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
             },
           }}
         >
-          🎄 Especial Navidad: promociones y cuotas hasta el 24/12
+          🎄 Especial Navidad: promociones y cuotas
         </Alert>
       )}
 
