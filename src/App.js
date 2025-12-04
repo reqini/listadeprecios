@@ -88,7 +88,12 @@ const AppContent = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Router>
+      <Router
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <AnalyticsTracker />
         <Routes>
           <Route path="/activos" element={<Activos />} />

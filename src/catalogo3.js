@@ -37,6 +37,7 @@ const Catalogo3 = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [bankPromos] = useState([]); // Promos de bancos (legacy, usar bankLogos)
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [error, setError] = useState(null); // Estado para manejar errores de carga
   
   // Hook para manejar el layout de columnas en mobile
   const { mobileColumns, toggleColumns } = useColumnLayout('catalogo3', 1);
@@ -61,10 +62,10 @@ const Catalogo3 = () => {
   const getData = async () => {
     try {
       const result = await axios.get(`/api/productos`);
-      return result.data;
+      return { success: true, data: result.data };
     } catch (error) {
       console.error("Error cargando productos:", error);
-      return [];
+      return { success: false, error: error.message || 'Error al cargar productos', data: [] };
     }
   };
 
@@ -152,7 +153,20 @@ const Catalogo3 = () => {
     
     const loadInitialData = async () => {
       setLoading(true);
-      const productosData = await getData();
+      setError(null); // Limpiar error anterior
+      const result = await getData();
+      
+      if (!result.success) {
+        // Si hay error, mostrar mensaje pero no quedarse en loading
+        setError(result.error || 'Error al cargar productos. Por favor, intenta recargar la página.');
+        setProductos([]);
+        setProductosOriginales([]);
+        setProductosAgrupados({});
+        setLoading(false);
+        return;
+      }
+      
+      const productosData = result.data || [];
       const productosFiltrados = productosData.filter(
         (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
       );
@@ -440,6 +454,50 @@ const Catalogo3 = () => {
           cuotasTexto="3 cuotas"
           bankLogos={bankLogos}
         />
+      )}
+
+      {/* Error state */}
+      {error && !loading && (
+        <Box sx={{ textAlign: 'center', py: 6, px: 2 }}>
+          <Alert severity="error" sx={{ mb: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Error al cargar productos
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              {error}
+            </Typography>
+            <Button
+              variant="contained"
+              onClick={() => {
+                setError(null);
+                setLoading(true);
+                const loadInitialData = async () => {
+                  const result = await getData();
+                  if (!result.success) {
+                    setError(result.error || 'Error al cargar productos. Por favor, intenta recargar la página.');
+                    setProductos([]);
+                    setProductosOriginales([]);
+                    setProductosAgrupados({});
+                    setLoading(false);
+                    return;
+                  }
+                  const productosData = result.data || [];
+                  const productosFiltrados = productosData.filter(
+                    (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
+                  );
+                  const productosUnicos = eliminarDuplicados(productosFiltrados);
+                  setProductos(productosUnicos);
+                  setProductosOriginales(productosUnicos);
+                  agruparProductosPorLinea(productosUnicos);
+                  setLoading(false);
+                };
+                loadInitialData();
+              }}
+            >
+              Reintentar
+            </Button>
+          </Alert>
+        </Box>
       )}
 
       {/* Loading state - Skeleton moderno */}

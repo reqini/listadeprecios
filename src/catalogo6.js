@@ -11,7 +11,7 @@ import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
 import Navbar from "./components/Navbar";
 import LaunchProductsCarousel from "./components/LaunchProductsCarousel";
 // Switch y carrusel antiguo eliminados de catálogos comunes
-import { Snackbar, Alert, Typography, Box } from "@mui/material";
+import { Snackbar, Alert, Typography, Box, Button } from "@mui/material";
 import { trackCatalogView, trackCatalogSearch, trackAddToCart, trackToggleFavorite } from "./utils/analytics";
 import { useAuth } from "./AuthContext";
 import { parsePrice } from "./utils/priceUtils";
@@ -38,6 +38,7 @@ const Catalogo6 = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [bankLogos, setBankLogos] = useState([]); // Logos de bancos para promociones
+  const [error, setError] = useState(null); // Estado para manejar errores de carga
   
   const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
   
@@ -60,10 +61,10 @@ const Catalogo6 = () => {
   const getData = async () => {
     try {
       const result = await axios.get(`/api/productos`);
-      return result.data;
+      return { success: true, data: result.data };
     } catch (error) {
       console.error("Error cargando productos:", error);
-      return [];
+      return { success: false, error: error.message || 'Error al cargar productos', data: [] };
     }
   };
 
@@ -73,7 +74,20 @@ const Catalogo6 = () => {
 
     const loadInitialData = async () => {
       setLoading(true);
-      const productosData = await getData();
+      setError(null); // Limpiar error anterior
+      const result = await getData();
+      
+      if (!result.success) {
+        // Si hay error, mostrar mensaje pero no quedarse en loading
+        setError(result.error || 'Error al cargar productos. Por favor, intenta recargar la página.');
+        setProductos([]);
+        setProductosOriginales([]);
+        setProductosAgrupados({});
+        setLoading(false);
+        return;
+      }
+      
+      const productosData = result.data || [];
       const productosFiltrados = productosData.filter(
         (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
       );
@@ -285,6 +299,50 @@ const Catalogo6 = () => {
             console.log('Producto clickeado:', prod);
           }}
         />
+      )}
+
+      {/* Error state */}
+      {error && !loading && (
+        <Box sx={{ textAlign: 'center', py: 6, px: 2 }}>
+          <Alert severity="error" sx={{ mb: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Error al cargar productos
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              {error}
+            </Typography>
+            <Button
+              variant="contained"
+              onClick={() => {
+                setError(null);
+                setLoading(true);
+                const loadInitialData = async () => {
+                  const result = await getData();
+                  if (!result.success) {
+                    setError(result.error || 'Error al cargar productos. Por favor, intenta recargar la página.');
+                    setProductos([]);
+                    setProductosOriginales([]);
+                    setProductosAgrupados({});
+                    setLoading(false);
+                    return;
+                  }
+                  const productosData = result.data || [];
+                  const productosFiltrados = productosData.filter(
+                    (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
+                  );
+                  const productosUnicos = eliminarDuplicados(productosFiltrados);
+                  setProductos(productosUnicos);
+                  setProductosOriginales(productosUnicos);
+                  agruparProductosPorLinea(productosUnicos);
+                  setLoading(false);
+                };
+                loadInitialData();
+              }}
+            >
+              Reintentar
+            </Button>
+          </Alert>
+        </Box>
       )}
 
       {/* Loading state - Skeleton moderno */}
