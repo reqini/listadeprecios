@@ -30,7 +30,6 @@ import Capacitaciones from "./pages/Capacitaciones";
 import AdminPanel from "./pages/AdminPanel";
 import BusquedaIA from "./components/BusquedaIA";
 import Entregaya from "./pages/Entregaya";
-import GlobalSearchPage from "./pages/GlobalSearchPage";
 import PWAInstallToast from "./components/PWAInstallToast";
 import { AuthProvider, useAuth } from "./AuthContext"; 
 
@@ -116,7 +115,6 @@ const AppContent = () => {
           <Route path="/capacitaciones" element={<PrivateRoute><Capacitaciones /></PrivateRoute>} />
           <Route path="/busqueda-ia" element={<PrivateRoute><BusquedaIA /></PrivateRoute>} />
           <Route path="/administrador" element={<AdminRoute><AdminPanel /></AdminRoute>} />
-          
           {/* Catálogo de Entrega Ya - Productos de la hoja entrega-ya */}
           <Route path="/entregaya" element={<PrivateRoute><Entregaya /></PrivateRoute>} />
           

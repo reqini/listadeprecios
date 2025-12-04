@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import GlobalProductSearch from '../components/GlobalProductSearch';
 import Navbar from '../components/Navbar';
@@ -11,8 +11,6 @@ import { useAuth } from '../AuthContext';
 const GlobalSearchPage = () => {
   const { logout, auth } = useAuth();
   const navigate = useNavigate();
-  const [isSearchOpen, setIsSearchOpen] = useState(true);
-
   const handleProductClick = (product) => {
     // Si es producto local, podría navegar a su detalle
     // Por ahora solo cerrar y mostrar en consola
@@ -30,12 +28,10 @@ const GlobalSearchPage = () => {
         onLogout={logout}
         user={auth?.user || { username: localStorage.getItem('activeSession') || '' }}
       />
-      {isSearchOpen && (
-        <GlobalProductSearch
-          onProductClick={handleProductClick}
-          onClose={handleCloseSearch}
-        />
-      )}
+      <GlobalProductSearch
+        onProductClick={handleProductClick}
+        onClose={handleCloseSearch}
+      />
     </>
   );
 };

@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
   TextField,
   InputAdornment,
-  Container,
   Typography,
   Card,
   CardContent,
@@ -20,23 +19,17 @@ import {
   Tab,
   IconButton,
   Tooltip,
-  Skeleton,
-  Fade,
   Grid,
-  Divider,
 } from '@mui/material';
 import {
   Search as SearchIcon,
   Close as CloseIcon,
-  Download as DownloadIcon,
   Star as StarIcon,
   ShoppingCart as ShoppingCartIcon,
   Language as LanguageIcon,
   Store as StoreIcon,
   TrendingDown as TrendingDownIcon,
   Compare as CompareIcon,
-  Refresh as RefreshIcon,
-  FileDownload as FileDownloadIcon,
   PictureAsPdf as PdfIcon,
   TableChart as ExcelIcon,
 } from '@mui/icons-material';
@@ -73,12 +66,12 @@ const GlobalProductSearch = ({ onProductClick, onClose }) => {
   const debouncedSearch = useDebounce(searchTerm, 400);
   const abortControllerRef = useRef(null);
   const inputRef = useRef(null);
-  const cacheRef = useRef(new Map());
+  // Cache interno no usado de momento; se mantiene la estrategia con sessionStorage
 
   // Cargar productos locales al montar
   useEffect(() => {
     loadLocalProducts();
-  }, []);
+  }, [loadLocalProducts]);
 
   // Búsqueda automática con debounce
   useEffect(() => {
