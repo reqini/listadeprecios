@@ -1,19 +1,26 @@
 import React, { useEffect, useState } from "react";
 import axios from "./utils/axios";
 import Container from "@mui/material/Container";
-import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
+import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
 import { Helmet } from "react-helmet";
 import ProductCatalogoPreferencial from "./components/ProductCatalogoPreferencial";
 import logo from "./assets/logo.png";
-import { Dialog, DialogTitle, DialogContent, Button } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, Button, Alert, Box } from "@mui/material";
+import ModernSearchBar from "./components/ModernSearchBar";
+import { filterAllProducts } from "./utils/filterProducts";
+import { normalizeString } from "./utils/searchUtils";
+import LoadingFallbackCatalog from "./components/LoadingFallbackCatalog";
+import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
 
 const Preferencial = () => {
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
-  const [filtro, setFiltro] = useState("");
+  const [productosOriginales, setProductosOriginales] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [openModal, setOpenModal] = useState(false);
+  const [error, setError] = useState(null);
 
   const eliminarDuplicados = (productos) => {
     return productos.reduce((acc, producto) => {
@@ -27,10 +34,10 @@ const Preferencial = () => {
   const getData = async () => {
     try {
       const result = await axios.get(`/api/productos`);
-      return result.data;
+      return { success: true, data: result.data };
     } catch (error) {
-      console.error("Error cargando productos:", error.message);
-      return [];
+      console.error("Error cargando productos:", error);
+      return { success: false, error: error.message || 'Error al cargar productos', data: [] };
     }
   };
 
@@ -41,7 +48,18 @@ const Preferencial = () => {
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
-      const productosData = await getData();
+      setError(null);
+      const result = await getData();
+      
+      if (!result.success) {
+        setError(result.error || 'Error al cargar productos. Por favor, intenta recargar la página.');
+        setProductos([]);
+        setProductosOriginales([]);
+        setLoading(false);
+        return;
+      }
+      
+      const productosData = result.data || [];
       const productosFiltrados = productosData.filter(
         (producto) =>
           (producto?.vigencia || "").toLowerCase() !== "no" &&
@@ -49,24 +67,59 @@ const Preferencial = () => {
       );
       const productosUnicos = eliminarDuplicados(productosFiltrados);
       setProductos(productosUnicos);
+      setProductosOriginales(productosUnicos);
       setLoading(false);
     };
 
     loadInitialData();
   }, []);
 
-  const productosFiltrados = productos.filter(
-    (producto) =>
-      (producto?.descripcion || "").toLowerCase().includes(filtro.toLowerCase()) &&
-      (producto?.linea || "").toLowerCase() !== "repuestos"
-  );
+  const productosFiltrados = searchTerm 
+    ? filterAllProducts(productosOriginales.length > 0 ? productosOriginales : productos, searchTerm).filter(
+        (producto) => normalizeString(producto?.linea) !== 'repuestos'
+      )
+    : productos.filter(
+        (producto) => normalizeString(producto?.linea) !== 'repuestos'
+      );
 
   return (
-    <Container maxWidth="lg" className="conteiner-list">
+    <>
       <Helmet>
         <title>Catálogo Precio Preferencial</title>
       </Helmet>
 
+      {IS_CHRISTMAS_MODE && (
+        <Alert
+          severity="info"
+          icon={false}
+          sx={{
+            backgroundColor: '#C62828',
+            color: '#FFFFFF',
+            textAlign: 'center',
+            py: 0.5,
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+            fontWeight: 600,
+            borderRadius: 0,
+            '& .MuiAlert-message': {
+              width: '100%',
+            },
+          }}
+        >
+          🎄 Especial Navidad: promociones y cuotas
+        </Alert>
+      )}
+
+      <Box className="catalog-search-sticky">
+        <ModernSearchBar
+          value={searchTerm}
+          onChange={(value) => {
+            setSearchTerm(value);
+          }}
+          placeholder="Buscar productos por nombre, categoría o banco..."
+        />
+      </Box>
+
+      <Container maxWidth="lg" className="conteiner-list">
       {/* Botón Donar */}
       <div className="mar-t10 mar-b20 flex justify-center">
         <Button
@@ -94,32 +147,68 @@ const Preferencial = () => {
         <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
       </div>
 
-      <div className={`header-catalogo flex-center pad10`}>
-        <TextField
-          style={{ maxWidth: 450 }}
-          fullWidth
-          className="search"
-          id="outlined-basic"
-          label="Buscar Producto"
-          variant="outlined"
-          value={filtro}
-          onChange={(e) => setFiltro(e.target.value)}
-        />
-      </div>
+      {error && !loading && (
+        <Box sx={{ textAlign: 'center', py: 6, px: 2 }}>
+          <Alert severity="error" sx={{ mb: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Error al cargar productos
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              {error}
+            </Typography>
+            <Button
+              variant="contained"
+              onClick={() => {
+                setError(null);
+                setLoading(true);
+                const loadInitialData = async () => {
+                  const result = await getData();
+                  if (!result.success) {
+                    setError(result.error || 'Error al cargar productos. Por favor, intenta recargar la página.');
+                    setProductos([]);
+                    setProductosOriginales([]);
+                    setLoading(false);
+                    return;
+                  }
+                  const productosData = result.data || [];
+                  const productosFiltrados = productosData.filter(
+                    (producto) =>
+                      (producto?.vigencia || "").toLowerCase() !== "no" &&
+                      productHasPreferencial(producto)
+                  );
+                  const productosUnicos = eliminarDuplicados(productosFiltrados);
+                  setProductos(productosUnicos);
+                  setProductosOriginales(productosUnicos);
+                  setLoading(false);
+                };
+                loadInitialData();
+              }}
+            >
+              Reintentar
+            </Button>
+          </Alert>
+        </Box>
+      )}
 
-      {loading ? (
-        <ul className="lista-prod-catalog w-100">
-          {[...Array(8)].map((_, idx) => (
-            <Skeleton
-              key={idx}
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-          ))}
-        </ul>
-      ) : (
+      {loading && (
+        <Box>
+          <LinearProgress sx={{ marginBottom: 3 }} />
+          <ul className="lista-prod-catalog w-100">
+            {[...Array(8)].map((_, idx) => (
+              <Skeleton
+                key={idx}
+                sx={{ height: 300, margin: 1 }}
+                animation="wave"
+                variant="rectangular"
+                className="grid-item"
+              />
+            ))}
+          </ul>
+          <LoadingFallbackCatalog />
+        </Box>
+      )}
+
+      {!loading && !error && (
         <ul className="lista-prod-catalog w-100">
           {productosFiltrados.map((product) => (
             <li className="grid-item" key={product.id}>
@@ -159,7 +248,8 @@ const Preferencial = () => {
           </a>
         </DialogContent>
       </Dialog>
-    </Container>
+      </Container>
+    </>
   );
 };
 

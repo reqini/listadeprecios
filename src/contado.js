@@ -1,21 +1,27 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "./utils/axios";
 import Container from "@mui/material/Container";
-import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
+import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
 import { Helmet } from "react-helmet";
 import ProductCatalogoNegocio from "./components/productCalatogoNegocio";
 import logo from "./assets/logo.png";
-import { filterProducts, normalizeString } from "./utils/searchUtils";
+import { normalizeString } from "./utils/searchUtils";
+import { filterAllProducts } from "./utils/filterProducts";
 import LaunchProductsCarousel from "./components/LaunchProductsCarousel";
-// Switch y carrusel antiguo eliminados de catálogos comunes
+import ModernSearchBar from "./components/ModernSearchBar";
+import { Alert, Box, Button } from "@mui/material";
+import LoadingFallbackCatalog from "./components/LoadingFallbackCatalog";
+import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
 
 
 const Contado = () => {
   const [loading, setLoading] = useState(true);
-  const [productos, setProductos] = useState([]); // Lista ORIGINAL de productos - NUNCA modificar
-  const [searchTerm, setSearchTerm] = useState(""); // Estado SOLO para el input - independiente
+  const [productos, setProductos] = useState([]);
+  const [productosOriginales, setProductosOriginales] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [error, setError] = useState(null);
 
 
   const eliminarDuplicados = (productos) => {
@@ -30,56 +36,93 @@ const Contado = () => {
   const getData = async () => {
     try {
       const result = await axios.get(`/api/productos`);
-      return result.data;
+      return { success: true, data: result.data };
     } catch (error) {
-      console.error("Error cargando productos:", error.message);
-      return [];
+      console.error("Error cargando productos:", error);
+      return { success: false, error: error.message || 'Error al cargar productos', data: [] };
     }
   };
 
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
-      const productosData = await getData();
+      setError(null);
+      const result = await getData();
+      
+      if (!result.success) {
+        setError(result.error || 'Error al cargar productos. Por favor, intenta recargar la página.');
+        setProductos([]);
+        setProductosOriginales([]);
+        setLoading(false);
+        return;
+      }
+      
+      const productosData = result.data || [];
       const productosFiltrados = productosData.filter(
         (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
       );
       const productosUnicos = eliminarDuplicados(productosFiltrados);
       setProductos(productosUnicos);
+      setProductosOriginales(productosUnicos);
       setLoading(false);
     };
 
     loadInitialData();
   }, []);
 
-  // Filtrado DIRECTO desde searchTerm - SIN estados intermedios
-  // NO modifica productos original, solo filtra para render
-  // Usa función optimizada con normalización de acentos y búsqueda robusta
   const productosFiltrados = useMemo(() => {
-    // Si no hay productos, retornar vacío
     if (!productos || productos.length === 0) return [];
     
-    // Filtrar usando la función optimizada de searchUtils
-    // Esto incluye búsqueda por nombre, línea, categoría y código
-    // Con normalización de acentos y case-insensitive
-    let filtrados = filterProducts(productos, searchTerm, true);
+    const productosBase = productosOriginales.length > 0 ? productosOriginales : productos;
+    let filtrados = searchTerm 
+      ? filterAllProducts(productosBase, searchTerm)
+      : productosBase;
     
-    // Excluir repuestos (requerimiento específico de este catálogo)
     filtrados = filtrados.filter(
       (producto) => normalizeString(producto?.linea) !== 'repuestos'
     );
     
     return filtrados;
-  }, [productos, searchTerm]); // Dependencias: productos original y searchTerm
+  }, [productos, productosOriginales, searchTerm]);
 
   return (
-    <Container maxWidth="lg" className="conteiner-list">
+    <>
       <Helmet>
         <title>Catálogo Contado - Contado</title>
       </Helmet>
 
+      {IS_CHRISTMAS_MODE && (
+        <Alert
+          severity="info"
+          icon={false}
+          sx={{
+            backgroundColor: '#C62828',
+            color: '#FFFFFF',
+            textAlign: 'center',
+            py: 0.5,
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+            fontWeight: 600,
+            borderRadius: 0,
+            '& .MuiAlert-message': {
+              width: '100%',
+            },
+          }}
+        >
+          🎄 Especial Navidad: promociones y cuotas
+        </Alert>
+      )}
 
+      <Box className="catalog-search-sticky">
+        <ModernSearchBar
+          value={searchTerm}
+          onChange={(value) => {
+            setSearchTerm(value);
+          }}
+          placeholder="Buscar productos por nombre, categoría o banco..."
+        />
+      </Box>
 
+      <Container maxWidth="lg" className="conteiner-list">
       <div className="w-100 flex justify-center items-center flex-direction mar-t10">
         <Typography fontSize={13} margin={'6px 0 12px 0'}>
           Desarrollado por: <b><a href="https://www.instagram.com/lrecchini/" rel="noreferrer">Luciano Recchini</a></b>
@@ -87,28 +130,46 @@ const Contado = () => {
         <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
       </div>
 
-      <div className={`header-catalogo flex-center pad10`}>
-        <TextField
-          style={{ maxWidth: 450 }}
-          fullWidth
-          className="search"
-          id="outlined-basic"
-          label="Buscar Producto"
-          variant="outlined"
-          value={searchTerm}
-          onChange={(e) => {
-            // SOLO actualizar el estado del input - NADA MÁS
-            // El filtrado se hace automáticamente en useMemo
-            setSearchTerm(e.target.value);
-          }}
-          autoComplete="off"
-          inputProps={{
-            autoCapitalize: 'off',
-            autoCorrect: 'off',
-            spellCheck: 'false',
-          }}
-        />
-      </div>
+      {error && !loading && (
+        <Box sx={{ textAlign: 'center', py: 6, px: 2 }}>
+          <Alert severity="error" sx={{ mb: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Error al cargar productos
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              {error}
+            </Typography>
+            <Button
+              variant="contained"
+              onClick={() => {
+                setError(null);
+                setLoading(true);
+                const loadInitialData = async () => {
+                  const result = await getData();
+                  if (!result.success) {
+                    setError(result.error || 'Error al cargar productos. Por favor, intenta recargar la página.');
+                    setProductos([]);
+                    setProductosOriginales([]);
+                    setLoading(false);
+                    return;
+                  }
+                  const productosData = result.data || [];
+                  const productosFiltrados = productosData.filter(
+                    (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
+                  );
+                  const productosUnicos = eliminarDuplicados(productosFiltrados);
+                  setProductos(productosUnicos);
+                  setProductosOriginales(productosUnicos);
+                  setLoading(false);
+                };
+                loadInitialData();
+              }}
+            >
+              Reintentar
+            </Button>
+          </Alert>
+        </Box>
+      )}
 
       {/* Switch y carrusel antiguo eliminados de catálogos comunes */}
 
@@ -126,19 +187,25 @@ const Contado = () => {
         />
       )}
 
-      {loading ? (
-        <ul className="lista-prod-catalog w-100">
-          {[...Array(8)].map((_, idx) => (
-            <Skeleton
-              key={idx}
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-          ))}
-        </ul>
-      ) : productosFiltrados.length > 0 ? (
+      {loading && (
+        <Box>
+          <LinearProgress sx={{ marginBottom: 3 }} />
+          <ul className="lista-prod-catalog w-100">
+            {[...Array(8)].map((_, idx) => (
+              <Skeleton
+                key={idx}
+                sx={{ height: 300, margin: 1 }}
+                animation="wave"
+                variant="rectangular"
+                className="grid-item"
+              />
+            ))}
+          </ul>
+          <LoadingFallbackCatalog />
+        </Box>
+      )}
+
+      {!loading && !error && productosFiltrados.length > 0 ? (
         <ul className="lista-prod-catalog w-100">
           {productosFiltrados.map((product) => (
             <li className="grid-item" key={product.id}>
@@ -162,9 +229,8 @@ const Contado = () => {
           </Typography>
         </div>
       )}
-
-
-    </Container>
+      </Container>
+    </>
   );
 };
 

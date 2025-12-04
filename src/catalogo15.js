@@ -1,30 +1,48 @@
-/* eslint-disable */
 import React, { useEffect, useState, useMemo } from "react";
+import { normalizeString } from "./utils/searchUtils";
 import axios from "./utils/axios";
 import Container from "@mui/material/Container";
-import TextField from "@mui/material/TextField";
 import Skeleton from "@mui/material/Skeleton";
-import Dialog from "@mui/material/Dialog";
+import LinearProgress from "@mui/material/LinearProgress";
 import { Helmet } from "react-helmet";
-import ProductsCalatogo from "./components/productsCalatogo";
-import logo from './assets/logo.png';
-import { Snackbar, Alert, Typography } from "@mui/material";
-import ShoppingCartCatalogo from "./components/ShoppingCartCatalogo";
+import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
+import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
+import FeaturedProductsBanner from "./components/FeaturedProductsBanner";
+import { Snackbar, Alert, Typography, Box, Button } from "@mui/material";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { trackCatalogView, trackCatalogSearch, trackAddToCart, trackToggleFavorite } from "./utils/analytics";
+import { parsePrice } from "./utils/priceUtils";
+import { useIsIndividualCatalog } from "./utils/useCatalogContext";
+import ModernSearchBar from "./components/ModernSearchBar";
+import { filterAllProducts } from "./utils/filterProducts";
+import { useColumnLayout } from "./hooks/useColumnLayout";
+import ColumnLayoutToggle from "./components/ColumnLayoutToggle";
+import LoadingFallbackCatalog from "./components/LoadingFallbackCatalog";
+import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
 
 const Catalogo15 = () => {
+  const isIndividualCatalog = useIsIndividualCatalog();
+  const isMobile = useMediaQuery('(max-width:600px)');
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
-  const [filtro, setFiltro] = useState("");
+  const [productosOriginales, setProductosOriginales] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [productosAgrupados, setProductosAgrupados] = useState({});
-  const [isSticky, setIsSticky] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [showFavorites, setShowFavorites] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
+  const [bankPromos] = useState([]);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [error, setError] = useState(null);
+  
+  const { mobileColumns, toggleColumns } = useColumnLayout('catalogo15', 2);
 
+  const cuotasMap = useMemo(() => ({
+    "15 cuotas sin interés": 'quince_sin_interes',
+  }), []);
 
   const eliminarDuplicados = (productos) => {
     return productos.reduce((acc, producto) => {
@@ -36,22 +54,114 @@ const Catalogo15 = () => {
   };
 
   const getData = async () => {
-    const result = await axios.get(`/api/productos`);
-    return result.data;
+    try {
+      const result = await axios.get(`/api/productos`);
+      return { success: true, data: result.data };
+    } catch (error) {
+      console.error("Error cargando productos:", error);
+      return { success: false, error: error.message || 'Error al cargar productos', data: [] };
+    }
   };
 
   useEffect(() => {
+    try {
+      const savedFavorites = localStorage.getItem('favorites');
+      if (savedFavorites) {
+        let favorites = JSON.parse(savedFavorites);
+        favorites = favorites.filter((fav, index, self) =>
+          index === self.findIndex(f => {
+            if (fav.id && f.id) {
+              return String(f.id) === String(fav.id);
+            }
+            if (fav.codigo && f.codigo) {
+              return String(f.codigo) === String(fav.codigo);
+            }
+            return false;
+          })
+        );
+        setFavorites(favorites);
+        if (favorites.length !== JSON.parse(savedFavorites).length) {
+          localStorage.setItem('favorites', JSON.stringify(favorites));
+        }
+      }
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleFavoritesUpdate = (e) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setFavorites(e.detail);
+      }
+    };
+    
+    window.addEventListener('favoritesUpdated', handleFavoritesUpdate);
+    return () => window.removeEventListener('favoritesUpdated', handleFavoritesUpdate);
+  }, []);
+
+  const [bankLogos, setBankLogos] = useState([]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      setShowScrollTop(scrollTop > 300);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+  
+  useEffect(() => {
+    const loadBankLogos = async () => {
+      try {
+        const { getBankLogosForCatalogo } = await import('./utils/catalogoPromosAPI');
+        const logos = await getBankLogosForCatalogo('/catalogo15');
+        setBankLogos(logos);
+      } catch (error) {
+        console.warn('No se pudieron cargar logos de bancos para catalogo15:', error);
+        setBankLogos([]);
+      }
+    };
+    
+    loadBankLogos();
+    
+    const handlePromosUpdate = () => {
+      loadBankLogos();
+    };
+    window.addEventListener('catalogoPromosUpdated', handlePromosUpdate);
+    return () => window.removeEventListener('catalogoPromosUpdated', handlePromosUpdate);
+  }, []);
+
+  useEffect(() => {
+    trackCatalogView("Catálogo", "15 cuotas sin interés");
+    
     const loadInitialData = async () => {
       setLoading(true);
-      const productosData = await getData();
+      setError(null);
+      const result = await getData();
+      
+      if (!result.success) {
+        setError(result.error || 'Error al cargar productos. Por favor, intenta recargar la página.');
+        setProductos([]);
+        setProductosOriginales([]);
+        setProductosAgrupados({});
+        setLoading(false);
+        return;
+      }
+      
+      const productosData = result.data || [];
       const productosFiltrados = productosData.filter(
         (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
       );
       const productosUnicos = eliminarDuplicados(productosFiltrados);
       setProductos(productosUnicos);
+      setProductosOriginales(productosUnicos);
       agruparProductosPorLinea(productosUnicos);
       setLoading(false);
     };
+
     loadInitialData();
   }, []);
 
@@ -66,135 +176,412 @@ const Catalogo15 = () => {
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsSticky(window.scrollY > 100);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const cuotasMap = useMemo(() => ({
-    "15 cuotas sin interés": 'quince_sin_interes',
-  }), []);
-
-  useEffect(() => {
-    let productosFiltrados = productos.filter((producto) =>
-      (producto?.descripcion || '').toLowerCase().includes(filtro.toLowerCase()) &&
-      (producto?.linea || '').toLowerCase() !== 'repuestos'
+    const productosBase = productosOriginales.length > 0 ? productosOriginales : productos;
+    
+    let productosFiltrados = searchTerm 
+      ? filterAllProducts(productosBase, searchTerm)
+      : productosBase;
+    
+    productosFiltrados = productosFiltrados.filter(
+      (producto) => normalizeString(producto?.linea) !== 'repuestos'
     );
+
+    if (searchTerm && searchTerm.trim()) {
+      trackCatalogSearch("Catálogo 15", searchTerm);
+    }
+
     if (cuotasMap["15 cuotas sin interés"]) {
+      const cuotaKey = cuotasMap["15 cuotas sin interés"];
       productosFiltrados = productosFiltrados.filter(
-        (producto) => producto[cuotasMap["15 cuotas sin interés"]] !== 'NO'
+        (producto) => producto[cuotaKey] && producto[cuotaKey] !== 'NO'
       );
     }
-    agruparProductosPorLinea(productosFiltrados);
-  }, [filtro, productos, cuotasMap]);
 
-  const addToCart = (product) => setCart([...cart, product]);
+    agruparProductosPorLinea(productosFiltrados);
+  }, [searchTerm, productos, productosOriginales, cuotasMap]);
+
+  const addToCart = (product) => {
+    const cuotaKeyCatalogo = cuotasMap["15 cuotas sin interés"];
+    const cuotaValueRaw = product[cuotaKeyCatalogo] && product[cuotaKeyCatalogo] !== 'NO' 
+      ? product[cuotaKeyCatalogo] 
+      : null;
+    const cuotaValue = cuotaValueRaw ? parsePrice(cuotaValueRaw) : null;
+    
+    const productWithCuota = {
+      ...product,
+      selectedCuotaKey: product.selectedCuotaKey || cuotaKeyCatalogo,
+      selectedCuotaValue: product.selectedCuotaValue || cuotaValue,
+      selectedCuotaLabel: product.selectedCuotaLabel || "15 cuotas sin interés",
+    };
+
+    setCart((prevCart) => {
+      const existingIndex = prevCart.findIndex(
+        (item) => item.codigo === product.codigo
+      );
+      
+      if (existingIndex >= 0) {
+        const updatedCart = [...prevCart];
+        updatedCart[existingIndex] = {
+          ...updatedCart[existingIndex],
+          cantidad: (updatedCart[existingIndex].cantidad || 1) + 1,
+          selectedCuotaKey: updatedCart[existingIndex].selectedCuotaKey || productWithCuota.selectedCuotaKey,
+          selectedCuotaValue: updatedCart[existingIndex].selectedCuotaValue || productWithCuota.selectedCuotaValue,
+          selectedCuotaLabel: updatedCart[existingIndex].selectedCuotaLabel || productWithCuota.selectedCuotaLabel,
+        };
+        return updatedCart;
+      } else {
+        return [...prevCart, { ...productWithCuota, cantidad: 1 }];
+      }
+    });
+    trackAddToCart("Catálogo 15", product);
+  };
 
   const toggleFavorite = (product) => {
-    const exists = favorites.some(fav => fav.id === product.id);
-    const updatedFavorites = exists
-      ? favorites.filter(fav => fav.id !== product.id)
-      : [...favorites, product];
-    const message = exists
-      ? `${product.descripcion} ha sido eliminado de tus favoritos`
-      : `${product.descripcion} ha sido agregado a tus favoritos`;
-    setFavorites(updatedFavorites);
-    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
-    setSnackbarMessage(message);
-    setSnackbarSeverity(exists ? 'warning' : 'success');
-    setSnackbarOpen(true);
-    if (!updatedFavorites.length) {
-      setShowFavorites(false);
-      agruparProductosPorLinea(productos);
+    try {
+      const savedFavorites = localStorage.getItem('favorites');
+      let currentFavorites = savedFavorites ? JSON.parse(savedFavorites) : [];
+      
+      currentFavorites = currentFavorites.filter((fav, index, self) =>
+        index === self.findIndex(f => {
+          if (fav.id && f.id) {
+            return String(f.id) === String(fav.id);
+          }
+          if (fav.codigo && f.codigo) {
+            return String(f.codigo) === String(fav.codigo);
+          }
+          return false;
+        })
+      );
+      
+      const isCurrentlyFavorite = currentFavorites.some(fav => {
+        if (product.id && fav.id) {
+          return String(fav.id) === String(product.id);
+        }
+        if (product.codigo && fav.codigo) {
+          return String(fav.codigo) === String(product.codigo);
+        }
+        return false;
+      });
+      
+      let updatedFavorites;
+      let message;
+
+      if (isCurrentlyFavorite) {
+        updatedFavorites = currentFavorites.filter(fav => {
+          if (product.id && fav.id) {
+            return String(fav.id) !== String(product.id);
+          }
+          if (product.codigo && fav.codigo) {
+            return String(fav.codigo) !== String(product.codigo);
+          }
+          return true;
+        });
+        message = `${product.descripcion} ha sido eliminado de tus favoritos`;
+        setSnackbarSeverity('warning');
+        trackToggleFavorite("Catálogo 15", product, false);
+      } else {
+        updatedFavorites = [...currentFavorites, product];
+        message = `${product.descripcion} ha sido agregado a tus favoritos`;
+        setSnackbarSeverity('success');
+        trackToggleFavorite("Catálogo 15", product, true);
+      }
+
+      setFavorites(updatedFavorites);
+      localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+      window.dispatchEvent(new CustomEvent('favoritesUpdated', { detail: updatedFavorites }));
+      
+      setSnackbarMessage(message);
+      setSnackbarOpen(true);
+
+      if (updatedFavorites.length === 0) {
+        setShowFavorites(false);
+        agruparProductosPorLinea(productos);
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      setSnackbarMessage('Error al actualizar favoritos');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
     }
+  };
+
+  const getBankPromoForProduct = (product) => {
+    if (!bankPromos || bankPromos.length === 0) return null;
+    
+    if (product.banco) {
+      const promo = bankPromos.find(p => 
+        p.banco && product.banco && 
+        (p.banco.toUpperCase().includes(product.banco.toUpperCase()) ||
+         product.banco.toUpperCase().includes(p.banco.toUpperCase()))
+      );
+      if (promo) return promo;
+    }
+    
+    if (product.banco_codigo) {
+      const promo = bankPromos.find(p => 
+        p.banco_codigo === product.banco_codigo
+      );
+      if (promo) return promo;
+    }
+    
+    return null;
   };
 
   const productosAMostrar = showFavorites
     ? Object.keys(productosAgrupados).reduce((acc, linea) => {
-        const favoritos = productosAgrupados[linea].filter(product =>
-          favorites.some(fav => fav.id === product.id)
+        const productosFavoritos = productosAgrupados[linea].filter(product =>
+          favorites.some(fav => 
+            (fav.id && product.id && String(fav.id) === String(product.id)) ||
+            (fav.codigo && product.codigo && String(fav.codigo) === String(product.codigo))
+          )
         );
-        if (favoritos.length) acc[linea] = favoritos;
+        if (productosFavoritos.length) {
+          acc[linea] = productosFavoritos;
+        }
         return acc;
       }, {})
     : productosAgrupados;
 
   return (
-    <Container maxWidth="lg" className="conteiner-list">
+    <>
       <Helmet>
-        <title>Catalogo Simple - Catálogo</title>
+        <title>Catálogo 15 Cuotas - Catálogo</title>
       </Helmet>
-
-
-
-      {/* INFO DE DESARROLLADOR */}
-      <div className="w-100 flex justify-center items-center flex-direction mar-t10">
-        <Typography fontSize={13} margin={'6px 0 12px 0'} style={{textAlign: 'center'}}>
-            <b>Desarrollado por:</b><br></br>
-            <b>
-              <a href="https://www.instagram.com/lrecchini/" rel="noreferrer"> Luciano Recchini</a>
-            </b>
-          </Typography>
-        <img src={logo} alt="logo" width="200" className="mar-t10 mar-b20" />
-      </div>
-
-      {/* BUSCADOR oculto */}
-      {/* <div className={`header-catalogo flex-center pad10 ${isSticky ? "sticky" : ""}`}>
-        <TextField
-          style={{ maxWidth: 450 }}
-          fullWidth
-          className="search"
-          label="Buscar Producto"
-          variant="outlined"
-          value={filtro}
-          onChange={(e) => setFiltro(e.target.value)}
-        />
-      </div> */}
-
-      {/* LOADING */}
-      {loading && (
-        <ul className="lista-prod-catalog w-100">
-          {[...Array(8)].map((_, idx) => (
-            <Skeleton
-              key={idx}
-              sx={{ height: 300, margin: 1 }}
-              animation="wave"
-              variant="rectangular"
-              className="grid-item"
-            />
-          ))}
-        </ul>
+      
+      {IS_CHRISTMAS_MODE && (
+        <Alert
+          severity="info"
+          icon={false}
+          sx={{
+            backgroundColor: '#C62828',
+            color: '#FFFFFF',
+            textAlign: 'center',
+            py: 0.5,
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+            fontWeight: 600,
+            borderRadius: 0,
+            '& .MuiAlert-message': {
+              width: '100%',
+            },
+          }}
+        >
+          🎄 Especial Navidad: promociones y cuotas
+        </Alert>
+      )}
+      
+      {!isIndividualCatalog && (
+        <Box className="catalog-search-sticky">
+          <ModernSearchBar
+            value={searchTerm}
+            onChange={(value) => {
+              setSearchTerm(value);
+            }}
+            placeholder="Buscar productos por nombre, categoría o banco..."
+          />
+        </Box>
       )}
 
-      {/* PRODUCTOS */}
-      {Object.keys(productosAMostrar).map((linea) => (
-        <div key={linea} className="linea-section">
-          <Typography variant="h5" gutterBottom margin="20px 0">
-            Línea: <b>{linea}</b>
-          </Typography>
-          <ul className="lista-prod-catalog w-100">
-            {productosAMostrar[linea].map((product) => (
-              <li className="grid-item" key={product.id}>
-                <ProductsCalatogo
-                  product={product}
-                  onAddToCart={addToCart}
-                  isFavorite={favorites.some(fav => fav.id === product.id)}
-                  onToggleFavorite={() => toggleFavorite(product)}
-                  selectedCuota={'15 cuotas sin interés'}
-                  sumarEnvio={sumarEnvio}
-                  costoEnvio={17362}
-                />
-              </li>
+      <Container 
+        maxWidth="lg" 
+        className="conteiner-list"
+        sx={{
+          paddingTop: { xs: 1, sm: 2 },
+          paddingBottom: { xs: 4, sm: 5 },
+        }}
+      >
+      {!loading && productos.length > 0 && (
+        <FeaturedProductsBanner
+          productos={productos}
+          onAddToCart={(prod) => {
+            addToCart(prod);
+            trackAddToCart("Catálogo 15", prod);
+          }}
+          onToggleFavorite={(prod) => toggleFavorite(prod)}
+          selectedCuota={'15 cuotas sin interés'}
+          isContado={false}
+          cuotaKey="quince_sin_interes"
+          cuotasTexto="15 cuotas"
+          bankLogos={bankLogos}
+        />
+      )}
+
+      {error && !loading && (
+        <Box sx={{ textAlign: 'center', py: 6, px: 2 }}>
+          <Alert severity="error" sx={{ mb: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Error al cargar productos
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              {error}
+            </Typography>
+            <Button
+              variant="contained"
+              onClick={() => {
+                setError(null);
+                setLoading(true);
+                const loadInitialData = async () => {
+                  const result = await getData();
+                  if (!result.success) {
+                    setError(result.error || 'Error al cargar productos. Por favor, intenta recargar la página.');
+                    setProductos([]);
+                    setProductosOriginales([]);
+                    setProductosAgrupados({});
+                    setLoading(false);
+                    return;
+                  }
+                  const productosData = result.data || [];
+                  const productosFiltrados = productosData.filter(
+                    (producto) => (producto?.vigencia || '').toLowerCase() !== "no"
+                  );
+                  const productosUnicos = eliminarDuplicados(productosFiltrados);
+                  setProductos(productosUnicos);
+                  setProductosOriginales(productosUnicos);
+                  agruparProductosPorLinea(productosUnicos);
+                  setLoading(false);
+                };
+                loadInitialData();
+              }}
+            >
+              Reintentar
+            </Button>
+          </Alert>
+        </Box>
+      )}
+
+      {loading && (
+        <Box>
+          <LinearProgress sx={{ marginBottom: 3 }} />
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(2, 1fr)',
+                lg: 'repeat(3, 1fr)',
+              },
+              gap: { xs: 3, sm: 3, md: 4 },
+            }}
+          >
+            {[...Array(6)].map((_, idx) => (
+              <Skeleton
+                key={idx}
+                variant="rectangular"
+                height={400}
+                sx={{
+                  borderRadius: 3,
+                  animation: 'wave',
+                }}
+              />
             ))}
-          </ul>
-        </div>
+          </Box>
+          <LoadingFallbackCatalog />
+        </Box>
+      )}
+
+      {!loading && Object.keys(productosAMostrar).map((linea) => (
+        <Box key={linea} sx={{ marginBottom: { xs: 4, sm: 5 } }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: { xs: 2, sm: 3 } }}>
+            <Typography 
+              variant="h5" 
+              sx={{
+                fontSize: { xs: '1.25rem', sm: '1.5rem' },
+                fontWeight: 600,
+                color: '#222222',
+              }}
+            >
+              Línea: <Box component="span" sx={{ fontWeight: 700 }}>{linea}</Box>
+            </Typography>
+            
+            <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+              <ColumnLayoutToggle
+                mobileColumns={mobileColumns}
+                onToggle={toggleColumns}
+                variant="icons"
+                size="small"
+              />
+            </Box>
+          </Box>
+          
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: mobileColumns === 1 ? '1fr' : 'repeat(2, 1fr)',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(2, 1fr)',
+                lg: 'repeat(3, 1fr)',
+              },
+              gap: { xs: mobileColumns === 1 ? 2.5 : 1.5, sm: 2.5, md: 3 },
+            }}
+          >
+            {productosAMostrar[linea].map((product) => {
+              const bankPromo = getBankPromoForProduct(product);
+              
+              return (
+                <ModernProductCardAirbnb
+                  key={product.id || product.codigo}
+                  product={product}
+                  onAddToCart={(prod) => {
+                    addToCart(prod);
+                    trackAddToCart("Catálogo 15", prod);
+                  }}
+                  onToggleFavorite={(prod, isFavorite) => {
+                    toggleFavorite(prod);
+                  }}
+                  selectedCuota={'15 cuotas sin interés'}
+                  isContado={false}
+                  isNew={product.nuevo === 'si' || product.nuevo === true || product.nuevo === 'Sí'}
+                  isBestSeller={product.mas_vendida === 'si' || product.mas_vendida === true || product.mas_vendida === 'Sí'}
+                  stockLow={
+                    product.stock_actual && product.stock_total &&
+                    parseFloat(product.stock_actual) > 0 && parseFloat(product.stock_total) > 0 &&
+                    (parseFloat(product.stock_actual) / parseFloat(product.stock_total)) < 0.2
+                  }
+                  bankLogos={bankLogos}
+                  bankPromo={bankPromo}
+                  isCompactMode={mobileColumns === 2}
+                />
+              );
+            })}
+          </Box>
+        </Box>
       ))}
 
-      <ShoppingCartCatalogo cart={cart} setCart={setCart} cuotaKey="quince_sin_interes" cuotasTexto="15 cuotas" />
+      <ModernCartBottomSheet 
+        cart={cart} 
+        setCart={setCart} 
+        cuotaKey="quince_sin_interes" 
+        cuotasTexto="15 cuotas" 
+      />
+      </Container>
 
-      {/* SNACKBAR */}
+      {showScrollTop && (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          sx={{
+            position: "fixed",
+            bottom: isMobile ? 90 : 90,
+            left: 24,
+            zIndex: 999,
+            backgroundColor: theme => theme.palette.primary.main,
+            borderRadius: "50%",
+            minWidth: 0,
+            width: 48,
+            height: 48,
+            boxShadow: 3,
+            fontSize: 24,
+            '&:hover': {
+              backgroundColor: theme => theme.palette.primary.dark,
+            },
+          }}
+        >
+          ↑
+        </Button>
+      )}
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}
@@ -204,9 +591,7 @@ const Catalogo15 = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-
-
-    </Container>
+    </>
   );
 };
 
