@@ -36,7 +36,7 @@ const Entregaya = () => {
   const [cart, setCart] = useState([]);
   
   // Hook para manejar el layout de columnas en mobile
-  const { mobileColumns, toggleColumns } = useColumnLayout('entregaya', 1);
+  const { mobileColumns, toggleColumns } = useColumnLayout('entregaya', 2);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [productos, setProductos] = useState([]);

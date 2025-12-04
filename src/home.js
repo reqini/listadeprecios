@@ -42,7 +42,7 @@ const Home = () => {
   const isMobile = useMediaQuery('(max-width:600px)');
   
   // Hook para manejar el layout de columnas en mobile
-  const { mobileColumns, toggleColumns } = useColumnLayout('home', 1);
+  const { mobileColumns, toggleColumns } = useColumnLayout('home', 2);
 
   const [catalogos] = useState([
   { nombre: "Preferencial", url: "/preferencial" },

@@ -45,7 +45,7 @@ const Catalogo6 = () => {
   const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
   
   // Hook para manejar el layout de columnas en mobile
-  const { mobileColumns, toggleColumns } = useColumnLayout('catalogo6', 1);
+  const { mobileColumns, toggleColumns } = useColumnLayout('catalogo6', 2);
 
   const cuotasMap = useMemo(() => ({
     "6 cuotas sin interés": 'seis_sin_interes',

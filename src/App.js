@@ -122,7 +122,7 @@ const AppContent = () => {
           <Route path="/catalogo18" element={<Catalogo18 />} />
           <Route path="/catalogo20" element={<Catalogo20 />} />
           <Route path="/catalogo24" element={<Catalogo24 />} />
-          <Route path="/contado" element={<PrivateRoute><Contado /></PrivateRoute>} />
+          <Route path="/contado" element={<Contado />} />
           <Route path="/generarPlaca" element={<UltraMinimalPlacaGenerator />} />
           <Route path="/emprendedoras" element={<PrivateRoute><Emprendedoras /></PrivateRoute>} />
           <Route path="/ventas" element={<PrivateRoute><Ventas /></PrivateRoute>} />

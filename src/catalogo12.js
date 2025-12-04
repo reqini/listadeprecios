@@ -43,7 +43,7 @@ const Catalogo12 = () => {
   const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
   
   // Hook para manejar el layout de columnas en mobile
-  const { mobileColumns, toggleColumns } = useColumnLayout('catalogo12', 1);
+  const { mobileColumns, toggleColumns } = useColumnLayout('catalogo12', 2);
 
 
   const eliminarDuplicados = (productos) => {

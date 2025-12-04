@@ -42,7 +42,7 @@ const Catalogo3 = () => {
   const [error, setError] = useState(null); // Estado para manejar errores de carga
   
   // Hook para manejar el layout de columnas en mobile
-  const { mobileColumns, toggleColumns } = useColumnLayout('catalogo3', 1);
+  const { mobileColumns, toggleColumns } = useColumnLayout('catalogo3', 2);
 
   // Mapeo correcto de cuotas
   const cuotasMap = useMemo(() => ({

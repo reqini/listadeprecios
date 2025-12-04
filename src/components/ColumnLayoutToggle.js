@@ -14,8 +14,10 @@ import {
 
 /**
  * Componente para alternar entre 1 y 2 columnas en mobile
- * Opción 1: Iconos (ViewColumn y ViewComfy)
- * Opción 2: Switch/ToggleButton
+ * UX mejorada:
+ * - 2 columnas es el modo principal (estado \"activo\")
+ * - Íconos claros: lista (1 col) vs grilla (2 col)
+ * - Botón tipo pill con fondo y borde diferenciados
  */
 const ColumnLayoutToggle = ({ 
   mobileColumns, 
@@ -24,57 +26,55 @@ const ColumnLayoutToggle = ({
   size = 'medium',
   sx = {}
 }) => {
-  if (variant === 'toggle') {
-    return (
+  // Variante por defecto: pill compacto con 1 col vs 2 col
+  return (
+    <Box sx={{ display: 'inline-flex', ...sx }}>
       <ToggleButtonGroup
         value={mobileColumns}
         exclusive
         onChange={(e, newValue) => {
-          if (newValue !== null) {
+          if (newValue !== null && newValue !== mobileColumns) {
             onToggle();
           }
         }}
         size={size}
-        sx={{ 
-          height: size === 'small' ? 32 : 40,
-          ...sx 
+        sx={{
+          borderRadius: 999,
+          overflow: 'hidden',
+          bgcolor: 'background.paper',
+          '& .MuiToggleButton-root': {
+            border: 'none',
+            px: size === 'small' ? 1 : 1.5,
+            minWidth: size === 'small' ? 38 : 46,
+          },
         }}
       >
-        <ToggleButton value={1} aria-label="1 columna">
-          <ViewListIcon sx={{ fontSize: size === 'small' ? 18 : 20 }} />
-        </ToggleButton>
-        <ToggleButton value={2} aria-label="2 columnas">
-          <ViewComfyIcon sx={{ fontSize: size === 'small' ? 18 : 20 }} />
-        </ToggleButton>
-      </ToggleButtonGroup>
-    );
-  }
-
-  // Variante con iconos (default)
-  return (
-    <Box sx={{ display: 'flex', gap: 0.5, ...sx }}>
-      <Tooltip title={mobileColumns === 1 ? 'Ver en 2 columnas' : 'Ver en 1 columna'}>
-        <IconButton
-          onClick={onToggle}
-          size={size}
-          color={mobileColumns === 1 ? 'default' : 'primary'}
+        <ToggleButton
+          value={1}
+          aria-label="Ver en 1 columna"
+          selected={mobileColumns === 1}
           sx={{
-            border: mobileColumns === 1 ? '1px solid' : '1px solid',
-            borderColor: mobileColumns === 1 ? 'divider' : 'primary.main',
-            bgcolor: mobileColumns === 1 ? 'transparent' : 'primary.light',
-            '&:hover': {
-              bgcolor: mobileColumns === 1 ? 'action.hover' : 'primary.main',
-              borderColor: mobileColumns === 1 ? 'text.secondary' : 'primary.dark',
-            },
+            bgcolor: mobileColumns === 1 ? 'action.selected' : 'transparent',
           }}
         >
-          {mobileColumns === 1 ? (
-            <ViewColumnIcon sx={{ fontSize: size === 'small' ? 18 : 20 }} />
-          ) : (
+          <Tooltip title="Ver en 1 columna">
+            <ViewListIcon sx={{ fontSize: size === 'small' ? 18 : 20 }} />
+          </Tooltip>
+        </ToggleButton>
+        <ToggleButton
+          value={2}
+          aria-label="Ver en 2 columnas"
+          selected={mobileColumns === 2}
+          sx={{
+            bgcolor: mobileColumns === 2 ? 'primary.main' : 'transparent',
+            color: mobileColumns === 2 ? 'primary.contrastText' : 'inherit',
+          }}
+        >
+          <Tooltip title="Ver en 2 columnas (recomendado)">
             <ViewComfyIcon sx={{ fontSize: size === 'small' ? 18 : 20 }} />
-          )}
-        </IconButton>
-      </Tooltip>
+          </Tooltip>
+        </ToggleButton>
+      </ToggleButtonGroup>
     </Box>
   );
 };
