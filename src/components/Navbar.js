@@ -28,6 +28,8 @@ import Logo from '../assets/logo512.png'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MenuIcon from '@mui/icons-material/Menu';
 import ModernSearchBar from "./ModernSearchBar";
+import { IS_CHRISTMAS_MODE } from "../config/christmasConfig";
+import { Alert } from "@mui/material";
 
 const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch = false }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -107,6 +109,28 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
 
   return (
     <>
+      {/* Banner Navideño Superior */}
+      {IS_CHRISTMAS_MODE && (
+        <Alert
+          severity="info"
+          icon={false}
+          sx={{
+            backgroundColor: '#C62828',
+            color: '#FFFFFF',
+            textAlign: 'center',
+            py: 0.5,
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+            fontWeight: 600,
+            borderRadius: 0,
+            '& .MuiAlert-message': {
+              width: '100%',
+            },
+          }}
+        >
+          🎄 Especial Navidad: promociones y cuotas hasta el 24/12
+        </Alert>
+      )}
+
       {/* Spacer solo cuando está fixed (no catálogo y scrolled) */}
       {!isCatalog && isScrolled && (
         <Box sx={{ height: { xs: '64px', sm: '64px' } }} />
@@ -138,13 +162,30 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
             order: { xs: 1, sm: 1 },
             flex: { sm: '0 0 auto' },
           }}>
-            <div className="flex items-center">
+            <div className="flex items-center" style={{ position: 'relative' }}>
                 {location.pathname !== "/home" ? (
                   <IconButton size="small" color="secondary" onClick={() => navigate(-1)}>
                     <ArrowBackIcon color="secondary" />
                   </IconButton>
                 ) : (
-                  <img src={Logo} alt="logo" width="48" />
+                  <>
+                    <img src={Logo} alt="logo" width="48" />
+                    {/* Gorrito navideño sobre el logo */}
+                    {IS_CHRISTMAS_MODE && (
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: -8,
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          fontSize: '24px',
+                          zIndex: 1,
+                        }}
+                      >
+                        🎅
+                      </Box>
+                    )}
+                  </>
                 )}
             </div>
             {!showSearch && (

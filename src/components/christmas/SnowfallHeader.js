@@ -9,18 +9,6 @@ import { IS_CHRISTMAS_MODE } from '../../config/christmasConfig';
  */
 const SnowfallHeader = () => {
   const isMobile = useMediaQuery('(max-width:600px)');
-
-  if (!IS_CHRISTMAS_MODE) return null;
-
-  // Detección simple de dispositivos que prefieren menos animación
-  if (typeof window !== 'undefined') {
-    const prefersReduced = window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) {
-      return null;
-    }
-  }
-
   const flakeCount = isMobile ? 18 : 32;
 
   const flakes = useMemo(
@@ -36,6 +24,17 @@ const SnowfallHeader = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [flakeCount, isMobile]
   );
+
+  if (!IS_CHRISTMAS_MODE) return null;
+
+  // Detección simple de dispositivos que prefieren menos animación
+  if (typeof window !== 'undefined') {
+    const prefersReduced = window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) {
+      return null;
+    }
+  }
 
   return (
     <Box

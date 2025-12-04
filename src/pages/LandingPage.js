@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { IS_CHRISTMAS_MODE } from '../config/christmasConfig';
 import {
   Container,
   Typography,
@@ -254,7 +255,7 @@ const LandingPage = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
             <img src={logo} alt="Logo" style={{ height: 40, marginRight: 16 }} />
             <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
-              Lista de Precios
+              {IS_CHRISTMAS_MODE ? 'Lista de Precios – Especial Navidad 🎁' : 'Lista de Precios'}
             </Typography>
           </Box>
           
@@ -823,10 +824,24 @@ const LandingPage = () => {
             </Grid>
           </Grid>
           
-          <Box sx={{ borderTop: 1, borderColor: 'rgba(255,255,255,0.2)', mt: 4, pt: 3, textAlign: 'center' }}>
+          <Box sx={{ 
+            borderTop: 1, 
+            borderColor: 'rgba(255,255,255,0.2)', 
+            mt: 4, 
+            pt: 3, 
+            textAlign: 'center',
+            backgroundColor: IS_CHRISTMAS_MODE ? 'rgba(27, 94, 32, 0.1)' : 'transparent',
+            borderRadius: IS_CHRISTMAS_MODE ? 2 : 0,
+            py: IS_CHRISTMAS_MODE ? 2 : 0,
+          }}>
             <Typography variant="body2">
               © 2024 Lista de Precios. Todos los derechos reservados.
             </Typography>
+            {IS_CHRISTMAS_MODE && (
+              <Typography variant="body2" sx={{ mt: 1, fontSize: '0.875rem' }}>
+                🎄 Hecho con ❤️ para acompañar tus ventas en estas fiestas.
+              </Typography>
+            )}
           </Box>
         </Container>
       </Box>

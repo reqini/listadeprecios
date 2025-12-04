@@ -34,6 +34,7 @@ import ReviewSlider from "./components/ReviewSlider";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useColumnLayout } from "./hooks/useColumnLayout";
 import ColumnLayoutToggle from "./components/ColumnLayoutToggle";
+import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
 
 const Home = () => {
   const { logout } = useAuth();
@@ -397,7 +398,14 @@ const Home = () => {
             </AccordionDetails>
           </Accordion>
           <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100">
-            <Typography style={{maxWidth: 350}} textAlign={'center'} variant="h6">Por este medio podes generar la url y enviar el catálogo que tu cliente quiera</Typography>
+            <Typography style={{maxWidth: 350}} textAlign={'center'} variant="h6">
+              {IS_CHRISTMAS_MODE ? '🎄 Catálogo Navideño 🎄' : 'Por este medio podes generar la url y enviar el catálogo que tu cliente quiera'}
+            </Typography>
+            {IS_CHRISTMAS_MODE && (
+              <Typography style={{maxWidth: 350, marginTop: 8}} textAlign={'center'} variant="body2" color="text.secondary">
+                Por este medio podes generar la url y enviar el catálogo que tu cliente quiera
+              </Typography>
+            )}
           </div>
         {/* Sección de catálogos - Acceso libre para todos los usuarios */}
         <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100" style={{ gap: 12 }}>

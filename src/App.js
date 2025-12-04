@@ -31,7 +31,10 @@ import AdminPanel from "./pages/AdminPanel";
 import BusquedaIA from "./components/BusquedaIA";
 import Entregaya from "./pages/Entregaya";
 import PWAInstallToast from "./components/PWAInstallToast";
-import { AuthProvider, useAuth } from "./AuthContext"; 
+import { AuthProvider, useAuth } from "./AuthContext";
+import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
+import SantaSleighOverlay from "./components/christmas/SantaSleighOverlay";
+import SnowfallHeader from "./components/christmas/SnowfallHeader"; 
 
 // Google Analytics
 const TRACKING_ID = "G-5S2G3FYSPS";
@@ -88,6 +91,13 @@ const AppContent = () => {
 
   return (
     <ThemeProvider theme={theme}>
+      {/* Decoraciones Navideñas Globales */}
+      {IS_CHRISTMAS_MODE && (
+        <>
+          <SnowfallHeader />
+          <SantaSleighOverlay />
+        </>
+      )}
       <Router
         future={{
           v7_startTransition: true,
@@ -121,7 +131,7 @@ const AppContent = () => {
           <Route path="/busqueda-ia" element={<PrivateRoute><BusquedaIA /></PrivateRoute>} />
           <Route path="/administrador" element={<AdminRoute><AdminPanel /></AdminRoute>} />
           {/* Catálogo de Entrega Ya - Productos de la hoja entrega-ya */}
-          <Route path="/entregaya" element={<PrivateRoute><Entregaya /></PrivateRoute>} />
+          <Route path="/entregaya" element={<Entregaya />} />
           
           <Route path="/" element={<LandingPage />} />
         </Routes>
