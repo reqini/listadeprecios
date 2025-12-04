@@ -43,3 +43,15 @@
     transform: rotate(360deg);
   }
 }
+
+/* Ícono navideño minimalista en las cards (no afecta layout) */
+.xmas-icon {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  font-size: 14px;
+  opacity: 0.85;
+  z-index: 3;
+  pointer-events: none;
+}
+

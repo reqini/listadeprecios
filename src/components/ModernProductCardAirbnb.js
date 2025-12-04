@@ -20,7 +20,6 @@ import { Close as CloseIcon, ZoomIn as ZoomInIcon, Favorite, FavoriteBorder } fr
 import { formatPrice, parsePrice } from '../utils/priceUtils';
 import BankPromoBadge from './BankPromoBadge';
 import BankLogosRow from './BankLogosRow';
-import ChristmasBadge from './christmas/ChristmasBadge';
 import { IS_CHRISTMAS_MODE } from '../config/christmasConfig';
 
 /**
@@ -342,6 +341,11 @@ const ModernProductCardAirbnb = ({
           }}
           onClick={handleImageClick}
         >
+          {/* Ícono navideño minimalista (no afecta layout) */}
+          {IS_CHRISTMAS_MODE && (
+            <span className="xmas-icon">🎅</span>
+          )}
+
           {/* Badge de descuento si existe */}
           {product.discount && (
             <Chip
@@ -465,18 +469,6 @@ const ModernProductCardAirbnb = ({
                   color: 'white',
                   fontWeight: 600,
                   fontSize: isCompactMode ? '0.6rem' : '0.7rem',
-                  height: isCompactMode ? 20 : 24,
-                  padding: isCompactMode ? '0 4px' : '0 6px',
-                }}
-              />
-            )}
-            
-            {/* Badge Navideño - Solo algunos productos aleatoriamente para no saturar */}
-            {IS_CHRISTMAS_MODE && Math.random() > 0.7 && (
-              <ChristmasBadge 
-                variant={Math.random() > 0.5 ? 'special' : 'gift'}
-                sx={{
-                  fontSize: isCompactMode ? '0.65rem' : '0.7rem',
                   height: isCompactMode ? 20 : 24,
                   padding: isCompactMode ? '0 4px' : '0 6px',
                 }}
