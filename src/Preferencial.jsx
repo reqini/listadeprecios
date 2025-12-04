@@ -5,7 +5,7 @@ import Skeleton from "@mui/material/Skeleton";
 import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
 import { Helmet } from "react-helmet";
-import ProductCatalogoPreferencial from "./components/ProductCatalogoPreferencial";
+import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
 import logo from "./assets/logo.png";
 import { Dialog, DialogTitle, DialogContent, Button, Alert, Box } from "@mui/material";
 import ModernSearchBar from "./components/ModernSearchBar";
@@ -13,14 +13,21 @@ import { filterAllProducts } from "./utils/filterProducts";
 import { normalizeString } from "./utils/searchUtils";
 import LoadingFallbackCatalog from "./components/LoadingFallbackCatalog";
 import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
+import { useColumnLayout } from "./hooks/useColumnLayout";
+import ColumnLayoutToggle from "./components/ColumnLayoutToggle";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 const Preferencial = () => {
+  const isMobile = useMediaQuery('(max-width:600px)');
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
   const [productosOriginales, setProductosOriginales] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [error, setError] = useState(null);
+  const [favorites, setFavorites] = useState([]);
+  
+  const { mobileColumns, toggleColumns } = useColumnLayout('preferencial', 2);
 
   const eliminarDuplicados = (productos) => {
     return productos.reduce((acc, producto) => {
@@ -193,29 +200,96 @@ const Preferencial = () => {
       {loading && (
         <Box>
           <LinearProgress sx={{ marginBottom: 3 }} />
-          <ul className="lista-prod-catalog w-100">
-            {[...Array(8)].map((_, idx) => (
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(2, 1fr)',
+                lg: 'repeat(3, 1fr)',
+              },
+              gap: { xs: 3, sm: 3, md: 4 },
+            }}
+          >
+            {[...Array(6)].map((_, idx) => (
               <Skeleton
                 key={idx}
-                sx={{ height: 300, margin: 1 }}
-                animation="wave"
                 variant="rectangular"
-                className="grid-item"
+                height={400}
+                sx={{
+                  borderRadius: 3,
+                  animation: 'wave',
+                }}
               />
             ))}
-          </ul>
+          </Box>
           <LoadingFallbackCatalog />
         </Box>
       )}
 
-      {!loading && !error && (
-        <ul className="lista-prod-catalog w-100">
-          {productosFiltrados.map((product) => (
-            <li className="grid-item" key={product.id}>
-              <ProductCatalogoPreferencial product={product} costoEnvio={17362} />
-            </li>
-          ))}
-        </ul>
+      {!loading && !error && productosFiltrados.length > 0 && (
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: { xs: 2, sm: 3 } }}>
+            <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+              <ColumnLayoutToggle
+                mobileColumns={mobileColumns}
+                onToggle={toggleColumns}
+                variant="toggle"
+                size="small"
+              />
+            </Box>
+          </Box>
+          
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: mobileColumns === 1 ? '1fr' : 'repeat(2, 1fr)',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(2, 1fr)',
+                lg: 'repeat(3, 1fr)',
+              },
+              gap: { xs: mobileColumns === 1 ? 2.5 : 1.5, sm: 2.5, md: 3 },
+            }}
+          >
+            {productosFiltrados.map((product) => (
+              <ModernProductCardAirbnb
+                key={product.id || product.codigo}
+                product={product}
+                onAddToCart={(prod) => {
+                  console.log('Producto para agregar:', prod);
+                }}
+                onToggleFavorite={(prod) => {
+                  console.log('Toggle favorite:', prod);
+                }}
+                selectedCuota={null}
+                isContado={false}
+                isNew={product.nuevo === 'si' || product.nuevo === true || product.nuevo === 'Sí'}
+                isBestSeller={product.mas_vendida === 'si' || product.mas_vendida === true || product.mas_vendida === 'Sí'}
+                stockLow={
+                  product.stock_actual && product.stock_total &&
+                  parseFloat(product.stock_actual) > 0 && parseFloat(product.stock_total) > 0 &&
+                  (parseFloat(product.stock_actual) / parseFloat(product.stock_total)) < 0.2
+                }
+                isCompactMode={mobileColumns === 2}
+              />
+            ))}
+          </Box>
+        </Box>
+      )}
+
+      {!loading && !error && productosFiltrados.length === 0 && (
+        <Box sx={{ textAlign: 'center', py: 6, px: 2 }}>
+          <Typography variant="h6" sx={{ color: '#717171', marginBottom: 1 }}>
+            No se encontraron productos
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#999' }}>
+            {searchTerm && searchTerm.trim() !== '' 
+              ? `No hay productos que coincidan con "${searchTerm}". Intenta con otro término de búsqueda.`
+              : 'No hay productos con precio preferencial disponibles en este momento.'}
+          </Typography>
+        </Box>
       )}
 
       {/* Modal Donar */}
