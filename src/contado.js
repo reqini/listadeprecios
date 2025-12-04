@@ -5,7 +5,7 @@ import Skeleton from "@mui/material/Skeleton";
 import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
 import { Helmet } from "react-helmet";
-import ProductCatalogoNegocio from "./components/productCalatogoNegocio";
+import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
 import logo from "./assets/logo.png";
 import { normalizeString } from "./utils/searchUtils";
 import { filterAllProducts } from "./utils/filterProducts";
@@ -14,14 +14,21 @@ import ModernSearchBar from "./components/ModernSearchBar";
 import { Alert, Box, Button } from "@mui/material";
 import LoadingFallbackCatalog from "./components/LoadingFallbackCatalog";
 import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
+import { useColumnLayout } from "./hooks/useColumnLayout";
+import ColumnLayoutToggle from "./components/ColumnLayoutToggle";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 
 const Contado = () => {
+  const isMobile = useMediaQuery('(max-width:600px)');
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
   const [productosOriginales, setProductosOriginales] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
+  const [favorites, setFavorites] = useState([]);
+  
+  const { mobileColumns, toggleColumns } = useColumnLayout('contado', 2);
 
 
   const eliminarDuplicados = (productos) => {
@@ -206,13 +213,55 @@ const Contado = () => {
       )}
 
       {!loading && !error && productosFiltrados.length > 0 ? (
-        <ul className="lista-prod-catalog w-100">
-          {productosFiltrados.map((product) => (
-            <li className="grid-item" key={product.id}>
-              <ProductCatalogoNegocio product={product} costoEnvio={17362} />
-            </li>
-          ))}
-        </ul>
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: { xs: 2, sm: 3 } }}>
+            <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+              <ColumnLayoutToggle
+                mobileColumns={mobileColumns}
+                onToggle={toggleColumns}
+                variant="toggle"
+                size="small"
+              />
+            </Box>
+          </Box>
+          
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: mobileColumns === 1 ? '1fr' : 'repeat(2, 1fr)',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(2, 1fr)',
+                lg: 'repeat(3, 1fr)',
+              },
+              gap: { xs: mobileColumns === 1 ? 2.5 : 1.5, sm: 2.5, md: 3 },
+            }}
+          >
+            {productosFiltrados.map((product) => (
+              <ModernProductCardAirbnb
+                key={product.id || product.codigo}
+                product={product}
+                onAddToCart={(prod) => {
+                  console.log('Producto para agregar:', prod);
+                }}
+                onToggleFavorite={(prod) => {
+                  // Manejar favoritos si es necesario
+                  console.log('Toggle favorite:', prod);
+                }}
+                selectedCuota={null}
+                isContado={true}
+                isNew={product.nuevo === 'si' || product.nuevo === true || product.nuevo === 'Sí'}
+                isBestSeller={product.mas_vendida === 'si' || product.mas_vendida === true || product.mas_vendida === 'Sí'}
+                stockLow={
+                  product.stock_actual && product.stock_total &&
+                  parseFloat(product.stock_actual) > 0 && parseFloat(product.stock_total) > 0 &&
+                  (parseFloat(product.stock_actual) / parseFloat(product.stock_total)) < 0.2
+                }
+                isCompactMode={mobileColumns === 2}
+              />
+            ))}
+          </Box>
+        </Box>
       ) : searchTerm && searchTerm.trim() !== '' ? (
         <div style={{ textAlign: 'center', padding: '40px 20px' }}>
           <Typography variant="h6" sx={{ color: '#717171', marginBottom: 1 }}>
