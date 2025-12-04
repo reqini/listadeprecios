@@ -231,7 +231,7 @@ const Preferencial = () => {
         }}
       >
       {/* Botón Donar */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', my: { xs: 2, sm: 3 } }}>
+      <Box sx={{ display: 'none', my: { xs: 2, sm: 3 } }}>
         <Button
           variant="contained"
           color="secondary"
