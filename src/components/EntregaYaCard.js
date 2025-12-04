@@ -24,6 +24,7 @@ import {
   ZoomIn as ZoomInIcon,
 } from '@mui/icons-material';
 import { formatPrice, parsePrice } from '../utils/priceUtils';
+import { IS_CHRISTMAS_MODE } from '../config/christmasConfig';
 
 /**
  * Card moderna y vistosa para productos de Entrega Ya
@@ -109,6 +110,7 @@ const EntregaYaCard = ({
         boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
         transition: 'all 0.3s ease',
         cursor: onProductClick ? 'pointer' : 'default',
+        position: 'relative',
         '&:hover': {
           transform: 'translateY(-4px)',
           boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
@@ -116,9 +118,40 @@ const EntregaYaCard = ({
       }}
       onClick={handleCardClick}
     >
+      {/* Borde navideño superior minimalista */}
+      {IS_CHRISTMAS_MODE && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            background: 'linear-gradient(90deg, #c62828, #d4af37, #1b5e20)',
+            borderRadius: '4px 4px 0 0',
+            zIndex: 1,
+          }}
+        />
+      )}
       {/* Contenedor de imagen con overlay de badges */}
       <Box sx={{ position: 'relative' }}>
         <Box sx={{ position: 'relative' }}>
+          {/* Ícono navideño minimalista */}
+          {IS_CHRISTMAS_MODE && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 10,
+                left: 10,
+                fontSize: '14px',
+                opacity: 0.85,
+                zIndex: 3,
+                pointerEvents: 'none',
+              }}
+            >
+              🎄
+            </Box>
+          )}
           <CardMedia
             component="img"
             height="240"

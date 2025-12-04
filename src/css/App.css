@@ -47,11 +47,27 @@
 /* Ícono navideño minimalista en las cards (no afecta layout) */
 .xmas-icon {
   position: absolute;
-  top: 6px;
-  left: 6px;
+  top: 10px;
+  left: 10px;
   font-size: 14px;
   opacity: 0.85;
   z-index: 3;
   pointer-events: none;
+}
+
+/* Borde navideño superior en cards */
+.card-xmas-top-border {
+  height: 4px;
+  background: linear-gradient(90deg, #c62828, #d4af37, #1b5e20);
+  border-radius: 4px 4px 0 0;
+}
+
+/* Barra de búsqueda sticky en catálogos */
+.catalog-search-sticky {
+  position: sticky;
+  top: 60px; /* debajo del banner navideño */
+  z-index: 20;
+  background: white;
+  padding-bottom: 8px;
 }
 

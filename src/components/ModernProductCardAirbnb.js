@@ -320,12 +320,28 @@ const ModernProductCardAirbnb = ({
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           border: '1px solid rgba(0,0,0,0.08)',
           backgroundColor: '#ffffff',
+          position: 'relative',
           '&:hover': {
             boxShadow: '0 4px 12px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.1)',
             transform: 'translateY(-2px)',
           },
         }}
       >
+        {/* Borde navideño superior minimalista */}
+        {IS_CHRISTMAS_MODE && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '4px',
+              background: 'linear-gradient(90deg, #c62828, #d4af37, #1b5e20)',
+              borderRadius: '4px 4px 0 0',
+              zIndex: 1,
+            }}
+          />
+        )}
         {/* Imagen protagonista - Mobile first - Ratio optimizado */}
         <Box
           sx={{
@@ -343,7 +359,19 @@ const ModernProductCardAirbnb = ({
         >
           {/* Ícono navideño minimalista (no afecta layout) */}
           {IS_CHRISTMAS_MODE && (
-            <span className="xmas-icon">🎅</span>
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 10,
+                left: 10,
+                fontSize: '14px',
+                opacity: 0.85,
+                zIndex: 3,
+                pointerEvents: 'none',
+              }}
+            >
+              🎄
+            </Box>
           )}
 
           {/* Badge de descuento si existe */}

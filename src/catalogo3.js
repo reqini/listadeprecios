@@ -433,13 +433,15 @@ const Catalogo3 = () => {
       
       {/* Buscador oculto en catálogos individuales */}
       {!isIndividualCatalog && (
-        <ModernSearchBar
-          value={searchTerm}
-          onChange={(value) => {
-            setSearchTerm(value); // Actualizar directamente el estado
-          }}
-          placeholder="Buscar productos por nombre, categoría o banco..."
-        />
+        <Box className="catalog-search-sticky">
+          <ModernSearchBar
+            value={searchTerm}
+            onChange={(value) => {
+              setSearchTerm(value); // Actualizar directamente el estado
+            }}
+            placeholder="Buscar productos por nombre, categoría o banco..."
+          />
+        </Box>
       )}
 
       <Container 
