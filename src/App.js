@@ -83,10 +83,9 @@ const PrivateRoute = ({ children }) => {
   }
 
   // Para otras rutas protegidas, validar suscripción activa
-  if (!subscriptionStatus || subscriptionStatus === 'none') {
-    return <Navigate to="/suscripcion/activar" replace />;
-  }
-
+  // PERMITIR acceso a usuarios antiguos (subscriptionStatus === 'none') pero mostrar aviso
+  // Solo bloquear si está explícitamente vencida o cancelada
+  
   // Bloquear acceso si está vencida o cancelada (excepto rutas de suscripción)
   if (subscriptionStatus === 'expired') {
     // Permitir que el modal se muestre, pero bloquear navegación
@@ -96,6 +95,13 @@ const PrivateRoute = ({ children }) => {
 
   if (subscriptionStatus === 'past_due' || subscriptionStatus === 'canceled') {
     return <Navigate to="/suscripcion/renovar" replace />;
+  }
+  
+  // Si no tiene suscripción (usuarios antiguos), permitir acceso pero mostrar modal
+  // El modal de suscripción se encargará de mostrar el aviso
+  if (!subscriptionStatus || subscriptionStatus === 'none') {
+    // Permitir acceso temporal - el modal mostrará el aviso para suscribirse
+    return children;
   }
 
   // Si la suscripción está activa pero no completó el onboarding, redirigir

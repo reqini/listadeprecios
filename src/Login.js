@@ -91,13 +91,7 @@ const Login = () => {
         localStorage.setItem("accessCode", response.data.access_code || '');
         
         // Manejar diferentes estados de suscripción
-        if (subscriptionStatus === 'none') {
-          // Sin suscripción - redirigir a activar
-          window.location.href = "/suscripcion/activar";
-          return;
-        }
-        
-        if (subscriptionStatus === 'past_due' || subscriptionStatus === 'canceled') {
+        if (subscriptionStatus === 'past_due' || subscriptionStatus === 'canceled' || subscriptionStatus === 'expired') {
           // Suscripción vencida/cancelada - redirigir a renovar
           window.location.href = "/suscripcion/renovar";
           return;
@@ -114,8 +108,10 @@ const Login = () => {
           return;
         }
         
-        // Estado desconocido - redirigir a activar por seguridad
-        window.location.href = "/suscripcion/activar";
+        // Si subscriptionStatus === 'none' o estado desconocido:
+        // Permitir acceso a usuarios antiguos - ir a home con aviso de suscripción
+        // El PrivateRoute mostrará el modal de suscripción si es necesario
+        window.location.href = "/home";
       } else {
         alert("Usuario o contraseña incorrectos");
       }
