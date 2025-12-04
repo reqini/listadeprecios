@@ -29,6 +29,7 @@ import DialogActions from '@mui/material/DialogActions';
 import InfoIcon from '@mui/icons-material/Info';
 import axios from "./utils/axios";
 import { mercadopagoService } from './utils/mercadopago';
+import { redirectToCheckout, SUBSCRIPTION_CONFIG } from './services/mercadopagoSubscriptionService';
 import { Typography } from '@mui/material';
 import Image from './assets/background.jpg';
 
@@ -141,27 +142,10 @@ const handleSubmit = async (e) => {
 
     if (response.data.success) {
       localStorage.setItem("registeredUsername", username);
+      localStorage.setItem("subscriptionStatus", "none"); // Marcar como sin suscripción
 
-      if (selectedPlan === 'full') {
-        // Plan de pago - crear suscripción en Mercado Pago
-        const userData = {
-          username,
-          email: username + '@ejemplo.com', // En producción esto vendría del formulario
-        };
-
-        const subscriptionResponse = await mercadopagoService.createSubscription(userData, 'full');
-        
-        if (subscriptionResponse.success) {
-          // Redirigir a Mercado Pago
-          window.location.href = subscriptionResponse.initPoint;
-        } else {
-          setError('Error al procesar el pago. Intenta de nuevo.');
-        }
-      } else {
-        // Plan gratuito - ir directo al login
-        navigate('/login?registered=true');
-      }
-
+      // Redirigir a la pantalla de activar suscripción (OBLIGATORIO)
+      navigate('/suscripcion/activar');
     } else {
       setCodigoError(response.data.message || 'Hubo un problema durante el registro.');
     }
@@ -373,15 +357,18 @@ const handleSubmit = async (e) => {
                 variant="contained"
                 size="large"
                 disabled={!isFormValid || loading}
-                color={selectedPlan === 'full' ? 'secondary' : 'primary'}
+                color="primary"
               >
                 {loading 
                   ? 'Procesando...' 
-                  : selectedPlan === 'full' 
-                    ? 'Registrarse y Pagar $25.000' 
-                    : 'Registrarse Gratis'
+                  : 'Registrarse y Activar Suscripción Mensual'
                 }
               </Button>
+              <Box sx={{ mt: 2, textAlign: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                  Después del registro, serás redirigido a Mercado Pago para activar tu suscripción mensual de $10.000
+                </Typography>
+              </Box>
             </Grid>
           </Grid>
         </form>

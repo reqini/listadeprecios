@@ -81,15 +81,56 @@ const Login = () => {
       });
 
       if (response.data.token) {
+        const subscriptionStatus = response.data.subscription_status || 'none';
+        
+        // Guardar datos de sesión
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("activeSession", response.data.username);
-        localStorage.setItem("tipoUsuario", response.data.tipo_usuario);
-        window.location.href = "/home";
+        localStorage.setItem("tipoUsuario", response.data.tipo_usuario || '');
+        localStorage.setItem("subscriptionStatus", subscriptionStatus);
+        localStorage.setItem("accessCode", response.data.access_code || '');
+        
+        // Manejar diferentes estados de suscripción
+        if (subscriptionStatus === 'none') {
+          // Sin suscripción - redirigir a activar
+          window.location.href = "/suscripcion/activar";
+          return;
+        }
+        
+        if (subscriptionStatus === 'past_due' || subscriptionStatus === 'canceled') {
+          // Suscripción vencida/cancelada - redirigir a renovar
+          window.location.href = "/suscripcion/renovar";
+          return;
+        }
+        
+        if (subscriptionStatus === 'active') {
+          // Suscripción activa - verificar si completó onboarding
+          const onboardingCompleted = localStorage.getItem('onboardingCompleted');
+          if (!onboardingCompleted) {
+            window.location.href = "/onboarding";
+          } else {
+            window.location.href = "/home";
+          }
+          return;
+        }
+        
+        // Estado desconocido - redirigir a activar por seguridad
+        window.location.href = "/suscripcion/activar";
       } else {
         alert("Usuario o contraseña incorrectos");
       }
     } catch (error) {
       console.error("Error durante la autenticación:", error);
+      
+      // Verificar si es error de suscripción inactiva
+      if (error.response?.status === 403 && error.response.data.code === 'SUBSCRIPTION_INACTIVE') {
+        setErrorMsg(error.response.data.message || "Tu suscripción está vencida o inactiva. Volvé a suscribirte para acceder.");
+        setShowModal(true);
+        setTimeout(() => {
+          window.location.href = "/suscripcion/renovar";
+        }, 2000);
+        return;
+      }
       
       if (error.response?.status === 403 && error.response.data.showModal) {
         setErrorMsg(error.response.data.message || "Máximo de sesiones activas alcanzado.");

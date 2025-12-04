@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import ReactGA from "react-ga4";
 
@@ -30,6 +30,11 @@ import Capacitaciones from "./pages/Capacitaciones";
 import AdminPanel from "./pages/AdminPanel";
 import BusquedaIA from "./components/BusquedaIA";
 import Entregaya from "./pages/Entregaya";
+import SuscripcionConfirmacion from "./pages/SuscripcionConfirmacion";
+import SuscripcionRenovar from "./pages/SuscripcionRenovar";
+import SuscripcionActivar from "./pages/SuscripcionActivar";
+import Onboarding from "./pages/Onboarding";
+import ExpirationModal from "./components/subscription/ExpirationModal";
 import PWAInstallToast from "./components/PWAInstallToast";
 import { AuthProvider, useAuth } from "./AuthContext";
 import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
@@ -40,10 +45,66 @@ import Snowfall from "./components/christmas/Snowfall";
 const TRACKING_ID = "G-5S2G3FYSPS";
 ReactGA.initialize(TRACKING_ID);
 
-// 🔐 Rutas protegidas
+// 🔐 Rutas protegidas con validación de suscripción
 const PrivateRoute = ({ children }) => {
   const { auth } = useAuth();
-  return auth?.token ? children : <Navigate to="/login" replace />;
+  const location = useLocation();
+  const subscriptionStatus = localStorage.getItem('subscriptionStatus');
+  const onboardingCompleted = localStorage.getItem('onboardingCompleted');
+
+  // Si no está autenticado, redirigir a login
+  if (!auth?.token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Permitir acceso a onboarding si la suscripción está activa pero no completó onboarding
+  if (location.pathname === '/onboarding') {
+    if (subscriptionStatus === 'active') {
+      return children;
+    }
+    // Si no tiene suscripción activa, redirigir
+    if (!subscriptionStatus || subscriptionStatus === 'none') {
+      return <Navigate to="/suscripcion/activar" replace />;
+    }
+    if (subscriptionStatus === 'past_due' || subscriptionStatus === 'canceled') {
+      return <Navigate to="/suscripcion/renovar" replace />;
+    }
+  }
+
+  // Permitir acceso a rutas de suscripción sin bloqueo
+  const allowedSubscriptionRoutes = [
+    '/suscripcion/activar',
+    '/suscripcion/confirmacion',
+    '/suscripcion/renovar',
+  ];
+
+  if (allowedSubscriptionRoutes.includes(location.pathname)) {
+    return children;
+  }
+
+  // Para otras rutas protegidas, validar suscripción activa
+  if (!subscriptionStatus || subscriptionStatus === 'none') {
+    return <Navigate to="/suscripcion/activar" replace />;
+  }
+
+  // Bloquear acceso si está vencida o cancelada (excepto rutas de suscripción)
+  if (subscriptionStatus === 'expired') {
+    // Permitir que el modal se muestre, pero bloquear navegación
+    // El modal se encargará de redirigir
+    return <Navigate to="/suscripcion/renovar" replace />;
+  }
+
+  if (subscriptionStatus === 'past_due' || subscriptionStatus === 'canceled') {
+    return <Navigate to="/suscripcion/renovar" replace />;
+  }
+
+  // Si la suscripción está activa pero no completó el onboarding, redirigir
+  if (subscriptionStatus === 'active' && !onboardingCompleted) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  // Todo OK, permitir acceso
+  return children;
 };
 
 // 🔐 Ruta de administrador (solo cocinaty)
@@ -128,13 +189,21 @@ const AppContent = () => {
           <Route path="/ventas" element={<PrivateRoute><Ventas /></PrivateRoute>} />
           <Route path="/perfil" element={<PrivateRoute><PerfilEmprendedora /></PrivateRoute>} />
           <Route path="/capacitaciones" element={<PrivateRoute><Capacitaciones /></PrivateRoute>} />
-          <Route path="/busqueda-ia" element={<PrivateRoute><BusquedaIA /></PrivateRoute>} />
+          <Route path="/busqueda-ia" element={<PrivateRoute></PrivateRoute>} />
           <Route path="/administrador" element={<AdminRoute><AdminPanel /></AdminRoute>} />
           {/* Catálogo de Entrega Ya - Productos de la hoja entrega-ya */}
           <Route path="/entregaya" element={<Entregaya />} />
+          {/* Rutas de Suscripción - Acceso sin validación de suscripción */}
+          <Route path="/suscripcion/activar" element={<SuscripcionActivar />} />
+          <Route path="/suscripcion/confirmacion" element={<SuscripcionConfirmacion />} />
+          <Route path="/suscripcion/renovar" element={<SuscripcionRenovar />} />
+          {/* Onboarding - Requiere autenticación y suscripción activa */}
+          <Route path="/onboarding" element={<PrivateRoute><Onboarding /></PrivateRoute>} />
           
           <Route path="/" element={<LandingPage />} />
         </Routes>
+        {/* Modal global de vencimiento de suscripción */}
+        <ExpirationModal />
         <PWAInstallToast />
       </Router>
     </ThemeProvider>
