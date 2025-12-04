@@ -71,3 +71,24 @@
   padding-bottom: 8px;
 }
 
+/* Cartel de 60 días gratis */
+.free-trial-banner {
+  background: #e6f4ea;
+  border-left: 4px solid #2e7d32;
+  padding: 12px 16px;
+  margin: 12px 0 20px 0;
+  font-size: 1rem;
+  border-radius: 8px;
+  color: #2e7d32;
+}
+
+/* Buscador de catálogos */
+.catalog-search-input {
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+

@@ -34,6 +34,7 @@ import ReviewSlider from "./components/ReviewSlider";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useColumnLayout } from "./hooks/useColumnLayout";
 import ColumnLayoutToggle from "./components/ColumnLayoutToggle";
+import ModernSearchBar from "./components/ModernSearchBar";
 import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
 
 const Home = () => {
@@ -59,6 +60,7 @@ const Home = () => {
   ]);
 
   const [selectedCatalog, setSelectedCatalog] = useState("");
+  const [catalogSearchTerm, setCatalogSearchTerm] = useState(""); // Buscador de catálogos
 
 
   // Nuevo estado para los colores
@@ -291,6 +293,17 @@ const Home = () => {
     return filterAllProducts(productosBase, searchTerm);
   }, [productosOriginales, productos, searchTerm]);
 
+  // Filtrado de catálogos por búsqueda
+  const catalogosFiltrados = useMemo(() => {
+    if (!catalogSearchTerm || catalogSearchTerm.trim() === '') {
+      return catalogos;
+    }
+    const searchLower = catalogSearchTerm.toLowerCase();
+    return catalogos.filter((cat) =>
+      cat.nombre.toLowerCase().includes(searchLower)
+    );
+  }, [catalogos, catalogSearchTerm]);
+
 
   // Cerrar snackbar
   const handleSnackbarClose = (event, reason) => {
@@ -407,6 +420,21 @@ const Home = () => {
               </Typography>
             )}
           </div>
+        
+        {/* Buscador de catálogos */}
+        <Box sx={{ mb: 3, px: { xs: 2, sm: 0 } }}>
+          <ModernSearchBar
+            value={catalogSearchTerm}
+            onChange={(value) => setCatalogSearchTerm(value)}
+            placeholder="Buscar catálogos..."
+            sx={{
+              width: '100%',
+              maxWidth: '600px',
+              mx: 'auto',
+            }}
+          />
+        </Box>
+
         {/* Sección de catálogos - Acceso libre para todos los usuarios */}
         <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100" style={{ gap: 12 }}>
           <FormControl size="small" sx={{ minWidth: 200, width: '100%', maxWidth: 400, background: 'white' }}>
@@ -420,7 +448,7 @@ const Home = () => {
               label="Seleccioná un catálogo"
             >
               <MenuItem value="">-- Elegí uno --</MenuItem>
-              {catalogos.map((cat) => (
+              {catalogosFiltrados.map((cat) => (
                 <MenuItem key={cat.url} value={cat.url}>{cat.nombre}</MenuItem>
               ))}
             </Select>

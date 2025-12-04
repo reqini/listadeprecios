@@ -63,6 +63,22 @@ const SuscripcionActivar = () => {
           </Typography>
         </Box>
 
+        {/* Cartel 60 días gratis */}
+        <Box
+          className="free-trial-banner"
+          sx={{
+            background: '#e6f4ea',
+            borderLeft: '4px solid #2e7d32',
+            padding: '12px 16px',
+            margin: '12px 0 20px 0',
+            fontSize: '1rem',
+            borderRadius: '8px',
+            color: '#2e7d32',
+          }}
+        >
+          🎁 <strong>60 días gratis de prueba</strong> – Usá todas las funciones sin límites durante tu período de prueba.
+        </Box>
+
         <Divider sx={{ my: 4 }} />
 
         <Alert severity="info" sx={{ mb: 4 }}>
