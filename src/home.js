@@ -35,6 +35,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useColumnLayout } from "./hooks/useColumnLayout";
 import ColumnLayoutToggle from "./components/ColumnLayoutToggle";
 import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
+import PremiumPlanCard from "./components/home/PremiumPlanCard";
 
 const Home = () => {
   const { logout } = useAuth();
@@ -84,6 +85,9 @@ const Home = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [bankLogos, setBankLogos] = useState([]); // Logos de bancos para Home
+  const [subscriptionStatus, setSubscriptionStatus] = useState(
+    localStorage.getItem('subscriptionStatus') || 'none'
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -436,6 +440,22 @@ const Home = () => {
             Copiar URL
           </Button>
         </div>
+
+        {/* Sección de Plan Premium - Solo mostrar si no hay búsqueda activa */}
+        {!loading && (!searchTerm || searchTerm.trim() === '') && (
+          <Box 
+            sx={{ 
+              mb: 6, 
+              mt: 6,
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <Box sx={{ maxWidth: { xs: '100%', sm: 600, md: 700 }, width: '100%' }}>
+              <PremiumPlanCard />
+            </Box>
+          </Box>
+        )}
 
         {/* Grid responsive estilo Airbnb - Moderno */}
         {loading ? (
