@@ -321,30 +321,16 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
             </MenuItem>
             <Divider />
             
-            {/* Búsqueda IA */}
+            {/* Buscador Inteligente - Unificado */}
             <MenuItem
               onClick={() => {
-                navigate("/busqueda-ia");
+                navigate("/buscador-inteligente");
                 handleMenuClose();
               }}
             >
               <Box display="flex" alignItems="center" gap={1}>
-                <Typography fontWeight="bold">Búsqueda IA</Typography>
+                <Typography fontWeight="bold">Buscador Inteligente</Typography>
                 <Typography color="primary" fontSize={12}>🤖 IA</Typography>
-              </Box>
-            </MenuItem>
-            <Divider />
-            
-            {/* Búsqueda Global */}
-            <MenuItem
-              onClick={() => {
-                navigate("/busqueda-global");
-                handleMenuClose();
-              }}
-            >
-              <Box display="flex" alignItems="center" gap={1}>
-                <Typography fontWeight="bold">Búsqueda Global</Typography>
-                <Typography color="primary" fontSize={12}>🔍 Web</Typography>
               </Box>
             </MenuItem>
             {(user?.username === 'cocinaty' || localStorage.getItem('activeSession') === 'cocinaty') && (

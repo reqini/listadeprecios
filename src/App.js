@@ -28,8 +28,8 @@ import PerfilEmprendedora from "./pages/PerfilEmprendedora";
 import LandingPage from "./pages/LandingPage";
 import Capacitaciones from "./pages/Capacitaciones";
 import AdminPanel from "./pages/AdminPanel";
-import BusquedaIA from "./components/BusquedaIA";
 import Entregaya from "./pages/Entregaya";
+import UnifiedSearchPage from "./pages/UnifiedSearchPage";
 import SuscripcionConfirmacion from "./pages/SuscripcionConfirmacion";
 import SuscripcionRenovar from "./pages/SuscripcionRenovar";
 import SuscripcionActivar from "./pages/SuscripcionActivar";
@@ -195,7 +195,12 @@ const AppContent = () => {
           <Route path="/ventas" element={<PrivateRoute><Ventas /></PrivateRoute>} />
           <Route path="/perfil" element={<PrivateRoute><PerfilEmprendedora /></PrivateRoute>} />
           <Route path="/capacitaciones" element={<PrivateRoute><Capacitaciones /></PrivateRoute>} />
-          <Route path="/busqueda-ia" element={<PrivateRoute></PrivateRoute>} />
+          {/* Buscador Inteligente Unificado */}
+          <Route path="/buscador-inteligente" element={<PrivateRoute><UnifiedSearchPage /></PrivateRoute>} />
+          <Route path="/unified-search" element={<PrivateRoute><UnifiedSearchPage /></PrivateRoute>} />
+          {/* Redirección desde rutas antiguas */}
+          <Route path="/busqueda-ia" element={<PrivateRoute><Navigate to="/buscador-inteligente" replace /></PrivateRoute>} />
+          <Route path="/busqueda-global" element={<PrivateRoute><Navigate to="/buscador-inteligente" replace /></PrivateRoute>} />
           <Route path="/administrador" element={<AdminRoute><AdminPanel /></AdminRoute>} />
           {/* Catálogo de Entrega Ya - Productos de la hoja entrega-ya */}
           <Route path="/entregaya" element={<Entregaya />} />
