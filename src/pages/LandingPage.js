@@ -54,6 +54,14 @@ import {
 } from '@mui/icons-material';
 import logo from '../assets/logo.png';
 import ModernReviewCarousel from '../components/ModernReviewCarousel';
+import PremiumPlanCard from '../components/home/PremiumPlanCard';
+import {
+  Search as SearchIcon,
+  AutoAwesome as AutoAwesomeIcon,
+  Lightbulb as LightbulbIcon,
+  ConnectWithoutContact as ConnectIcon,
+  ShowChart as ShowChartIcon,
+} from '@mui/icons-material';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -72,60 +80,6 @@ const LandingPage = () => {
     message: ''
   });
 
-  // Estadísticas de la app
-  const [stats] = useState({
-    emprendedoras: 1250,
-    ventasGeneradas: 45000,
-    placasCreadas: 8900,
-    rating: 4.9
-  });
-
-  // Planes de suscripción
-  const plans = [
-    {
-      name: 'Limitado',
-      price: 'Gratis',
-      period: 'Siempre',
-      features: [
-        'Acceso solo a la página principal',
-        'Recuperación de contraseña',
-        'Información básica de productos',
-        'Soporte por email'
-      ],
-      limitations: [
-        'Sin acceso a catálogos completos',
-        'Sin generación de placas',
-        'Sin gestión de clientes',
-        'Sin estadísticas avanzadas'
-      ],
-      color: 'primary',
-      popular: false,
-      buttonText: 'Comenzar Gratis',
-      buttonVariant: 'outlined',
-      planId: 'limitado'
-    },
-    {
-      name: 'Full',
-      price: '$25.000',
-      period: 'por mes',
-      features: [
-        'Acceso completo a todos los catálogos',
-        'Generación de placas con IA',
-        'Gestión ilimitada de clientes',
-        'Estadísticas avanzadas y reportes',
-        'Soporte prioritario por WhatsApp',
-        'Templates premium y personalización',
-        'Exportación de datos',
-        'Integración con redes sociales'
-      ],
-      limitations: [],
-      color: 'secondary',
-      popular: true,
-      buttonText: 'Suscribirse Ahora',
-      buttonVariant: 'contained',
-      planId: 'full'
-    }
-  ];
 
   // Detectar si la app se puede instalar
   useEffect(() => {
@@ -163,89 +117,6 @@ const LandingPage = () => {
     setContactDialogOpen(false);
     setContactForm({ name: '', email: '', phone: '', message: '' });
   };
-
-  const handlePlanSelect = (plan) => {
-    if (plan.planId === 'limitado') {
-      // Plan gratuito - ir directo al registro
-      navigate('/registro?plan=limitado');
-    } else if (plan.planId === 'full') {
-      // Plan de pago - ir al registro y luego a Mercado Pago
-      navigate('/registro?plan=full');
-    }
-  };
-
-  const StatCard = ({ icon: Icon, value, label, color = 'primary' }) => (
-    <Card sx={{ 
-      height: '100%', 
-      textAlign: 'center', 
-      p: 3,
-      background: 'rgba(255,255,255,0.95)',
-      backdropFilter: 'blur(10px)',
-      borderRadius: 3,
-      border: '1px solid rgba(255,255,255,0.2)',
-      boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-      transition: 'all 0.3s ease',
-      '&:hover': {
-        transform: 'translateY(-4px)',
-        boxShadow: '0 12px 40px rgba(0,0,0,0.15)'
-      }
-    }}>
-      <CardContent>
-        <Avatar sx={{ 
-          bgcolor: `${color}.main`, 
-          width: 80, 
-          height: 80, 
-          mx: 'auto', 
-          mb: 2,
-          boxShadow: '0 4px 16px rgba(0,0,0,0.2)'
-        }}>
-          <Icon sx={{ fontSize: 40 }} />
-        </Avatar>
-        <Typography variant="h3" component="div" color={`${color}.main`} fontWeight="bold" sx={{ mb: 1 }}>
-          {value}
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
-          {label}
-        </Typography>
-      </CardContent>
-    </Card>
-  );
-
-  const FeatureCard = ({ icon: Icon, title, description, color = 'primary' }) => (
-    <Card sx={{ 
-      height: '100%', 
-      p: 4, 
-      textAlign: 'center',
-      borderRadius: 3,
-      border: '1px solid rgba(0,0,0,0.05)',
-      boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-      transition: 'all 0.3s ease',
-      '&:hover': {
-        transform: 'translateY(-8px)',
-        boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
-        borderColor: `${color}.main`
-      }
-    }}>
-      <CardContent>
-        <Avatar sx={{ 
-          bgcolor: `${color}.main`, 
-          width: 100, 
-          height: 100, 
-          mx: 'auto', 
-          mb: 3,
-          boxShadow: '0 8px 24px rgba(0,0,0,0.15)'
-        }}>
-          <Icon sx={{ fontSize: 50 }} />
-        </Avatar>
-        <Typography variant="h5" component="h3" gutterBottom fontWeight="bold" sx={{ mb: 2 }}>
-          {title}
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.6 }}>
-          {description}
-        </Typography>
-      </CardContent>
-    </Card>
-  );
 
   return (
     <>
@@ -345,17 +216,14 @@ const LandingPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Hero Section */}
+      {/* Hero Section Moderno */}
       <Box sx={{ 
-        pt: { xs: 8, sm: 10, md: 12 }, 
-        pb: { xs: 4, sm: 6, md: 8 }, 
-        px: { xs: 1, sm: 2, md: 0 },
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white',
-        textAlign: 'center',
+        pt: { xs: 10, sm: 12, md: 16 }, 
+        pb: { xs: 6, sm: 8, md: 10 }, 
+        px: { xs: 2, sm: 3, md: 0 },
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
         position: 'relative',
         overflow: 'hidden',
-        minHeight: { xs: '90vh', sm: '100vh', md: 'auto' }
       }}>
         {/* Elementos decorativos de fondo */}
         <Box sx={{
@@ -365,483 +233,436 @@ const LandingPage = () => {
           right: 0,
           bottom: 0,
           background: `
-            radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%)
+            radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.1) 0%, transparent 50%)
           `,
           zIndex: 0
         }} />
         
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-          <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <img 
-              src={logo} 
-              alt="Logo Lista de Precios" 
-              style={{ 
-                height: isMobile ? 60 : 100, 
-                filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.2))',
-                marginBottom: isMobile ? '15px' : '20px'
-              }} 
-            />
+          <Box sx={{ textAlign: 'center', mb: 6 }}>
+            <Typography variant="h1" component="h1" gutterBottom sx={{ 
+              fontWeight: 800, 
+              mb: 2,
+              fontSize: { xs: '2rem', sm: '3rem', md: '4.5rem' },
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              lineHeight: 1.2,
+            }}>
+              El Catálogo Inteligente para Emprendedoras
+            </Typography>
+            <Typography variant="h5" sx={{ 
+              mb: 4, 
+              color: 'text.secondary',
+              maxWidth: { xs: '100%', md: 700 }, 
+              mx: 'auto',
+              fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' },
+              lineHeight: 1.6,
+              fontWeight: 400,
+            }}>
+              Organizá, vendé y crecé con tu negocio de Essen.
+            </Typography>
+            
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 2, 
+              justifyContent: 'center', 
+              flexDirection: { xs: 'column', sm: 'row' },
+              alignItems: 'center',
+              mb: 4,
+            }}>
+              <Button 
+                variant="contained" 
+                size="large" 
+                onClick={() => navigate('/registro')}
+                sx={{ 
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  px: 4,
+                  py: 1.5,
+                  fontSize: { xs: '1rem', sm: '1.125rem' },
+                  fontWeight: 600,
+                  borderRadius: 3,
+                  boxShadow: '0 4px 16px rgba(102, 126, 234, 0.4)',
+                  textTransform: 'none',
+                  '&:hover': { 
+                    background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                    boxShadow: '0 6px 24px rgba(102, 126, 234, 0.5)',
+                    transform: 'translateY(-2px)',
+                  }
+                }}
+              >
+                Probar GRATIS por 60 días
+              </Button>
+              <Button 
+                variant="outlined" 
+                size="large"
+                onClick={() => {
+                  const element = document.getElementById('benefits-section');
+                  element?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                sx={{ 
+                  borderColor: 'primary.main', 
+                  color: 'primary.main',
+                  borderWidth: 2,
+                  px: 4,
+                  py: 1.5,
+                  fontSize: { xs: '1rem', sm: '1.125rem' },
+                  fontWeight: 600,
+                  borderRadius: 3,
+                  textTransform: 'none',
+                  '&:hover': { 
+                    borderWidth: 2,
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                  }
+                }}
+              >
+                Ver cómo funciona
+              </Button>
+            </Box>
           </Box>
-          <Typography variant="h1" component="h1" gutterBottom sx={{ 
-            fontWeight: 900, 
-            mb: { xs: 1.5, sm: 2, md: 3 },
-            fontSize: { xs: '1.8rem', sm: '2.5rem', md: '4rem' },
-            background: 'linear-gradient(45deg, #fff 30%, #f0f0f0 90%)',
+        </Container>
+      </Box>
+
+      {/* Barra de búsqueda visual */}
+      <Box sx={{ 
+        bgcolor: 'white',
+        py: 3,
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+      }}>
+        <Container maxWidth="md">
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              bgcolor: 'grey.50',
+              borderRadius: 3,
+              px: 2,
+              py: 1.5,
+              border: '1px solid',
+              borderColor: 'divider',
+            }}
+          >
+            <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />
+            <Typography variant="body1" sx={{ color: 'text.secondary', flex: 1 }}>
+              Buscá productos Essen, recetas o ideas
+            </Typography>
+          </Box>
+        </Container>
+      </Box>
+
+      {/* Sección de Beneficios */}
+      <Box id="benefits-section" sx={{ py: { xs: 6, sm: 8, md: 10 }, bgcolor: 'white' }}>
+        <Container maxWidth="lg">
+          <Typography variant="h2" component="h2" sx={{ 
+            textAlign: 'center',
+            mb: 6,
+            fontWeight: 700,
+            fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            textShadow: '0 4px 8px rgba(0,0,0,0.3)',
-            lineHeight: { xs: 1.1, sm: 1.2, md: 1.1 },
-            px: { xs: 1, sm: 0 }
           }}>
-            La Revolución para Emprendedoras
-          </Typography>
-          <Typography variant="h4" sx={{ 
-            mb: { xs: 2.5, sm: 3, md: 4 }, 
-            opacity: 0.95, 
-            maxWidth: { xs: '100%', md: 900 }, 
-            mx: 'auto',
-            fontSize: { xs: '0.9rem', sm: '1.2rem', md: '1.5rem' },
-            lineHeight: { xs: 1.3, sm: 1.4, md: 1.6 },
-            textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-            px: { xs: 0.5, sm: 1, md: 0 }
-          }}>
-            🚀 Crea catálogos profesionales, genera placas con IA y gestiona tus ventas 
-            desde una sola plataforma. Únete a más de <strong>{stats.emprendedoras.toLocaleString()}</strong> emprendedoras exitosas.
+            Todo lo que necesitás para vender más
           </Typography>
           
-          <Box sx={{ 
-            display: 'flex', 
-            gap: { xs: 1.5, sm: 2, md: 3 }, 
-            justifyContent: 'center', 
-            flexDirection: { xs: 'column', sm: 'row' },
-            alignItems: 'center',
-            mb: { xs: 3, sm: 4, md: 6 },
-            px: { xs: 1, sm: 2, md: 0 }
-          }}>
-            <Button 
-              variant="contained" 
-              size="large" 
-              fullWidth={isMobile}
-              onClick={() => navigate('/registro')}
-              sx={{ 
-                bgcolor: 'white', 
-                color: 'primary.main',
-                px: { xs: 2, sm: 3, md: 4 },
-                py: { xs: 1.2, sm: 1.5, md: 1.5 },
-                fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
-                fontWeight: 'bold',
+          <Grid container spacing={4}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ 
+                height: '100%',
                 borderRadius: 3,
-                boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                transform: 'translateY(0)',
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                 transition: 'all 0.3s ease',
-                maxWidth: { xs: '100%', sm: '300px' },
-                minHeight: { xs: '44px', sm: '48px' },
-                '&:hover': { 
-                  bgcolor: 'grey.100',
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 12px 40px rgba(0,0,0,0.4)'
+                '&:hover': {
+                  transform: 'translateY(-8px)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
                 }
-              }}
-            >
-              🚀 Comenzar Gratis
-            </Button>
-            <Button 
-              variant="outlined" 
-              size="large"
-              fullWidth={isMobile}
-              onClick={() => setContactDialogOpen(true)}
-              sx={{ 
-                borderColor: 'white', 
-                color: 'white',
-                borderWidth: 2,
-                px: { xs: 3, md: 4 },
-                py: { xs: 1.5, md: 1.5 },
-                fontSize: { xs: '1rem', md: '1.1rem' },
-                fontWeight: 'bold',
+              }}>
+                <CardContent sx={{ p: 3, textAlign: 'center' }}>
+                  <Avatar sx={{ 
+                    bgcolor: 'primary.main', 
+                    width: 64, 
+                    height: 64, 
+                    mx: 'auto', 
+                    mb: 2,
+                  }}>
+                    <ShoppingCartIcon sx={{ fontSize: 32 }} />
+                  </Avatar>
+                  <Typography variant="h6" fontWeight={600} gutterBottom>
+                    Catálogos Inteligentes
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Accedé a todos los catálogos actualizados con precios y cuotas en tiempo real.
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ 
+                height: '100%',
                 borderRadius: 3,
-                backdropFilter: 'blur(10px)',
-                bgcolor: 'rgba(255,255,255,0.1)',
-                transform: 'translateY(0)',
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                 transition: 'all 0.3s ease',
-                maxWidth: { xs: '100%', sm: '300px' },
-                '&:hover': { 
-                  borderColor: 'white', 
-                  bgcolor: 'rgba(255,255,255,0.2)',
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 8px 32px rgba(255,255,255,0.2)'
+                '&:hover': {
+                  transform: 'translateY(-8px)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
                 }
-              }}
-            >
-              📱 Ver Demo
-            </Button>
-          </Box>
-
-          {/* Estadísticas */}
-          <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} sx={{ mt: { xs: 3, sm: 4, md: 6 } }}>
-            <Grid item xs={6} md={3}>
-              <StatCard 
-                icon={PeopleIcon} 
-                value={stats.emprendedoras.toLocaleString()} 
-                label="Emprendedoras Activas" 
-                color="success"
-              />
+              }}>
+                <CardContent sx={{ p: 3, textAlign: 'center' }}>
+                  <Avatar sx={{ 
+                    bgcolor: 'secondary.main', 
+                    width: 64, 
+                    height: 64, 
+                    mx: 'auto', 
+                    mb: 2,
+                  }}>
+                    <AutoAwesomeIcon sx={{ fontSize: 32 }} />
+                  </Avatar>
+                  <Typography variant="h6" fontWeight={600} gutterBottom>
+                    Buscador con IA
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Encontrá productos, recetas e ideas de venta con búsqueda inteligente.
+                  </Typography>
+                </CardContent>
+              </Card>
             </Grid>
-            <Grid item xs={6} md={3}>
-              <StatCard 
-                icon={TrendingUpIcon} 
-                value={`$${stats.ventasGeneradas.toLocaleString()}`} 
-                label="Ventas Generadas" 
-                color="warning"
-              />
+            
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ 
+                height: '100%',
+                borderRadius: 3,
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-8px)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                }
+              }}>
+                <CardContent sx={{ p: 3, textAlign: 'center' }}>
+                  <Avatar sx={{ 
+                    bgcolor: 'success.main', 
+                    width: 64, 
+                    height: 64, 
+                    mx: 'auto', 
+                    mb: 2,
+                  }}>
+                    <LightbulbIcon sx={{ fontSize: 32 }} />
+                  </Avatar>
+                  <Typography variant="h6" fontWeight={600} gutterBottom>
+                    Ideas para vender
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Generá textos, ideas de reels y contenido para tus redes sociales.
+                  </Typography>
+                </CardContent>
+              </Card>
             </Grid>
-            <Grid item xs={6} md={3}>
-              <StatCard 
-                icon={PaletteIcon} 
-                value={stats.placasCreadas.toLocaleString()} 
-                label="Placas Creadas" 
-                color="info"
-              />
-            </Grid>
-            <Grid item xs={6} md={3}>
-              <StatCard 
-                icon={StarIcon} 
-                value={stats.rating} 
-                label="Rating Promedio" 
-                color="secondary"
-              />
+            
+            <Grid item xs={12} sm={6} md={3}>
+              <Card sx={{ 
+                height: '100%',
+                borderRadius: 3,
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-8px)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                }
+              }}>
+                <CardContent sx={{ p: 3, textAlign: 'center' }}>
+                  <Avatar sx={{ 
+                    bgcolor: 'info.main', 
+                    width: 64, 
+                    height: 64, 
+                    mx: 'auto', 
+                    mb: 2,
+                  }}>
+                    <ShowChartIcon sx={{ fontSize: 32 }} />
+                  </Avatar>
+                  <Typography variant="h6" fontWeight={600} gutterBottom>
+                    Seguimiento para nuevas emprendedoras
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Herramientas y recursos para acompañarte en tu crecimiento.
+                  </Typography>
+                </CardContent>
+              </Card>
             </Grid>
           </Grid>
         </Container>
       </Box>
 
-      {/* Características */}
-      <Container maxWidth="lg" sx={{ py: { xs: 4, sm: 6, md: 10 }, px: { xs: 1, sm: 2, md: 0 } }}>
-        <Box sx={{ textAlign: 'center', mb: { xs: 4, sm: 6, md: 8 } }}>
-          <Typography variant="h2" component="h2" gutterBottom sx={{ 
-            fontWeight: 800,
-            background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            mb: 2,
-            fontSize: { xs: '1.5rem', sm: '2.2rem', md: '3rem' },
-            lineHeight: { xs: 1.2, sm: 1.3, md: 1.4 },
-            px: { xs: 1, sm: 0 }
-          }}>
-            Todo lo que necesitas para triunfar
-          </Typography>
-          <Typography variant="h6" color="text.secondary" sx={{ 
-            maxWidth: { xs: '100%', md: 600 }, 
-            mx: 'auto',
-            fontSize: { xs: '0.9rem', sm: '1rem', md: '1.25rem' },
-            px: { xs: 1, sm: 2, md: 0 },
-            lineHeight: { xs: 1.4, sm: 1.5, md: 1.6 }
-          }}>
-            Herramientas profesionales diseñadas específicamente para emprendedoras que quieren crecer
-          </Typography>
-        </Box>
-        
-        <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
-          <Grid item xs={12} md={4}>
-            <FeatureCard
-              icon={PaletteIcon}
-              title="Generación de Placas con IA"
-              description="Crea placas profesionales automáticamente con inteligencia artificial. Sin fondo, perfectas para redes sociales."
-              color="primary"
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <FeatureCard
-              icon={ShoppingCartIcon}
-              title="Catálogos Dinámicos"
-              description="Mantén tus precios actualizados en tiempo real. Catálogos automáticos para todas las cuotas."
-              color="secondary"
-            />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <FeatureCard
-              icon={BusinessIcon}
-              title="Gestión de Clientes"
-              description="Organiza tus clientes, envía catálogos por WhatsApp y lleva el control de tus ventas."
-              color="success"
-            />
-          </Grid>
-        </Grid>
-      </Container>
-
-      {/* Planes de Suscripción */}
+      {/* Plan de Suscripción */}
       <Box sx={{ 
         bgcolor: 'grey.50', 
-        py: { xs: 4, sm: 6, md: 10 },
-        position: 'relative',
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%)',
-          zIndex: 0
-        }
+        py: { xs: 6, sm: 8, md: 10 },
       }}>
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, px: { xs: 1, sm: 2, md: 0 } }}>
-          <Box sx={{ textAlign: 'center', mb: { xs: 4, sm: 6, md: 8 } }}>
-            <Typography variant="h2" component="h2" gutterBottom sx={{ 
-              fontWeight: 800,
-              background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+        <Container maxWidth="md">
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <Typography variant="h2" component="h2" sx={{ 
+              fontWeight: 700,
+              mb: 2,
+              fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              mb: 2,
-              fontSize: { xs: '1.5rem', sm: '2.2rem', md: '3rem' },
-              lineHeight: { xs: 1.2, sm: 1.3, md: 1.4 },
-              px: { xs: 1, sm: 0 }
             }}>
-              Elige tu Plan
-            </Typography>
-            <Typography variant="h6" color="text.secondary" sx={{ 
-              maxWidth: { xs: '100%', md: 600 }, 
-              mx: 'auto',
-              fontSize: { xs: '0.9rem', sm: '1rem', md: '1.25rem' },
-              px: { xs: 1, sm: 2, md: 0 },
-              lineHeight: { xs: 1.4, sm: 1.5, md: 1.6 }
-            }}>
-              Comienza gratis y escala cuando estés lista para crecer
+              Plan Emprendedoras Premium
             </Typography>
           </Box>
-          
-          <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} justifyContent="center">
-            {plans.map((plan) => (
-              <Grid item xs={12} md={4} key={plan.name}>
-                <Card 
-                  sx={{ 
-                    height: '100%', 
-                    position: 'relative',
-                    border: plan.popular ? 3 : 1,
-                    borderColor: plan.popular ? 'primary.main' : 'divider',
-                    transform: plan.popular ? { xs: 'scale(1)', md: 'scale(1.05)' } : 'scale(1)',
-                    transition: 'all 0.3s ease',
-                    borderRadius: 4,
-                    boxShadow: plan.popular 
-                      ? '0 20px 60px rgba(102, 126, 234, 0.3)' 
-                      : '0 8px 32px rgba(0,0,0,0.1)',
-                    '&:hover': {
-                      transform: plan.popular ? { xs: 'scale(1.02)', md: 'scale(1.08)' } : 'scale(1.02)',
-                      boxShadow: plan.popular 
-                        ? '0 25px 80px rgba(102, 126, 234, 0.4)' 
-                        : '0 12px 40px rgba(0,0,0,0.15)'
-                    }
-                  }}
-                >
-                  {plan.popular && (
-                    <Chip 
-                      label="Más Popular" 
-                      color="primary" 
-                      sx={{ 
-                        position: 'absolute', 
-                        top: -12, 
-                        left: '50%', 
-                        transform: 'translateX(-50%)',
-                        zIndex: 10,
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                      }}
-                    />
-                  )}
-                  
-                  <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 }, textAlign: 'center' }}>
-                    <Typography variant="h5" component="h3" gutterBottom fontWeight="bold">
-                      {plan.name}
-                    </Typography>
-                    
-                    <Box sx={{ mb: 3 }}>
-                      <Typography variant="h3" component="div" color={`${plan.color}.main`} fontWeight="bold">
-                        {plan.price}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {plan.period}
-                      </Typography>
-                    </Box>
-                    
-                    <List sx={{ mb: 3 }}>
-                      {plan.features.map((feature, index) => (
-                        <ListItem key={index} sx={{ px: 0 }}>
-                          <ListItemIcon sx={{ minWidth: 36 }}>
-                            <CheckIcon color="success" />
-                          </ListItemIcon>
-                          <ListItemText primary={feature} />
-                        </ListItem>
-                      ))}
-                      {plan.limitations && plan.limitations.length > 0 && (
-                        <>
-                          <Divider sx={{ my: 2 }} />
-                          <Typography variant="subtitle2" color="text.secondary" sx={{ px: 2, mb: 1 }}>
-                            Limitaciones:
-                          </Typography>
-                          {plan.limitations.map((limitation, index) => (
-                            <ListItem key={`limitation-${index}`} sx={{ px: 0 }}>
-                              <ListItemIcon sx={{ minWidth: 36 }}>
-                                <CloseIcon color="error" />
-                              </ListItemIcon>
-                              <ListItemText 
-                                primary={limitation} 
-                                sx={{ 
-                                  '& .MuiListItemText-primary': { 
-                                    color: 'text.secondary',
-                                    textDecoration: 'line-through'
-                                  } 
-                                }} 
-                              />
-                            </ListItem>
-                          ))}
-                        </>
-                      )}
-                    </List>
-                    
-                    <Button
-                      variant={plan.buttonVariant}
-                      color={plan.color}
-                      fullWidth
-                      size="large"
-                      onClick={() => handlePlanSelect(plan)}
-                      sx={{ 
-                        mt: 3,
-                        py: 1.5,
-                        fontSize: '1.1rem',
-                        fontWeight: 'bold',
-                        borderRadius: 3,
-                        boxShadow: plan.popular ? '0 8px 24px rgba(102, 126, 234, 0.3)' : 'none',
-                        '&:hover': {
-                          boxShadow: plan.popular ? '0 12px 32px rgba(102, 126, 234, 0.4)' : '0 4px 16px rgba(0,0,0,0.1)'
-                        }
-                      }}
-                    >
-                      {plan.buttonText}
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
+          <PremiumPlanCard />
+        </Container>
+      </Box>
+
+      {/* Sección Inspiracional */}
+      <Box sx={{ py: { xs: 6, sm: 8, md: 10 }, bgcolor: 'white' }}>
+        <Container maxWidth="lg">
+          <Grid container spacing={4} alignItems="center">
+            <Grid item xs={12} md={6}>
+              <Typography variant="h3" sx={{ 
+                fontWeight: 700,
+                mb: 3,
+                fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.75rem' },
+              }}>
+                Conectá con tus clientas
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 2, fontSize: '1.125rem', color: 'text.secondary' }}>
+                Mostrá tus productos con estilo y profesionalismo. Compartí catálogos personalizados que reflejen tu marca.
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 2, fontSize: '1.125rem', color: 'text.secondary' }}>
+                Vende más con inteligencia y simplicidad. Herramientas diseñadas especialmente para emprendedoras que buscan crecer.
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Box sx={{ 
+                bgcolor: 'grey.50',
+                borderRadius: 3,
+                p: 4,
+                textAlign: 'center',
+                minHeight: 300,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+                <ConnectIcon sx={{ fontSize: 120, color: 'primary.main', opacity: 0.3 }} />
+              </Box>
+            </Grid>
           </Grid>
         </Container>
       </Box>
 
       {/* Testimonios */}
-      <Container maxWidth="lg" sx={{ py: 10 }}>
-        <Box sx={{ textAlign: 'center', mb: 8 }}>
-          <Typography variant="h2" component="h2" gutterBottom sx={{ 
-            fontWeight: 800,
-            background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+      <Container maxWidth="lg" sx={{ py: { xs: 6, sm: 8, md: 10 } }}>
+        <Box sx={{ textAlign: 'center', mb: 6 }}>
+          <Typography variant="h2" component="h2" sx={{ 
+            fontWeight: 700,
+            mb: 2,
+            fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            mb: 2
           }}>
             Lo que dicen nuestras emprendedoras
           </Typography>
-          <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
+          <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
             Más de 1,250 emprendedoras ya confían en nuestra plataforma
           </Typography>
         </Box>
-        
         <ModernReviewCarousel />
       </Container>
 
-      {/* Footer */}
-      <Box sx={{ bgcolor: '#000000', color: 'white', py: 6 }}>
+      {/* Footer Moderno */}
+      <Box sx={{ bgcolor: 'grey.900', color: 'white', py: { xs: 4, sm: 6 } }}>
         <Container maxWidth="lg">
           <Grid container spacing={4}>
-            <Grid item xs={12} md={4}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <img src={logo} alt="Logo" style={{ height: 32, marginRight: 12 }} />
-                <Typography variant="h6" fontWeight="bold">
-                  Lista de Precios
-                </Typography>
-              </Box>
-              <Typography variant="body2" sx={{ mb: 2 }}>
-                La plataforma líder para emprendedoras. Crea, vende y crece con nosotros.
+            <Grid item xs={12} md={6}>
+              <Typography variant="h6" fontWeight={600} gutterBottom>
+                Lista de Precios
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2, color: 'grey.400' }}>
+                Hecho para emprendedoras que buscan crecer y vender más.
               </Typography>
               <Box sx={{ display: 'flex', gap: 1 }}>
-                <IconButton color="inherit" href="https://wa.me/5491151347453" target="_blank">
+                <IconButton 
+                  color="inherit" 
+                  href="https://wa.me/5491151347453" 
+                  target="_blank"
+                  sx={{ color: 'grey.300', '&:hover': { color: 'white' } }}
+                >
                   <WhatsAppIcon />
                 </IconButton>
-                <IconButton color="inherit" href="https://instagram.com/listadeprecios" target="_blank">
+                <IconButton 
+                  color="inherit" 
+                  href="https://instagram.com/listadeprecios" 
+                  target="_blank"
+                  sx={{ color: 'grey.300', '&:hover': { color: 'white' } }}
+                >
                   <InstagramIcon />
                 </IconButton>
               </Box>
             </Grid>
             
-            <Grid item xs={12} md={4}>
-              <Typography variant="h6" gutterBottom fontWeight="bold">
-                Contacto
+            <Grid item xs={12} md={3}>
+              <Typography variant="subtitle2" fontWeight={600} gutterBottom sx={{ color: 'grey.300' }}>
+                Enlaces
               </Typography>
-              <List dense>
-                <ListItem sx={{ px: 0 }}>
-                  <ListItemIcon sx={{ minWidth: 36 }}>
-                    <PhoneIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="+54 9 11 5134-7453" />
-                </ListItem>
-                <ListItem sx={{ px: 0 }}>
-                  <ListItemIcon sx={{ minWidth: 36 }}>
-                    <EmailIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="reqini@gmail.com" />
-                </ListItem>
-                <ListItem sx={{ px: 0 }}>
-                  <ListItemIcon sx={{ minWidth: 36 }}>
-                    <LocationIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Dr Pedro Chutro 440, Haedo" />
-                </ListItem>
-              </List>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Button 
+                  color="inherit" 
+                  onClick={() => navigate('/login')}
+                  sx={{ justifyContent: 'flex-start', color: 'grey.300', '&:hover': { color: 'white' } }}
+                >
+                  Iniciar Sesión
+                </Button>
+                <Button 
+                  color="inherit" 
+                  onClick={() => navigate('/registro')}
+                  sx={{ justifyContent: 'flex-start', color: 'grey.300', '&:hover': { color: 'white' } }}
+                >
+                  Registrarse
+                </Button>
+              </Box>
             </Grid>
             
-            <Grid item xs={12} md={4}>
-              <Typography variant="h6" gutterBottom fontWeight="bold">
-                Enlaces Rápidos
+            <Grid item xs={12} md={3}>
+              <Typography variant="subtitle2" fontWeight={600} gutterBottom sx={{ color: 'grey.300' }}>
+                Contacto
               </Typography>
-              <List dense>
-                <ListItem sx={{ px: 0 }}>
-                  <Button color="inherit" onClick={() => navigate('/login')}>
-                    Iniciar Sesión
-                  </Button>
-                </ListItem>
-                <ListItem sx={{ px: 0 }}>
-                  <Button color="inherit" onClick={() => navigate('/registro')}>
-                    Registrarse
-                  </Button>
-                </ListItem>
-                <ListItem sx={{ px: 0 }}>
-                  <Button color="inherit" onClick={() => setContactDialogOpen(true)}>
-                    Contacto
-                  </Button>
-                </ListItem>
-              </List>
+              <Typography variant="body2" sx={{ color: 'grey.400', mb: 0.5 }}>
+                +54 9 11 5134-7453
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'grey.400' }}>
+                reqini@gmail.com
+              </Typography>
             </Grid>
           </Grid>
           
-          <Box sx={{ 
-            borderTop: 1, 
-            borderColor: 'rgba(255,255,255,0.2)', 
-            mt: 4, 
-            pt: 3, 
-            textAlign: 'center',
-            backgroundColor: IS_CHRISTMAS_MODE ? 'rgba(27, 94, 32, 0.1)' : 'transparent',
-            borderRadius: IS_CHRISTMAS_MODE ? 2 : 0,
-            py: IS_CHRISTMAS_MODE ? 2 : 0,
-          }}>
-            <Typography variant="body2">
+          <Divider sx={{ my: 4, borderColor: 'rgba(255,255,255,0.1)' }} />
+          
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="body2" sx={{ color: 'grey.400' }}>
               © 2024 Lista de Precios. Todos los derechos reservados.
             </Typography>
-            {IS_CHRISTMAS_MODE && (
-              <Typography variant="body2" sx={{ mt: 1, fontSize: '0.875rem' }}>
-                🎄 Hecho con ❤️ para acompañar tus ventas en estas fiestas.
-              </Typography>
-            )}
+            <Typography variant="body2" sx={{ mt: 1, color: 'grey.500' }}>
+              Hecho para emprendedoras
+            </Typography>
           </Box>
         </Container>
       </Box>

@@ -24,7 +24,6 @@ import Contado from "./contado";
 import Activos from "./Activos";
 import Emprendedoras from "./Emprendedoras";
 import GeneradorDePlacas from "./GeneradorDePlacas";
-import CatalogoIndividual from "./pages/CatalogoIndividual";
 import Entregaya from "./pages/Entregaya";
 import UrlRedirect from "./components/UrlRedirect";
 import { AuthProvider, useAuth } from "./AuthContext";
@@ -55,7 +54,7 @@ const AnalyticsTracker = () => {
 
 const AppContent = () => {
   const theme = useMemo(() => {
-    const primary = localStorage.getItem("userPrimary") || "#A47A9E";
+    const primary = localStorage.getItem("userPrimary") || "#666666";
     const secondary = localStorage.getItem("userSecondary") || "#FFC43C";
     return createTheme({
       palette: {

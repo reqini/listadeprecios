@@ -133,7 +133,7 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
 
       {/* Spacer solo cuando está fixed (no catálogo y scrolled) */}
       {!isCatalog && isScrolled && (
-        <Box sx={{ height: { xs: '64px', sm: '64px' } }} />
+        <Box sx={{ height: { xs: '70px', sm: '64px' } }} />
       )}
       
       <AppBar 
@@ -142,6 +142,8 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
           zIndex: appBarZIndex,
           boxShadow: appBarBoxShadow,
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          minHeight: { xs: '70px', sm: '64px' },
+          height: { xs: 'auto', sm: '64px' },
         }}
       >
         <Toolbar 
@@ -150,46 +152,87 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
             justifyContent: 'space-between',
             alignItems: 'center',
             flexDirection: { xs: showSearch ? 'column' : 'row', sm: 'row' },
-            paddingY: { xs: showSearch ? 1.5 : 0, sm: 0 },
+            paddingY: { xs: showSearch ? 1.5 : 1, sm: 0 },
+            paddingX: { xs: 1, sm: 2 },
             gap: { xs: showSearch ? 1 : 0, sm: 0 },
-            flexWrap: 'wrap',
+            flexWrap: 'nowrap',
+            minHeight: { xs: '70px !important', sm: '64px !important' },
+            height: { xs: 'auto', sm: '64px' },
+            overflow: 'visible',
           }}
         >
           {/* Logo/título - Lado izquierdo */}
           <Box sx={{ 
             display: 'flex', 
             alignItems: 'center', 
+            justifyContent: { xs: 'center', sm: 'flex-start' },
             order: { xs: 1, sm: 1 },
-            flex: { sm: '0 0 auto' },
+            flex: { xs: showSearch ? '0 0 auto' : '1 1 auto', sm: '0 0 auto' },
+            width: { xs: showSearch ? 'auto' : '100%', sm: 'auto' },
+            position: 'relative',
           }}>
-            <div className="flex items-center" style={{ position: 'relative' }}>
-                {location.pathname !== "/home" ? (
-                  <IconButton size="small" color="secondary" onClick={() => navigate(-1)}>
-                    <ArrowBackIcon color="secondary" />
-                  </IconButton>
-                ) : (
-                  <>
-                    <img src={Logo} alt="logo" width="48" />
-                    {/* Gorrito navideño sobre el logo */}
-                    {IS_CHRISTMAS_MODE && (
-                      <Box
-                        sx={{
-                          position: 'absolute',
-                          top: -8,
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          fontSize: '24px',
-                          zIndex: 1,
-                        }}
-                      >
-                        🎅
-                      </Box>
-                    )}
-                  </>
-                )}
-            </div>
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                width: { xs: '48px', sm: '48px' },
+                height: { xs: '48px', sm: '48px' },
+              }}
+            >
+              {location.pathname !== "/home" ? (
+                <IconButton 
+                  size="small" 
+                  color="secondary" 
+                  onClick={() => navigate(-1)}
+                  sx={{
+                    padding: { xs: 1, sm: 0.5 },
+                  }}
+                >
+                  <ArrowBackIcon color="secondary" />
+                </IconButton>
+              ) : (
+                <>
+                  <img 
+                    src={Logo} 
+                    alt="logo" 
+                    style={{ 
+                      width: '48px', 
+                      height: '48px',
+                      objectFit: 'contain',
+                    }} 
+                  />
+                  {/* Gorrito navideño sobre el logo - Centrado perfecto */}
+                  {IS_CHRISTMAS_MODE && (
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: { xs: -6, sm: -8 },
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        fontSize: { xs: '20px', sm: '24px' },
+                        zIndex: 2,
+                        lineHeight: 1,
+                        pointerEvents: 'none',
+                      }}
+                    >
+                      🎅
+                    </Box>
+                  )}
+                </>
+              )}
+            </Box>
             {!showSearch && (
-              <Typography variant="body1" fontSize={16} sx={{ margin: { sm: '0 12px' }, display: { xs: 'none', sm: 'block' } }}>
+              <Typography 
+                variant="body1" 
+                fontSize={16} 
+                sx={{ 
+                  margin: { sm: '0 12px' }, 
+                  display: { xs: 'none', sm: 'block' },
+                  flex: 1,
+                }}
+              >
                 {title}
               </Typography>
             )}
@@ -199,13 +242,14 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
           {showSearch && (
             <Box sx={{ 
               width: '100%',
-              maxWidth: '560px',
+              maxWidth: { xs: '100%', sm: '560px' },
               marginX: 'auto',
               order: { xs: 2, sm: 2 },
               flex: { sm: '1 1 auto' },
               display: 'flex',
               justifyContent: 'center',
-              px: { xs: 2, sm: 2 },
+              px: { xs: 1, sm: 2 },
+              mt: { xs: 0, sm: 0 },
             }}>
               <Box sx={{ width: '100%' }}>
                 <ModernSearchBar
@@ -232,9 +276,15 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
           <Box sx={{ 
             display: 'flex', 
             alignItems: 'center',
+            justifyContent: { xs: 'flex-end', sm: 'flex-end' },
             order: { xs: 3, sm: 3 },
-            flex: { sm: '0 0 auto' },
-            marginLeft: { xs: showSearch ? 0 : 'auto', sm: showSearch ? 0 : 'auto' },
+            flex: { xs: showSearch ? '0 0 auto' : '0 0 auto', sm: '0 0 auto' },
+            marginLeft: { xs: 0, sm: showSearch ? 0 : 'auto' },
+            position: { xs: showSearch ? 'relative' : 'absolute', sm: 'relative' },
+            right: { xs: showSearch ? 'auto' : 8, sm: 'auto' },
+            top: { xs: showSearch ? 'auto' : '50%', sm: 'auto' },
+            transform: { xs: showSearch ? 'none' : 'translateY(-50%)', sm: 'none' },
+            zIndex: 10,
           }}>
             <IconButton color="inherit" onClick={handleMenuOpen}>
               <Badge

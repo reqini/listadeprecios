@@ -146,7 +146,7 @@ const AnalyticsTracker = () => {
 
 const AppContent = () => {
   const theme = useMemo(() => {
-    const primary = localStorage.getItem("userPrimary") || "#A47A9E";
+    const primary = localStorage.getItem("userPrimary") || "#666666";
     const secondary = localStorage.getItem("userSecondary") || "#FFC43C";
     return createTheme({
       palette: {

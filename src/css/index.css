@@ -180,7 +180,7 @@ li {
   top: 0; /* Lo coloca en la parte superior */
   left: 0; /* Asegura que esté alineado a la izquierda */
   width: 100%; /* Ocupa todo el ancho */
-  background-color: #a47a9e; /* Color de fondo al hacer scroll */
+  background-color: #666666; /* Color de fondo al hacer scroll */
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra para destacar */
 }
 .header-catalogo.sticky {
@@ -232,7 +232,7 @@ li {
 
 .card-register {
   position: relative;
-  background: #a47a9e;
+  background: #666666;
   box-sizing: border-box;
   padding: 20px;
   margin-top: 20px;
@@ -268,7 +268,7 @@ li {
 .title-registro {
   background: white;
   background-attachment: fixed;
-  color: #a47a9e;
+  color: #666666;
   padding: 16px;
   border-radius: 20px;
   font-weight: 700 !important;
