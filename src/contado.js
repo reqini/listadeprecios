@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import axios from "./utils/axios";
 import Container from "@mui/material/Container";
 import Skeleton from "@mui/material/Skeleton";
@@ -26,6 +26,8 @@ const Contado = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState([]);
+  const [isSearchSticky, setIsSearchSticky] = useState(false);
+  const searchBarRef = useRef(null);
   
   const { mobileColumns, toggleColumns } = useColumnLayout('contado', 2);
 
@@ -76,6 +78,22 @@ const Contado = () => {
     loadInitialData();
   }, []);
 
+  // Hacer search bar sticky al hacer scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      
+      if (searchBarRef.current) {
+        const searchBarTop = searchBarRef.current.offsetTop;
+        setIsSearchSticky(scrollTop > searchBarTop);
+      }
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const productosFiltrados = useMemo(() => {
     if (!productos || productos.length === 0) return [];
     
@@ -118,15 +136,38 @@ const Contado = () => {
         </Alert>
       )}
 
-      <Box className="catalog-search-sticky">
+      {/* Search Bar - Fixed al hacer scroll */}
+      <Box
+        ref={searchBarRef}
+        sx={{
+          position: isSearchSticky ? 'fixed' : 'relative',
+          top: isSearchSticky ? 0 : 'auto',
+          left: 0,
+          right: 0,
+          zIndex: isSearchSticky ? 1100 : 'auto',
+          backgroundColor: isSearchSticky ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+          backdropFilter: isSearchSticky ? 'blur(10px)' : 'none',
+          boxShadow: isSearchSticky ? '0 2px 8px rgba(0,0,0,0.1)' : 'none',
+          transition: 'all 0.3s ease',
+        }}
+      >
         <ModernSearchBar
           value={searchTerm}
           onChange={(value) => {
             setSearchTerm(value);
           }}
           placeholder="Buscar productos por nombre, categoría o banco..."
+          sx={{
+            paddingX: { xs: 2, sm: 3 },
+            paddingY: isSearchSticky ? { xs: 1.5, sm: 2 } : { xs: 2, sm: 2.5 },
+            marginBottom: 0,
+          }}
         />
       </Box>
+      {/* Spacer para compensar el espacio cuando está fixed */}
+      {isSearchSticky && (
+        <Box sx={{ height: { xs: '88px', sm: '96px' } }} />
+      )}
 
       <Container maxWidth="lg" className="conteiner-list">
 

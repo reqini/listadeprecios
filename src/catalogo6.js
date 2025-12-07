@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import axios from "./utils/axios";
 import Container from "@mui/material/Container";
 import Skeleton from "@mui/material/Skeleton";
@@ -41,6 +41,8 @@ const Catalogo6 = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [bankLogos, setBankLogos] = useState([]); // Logos de bancos para promociones
   const [error, setError] = useState(null); // Estado para manejar errores de carga
+  const [isSearchSticky, setIsSearchSticky] = useState(false);
+  const searchBarRef = useRef(null);
   
   const sumarEnvio = localStorage.getItem("sumarEnvio") === "true";
   
@@ -114,7 +116,17 @@ const Catalogo6 = () => {
   };
 
   useEffect(() => {
-    const handleScroll = () => setIsSticky(window.scrollY > 100);
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      setIsSticky(scrollTop > 100);
+      
+      // Hacer search bar sticky al hacer scroll
+      if (searchBarRef.current) {
+        const searchBarTop = searchBarRef.current.offsetTop;
+        setIsSearchSticky(scrollTop > searchBarTop);
+      }
+    };
+    handleScroll(); // Verificar estado inicial
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -293,17 +305,41 @@ const Catalogo6 = () => {
         </Alert>
       )}
 
-      {/* Buscador oculto en catálogos individuales */}
+      {/* Buscador oculto en catálogos individuales - Fixed al hacer scroll */}
       {!isIndividualCatalog && (
-        <Box className="catalog-search-sticky">
-          <ModernSearchBar
-            value={searchTerm}
-            onChange={(value) => {
-              setSearchTerm(value); // Actualizar directamente el estado
+        <>
+          <Box
+            ref={searchBarRef}
+            sx={{
+              position: isSearchSticky ? 'fixed' : 'relative',
+              top: isSearchSticky ? 0 : 'auto',
+              left: 0,
+              right: 0,
+              zIndex: isSearchSticky ? 1100 : 'auto',
+              backgroundColor: isSearchSticky ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+              backdropFilter: isSearchSticky ? 'blur(10px)' : 'none',
+              boxShadow: isSearchSticky ? '0 2px 8px rgba(0,0,0,0.1)' : 'none',
+              transition: 'all 0.3s ease',
             }}
-            placeholder="Buscar productos por nombre, categoría o banco..."
-          />
-        </Box>
+          >
+            <ModernSearchBar
+              value={searchTerm}
+              onChange={(value) => {
+                setSearchTerm(value);
+              }}
+              placeholder="Buscar productos por nombre, categoría o banco..."
+              sx={{
+                paddingX: { xs: 2, sm: 3 },
+                paddingY: isSearchSticky ? { xs: 1.5, sm: 2 } : { xs: 2, sm: 2.5 },
+                marginBottom: 0,
+              }}
+            />
+          </Box>
+          {/* Spacer para compensar el espacio cuando está fixed */}
+          {isSearchSticky && (
+            <Box sx={{ height: { xs: '88px', sm: '96px' } }} />
+          )}
+        </>
       )}
 
       <Container 

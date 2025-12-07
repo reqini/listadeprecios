@@ -315,8 +315,8 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
             </MenuItem>
             <Divider />
             
-            {/* Perfil */}
-            <MenuItem
+            {/* Perfil - OCULTO TEMPORALMENTE */}
+            {/* <MenuItem
               onClick={() => {
                 navigate("/perfil");
                 handleMenuClose();
@@ -324,7 +324,7 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
             >
               Perfil
             </MenuItem>
-            <Divider />
+            <Divider /> */}
             
             {/* Catálogos y Clientes */}
             <MenuItem
@@ -369,10 +369,9 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
                 <Typography color="secondary" fontSize={12}>🎓 Gratis</Typography>
               </Box>
             </MenuItem>
-            <Divider />
             
-            {/* Buscador Inteligente - Unificado */}
-            <MenuItem
+            {/* Buscador Inteligente - OCULTO TEMPORALMENTE */}
+            {/* <MenuItem
               onClick={() => {
                 navigate("/buscador-inteligente");
                 handleMenuClose();
@@ -382,7 +381,7 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
                 <Typography fontWeight="bold">Buscador Inteligente</Typography>
                 <Typography color="primary" fontSize={12}>🤖 IA</Typography>
               </Box>
-            </MenuItem>
+            </MenuItem> */}
             {(user?.username === 'cocinaty' || localStorage.getItem('activeSession') === 'cocinaty') && (
               <>
                 <Divider />
