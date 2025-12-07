@@ -32,7 +32,7 @@
    - Copia la clave generada
    - (Opcional pero recomendado) Restringe la clave a Google Sheets API y a tu dominio de Netlify
 
-**Ejemplo**: `AIzaSyAbCdEfGhIjKlMnOpQrStUvWxYz1234567`
+**Ejemplo**: `TU_API_KEY_AQUI` (formato típico: comienza con letras y números)
 
 ---
 
@@ -126,7 +126,7 @@ Variable Name: REACT_APP_GOOGLE_SHEET_ID
 Value: 1ABC123def456GHI789jkl012MNO345pqr678STU901vwx234YZA567bcd890
 
 Variable Name: REACT_APP_GOOGLE_API_KEY
-Value: AIzaSyAbCdEfGhIjKlMnOpQrStUvWxYz1234567
+Value: TU_API_KEY_DE_GOOGLE_AQUI
 ```
 
 ---
