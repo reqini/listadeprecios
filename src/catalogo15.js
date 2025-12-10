@@ -479,6 +479,18 @@ const Catalogo15 = () => {
         </Box>
       )}
 
+      {/* Toggle de columnas - Solo una vez, fuera del map de categorías */}
+      {!loading && Object.keys(productosAMostrar).length > 0 && (
+        <Box sx={{ display: { xs: 'flex', sm: 'none' }, justifyContent: 'flex-end', mb: 2 }}>
+          <ColumnLayoutToggle
+            mobileColumns={mobileColumns}
+            onToggle={toggleColumns}
+            variant="icons"
+            size="small"
+          />
+        </Box>
+      )}
+
       {!loading && Object.keys(productosAMostrar).map((linea) => (
         <Box key={linea} sx={{ marginBottom: { xs: 4, sm: 5 } }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: { xs: 2, sm: 3 } }}>
@@ -492,15 +504,6 @@ const Catalogo15 = () => {
             >
               Línea: <Box component="span" sx={{ fontWeight: 700 }}>{linea}</Box>
             </Typography>
-            
-            <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
-              <ColumnLayoutToggle
-                mobileColumns={mobileColumns}
-                onToggle={toggleColumns}
-                variant="icons"
-                size="small"
-              />
-            </Box>
           </Box>
           
           <Box

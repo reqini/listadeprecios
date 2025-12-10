@@ -133,7 +133,7 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
 
       {/* Spacer solo cuando está fixed (no catálogo y scrolled) */}
       {!isCatalog && isScrolled && (
-        <Box sx={{ height: { xs: '70px', sm: '64px' } }} />
+        <Box sx={{ height: { xs: '56px', sm: '64px' } }} />
       )}
       
       <AppBar 
@@ -142,7 +142,7 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
           zIndex: appBarZIndex,
           boxShadow: appBarBoxShadow,
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          minHeight: { xs: '70px', sm: '64px' },
+          minHeight: { xs: '56px', sm: '64px' },
           height: { xs: 'auto', sm: '64px' },
         }}
       >
@@ -152,11 +152,11 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
             justifyContent: 'space-between',
             alignItems: 'center',
             flexDirection: { xs: showSearch ? 'column' : 'row', sm: 'row' },
-            paddingY: { xs: showSearch ? 1.5 : 1, sm: 0 },
+            paddingY: { xs: showSearch ? 1 : 0.5, sm: 0 },
             paddingX: { xs: 1, sm: 2 },
-            gap: { xs: showSearch ? 1 : 0, sm: 0 },
+            gap: { xs: showSearch ? 0.5 : 0, sm: 0 },
             flexWrap: 'nowrap',
-            minHeight: { xs: '70px !important', sm: '64px !important' },
+            minHeight: { xs: '56px !important', sm: '64px !important' },
             height: { xs: 'auto', sm: '64px' },
             overflow: 'visible',
           }}
@@ -177,8 +177,8 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
                 alignItems: 'center',
                 justifyContent: 'center',
                 position: 'relative',
-                width: { xs: '48px', sm: '48px' },
-                height: { xs: '48px', sm: '48px' },
+                width: { xs: '40px', sm: '48px' },
+                height: { xs: '40px', sm: '48px' },
               }}
             >
               {location.pathname !== "/home" ? (

@@ -43,6 +43,7 @@ const ModernProductCardAirbnb = ({
   bankLogos = [], // Array de logos de bancos para mostrar como miniaturas
   showAllData = false, // Prop para mostrar todos los datos (precio negocio, PSVP, puntos, todas las cuotas, etc.)
   isCompactMode = false, // Modo compacto para vista de 2 columnas en mobile
+  isPreferencial = false, // Prop para indicar que debe usar precio_preferencial como precio principal
 }) => {
   const [shippingCost, setShippingCost] = useState(21036);
   const [imageModalOpen, setImageModalOpen] = useState(false);
@@ -111,6 +112,15 @@ const ModernProductCardAirbnb = ({
     ? parseFloat(product.precio_negocio.replace(/[^0-9.-]/g, '')) || null
     : null;
 
+  // Procesar precio preferencial (para catálogo preferencial)
+  const precioPreferencial = product.precio_preferencial
+    ? parseFloat(product.precio_preferencial.replace(/[^0-9.-]/g, '')) || null
+    : null;
+
+  // Determinar qué precio usar como principal
+  const precioPrincipal = isPreferencial ? precioPreferencial : precioNegocio;
+  const precioPrincipalLabel = isPreferencial ? "Precio Preferencial" : "Precio de Negocio";
+
   const SHIPPING_COST = 18697;
 
   // Determinar precio final según el contexto - ACTUALIZADO para recalcular cuando cambia selectedCuotaHome
@@ -128,13 +138,15 @@ const ModernProductCardAirbnb = ({
 
   const precioFinal = useMemo(() => {
     if (isContado) {
-      return (precioNegocio || 0) + (sumarEnvio && aplicaEnvio ? SHIPPING_COST : 0);
+      // Para catálogo preferencial, usar precio_preferencial en lugar de precio_negocio
+      const precioBase = isPreferencial ? precioPreferencial : precioNegocio;
+      return (precioBase || 0) + (sumarEnvio && aplicaEnvio ? SHIPPING_COST : 0);
     }
     
     // Usar cuotaValueDynamic que se recalcula cuando cambia selectedCuotaHome
     return (cuotaValueDynamic || parseFloat(product.psvp_lista?.replace(/[^0-9.-]/g, '')) || 0) +
       (sumarEnvio && aplicaEnvio ? SHIPPING_COST : 0);
-  }, [isContado, precioNegocio, sumarEnvio, aplicaEnvio, cuotaValueDynamic, product]);
+  }, [isContado, precioNegocio, precioPreferencial, isPreferencial, sumarEnvio, aplicaEnvio, cuotaValueDynamic, product]);
 
   // Manejo del modal de imagen con zoom
   const handleImageClick = () => {
@@ -621,14 +633,14 @@ const ModernProductCardAirbnb = ({
                     marginBottom: isCompactMode ? 0.25 : 0.5,
                   }}
                 >
-                  Precio de Negocio
+                  {precioPrincipalLabel}
                 </Typography>
                 <Typography
                   variant="h5"
                   sx={{
                     fontSize: isCompactMode ? '1.125rem' : { xs: '1.5rem', sm: '1.75rem' },
                     fontWeight: 800,
-                    color: '#222222',
+                    color: isPreferencial ? '#FF385C' : '#222222',
                     lineHeight: 1.2,
                   }}
                 >
@@ -662,8 +674,8 @@ const ModernProductCardAirbnb = ({
                   {formatPrice(precioFinal)}
                 </Typography>
               </Box>
-            ) : showAllData && precioNegocio ? (
-              // Cuando showAllData está activo y no hay cuota seleccionada, mostrar precio de negocio
+            ) : (showAllData || isPreferencial) && precioPrincipal ? (
+              // Cuando showAllData está activo o es catálogo preferencial y no hay cuota seleccionada, mostrar precio principal
               <Box>
                 <Typography
                   variant="caption"
@@ -674,18 +686,44 @@ const ModernProductCardAirbnb = ({
                     marginBottom: 0.5,
                   }}
                 >
-                  Precio de Negocio
+                  {precioPrincipalLabel}
                 </Typography>
                 <Typography
                   variant="h5"
                   sx={{
                     fontSize: { xs: '1.5rem', sm: '1.75rem' },
                     fontWeight: 800,
-                    color: '#222222',
+                    color: isPreferencial ? '#FF385C' : '#222222',
                     lineHeight: 1.2,
                   }}
                 >
-                  {formatPrice(precioNegocio)}
+                  {formatPrice(precioPrincipal)}
+                </Typography>
+              </Box>
+            ) : precioPrincipal ? (
+              // Si hay precio principal pero no se cumplen las condiciones anteriores, mostrarlo igual
+              <Box>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: '#717171',
+                    fontSize: '0.875rem',
+                    display: 'block',
+                    marginBottom: 0.5,
+                  }}
+                >
+                  {precioPrincipalLabel}
+                </Typography>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontSize: { xs: '1.5rem', sm: '1.75rem' },
+                    fontWeight: 800,
+                    color: isPreferencial ? '#FF385C' : '#222222',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {formatPrice(precioPrincipal)}
                 </Typography>
               </Box>
             ) : (

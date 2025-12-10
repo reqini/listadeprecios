@@ -22,6 +22,9 @@ import { useColumnLayout } from "./hooks/useColumnLayout";
 import ColumnLayoutToggle from "./components/ColumnLayoutToggle";
 import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
 import LoadingFallbackCatalog from "./components/LoadingFallbackCatalog";
+import RouletteModal from "./components/RouletteModal";
+import { applyDiscountToCart, addGiftToCart } from "./utils/rouletteHelpers";
+import { hasPlayedRoulette, isDevelopmentMode } from "./utils/rouletteStorage";
 
 const Catalogo6 = () => {
   // Detectar si estamos en una ruta dinámica (catálogo individual)
@@ -48,6 +51,9 @@ const Catalogo6 = () => {
   
   // Hook para manejar el layout de columnas en mobile
   const { mobileColumns, toggleColumns } = useColumnLayout('catalogo6', 2);
+
+  // Ruleta de premios - OCULTA
+  const [showRoulette, setShowRoulette] = useState(false);
 
   const cuotasMap = useMemo(() => ({
     "6 cuotas sin interés": 'seis_sin_interes',
@@ -305,6 +311,14 @@ const Catalogo6 = () => {
         </Alert>
       )}
 
+      {/* Ruleta de premios */}
+      {showRoulette && (
+        <RouletteModal
+          onWin={handleRouletteWin}
+          onClose={() => setShowRoulette(false)}
+        />
+      )}
+      
       {/* Buscador oculto en catálogos individuales - Fixed al hacer scroll */}
       {!isIndividualCatalog && (
         <>
@@ -441,6 +455,18 @@ const Catalogo6 = () => {
         </Box>
       )}
 
+      {/* Toggle de columnas - Solo una vez, fuera del map de categorías */}
+      {!loading && Object.keys(productosAMostrar).length > 0 && (
+        <Box sx={{ display: { xs: 'flex', sm: 'none' }, justifyContent: 'flex-end', mb: 2 }}>
+          <ColumnLayoutToggle
+            mobileColumns={mobileColumns}
+            onToggle={toggleColumns}
+            variant="icons"
+            size="small"
+          />
+        </Box>
+      )}
+
       {/* Productos - Layout moderno mobile-first */}
       {!loading && Object.keys(productosAMostrar).map((linea) => (
         <Box key={linea} sx={{ marginBottom: { xs: 4, sm: 5 } }}>
@@ -455,16 +481,6 @@ const Catalogo6 = () => {
             >
               Línea: <Box component="span" sx={{ fontWeight: 700 }}>{linea}</Box>
             </Typography>
-            
-            {/* Toggle de columnas - Solo visible en mobile */}
-            <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
-              <ColumnLayoutToggle
-                mobileColumns={mobileColumns}
-                onToggle={toggleColumns}
-                variant="icons"
-                size="small"
-              />
-            </Box>
           </Box>
           
           {/* Grid responsive estilo Airbnb */}

@@ -13,6 +13,7 @@ import { FaWhatsapp, FaTrashAlt } from "react-icons/fa";
 import { Close as CloseIcon, Add as AddIcon, Remove as RemoveIcon } from "@mui/icons-material";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { formatPrice, parsePrice } from "../utils/priceUtils";
+import { calculateCartTotalWithDiscounts } from "../utils/rouletteHelpers";
 
 /**
  * Carrito moderno con bottom sheet en mobile
@@ -114,10 +115,8 @@ const ModernCartBottomSheet = ({
   };
 
   const calcularTotal = () => {
-    return cart.reduce((acc, item) => {
-      const cantidad = item.cantidad || 1;
-      return acc + (getCuotaSeleccionada(item) * cantidad);
-    }, 0);
+    // Usar la función helper que aplica descuentos
+    return calculateCartTotalWithDiscounts(cart);
   };
 
   const total = calcularTotal();
@@ -208,8 +207,12 @@ const ModernCartBottomSheet = ({
       return "https://api.whatsapp.com/send?text=No%20hay%20productos%20en%20el%20carrito";
     }
 
-    const mensaje = cart
+    let mensaje = cart
       .map((item) => {
+        // Omitir descuentos y regalos del mensaje de WhatsApp (se aplican al total)
+        if (item.isDiscount || item.isGift) {
+          return null;
+        }
         const cantidad = item.cantidad || 1;
         const precioUnitario = formatPrice(getCuotaSeleccionada(item));
         const precioTotal = formatPrice(getCuotaSeleccionada(item) * cantidad);
@@ -217,7 +220,24 @@ const ModernCartBottomSheet = ({
         const cuotaTextoItem = getCuotaTexto(item);
         return `🛍️ ${item.descripcion}${cantidadTexto} - ${cantidad > 1 ? `${precioUnitario} c/u = ${precioTotal}` : precioUnitario} en ${cuotaTextoItem}`;
       })
+      .filter(Boolean) // Filtrar nulls
       .join("%0A");
+    
+    // Agregar información de descuentos y regalos al final
+    const discounts = cart.filter(item => item.isDiscount);
+    const gifts = cart.filter(item => item.isGift);
+    
+    if (discounts.length > 0) {
+      discounts.forEach(discount => {
+        mensaje += `%0A🎉 ${discount.descripcion}`;
+      });
+    }
+    
+    if (gifts.length > 0) {
+      gifts.forEach(gift => {
+        mensaje += `%0A🎁 ${gift.descripcion}`;
+      });
+    }
 
     return `https://api.whatsapp.com/send?text=✨ Hola me gustaria consultar por:%0A${mensaje}%0A%0ATotal: ${formatPrice(
       total
@@ -624,6 +644,22 @@ const ModernCartBottomSheet = ({
           <>
             <Divider sx={{ marginBottom: 2 }} />
             
+            {/* Descuentos y regalos aplicados */}
+            {cart.some(item => item.isDiscount || item.isGift) && (
+              <Box sx={{ mb: 2, p: 2, backgroundColor: '#e8f5e9', borderRadius: 2 }}>
+                {cart.filter(item => item.isDiscount).map((discount, idx) => (
+                  <Typography key={idx} variant="body2" sx={{ color: '#2e7d32', mb: 0.5 }}>
+                    🎉 {discount.descripcion}
+                  </Typography>
+                ))}
+                {cart.filter(item => item.isGift).map((gift, idx) => (
+                  <Typography key={idx} variant="body2" sx={{ color: '#2e7d32', mb: 0.5 }}>
+                    🎁 {gift.descripcion}
+                  </Typography>
+                ))}
+              </Box>
+            )}
+
             {/* Resumen de totales - Más claro */}
             <Box 
               sx={{ 
@@ -664,7 +700,7 @@ const ModernCartBottomSheet = ({
                   textAlign: 'right',
                 }}
               >
-                {cart.reduce((acc, item) => acc + (item.cantidad || 1), 0)} {cart.reduce((acc, item) => acc + (item.cantidad || 1), 0) === 1 ? 'producto' : 'productos'}
+                {cart.filter(item => !item.isDiscount && !item.isGift).reduce((acc, item) => acc + (item.cantidad || 1), 0)} {cart.filter(item => !item.isDiscount && !item.isGift).reduce((acc, item) => acc + (item.cantidad || 1), 0) === 1 ? 'producto' : 'productos'}
               </Typography>
             </Box>
             

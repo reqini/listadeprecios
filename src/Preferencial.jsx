@@ -406,6 +406,7 @@ const Preferencial = () => {
                   (parseFloat(product.stock_actual) / parseFloat(product.stock_total)) < 0.2
                 }
                 isCompactMode={mobileColumns === 2}
+                isPreferencial={true}
               />
             ))}
           </Box>
