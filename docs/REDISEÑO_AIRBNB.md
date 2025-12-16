@@ -223,3 +223,4 @@ handleTouchEnd: Resetea estado de toque
 
 
 
+

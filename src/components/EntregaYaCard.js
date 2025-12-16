@@ -41,9 +41,15 @@ const EntregaYaCard = ({
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [imageZoom, setImageZoom] = useState(1);
   
-  // Precio a mostrar (priorizar precio_negocio que es el de entregas-ya)
-  const precio = product.precio_negocio || product.precio || product.precio_contado || product.precio_preferencial || 0;
-  const precioFormateado = formatPrice(precio);
+  // Precios: preferimos mostrar el precio de contado real y el precio anterior (psvp_lista) tachado
+  const precioPrevio = typeof product.precio_psvp_lista === 'number' ? product.precio_psvp_lista : (product.precio_psvp_lista ? parsePrice(String(product.precio_psvp_lista)) : 0);
+  const precioContado = typeof product.precio_contado === 'number' ? product.precio_contado : (product.precio_contado ? parsePrice(String(product.precio_contado)) : null);
+
+  // Fallbacks para compatibilidad
+  const precioFallback = product.precio_negocio || product.precio || 0;
+  const precioActual = precioContado || precioFallback;
+  const precioFormateado = formatPrice(precioActual);
+  const precioPrevioFormateado = precioPrevio > 0 ? formatPrice(precioPrevio) : null;
   
   // Encontrar la mejor cuota sin interés disponible
   const cuotasSinInteres = [
@@ -314,17 +320,45 @@ const EntregaYaCard = ({
 
         {/* Precio destacado - Reducir espacio entre título y precio */}
         <Box sx={{ mb: 2, mt: 1 }}>
-          <Typography
-            variant="h5"
-            component="div"
-            sx={{
-              fontWeight: 800,
-              color: '#000000',
-              fontSize: '1.75rem',
-            }}
-          >
-            {precioFormateado}
-          </Typography>
+          {/* Mostrar precio anterior tachado si existe, y precio actual debajo */}
+          {precioPrevioFormateado && precioActual && precioPrevio > precioActual ? (
+            <Box>
+              <Typography
+                variant="body2"
+                component="div"
+                sx={{
+                  textDecoration: 'line-through',
+                  color: 'text.secondary',
+                  fontWeight: 600,
+                }}
+              >
+                {precioPrevioFormateado}
+              </Typography>
+              <Typography
+                variant="h5"
+                component="div"
+                sx={{
+                  fontWeight: 800,
+                  color: '#000000',
+                  fontSize: '1.75rem',
+                }}
+              >
+                {precioFormateado}
+              </Typography>
+            </Box>
+          ) : (
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{
+                fontWeight: 800,
+                color: '#000000',
+                fontSize: '1.75rem',
+              }}
+            >
+              {precioFormateado}
+            </Typography>
+          )}
           
           {/* Cuotas sin interés con Mercado Pago */}
           {mejorCuota && (

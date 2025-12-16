@@ -144,8 +144,8 @@ const Entregaya = () => {
 
   // Agregar al carrito
   const handleAddToCart = (product) => {
-    // Usar precio_negocio como precio principal (es el precio de entregas-ya)
-    const precioBase = product.precio_negocio || product.precio || product.precio_contado || product.precio_preferencial || 0;
+    // Usar `precio_contado` como precio actual (según hoja entregas-ya). Fallback a precio_negocio/ precio.
+    const precioBase = product.precio_contado || product.precio_negocio || product.precio || product.precio_preferencial || 0;
     
     // Asegurarse de que el precio sea un número válido
     const precioNumerico = typeof precioBase === 'number' ? precioBase : parsePrice(String(precioBase));

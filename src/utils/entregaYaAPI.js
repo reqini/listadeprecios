@@ -119,7 +119,10 @@ export function mapEntregaYaRowToProduct(row) {
     precio: precio,
     precio_negocio: normalizarPrecio(row.precio_negocio || precio),
     precio_preferencial: normalizarPrecio(row.precio_preferencial || 0),
-    precio_contado: precio, // Mantener compatibilidad
+    // Precio de contado real (traido del campo precio_contado si existe)
+    precio_contado: normalizarPrecio(row.precio_contado || row.precio_contado_lista || row.precio || precio),
+    // Precio anterior / sugerido proveniente de la hoja (psvp_lista)
+    precio_psvp_lista: normalizarPrecio(row.psvp_lista || row.pvsp_lista || row.precio_lista_anterior || 0),
     imagen: imagen,
     foto: imagen, // Mantener compatibilidad
     categoria: categoria,
