@@ -25,6 +25,7 @@
  * - O alternativamente, filtrar desde GET /api/productos por campo "hoja" = "entregas-ya"
  */
 import axios from './axios';
+import fallbackEntregaya from '../data/entregaya_fallback.json';
 import { parsePrice } from './priceUtils';
 
 /**
@@ -149,6 +150,60 @@ export function mapEntregaYaRowToProduct(row) {
 export async function getEntregaYaProducts() {
   console.log('🚀 INICIANDO: getEntregaYaProducts()');
   try {
+    // Intentar cargar directamente desde Google Sheets (gviz) - prioridad alta
+    const SHEET_ID = '1ATl5Avm6NjoiaPrVOG8xw8fLAZeBfuf5HG-sGBMCGQw';
+    const GID = '10927216'; // nuevo gid solicitado
+
+    const fetchFromGoogleSheet = async (sheetId, gid) => {
+      try {
+        console.log(`📡 Intentando cargar desde Google Sheets (id=${sheetId} gid=${gid})`);
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
+        const resp = await axios.get(url, { responseType: 'text' });
+        let text = resp.data;
+
+        // El endpoint devuelve un callback JS, quitar prefijo/sufijo
+        const jsonText = text.replace(/^.*?google\.visualization\.Query\.setResponse\(|\);?\s*$/g, '');
+        const data = JSON.parse(jsonText);
+
+        // Construir array de filas con keys desde labels
+        const cols = data.table.cols.map(c => (c.label || c.id || '').toString().trim());
+        const rows = (data.table.rows || []).map(r => {
+          const obj = {};
+          (r.c || []).forEach((cell, i) => {
+            const key = cols[i] || `col_${i}`;
+            obj[key] = cell && cell.v !== null && cell.v !== undefined ? cell.v : '';
+          });
+          return obj;
+        });
+
+        console.log('✅ Google Sheets: filas obtenidas:', rows.length);
+        if (rows.length === 0) return null;
+
+        // Mapear usando el mapeador existente
+        const mapped = rows.map(mapEntregaYaRowToProduct);
+        return mapped;
+      } catch (err) {
+        console.warn('⚠️ Falló carga directa desde Google Sheets:', err.message || err);
+        return null;
+      }
+    };
+
+    const fromSheet = await fetchFromGoogleSheet(SHEET_ID, GID);
+    if (Array.isArray(fromSheet) && fromSheet.length > 0) {
+      console.log('✅ Productos cargados directamente desde Google Sheets:', fromSheet.length);
+      return fromSheet;
+    }
+
+    // Si no se pudo cargar la sheet remota, usar JSON local de fallback
+    try {
+      if (Array.isArray(fallbackEntregaya) && fallbackEntregaya.length > 0) {
+        console.log('🔁 Usando fallback local `entregaya_fallback.json` con', fallbackEntregaya.length, 'productos');
+        const mappedFallback = fallbackEntregaya.map(mapEntregaYaRowToProduct);
+        return mappedFallback;
+      }
+    } catch (err) {
+      console.warn('⚠️ Error mapeando fallback local:', err.message || err);
+    }
     // Intentar endpoint específico primero
     try {
       console.log('📡 Intentando cargar desde /api/entrega-ya...');
