@@ -31,60 +31,15 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-<!-- Firebase core + messaging compat -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
-
-<script>
-  // Config de tu proyecto
-  const firebaseConfig = {
-    // La configuración real de Firebase se inyecta desde variables de entorno en el código fuente.
-    apiKey: "__FIREBASE_API_KEY_FROM_ENV__",
-    authDomain: "catalogo-simple.firebaseapp.com",
-    projectId: "catalogo-simple",
-    storageBucket: "catalogo-simple.firebasestorage.app",
-    messagingSenderId: "168562961302",
-    appId: "1:168562961302:web:a19002aed0c97802224bb7",
-    measurementId: "G-RC9CE84J3S"
-  };
-
-  // Inicializar Firebase
-  firebase.initializeApp(firebaseConfig);
-
-  // Registrar el SW
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/firebase-messaging-sw.js')
-      .then((registration) => {
-        //console.log('✅ SW registrado:', registration);
-      }).catch((err) => {
-        //console.log('❌ Error al registrar el SW:', err);
-      });
-  }
-
-  const messaging = firebase.messaging();
-
-  // Pedir permiso
-  Notification.requestPermission().then((permission) => {
-    if (permission === "granted") {
-      messaging.getToken().then((currentToken) => {
-        if (currentToken) {
-          //console.log("🔐 Token generado:", currentToken);
-          // Acá podrías guardarlo en tu backend si querés notificaciones personalizadas
+    <!-- Firebase removed - using Google Sheets API directly -->
+          //console.log("✅ Token de notificaciones listo (Firebase removido)");
         } else {
           //console.log("❌ No se pudo obtener el token.");
         }
       }).catch((err) => {
         //console.log("Error al obtener token", err);
       });
-    } else {
-      //console.log("Permiso denegado");
     }
-  });
-
-  // Escuchar notis cuando la app está abierta (foreground)
-  messaging.onMessage((payload) => {
-    //console.log("🔔 Notificación recibida:", payload);
-    alert(payload.notification.title + ": " + payload.notification.body);
   });
 </script>
     <!--

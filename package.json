@@ -20,7 +20,6 @@
     "browser-image-compression": "^2.0.2",
     "chart.js": "^4.4.8",
     "dom-to-image-more": "^3.5.0",
-    "firebase": "^11.6.0",
     "framer-motion": "^12.23.12",
     "html2canvas": "^1.4.1",
     "intro.js": "^7.2.0",
@@ -84,7 +83,6 @@
   },
   "proxy": "https://backend-catalogosimple.onrender.com",
   "devDependencies": {
-    "firebase-tools": "^14.16.0",
     "http-proxy-middleware": "^3.0.5",
     "identity-obj-proxy": "^3.0.0",
     "install": "^0.13.0",

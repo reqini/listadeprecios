@@ -76,6 +76,7 @@ const Entregaya = () => {
         console.log('📞 PÁGINA: Llamando a getEntregaYaProducts()...');
         const productosData = await getEntregaYaProducts();
         console.log('📥 PÁGINA: Productos recibidos de API:', productosData.length);
+        console.log('📋 PÁGINA: CÓDIGOS de productos recibidos:', productosData.map(p => p.codigo || p.id || '?').join(', '));
         console.log('📋 PÁGINA: Primeros 3 productos recibidos:', productosData.slice(0, 3));
         
         // Filtrar solo productos válidos (con precio)

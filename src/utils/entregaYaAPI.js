@@ -24,8 +24,7 @@
  * - GET /api/entrega-ya (endpoint específico, recomendado)
  * - O alternativamente, filtrar desde GET /api/productos por campo "hoja" = "entregas-ya"
  */
-import axios from './axios';
-import fallbackEntregaya from '../data/entregaya_fallback.json';
+// REMOVIDO: fallbackEntregaya - forzamos carga directa desde Google Sheet
 import { parsePrice } from './priceUtils';
 
 /**
@@ -112,6 +111,10 @@ export function mapEntregaYaRowToProduct(row) {
   const vigenciaValue = String(row.vigencia || 'SI').toUpperCase();
   const vigente = vigenciaValue === 'SI' || vigenciaValue === 'YES' || vigenciaValue === 'TRUE';
   
+  // Normalizar campo 'vendido' (si la fila indica que está vendido)
+  const vendidoValue = String(row.vendido || row.VENDIDO || row.vendido_flag || '').toUpperCase();
+  const vendido = vendidoValue === 'SI' || vendidoValue === 'YES' || vendidoValue === 'TRUE' || vendidoValue === '1';
+  
   return {
     id: row.id || row.ID || row.codigo || row._id || null,
     codigo: row.codigo || row.id || row.ID || '',
@@ -126,6 +129,8 @@ export function mapEntregaYaRowToProduct(row) {
     precio_psvp_lista: normalizarPrecio(row.psvp_lista || row.pvsp_lista || row.precio_lista_anterior || 0),
     imagen: imagen,
     foto: imagen, // Mantener compatibilidad
+    vendido: vendido,
+    vendido_raw: row.vendido || row.VENDIDO || '',
     categoria: categoria,
     linea: row.linea || categoria,
     stock: stock,
@@ -158,15 +163,51 @@ export async function getEntregaYaProducts() {
       try {
         console.log(`📡 Intentando cargar desde Google Sheets (id=${sheetId} gid=${gid})`);
         const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&gid=${gid}`;
-        const resp = await axios.get(url, { responseType: 'text' });
-        let text = resp.data;
-
+        console.log('🔗 URL:', url);
+        
+        // Usar fetch nativa en lugar de axios para evitar problemas CORS
+        const resp = await fetch(url);
+        console.log('✅ Respuesta recibida, status:', resp.status);
+        
+        if (!resp.ok) {
+          throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+        }
+        
+        const text = await resp.text();
+        console.log('📊 Tamaño de respuesta:', text.length, 'caracteres');
+        console.log('📋 Primeros 500 caracteres de respuesta:', text.substring(0, 500));
+        
         // El endpoint devuelve un callback JS, quitar prefijo/sufijo
-        const jsonText = text.replace(/^.*?google\.visualization\.Query\.setResponse\(|\);?\s*$/g, '');
-        const data = JSON.parse(jsonText);
+        // USAR EL MISMO MÉTODO QUE FUNCIONA EN check_entregaya.js
+        const marker = 'google.visualization.Query.setResponse(';
+        const startIdx = text.indexOf(marker);
+        if (startIdx === -1) {
+          console.error('❌ No se encontró el callback de Google Visualization');
+          return null;
+        }
+        const openIdx = startIdx + marker.length;
+        const endIdx = text.lastIndexOf(');');
+        if (endIdx === -1) {
+          console.error('❌ No se encontró el cierre del callback');
+          return null;
+        }
+        const jsonText = text.substring(openIdx, endIdx);
+        console.log('🔍 Después de extraer JSON, primeros 300 caracteres:', jsonText.substring(0, 300));
+        
+        let data;
+        try {
+          data = JSON.parse(jsonText);
+          console.log('✅ JSON parseado correctamente');
+        } catch (parseErr) {
+          console.error('❌ Error al parsear JSON:', parseErr.message);
+          console.log('🔍 JSON inválido recibido:', jsonText.substring(0, 500));
+          return null;
+        }
 
         // Construir array de filas con keys desde labels
         const cols = data.table.cols.map(c => (c.label || c.id || '').toString().trim());
+        console.log('📋 Columnas encontradas:', cols);
+        
         const rows = (data.table.rows || []).map(r => {
           const obj = {};
           (r.c || []).forEach((cell, i) => {
@@ -177,185 +218,55 @@ export async function getEntregaYaProducts() {
         });
 
         console.log('✅ Google Sheets: filas obtenidas:', rows.length);
-        if (rows.length === 0) return null;
+        if (rows.length === 0) {
+          console.warn('⚠️ Google Sheets devolvió 0 filas');
+          return null;
+        }
+        
+        console.log('📋 Primera fila raw:', JSON.stringify(rows[0]));
 
         // Mapear usando el mapeador existente
         const mapped = rows.map(mapEntregaYaRowToProduct);
+
+        console.log(`✅ Google Sheets: productos mapeados: ${mapped.length}`);
+        console.log('📋 Primera fila mapeada:', JSON.stringify(mapped[0]));
+        
+        // NO FILTRAR - devolver TODOS los productos de la sheet (la sheet gid=10927216 es la de entrega-ya)
         return mapped;
       } catch (err) {
+        console.error('❌ Error en fetchFromGoogleSheet:', {
+          message: err.message,
+          name: err.name,
+          code: err.code,
+          response: err.response?.status,
+        });
         console.warn('⚠️ Falló carga directa desde Google Sheets:', err.message || err);
         return null;
       }
     };
 
+    console.log('⏳ Antes de llamar fetchFromGoogleSheet...');
     const fromSheet = await fetchFromGoogleSheet(SHEET_ID, GID);
+    console.log('⏳ Después de fetchFromGoogleSheet, resultado:', fromSheet?.length);
     if (Array.isArray(fromSheet) && fromSheet.length > 0) {
       console.log('✅ Productos cargados directamente desde Google Sheets:', fromSheet.length);
+      console.log('✅ Códigos desde Google Sheets:', fromSheet.map(p => p.codigo).join(', '));
+      try {
+        if (typeof window !== 'undefined') window.__ENTREGAYA_SOURCE = 'google_sheet';
+      } catch (e) {
+        // no-op
+      }
       return fromSheet;
     }
 
-    // Si no se pudo cargar la sheet remota, usar JSON local de fallback
-    try {
-      if (Array.isArray(fallbackEntregaya) && fallbackEntregaya.length > 0) {
-        console.log('🔁 Usando fallback local `entregaya_fallback.json` con', fallbackEntregaya.length, 'productos');
-        const mappedFallback = fallbackEntregaya.map(mapEntregaYaRowToProduct);
-        return mappedFallback;
-      }
-    } catch (err) {
-      console.warn('⚠️ Error mapeando fallback local:', err.message || err);
-    }
-    // Intentar endpoint específico primero
-    try {
-      console.log('📡 Intentando cargar desde /api/entrega-ya...');
-      const response = await axios.get('/api/entrega-ya');
-      console.log('📥 Respuesta recibida de /api/entrega-ya:', {
-        status: response.status,
-        hasData: !!response.data,
-        isArray: Array.isArray(response.data),
-        length: Array.isArray(response.data) ? response.data.length : 'N/A',
-        firstItem: Array.isArray(response.data) && response.data.length > 0 ? response.data[0] : null,
-      });
-      
-      if (response.data && Array.isArray(response.data)) {
-        console.log('✅ Productos cargados desde /api/entrega-ya:', response.data.length);
-        console.log('📋 Primeros 3 productos sin mapear:', response.data.slice(0, 3));
-        const productosMapeados = response.data.map(mapEntregaYaRowToProduct);
-        console.log('✅ Productos mapeados:', productosMapeados.length);
-        console.log('📋 Primeros 3 productos mapeados:', productosMapeados.slice(0, 3));
-        return productosMapeados;
-      }
-      
-      // Si la respuesta tiene formato { success: true, data: [...] }
-      if (response.data && response.data.success && Array.isArray(response.data.data)) {
-        console.log('✅ Productos cargados desde /api/entrega-ya (formato success):', response.data.data.length);
-        console.log('📋 Primeros 3 productos sin mapear:', response.data.data.slice(0, 3));
-        const productosMapeados = response.data.data.map(mapEntregaYaRowToProduct);
-        console.log('✅ Productos mapeados:', productosMapeados.length);
-        return productosMapeados;
-      }
-    } catch (apiError) {
-      console.log('⚠️ Endpoint /api/entrega-ya no existe o falló:', apiError.message);
-      console.log('🔄 Intentando fallback desde /api/productos...');
-      
-      // Fallback: cargar desde productos generales y filtrar SOLO por hoja "entregas-ya"
-      console.log('📡 Cargando desde /api/productos...');
-      const productosResponse = await axios.get('/api/productos');
-      const todosProductos = productosResponse.data || [];
-      console.log('📦 Total de productos cargados desde /api/productos:', todosProductos.length);
-      
-      // Debug: Ver estructura de algunos productos para entender campos disponibles
-      if (todosProductos.length > 0) {
-        console.log('🔍 Analizando estructura de productos para encontrar hoja "entregas-ya"...');
-        const primerosProductos = todosProductos.slice(0, 10);
-        console.log('📋 Analizando primeros 10 productos:');
-        primerosProductos.forEach((producto, idx) => {
-          const hojaEncontrada = String(producto.hoja || producto.sheet || producto.HOJA || producto.SHEET || producto.hoja_nombre || producto.sheet_name || '').toLowerCase().trim();
-          console.log(`  ${idx + 1}. Código: ${producto.codigo || producto.id || 'N/A'} | Hoja: "${hojaEncontrada}" | Nombre: ${(producto.descripcion || producto.nombre || '').substring(0, 40)}`);
-        });
-      }
-      
-      // FILTRAR SOLO PRODUCTOS DE LA HOJA "entregas-ya"
-      // Buscar por campo "hoja" o "sheet" con variantes del nombre
-      const productosEntregasYa = [];
-      const variantesHoja = [
-        'entregas-ya',
-        'entregas_ya',
-        'entregas ya',
-        'entregasya',
-        'entrega-ya',
-        'entrega_ya',
-        'entrega ya',
-      ];
-      
-      console.log('🔍 Filtrando productos de la hoja "entregas-ya"...');
-      console.log('📋 Variantes buscadas:', variantesHoja);
-      
-      // También buscar productos por códigos específicos de la hoja entregas-ya
-      const codigosEntregasYa = [
-        '38252866', // SARTEN 28CM TERRA
-        '38653166', // SARTEN 31CM TERRA (aunque vigencia NO)
-        '38351866', // CACEROLA 18CM TERRA
-        '38452466', // CACEROLA 24CM TERRA
-        '38452866', // CACEROLA 28CM TERRA
-        '38752966', // CACEROLA CUADRADA 29CM TERRA
-      ];
-      
-      todosProductos.forEach((producto, index) => {
-        // Buscar en TODOS los campos posibles que puedan contener el nombre de la hoja
-        const hoja = String(producto.hoja || producto.sheet || producto.HOJA || producto.SHEET || producto.hoja_nombre || producto.sheet_name || '').toLowerCase().trim();
-        
-        // Verificar si está en la hoja "entregas-ya" (variantes exactas)
-        const enHojaEntregasYa = variantesHoja.some(variante => hoja === variante);
-        
-        // También verificar por código (fallback si no viene el campo hoja)
-        const codigo = String(producto.codigo || producto.id || '').trim();
-        const esCodigoEntregasYa = codigosEntregasYa.includes(codigo);
-        
-        // Excluir repuestos y productos no vigentes
-        const linea = String(producto?.linea || producto?.LINEA || '').toLowerCase();
-        const vigencia = String(producto?.vigencia || producto?.VIGENCIA || 'si').toLowerCase();
-        const esRepuesto = linea === 'repuestos';
-        const noVigente = vigencia === 'no' || vigencia === false;
-        
-        const cumpleCriterio = (enHojaEntregasYa || esCodigoEntregasYa) && !esRepuesto && !noVigente;
-        
-        if (cumpleCriterio) {
-          productosEntregasYa.push(producto);
-          console.log(`✅ Producto ${productosEntregasYa.length} de entregas-ya encontrado:`, {
-            codigo: producto.codigo || producto.id,
-            nombre: (producto.descripcion || producto.nombre || '').substring(0, 60),
-            hoja: producto.hoja || producto.sheet || 'N/A',
-            precio_negocio: producto.precio_negocio || producto.precio || producto.precio_contado,
-            vigencia: producto.vigencia,
-            linea: producto.linea,
-            encontradoPor: enHojaEntregasYa ? 'campo hoja' : 'código',
-          });
-        }
-      });
-      
-      console.log(`✅ Total de productos encontrados en hoja "entregas-ya": ${productosEntregasYa.length}`);
-      
-      // Si no encuentra productos, mostrar información detallada de debug
-      if (productosEntregasYa.length === 0) {
-        console.error('❌ No se encontraron productos en la hoja "entregas-ya"');
-        console.log('🔍 Buscando hojas únicas en TODOS los productos...');
-        const hojasUnicas = new Map();
-        todosProductos.forEach(p => {
-          const hoja = String(p.hoja || p.sheet || p.HOJA || p.SHEET || p.hoja_nombre || p.sheet_name || '').toLowerCase().trim();
-          if (hoja) {
-            hojasUnicas.set(hoja, (hojasUnicas.get(hoja) || 0) + 1);
-          }
-        });
-        const hojasOrdenadas = Array.from(hojasUnicas.entries()).sort((a, b) => b[1] - a[1]);
-        console.log('📋 Hojas encontradas (con cantidad de productos):');
-        hojasOrdenadas.forEach(([hoja, cantidad]) => {
-          console.log(`  - "${hoja}": ${cantidad} productos`);
-        });
-        console.warn('💡 Verificar que la hoja se llame exactamente "entregas-ya" en Google Sheets');
-      }
-      
-      // Mapear SOLO los productos de la hoja "entregas-ya"
-      console.log('🔄 Mapeando productos...');
-      const productosMapeados = productosEntregasYa.map((p, idx) => {
-        const mapeado = mapEntregaYaRowToProduct(p);
-        if (idx < 3) {
-          console.log(`  ${idx + 1}. Producto mapeado:`, {
-            codigo: mapeado.codigo,
-            nombre: mapeado.nombre,
-            precio: mapeado.precio,
-            imagen: mapeado.imagen ? 'Sí' : 'No',
-          });
-        }
-        return mapeado;
-      });
-      console.log(`✅ ${productosMapeados.length} productos mapeados correctamente`);
-      return productosMapeados;
-    }
-    
+    // Si Google Sheets no devuelve datos, NO usar fallback al backend
+    // porque el backend devuelve 5 productos de un filtro diferente
+    console.error('❌ CRÍTICO: No se pudieron cargar productos de Google Sheets (id=' + SHEET_ID + ', gid=' + GID + ')');
+    console.log('⚠️ Retornando array vacío para forzar que se vea el error al usuario');
     return [];
   } catch (error) {
     console.error('❌ Error al obtener productos de entrega-ya:', error);
-    throw error;
+    return [];
   }
 }
 

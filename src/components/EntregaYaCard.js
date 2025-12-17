@@ -76,7 +76,9 @@ const EntregaYaCard = ({
   // Manejar clic en WhatsApp
   const handleWhatsApp = (e) => {
     e.stopPropagation();
-    
+    // No permitir contacto si el producto está vendido
+    if (product.vendido) return;
+
     const message = `Hola! Me interesa este producto:\n\n*${product.nombre}*\n${product.descripcion ? product.descripcion.substring(0, 100) : ''}\n\nPrecio: ${precioFormateado}\n\n¿Tienen disponibilidad para entrega inmediata?`;
     const whatsappUrl = `https://wa.me/5491166666666?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
@@ -92,6 +94,8 @@ const EntregaYaCard = ({
   // Manejar agregar al carrito
   const handleAddToCart = (e) => {
     e.stopPropagation();
+    // No permitir agregar al carrito si está vendido
+    if (product.vendido) return;
     if (onAddToCart) {
       onAddToCart(product);
     }
@@ -117,7 +121,9 @@ const EntregaYaCard = ({
         transition: 'all 0.3s ease',
         cursor: onProductClick ? 'pointer' : 'default',
         position: 'relative',
-        '&:hover': {
+        opacity: product.vendido ? 0.65 : 1,
+        pointerEvents: product.vendido ? 'none' : 'auto',
+        '&:hover': product.vendido ? {} : {
           transform: 'translateY(-4px)',
           boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
         },
@@ -252,6 +258,35 @@ const EntregaYaCard = ({
             />
           )}
         </Box>
+
+        {/* Badge "VENDIDO" centrado por arriba de la foto */}
+        {product.vendido && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 10,
+              pointerEvents: 'none',
+            }}
+          >
+            <Chip
+              label="VENDIDO"
+              size="small"
+              sx={{
+                backgroundColor: '#c62828',
+                color: 'white',
+                fontWeight: 900,
+                fontSize: '0.9rem',
+                height: 36,
+                padding: '8px 16px',
+                '& .MuiChip-label': { px: 2, fontWeight: 900 },
+                boxShadow: '0 4px 12px rgba(198, 40, 40, 0.5)',
+              }}
+            />
+          </Box>
+        )}
         
         {/* Botón de favorito */}
         {onToggleFavorite && (
@@ -440,23 +475,32 @@ const EntregaYaCard = ({
       </CardContent>
 
       {/* Acciones */}
-      <CardActions sx={{ p: 2, pt: 0, gap: 1 }}>
+      <CardActions 
+        sx={{ 
+          p: 2, 
+          pt: 0, 
+          gap: 1,
+          opacity: product.vendido ? 0.5 : 1,
+          pointerEvents: product.vendido ? 'none' : 'auto',
+        }}
+      >
         <Button
           variant="contained"
           fullWidth
           startIcon={<WhatsAppIcon />}
           onClick={handleWhatsApp}
+          disabled={product.vendido}
           sx={{
-            backgroundColor: '#25D366',
+            backgroundColor: product.vendido ? '#bdbdbd' : '#25D366',
             color: '#FFFFFF',
             fontWeight: 700,
             textTransform: 'none',
             py: 1.2,
             borderRadius: 2,
-            boxShadow: '0 2px 8px rgba(37, 211, 102, 0.3)',
+            boxShadow: product.vendido ? 'none' : '0 2px 8px rgba(37, 211, 102, 0.3)',
             '&:hover': {
-              backgroundColor: '#1da851',
-              boxShadow: '0 4px 12px rgba(37, 211, 102, 0.4)',
+              backgroundColor: product.vendido ? '#bdbdbd' : '#1da851',
+              boxShadow: product.vendido ? 'none' : '0 4px 12px rgba(37, 211, 102, 0.4)',
             },
             transition: 'all 0.3s ease',
           }}
@@ -464,19 +508,21 @@ const EntregaYaCard = ({
           Consultar
         </Button>
         {onAddToCart && (
-          <Tooltip title="Agregar al carrito">
+          <Tooltip title={product.vendido ? "Producto agotado" : "Agregar al carrito"}>
             <IconButton
               variant="outlined"
               color="primary"
               onClick={handleAddToCart}
+              disabled={product.vendido}
               sx={{
                 border: '1px solid',
-                borderColor: 'primary.main',
+                borderColor: product.vendido ? '#bdbdbd' : 'primary.main',
                 borderRadius: 2,
                 p: 1.5,
+                color: product.vendido ? '#bdbdbd' : 'primary.main',
                 '&:hover': {
-                  backgroundColor: 'primary.main',
-                  color: 'white',
+                  backgroundColor: product.vendido ? 'transparent' : 'primary.main',
+                  color: product.vendido ? '#bdbdbd' : 'white',
                 },
               }}
               aria-label="Agregar al carrito"
