@@ -349,11 +349,12 @@ const Catalogo15 = () => {
       </Helmet>
       
       {IS_CHRISTMAS_MODE && (
-        <Alert
+         <Alert
           severity="info"
           icon={false}
           sx={{
             backgroundColor: '#C62828',
+            display: 'none',
             color: '#FFFFFF',
             textAlign: 'center',
             py: 0.5,
