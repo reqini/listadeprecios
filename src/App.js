@@ -37,6 +37,8 @@ import Onboarding from "./pages/Onboarding";
 import ExpirationModal from "./components/subscription/ExpirationModal";
 import PWAInstallToast from "./components/PWAInstallToast";
 import { AuthProvider, useAuth } from "./AuthContext";
+import { AdminAuthProvider, useAdminAuth } from "./AdminAuthContext";
+import AdminLogin from "./pages/AdminLogin";
 import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
 import SnowfallHeader from "./components/christmas/SnowfallHeader";
 import Snowfall from "./components/christmas/Snowfall"; 
@@ -113,20 +115,24 @@ const PrivateRoute = ({ children }) => {
   return children;
 };
 
-// 🔐 Ruta de administrador (solo cocinaty)
+// 🔐 Ruta de administrador — Supabase Auth + rol verificado server-side (RLS).
+// A propósito, independiente del login de clientes (AuthContext/backend legacy):
+// el rol se lee de la tabla `profiles`, protegida por RLS, no de localStorage.
 const AdminRoute = ({ children }) => {
-  const { auth } = useAuth();
-  const username = localStorage.getItem('activeSession');
-  
-  if (!auth?.token) {
-    return <Navigate to="/login" replace />;
+  const { session, role, loading } = useAdminAuth();
+
+  if (loading) {
+    return null;
   }
-  
-  // Verificar username desde localStorage
-  if (username !== 'cocinaty') {
+
+  if (!session) {
+    return <AdminLogin />;
+  }
+
+  if (role !== 'admin') {
     return <Navigate to="/home" replace />;
   }
-  
+
   return children;
 };
 
@@ -251,7 +257,9 @@ const App = () => {
 
   return (
     <AuthProvider>
-      <AppContent />
+      <AdminAuthProvider>
+        <AppContent />
+      </AdminAuthProvider>
     </AuthProvider>
   );
 };
