@@ -12,6 +12,7 @@
     "@mui/material": "^5.16.7",
     "@mui/styled-engine-sc": "^6.0.0-alpha.12",
     "@react-oauth/google": "^0.12.1",
+    "@supabase/supabase-js": "^2.109.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -84,9 +85,9 @@
   "proxy": "https://backend-catalogosimple.onrender.com",
   "devDependencies": {
     "http-proxy-middleware": "^3.0.5",
+    "husky": "^9.1.6",
     "identity-obj-proxy": "^3.0.0",
     "install": "^0.13.0",
-    "npm": "^10.9.0",
-    "husky": "^9.1.6"
+    "npm": "^10.9.0"
   }
 }
