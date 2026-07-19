@@ -480,6 +480,18 @@ const Catalogo15 = () => {
         </Box>
       )}
 
+      {/* Empty state: sin error de red, pero ningún producto tiene precio a 15 cuotas */}
+      {!loading && !error && Object.keys(productosAMostrar).length === 0 && (
+        <Box sx={{ textAlign: 'center', py: 8, px: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Por ahora no hay productos en 15 cuotas sin interés
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Probá con otro plan de cuotas desde el menú.
+          </Typography>
+        </Box>
+      )}
+
       {/* Toggle de columnas - Solo una vez, fuera del map de categorías */}
       {!loading && Object.keys(productosAMostrar).length > 0 && (
         <Box sx={{ display: { xs: 'flex', sm: 'none' }, justifyContent: 'flex-end', mb: 2 }}>

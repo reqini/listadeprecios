@@ -16,7 +16,13 @@ const AdminLogin = () => {
     try {
       await loginAdmin(email, password);
     } catch (err) {
-      setError("Email o contraseña incorrectos.");
+      if (!err.status) {
+        setError("Error de conexión. Verificá tu conexión a internet e intentá nuevamente.");
+      } else if (err.status === 400) {
+        setError("Email o contraseña incorrectos.");
+      } else {
+        setError("Error inesperado. Intentá nuevamente en unos momentos.");
+      }
     } finally {
       setSubmitting(false);
     }

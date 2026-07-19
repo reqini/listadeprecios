@@ -196,6 +196,17 @@ const Catalogo14 = () => {
         </>
       )}
 
+      {!loading && Object.keys(productosAMostrar).length === 0 && (
+        <div style={{ textAlign: 'center', padding: '64px 16px' }}>
+          <Typography variant="h6" gutterBottom>
+            Por ahora no hay productos en 14 cuotas sin interés
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Probá con otro plan de cuotas desde el menú.
+          </Typography>
+        </div>
+      )}
+
       {Object.keys(productosAMostrar).map((linea) => (
         <div key={linea} className="linea-section">
           <Typography variant="h5" gutterBottom margin="20px 0">

@@ -622,6 +622,18 @@ const Catalogo3 = () => {
         </Box>
       )}
 
+      {/* Empty state: sin error de red, pero ningún producto tiene precio a 3 cuotas */}
+      {!loading && !error && Object.keys(productosAMostrar).length === 0 && (
+        <Box sx={{ textAlign: 'center', py: 8, px: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Por ahora no hay productos en 3 cuotas sin interés
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Probá con otro plan de cuotas desde el menú.
+          </Typography>
+        </Box>
+      )}
+
       {/* Productos - Layout moderno mobile-first */}
       {!loading && Object.keys(productosAMostrar).map((linea) => (
         <Box key={linea} sx={{ marginBottom: { xs: 4, sm: 5 } }}>

@@ -165,7 +165,7 @@ const Login = () => {
                 fullWidth
                 type={showPassword ? "text" : "password"}
                 id="filled-required-code"
-                label="Código de emprendedora"
+                label="Contraseña"
                 value={password}
                 variant="filled"
                 onChange={(e) => setPassword(e.target.value)}
