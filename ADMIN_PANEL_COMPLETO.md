@@ -32,9 +32,11 @@
 ### 1. **Acceder al Panel:**
 ```
 URL: https://tu-dominio.com/administrador
-Usuario: cocinaty
-Contraseña: 279323
 ```
+> ⚠️ Desde la migración a Supabase Auth (Fase 1), el acceso es por email + password
+> de un usuario con `role = 'admin'` en la tabla `profiles`, no por el usuario/clave
+> hardcodeado de este documento. Ver `src/AdminAuthContext.js` y
+> `supabase/migrations/`.
 
 ### 2. **Modificar Costos:**
 - Cambiar el valor en los campos de texto

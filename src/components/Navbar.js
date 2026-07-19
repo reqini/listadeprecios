@@ -30,8 +30,10 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ModernSearchBar from "./ModernSearchBar";
 import { IS_CHRISTMAS_MODE } from "../config/christmasConfig";
 import { Alert } from "@mui/material";
+import { useAdminAuth } from "../AdminAuthContext";
 
 const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch = false }) => {
+  const { role: adminRole } = useAdminAuth();
   const [anchorEl, setAnchorEl] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
   // Estados del modal de perfil - temporalmente ocultos
@@ -383,10 +385,10 @@ const Navbar = ({ user, onLogout, title, searchValue, onSearchChange, showSearch
                 <Typography color="primary" fontSize={12}>🤖 IA</Typography>
               </Box>
             </MenuItem> */}
-            {(user?.username === 'cocinaty' || localStorage.getItem('activeSession') === 'cocinaty') && (
+            {adminRole === 'admin' && (
               <>
                 <Divider />
-                {/* Panel de Administración - Solo para cocinaty */}
+                {/* Panel de Administración - visible solo si hay sesión Supabase con role=admin */}
                 <MenuItem
                   onClick={() => {
                     navigate("/administrador");
