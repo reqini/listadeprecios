@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://backend-catalogosimple.onrender.com/api/:path*" },
+    { "source": "/auth/:path*", "destination": "https://backend-catalogosimple.onrender.com/auth/:path*" },
+    { "source": "/((?!api/|auth/|static/).*)", "destination": "/index.html" }
+  ]
+}
