@@ -35,6 +35,7 @@ import ReviewSlider from "./components/ReviewSlider";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 // ColumnLayoutToggle removido de home - siempre 1 columna en mobile
 import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
+import { cuotasConfig } from "./config/cuotasConfig";
 
 const Home = () => {
   const { logout } = useAuth();
@@ -44,17 +45,18 @@ const Home = () => {
   // ColumnLayoutToggle removido - home siempre usa 1 columna en mobile
 
   const [catalogos] = useState([
-  { nombre: "Preferencial", url: "/preferencial" },
-    { nombre: "Contado", url: "/contado" },
     { nombre: "Preferencial", url: "/preferencial" },
+    { nombre: "Contado", url: "/contado" },
     { nombre: "3 Cuotas", url: "/catalogo3" },
     { nombre: "6 Cuotas", url: "/catalogo6" },
-    { nombre: "9 Cuotas", url: "/catalogo9" },
+    { nombre: "9 Cuotas", url: cuotasConfig["9"].route },
     { nombre: "10 Cuotas", url: "/catalogo10" },
     { nombre: "12 Cuotas", url: "/catalogo12" },
     { nombre: "14 Cuotas", url: "/catalogo14" },
-    { nombre: "15 Cuotas", url: "/catalogo15" },
-    { nombre: "18 Cuotas", url: "/catalogo18" }
+    { nombre: "15 Cuotas", url: cuotasConfig["15"].route },
+    { nombre: "18 Cuotas", url: cuotasConfig["18"].route },
+    { nombre: "20 Cuotas", url: cuotasConfig["20"].route },
+    { nombre: "24 Cuotas", url: cuotasConfig["24"].route },
   ]);
 
   const [selectedCatalog, setSelectedCatalog] = useState("");
