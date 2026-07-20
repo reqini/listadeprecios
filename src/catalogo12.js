@@ -8,6 +8,7 @@ import { Helmet } from "react-helmet";
 import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
 import ModernSearchBar from "./components/ModernSearchBar";
 import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
+import { useCart } from "./contexts/CartContext";
 import Navbar from "./components/Navbar";
 import LaunchProductsCarousel from "./components/LaunchProductsCarousel";
 // Switch y carrusel antiguo eliminados de catálogos comunes
@@ -29,7 +30,7 @@ const Catalogo12 = () => {
   // Detectar si estamos en una ruta dinámica (catálogo individual)
   const isIndividualCatalog = useIsIndividualCatalog();
   const { logout } = useAuth();
-  const [cart, setCart] = useState([]);
+  const { addItem, setCart } = useCart();
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
   const [productosOriginales, setProductosOriginales] = useState([]); // Productos originales sin filtrar
@@ -205,29 +206,7 @@ const Catalogo12 = () => {
       selectedCuotaLabel: product.selectedCuotaLabel || "12 cuotas sin interés",
     };
 
-    setCart((prevCart) => {
-      // Buscar si el producto ya existe en el carrito (por código)
-      const existingIndex = prevCart.findIndex(
-        (item) => item.codigo === product.codigo
-      );
-      
-      if (existingIndex >= 0) {
-        // Si existe, incrementar la cantidad
-        const updatedCart = [...prevCart];
-        updatedCart[existingIndex] = {
-          ...updatedCart[existingIndex],
-          cantidad: (updatedCart[existingIndex].cantidad || 1) + 1,
-          // Actualizar información de cuota si no tenía
-          selectedCuotaKey: updatedCart[existingIndex].selectedCuotaKey || productWithCuota.selectedCuotaKey,
-          selectedCuotaValue: updatedCart[existingIndex].selectedCuotaValue || productWithCuota.selectedCuotaValue,
-          selectedCuotaLabel: updatedCart[existingIndex].selectedCuotaLabel || productWithCuota.selectedCuotaLabel,
-        };
-        return updatedCart;
-      } else {
-        // Si no existe, agregarlo con cantidad 1 y información de cuota
-        return [...prevCart, { ...productWithCuota, cantidad: 1 }];
-      }
-    });
+    addItem(productWithCuota);
     // GA: agregar al carrito
     trackAddToCart("Catálogo 12", product);
   };
@@ -538,10 +517,8 @@ const Catalogo12 = () => {
       ))}
 
       {/* Carrito moderno con bottom sheet */}
-      <ModernCartBottomSheet 
-        cart={cart} 
-        setCart={setCart} 
-        cuotaKey="doce_sin_interes" 
+      <ModernCartBottomSheet
+        cuotaKey="doce_sin_interes"
         cuotasTexto="12 cuotas" 
       />
       </Container>

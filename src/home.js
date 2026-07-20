@@ -27,6 +27,7 @@ import {
 import { Link } from "react-router-dom";
 import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
 import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
+import { useCart } from "./contexts/CartContext";
 import Navbar from "./components/Navbar";
 import ResponsiveDialog from "./components/dialog";
 import { useAuth } from "./AuthContext";
@@ -78,7 +79,7 @@ const Home = () => {
   const [timeOfDay, setTimeOfDay] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [rango, setRango] = useState("");
-  const [cart, setCart] = useState([]);
+  const { addItem } = useCart();
   const [openDialog, setOpenDialog] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [bankLogos, setBankLogos] = useState([]); // Logos de bancos para Home
@@ -108,25 +109,7 @@ const Home = () => {
   };
 
   const onAddToCart = (product) => {
-    setCart((prevCart) => {
-      // Buscar si el producto ya existe en el carrito (por código)
-      const existingIndex = prevCart.findIndex(
-        (item) => item.codigo === product.codigo
-      );
-      
-      if (existingIndex >= 0) {
-        // Si existe, incrementar la cantidad
-        const updatedCart = [...prevCart];
-        updatedCart[existingIndex] = {
-          ...updatedCart[existingIndex],
-          cantidad: (updatedCart[existingIndex].cantidad || 1) + 1,
-        };
-        return updatedCart;
-      } else {
-        // Si no existe, agregarlo con cantidad 1
-        return [...prevCart, { ...product, cantidad: 1 }];
-      }
-    });
+    addItem(product);
   };
 
   // clearCart removido - no se usa actualmente
@@ -545,10 +528,8 @@ const Home = () => {
         )}
 
         {/* Carrito moderno con bottom sheet */}
-        <ModernCartBottomSheet 
-          cart={cart} 
-          setCart={setCart} 
-          cuotaKey="tres_sin_interes" 
+        <ModernCartBottomSheet
+          cuotaKey="tres_sin_interes"
           cuotasTexto="3 cuotas"
         />
         

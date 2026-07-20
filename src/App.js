@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import ReactGA from "react-ga4";
+import { buildAppTheme } from "./theme";
 
 // Páginas y componentes
 import Login from "./Login";
@@ -38,6 +39,7 @@ import ExpirationModal from "./components/subscription/ExpirationModal";
 import PWAInstallToast from "./components/PWAInstallToast";
 import { AuthProvider, useAuth } from "./AuthContext";
 import { AdminAuthProvider, useAdminAuth } from "./AdminAuthContext";
+import { CartProvider } from "./contexts/CartContext";
 import AdminLogin from "./pages/AdminLogin";
 import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
 import SnowfallHeader from "./components/christmas/SnowfallHeader";
@@ -151,16 +153,7 @@ const AnalyticsTracker = () => {
 };
 
 const AppContent = () => {
-  const theme = useMemo(() => {
-    const primary = localStorage.getItem("userPrimary") || "#666666";
-    const secondary = localStorage.getItem("userSecondary") || "#FFC43C";
-    return createTheme({
-      palette: {
-        primary: { main: primary },
-        secondary: { main: secondary },
-      },
-    });
-  }, []);
+  const theme = useMemo(() => buildAppTheme(), []);
 
   return (
     <ThemeProvider theme={theme}>
@@ -258,7 +251,9 @@ const App = () => {
   return (
     <AuthProvider>
       <AdminAuthProvider>
-        <AppContent />
+        <CartProvider>
+          <AppContent />
+        </CartProvider>
       </AdminAuthProvider>
     </AuthProvider>
   );

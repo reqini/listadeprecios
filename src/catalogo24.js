@@ -7,6 +7,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import { Helmet } from "react-helmet";
 import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
 import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
+import { useCart } from "./contexts/CartContext";
 import FeaturedProductsBanner from "./components/FeaturedProductsBanner";
 import { Snackbar, Alert, Typography, Box, Button } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -24,7 +25,7 @@ const Catalogo24 = () => {
   // Detectar si estamos en una ruta dinámica (catálogo individual)
   const isIndividualCatalog = useIsIndividualCatalog();
   const isMobile = useMediaQuery('(max-width:600px)');
-  const [cart, setCart] = useState([]);
+  const { addItem } = useCart();
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
   const [productosOriginales, setProductosOriginales] = useState([]);
@@ -226,25 +227,7 @@ const Catalogo24 = () => {
       selectedCuotaLabel: product.selectedCuotaLabel || "24 cuotas sin interés",
     };
 
-    setCart((prevCart) => {
-      const existingIndex = prevCart.findIndex(
-        (item) => item.codigo === product.codigo
-      );
-      
-      if (existingIndex >= 0) {
-        const updatedCart = [...prevCart];
-        updatedCart[existingIndex] = {
-          ...updatedCart[existingIndex],
-          cantidad: (updatedCart[existingIndex].cantidad || 1) + 1,
-          selectedCuotaKey: updatedCart[existingIndex].selectedCuotaKey || productWithCuota.selectedCuotaKey,
-          selectedCuotaValue: updatedCart[existingIndex].selectedCuotaValue || productWithCuota.selectedCuotaValue,
-          selectedCuotaLabel: updatedCart[existingIndex].selectedCuotaLabel || productWithCuota.selectedCuotaLabel,
-        };
-        return updatedCart;
-      } else {
-        return [...prevCart, { ...productWithCuota, cantidad: 1 }];
-      }
-    });
+    addItem(productWithCuota);
     trackAddToCart("Catálogo 24", product);
   };
 
@@ -585,8 +568,6 @@ const Catalogo24 = () => {
 
       {/* Carrito moderno */}
       <ModernCartBottomSheet 
-        cart={cart} 
-        setCart={setCart} 
         cuotaKey="veinticuatro_sin_interes" 
         cuotasTexto="24 cuotas" 
       />

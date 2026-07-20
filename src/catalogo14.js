@@ -7,10 +7,11 @@ import { Helmet } from "react-helmet";
 import ProductsCalatogo from "./components/productsCalatogo";
 import logo from "./assets/logo.png";
 import { Snackbar, Alert, Typography } from "@mui/material";
-import ShoppingCartCatalogo from "./components/ShoppingCartCatalogo";
+import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
+import { useCart } from "./contexts/CartContext";
 
 const Catalogo14 = () => {
-  const [cart, setCart] = useState([]);
+  const { addItem } = useCart();
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
   const [filtro] = useState("");
@@ -108,7 +109,7 @@ const Catalogo14 = () => {
 
   // Añadir producto al carrito
   const addToCart = (product) => {
-    setCart([...cart, product]);
+    addItem(product);
   };
 
   // Manejar favoritos
@@ -229,7 +230,7 @@ const Catalogo14 = () => {
           </ul>
         </div>
       ))}
-      <ShoppingCartCatalogo cart={cart} setCart={setCart} cuotaKey="catorce_sin_interes" cuotasTexto="14 cuotas" />
+      <ModernCartBottomSheet cuotaKey="catorce_sin_interes" cuotasTexto="14 cuotas" />
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}

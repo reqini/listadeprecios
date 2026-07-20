@@ -15,6 +15,7 @@ import { Helmet } from "react-helmet";
 import EntregaYaCard from "../components/EntregaYaCard";
 import ModernSearchBar from "../components/ModernSearchBar";
 import ModernCartBottomSheet from "../components/ModernCartBottomSheet";
+import { useCart } from "../contexts/CartContext";
 import { getEntregaYaProducts } from "../utils/entregaYaAPI";
 import { filterAllProducts } from "../utils/filterProducts";
 import { trackCatalogView, trackAddToCart, trackToggleFavorite } from "../utils/analytics";
@@ -33,7 +34,7 @@ import ColumnLayoutToggle from "../components/ColumnLayoutToggle";
 const Entregaya = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const [cart, setCart] = useState([]);
+  const { setCart } = useCart();
   
   // Hook para manejar el layout de columnas en mobile
   const { mobileColumns, toggleColumns } = useColumnLayout('entregaya', 2);
@@ -491,7 +492,7 @@ const Entregaya = () => {
       </Container>
 
       {/* Carrito */}
-      <ModernCartBottomSheet cart={cart} setCart={setCart} />
+      <ModernCartBottomSheet />
 
       {/* Snackbar */}
       <Snackbar

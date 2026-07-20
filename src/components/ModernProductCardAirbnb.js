@@ -941,32 +941,39 @@ const ModernProductCardAirbnb = ({
             </Button>
 
             <Box sx={{ display: 'flex', gap: isCompactMode ? 1 : 1.5, alignItems: 'stretch' }}>
+              {/*
+                Acción secundaria a propósito: "Consultar" evita el carrito
+                para pedidos de 1 solo producto. Se distingue en jerarquía
+                de "Agregar al carrito" (contained, acción primaria) usando
+                outlined + menor peso visual, en vez de verse como un botón
+                equivalente.
+              */}
               <Button
                 fullWidth
-                variant="contained"
+                variant="outlined"
                 href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
                   `¡Quiero este Producto :)!\nProducto: ${product.descripcion}`
                 )}`}
                 target="_blank"
-                startIcon={!isCompactMode ? <FaWhatsapp style={{ fontSize: '1rem' }} /> : null}
+                startIcon={!isCompactMode ? <FaWhatsapp style={{ fontSize: '0.9rem' }} /> : null}
                 sx={{
-                  backgroundColor: '#25D366',
-                  color: '#FFFFFF',
-                  padding: isCompactMode ? '8px 10px' : { xs: '12px 16px', sm: '14px 20px' },
-                  fontSize: isCompactMode ? '0.75rem' : { xs: '0.9375rem', sm: '1rem' },
+                  borderColor: '#25D366',
+                  color: '#1da851',
+                  backgroundColor: 'transparent',
+                  padding: isCompactMode ? '8px 10px' : { xs: '10px 16px', sm: '12px 20px' },
+                  fontSize: isCompactMode ? '0.75rem' : { xs: '0.8125rem', sm: '0.875rem' },
                   fontWeight: 600,
                   textTransform: 'none',
                   borderRadius: 2,
-                  minHeight: isCompactMode ? '36px' : { xs: '44px', sm: '48px' },
-                  boxShadow: '0 2px 8px rgba(37, 211, 102, 0.3)',
+                  minHeight: isCompactMode ? '36px' : { xs: '40px', sm: '44px' },
                   '&:hover': {
-                    backgroundColor: '#1da851',
-                    boxShadow: '0 4px 12px rgba(37, 211, 102, 0.4)',
+                    backgroundColor: 'rgba(37, 211, 102, 0.08)',
+                    borderColor: '#1da851',
                   },
-                  transition: 'all 0.3s ease',
+                  transition: 'all 0.2s ease',
                 }}
               >
-                {isCompactMode ? 'Consultar' : 'WhatsApp'}
+                {isCompactMode ? 'Consultar' : 'Consultar por WhatsApp'}
               </Button>
 
               {product.ficha_tecnica && (

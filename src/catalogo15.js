@@ -7,6 +7,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import { Helmet } from "react-helmet";
 import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
 import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
+import { useCart } from "./contexts/CartContext";
 import FeaturedProductsBanner from "./components/FeaturedProductsBanner";
 import { Snackbar, Alert, Typography, Box, Button } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -23,7 +24,7 @@ import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
 const Catalogo15 = () => {
   const isIndividualCatalog = useIsIndividualCatalog();
   const isMobile = useMediaQuery('(max-width:600px)');
-  const [cart, setCart] = useState([]);
+  const { addItem } = useCart();
   const [loading, setLoading] = useState(true);
   const [productos, setProductos] = useState([]);
   const [productosOriginales, setProductosOriginales] = useState([]);
@@ -214,25 +215,7 @@ const Catalogo15 = () => {
       selectedCuotaLabel: product.selectedCuotaLabel || "15 cuotas sin interés",
     };
 
-    setCart((prevCart) => {
-      const existingIndex = prevCart.findIndex(
-        (item) => item.codigo === product.codigo
-      );
-      
-      if (existingIndex >= 0) {
-        const updatedCart = [...prevCart];
-        updatedCart[existingIndex] = {
-          ...updatedCart[existingIndex],
-          cantidad: (updatedCart[existingIndex].cantidad || 1) + 1,
-          selectedCuotaKey: updatedCart[existingIndex].selectedCuotaKey || productWithCuota.selectedCuotaKey,
-          selectedCuotaValue: updatedCart[existingIndex].selectedCuotaValue || productWithCuota.selectedCuotaValue,
-          selectedCuotaLabel: updatedCart[existingIndex].selectedCuotaLabel || productWithCuota.selectedCuotaLabel,
-        };
-        return updatedCart;
-      } else {
-        return [...prevCart, { ...productWithCuota, cantidad: 1 }];
-      }
-    });
+    addItem(productWithCuota);
     trackAddToCart("Catálogo 15", product);
   };
 
@@ -565,8 +548,6 @@ const Catalogo15 = () => {
       ))}
 
       <ModernCartBottomSheet 
-        cart={cart} 
-        setCart={setCart} 
         cuotaKey="quince_sin_interes" 
         cuotasTexto="15 cuotas" 
       />

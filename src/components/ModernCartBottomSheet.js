@@ -13,22 +13,24 @@ import { FaWhatsapp, FaTrashAlt } from "react-icons/fa";
 import { Close as CloseIcon, Add as AddIcon, Remove as RemoveIcon } from "@mui/icons-material";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { formatPrice, parsePrice } from "../utils/priceUtils";
-import { calculateCartTotalWithDiscounts } from "../utils/rouletteHelpers";
+import { useCart } from "../contexts/CartContext";
+import ConfirmDialog from "./ui/ConfirmDialog";
 
 /**
  * Carrito moderno con bottom sheet en mobile
- * Mantiene TODA la lógica del carrito original
+ * Estado del carrito vive en CartContext (persistido en localStorage),
+ * no en la página que renderiza este componente.
  */
 const ModernCartBottomSheet = ({
-  cart,
-  setCart,
   cuotaKey = "tres_sin_interes",
   cuotasTexto = "3 cuotas",
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { cart, removeItem, updateQuantity, clearCart, total } = useCart();
   const [open, setOpen] = useState(false);
   const [userClosedManually, setUserClosedManually] = useState(false);
+  const [confirmClearOpen, setConfirmClearOpen] = useState(false);
 
   const getCuotaSeleccionada = (product) => {
     // Si el producto tiene una cuota seleccionada desde Home (selectedCuotaValue), usarla
@@ -114,39 +116,10 @@ const ModernCartBottomSheet = ({
     return cuotasTexto || 'Cuotas disponibles';
   };
 
-  const calcularTotal = () => {
-    // Usar la función helper que aplica descuentos
-    return calculateCartTotalWithDiscounts(cart);
-  };
-
-  const total = calcularTotal();
-
-  const limpiarCarrito = () => {
-    setCart([]);
+  const confirmarLimpiarCarrito = () => {
+    clearCart();
+    setConfirmClearOpen(false);
     // El carrito se cerrará automáticamente por el useEffect cuando cart.length === 0
-  };
-
-  const eliminarItem = (codigo) => {
-    setCart((prev) => {
-      const nuevoCart = prev.filter((item) => item.codigo !== codigo);
-      // Si queda vacío, el useEffect se encargará de cerrarlo
-      return nuevoCart;
-    });
-  };
-
-  const actualizarCantidad = (codigo, nuevaCantidad) => {
-    if (nuevaCantidad <= 0) {
-      eliminarItem(codigo);
-      return;
-    }
-    
-    setCart((prev) =>
-      prev.map((item) =>
-        item.codigo === codigo
-          ? { ...item, cantidad: nuevaCantidad }
-          : item
-      )
-    );
   };
 
   // Función para cerrar el carrito
@@ -554,7 +527,7 @@ const ModernCartBottomSheet = ({
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, border: '1px solid rgba(0,0,0,0.12)', borderRadius: 1 }}>
                       <IconButton
                         size="small"
-                        onClick={() => actualizarCantidad(item.codigo, (item.cantidad || 1) - 1)}
+                        onClick={() => updateQuantity(item.codigo, (item.cantidad || 1) - 1)}
                         sx={{
                           padding: '4px',
                           color: '#717171',
@@ -562,6 +535,7 @@ const ModernCartBottomSheet = ({
                             backgroundColor: 'rgba(0,0,0,0.05)',
                           },
                         }}
+                        aria-label={`Restar unidad de ${item.descripcion}`}
                       >
                         <RemoveIcon fontSize="small" />
                       </IconButton>
@@ -578,7 +552,7 @@ const ModernCartBottomSheet = ({
                       </Typography>
                       <IconButton
                         size="small"
-                        onClick={() => actualizarCantidad(item.codigo, (item.cantidad || 1) + 1)}
+                        onClick={() => updateQuantity(item.codigo, (item.cantidad || 1) + 1)}
                         sx={{
                           padding: '4px',
                           color: '#717171',
@@ -586,15 +560,16 @@ const ModernCartBottomSheet = ({
                             backgroundColor: 'rgba(0,0,0,0.05)',
                           },
                         }}
+                        aria-label={`Sumar unidad de ${item.descripcion}`}
                       >
                         <AddIcon fontSize="small" />
                       </IconButton>
                     </Box>
-                    
+
                     {/* Botón eliminar */}
                     <IconButton
                       size="small"
-                      onClick={() => eliminarItem(item.codigo)}
+                      onClick={() => removeItem(item.codigo)}
                       sx={{
                         color: '#717171',
                         padding: '4px',
@@ -604,6 +579,7 @@ const ModernCartBottomSheet = ({
                         },
                       }}
                       title="Eliminar producto"
+                      aria-label={`Eliminar ${item.descripcion} del carrito`}
                     >
                       <FaTrashAlt size={14} />
                     </IconButton>
@@ -734,7 +710,7 @@ const ModernCartBottomSheet = ({
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={limpiarCarrito}
+                onClick={() => setConfirmClearOpen(true)}
                 sx={{
                   borderColor: '#d0d0d0',
                   color: '#717171',
@@ -758,6 +734,15 @@ const ModernCartBottomSheet = ({
         )}
       </Box>
     </Drawer>
+
+    <ConfirmDialog
+      open={confirmClearOpen}
+      title="Limpiar carrito"
+      message="Se van a quitar todos los productos de tu selección. Esta acción no se puede deshacer."
+      confirmLabel="Limpiar carrito"
+      onConfirm={confirmarLimpiarCarrito}
+      onCancel={() => setConfirmClearOpen(false)}
+    />
     </>
   );
 };
