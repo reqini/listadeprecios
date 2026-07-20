@@ -123,12 +123,12 @@ const handleSubmit = async (e) => {
       // Redirigir a la pantalla de activar suscripción (OBLIGATORIO)
       navigate('/suscripcion/activar');
     } else {
-      setCodigoError(response.data.message || 'Hubo un problema durante el registro.');
+      setError(response.data.message || 'Hubo un problema durante el registro.');
     }
 
   } catch (error) {
     console.error('Error durante el registro:', error.response?.data?.message || error.message);
-    setCodigoError(error.response?.data?.message || 'Hubo un problema al registrarse. Intenta de nuevo.');
+    setError(error.response?.data?.message || 'Hubo un problema al registrarse. Intenta de nuevo.');
   } finally {
     setLoading(false);
   }
