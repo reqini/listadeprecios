@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Box, Paper, TextField, Button, Typography, Alert } from "@mui/material";
+import { Box, Container, Paper, TextField, Button, Typography, Alert } from "@mui/material";
 import { useAdminAuth } from "../AdminAuthContext";
+import logo from "../assets/logo.png";
 
 const AdminLogin = () => {
   const { loginAdmin } = useAdminAuth();
@@ -35,51 +36,48 @@ const AdminLogin = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        bgcolor: "#f5f5f5",
+        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
         px: 2,
+        py: 6,
       }}
     >
-      <Paper elevation={3} sx={{ p: 4, width: "100%", maxWidth: 360 }}>
-        <Typography variant="h5" gutterBottom align="center">
-          Acceso administrador
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="Email"
-            type="email"
-            fullWidth
-            margin="normal"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="username"
-            required
-          />
-          <TextField
-            label="Contraseña"
-            type="password"
-            fullWidth
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-            required
-          />
-          {error && (
-            <Alert severity="error" sx={{ mt: 2 }}>
-              {error}
-            </Alert>
-          )}
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            sx={{ mt: 3 }}
-            disabled={submitting}
-          >
-            {submitting ? "Ingresando..." : "Ingresar"}
-          </Button>
-        </form>
-      </Paper>
+      <Container maxWidth="xs" disableGutters>
+        <Box sx={{ textAlign: "center", mb: 3 }}>
+          <img src={logo} alt="logo" height="88" />
+          <Typography variant="h6" sx={{ mt: 1.5, color: "text.secondary" }}>
+            Acceso administrador
+          </Typography>
+        </Box>
+
+        <Paper sx={{ p: 4 }}>
+          <form onSubmit={handleSubmit}>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+              <TextField
+                label="Email"
+                type="email"
+                fullWidth
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="username"
+                required
+              />
+              <TextField
+                label="Contraseña"
+                type="password"
+                fullWidth
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
+              {error && <Alert severity="error">{error}</Alert>}
+              <Button type="submit" variant="contained" fullWidth size="large" disabled={submitting}>
+                {submitting ? "Ingresando..." : "Ingresar"}
+              </Button>
+            </Box>
+          </form>
+        </Paper>
+      </Container>
     </Box>
   );
 };

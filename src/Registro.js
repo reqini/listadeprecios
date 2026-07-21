@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
@@ -12,9 +11,11 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Alert from '@mui/material/Alert';
 import axios from "./utils/axios";
 import { Typography } from '@mui/material';
-import Image from './assets/background.jpg';
+import logo from './assets/logo.png';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -137,55 +138,43 @@ const handleSubmit = async (e) => {
 
 
   return (
-    <div
-      className="full-width background-image"
-      style={{ 
-        backgroundImage: `url(${Image})`,
-        backgroundAttachment: 'fixed',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        minHeight: '100vh'
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        px: 2,
+        py: 6,
       }}
     >
-      <Container
-        className="flex justify-center items-center flex-direction"
-        maxWidth="sm"
-        style={{ paddingTop: 100 }}
-      >
-        <Typography
-          className="title-registro"
-          textAlign="center"
-          variant="h5"
-          marginBottom="20px"
-        >
-          Registro de usuarios nuevos
-        </Typography>
+      <Container maxWidth="xs" disableGutters>
+        <Box sx={{ textAlign: 'center', mb: 3 }}>
+          <img src={logo} alt="logo" height="88" />
+          <Typography variant="h6" sx={{ mt: 1.5, color: 'text.secondary' }}>
+            Registro de usuarios nuevos
+          </Typography>
+        </Box>
 
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={0} className="card">
-            <Grid item xs={12} style={{ margin: '10px 0' }}>
+        <Paper sx={{ p: 4 }}>
+          <form onSubmit={handleSubmit}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
               <TextField
                 required
                 fullWidth
-                style={{ color: 'black', backgroundColor: 'white' }}
                 id="filled-required-name"
                 label="Crear usuario"
                 value={username}
-                variant="filled"
                 onChange={handleChangeUsername}
               />
-            </Grid>
-            <Grid item xs={12} style={{ margin: '10px 0' }}>
               <TextField
                 required
                 fullWidth
                 type={showPassword ? 'text' : 'password'}
-                style={{ color: 'black', backgroundColor: 'white' }}
                 id="filled-required-password"
                 label="Crear contraseña"
                 value={password}
-                variant="filled"
                 onChange={(e) => setPassword(e.target.value)}
                 InputProps={{
                   endAdornment: (
@@ -193,29 +182,19 @@ const handleSubmit = async (e) => {
                       aria-label="toggle password visibility"
                       onClick={handleClickShowPassword}
                       edge="end"
-                      style={{
-                        position: 'absolute',
-                        right: 15,
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                      }}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   ),
                 }}
               />
-            </Grid>
-            <Grid item xs={12} style={{ margin: '10px 0' }}>
               <TextField
                 required
                 fullWidth
                 type={showConfirmPassword ? 'text' : 'password'}
-                style={{ color: 'black', backgroundColor: 'white' }}
                 id="filled-required-confirm-password"
                 label="Confirmar contraseña"
                 value={confirmPassword}
-                variant="filled"
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 InputProps={{
                   endAdornment: (
@@ -223,29 +202,18 @@ const handleSubmit = async (e) => {
                       aria-label="toggle confirm password visibility"
                       onClick={handleClickShowConfirmPassword}
                       edge="end"
-                      style={{
-                        position: 'absolute',
-                        right: 15,
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                      }}
                     >
                       {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   ),
                 }}
               />
-            </Grid>
-            <Grid item xs={12} style={{ margin: '10px 0' }}>
-              <FormControl
-                fullWidth
-                variant="filled"
-                style={{ backgroundColor: 'white' }}
-              >
+              <FormControl fullWidth>
                 <InputLabel id="rango-label">Selecciona un rango</InputLabel>
                 <Select
                   labelId="rango-label"
                   id="rango"
+                  label="Selecciona un rango"
                   value={rango}
                   onChange={(e) => setRango(e.target.value)}
                   required
@@ -257,85 +225,45 @@ const handleSubmit = async (e) => {
                   ))}
                 </Select>
               </FormControl>
-            </Grid>
-            <Grid item xs={12} style={{ margin: '10px 0' }}>
               <TextField
                 required
                 fullWidth
-                style={{ color: 'black', backgroundColor: 'white' }}
                 id="filled-required-codigo-emprendedora"
                 label="Código de Emprendedora"
                 value={codigoEmprendedora}
-                variant="filled"
                 onChange={handleCodigoChange}
                 error={!!codigoError}
                 helperText={codigoError}
               />
-            </Grid>
-            {/* <Grid item xs={12} style={{ margin: '10px 0' }}>
-              <FormControl fullWidth variant="filled" style={{ backgroundColor: 'white' }}>
-                <InputLabel id="tipo-usuario-label">Tipo de usuario</InputLabel>
-                <Select
-                  labelId="tipo-usuario-label"
-                  id="tipo_usuario"
-                  value={tipoUsuario}
-                  onChange={(e) => setTipoUsuario(e.target.value)}
-                  required
-                >
-                  <MenuItem value="limitado">Gratis (solo lista de precios)</MenuItem>
-                  <MenuItem value="full">Usuario full (con todas las herramientas)</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid> */}
 
-            {error && (
-              <Grid
-                item
-                xs={12}
-                style={{
-                  margin: '10px 0',
-                  color: 'red',
-                  textAlign: 'center',
-                }}
-              >
-                {error}
-              </Grid>
-            )}
-            <Grid item xs={12} style={{ margin: '10px 0' }}>
+              {error && <Alert severity="error">{error}</Alert>}
+
               <Button
                 fullWidth
                 type="submit"
                 variant="contained"
                 size="large"
                 disabled={!isFormValid || loading}
-                color="primary"
               >
-                {loading 
-                  ? 'Procesando...' 
+                {loading
+                  ? 'Procesando...'
                   : 'Registrarse y Activar Suscripción Mensual'
                 }
               </Button>
-              <Box sx={{ mt: 2, textAlign: 'center' }}>
-                <Typography variant="body2" color="text.secondary">
-                  Después del registro, serás redirigido a Mercado Pago para activar tu suscripción mensual de $10.000
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
-        </form>
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+                Después del registro, serás redirigido a Mercado Pago para activar tu suscripción mensual de $10.000
+              </Typography>
+            </Box>
+          </form>
+        </Paper>
 
-        {/* Botones de navegación */}
         <Box
           sx={{
             display: 'flex',
             gap: 2,
             justifyContent: 'center',
-            alignItems: 'center',
             mt: 3,
             flexDirection: { xs: 'column', sm: 'row' },
-            width: '100%',
-            maxWidth: 600,
-            mx: 'auto'
           }}
         >
           <Button
@@ -343,17 +271,6 @@ const handleSubmit = async (e) => {
             size="large"
             fullWidth
             onClick={() => navigate('/')}
-            sx={{
-              py: 1.5,
-              fontWeight: 'bold',
-              borderRadius: 2,
-              borderColor: 'primary.main',
-              color: 'primary.main',
-              '&:hover': {
-                borderColor: 'primary.dark',
-                backgroundColor: 'rgba(0, 0, 0, 0.04)'
-              }
-            }}
           >
             Volver a Home
           </Button>
@@ -362,24 +279,12 @@ const handleSubmit = async (e) => {
             size="large"
             fullWidth
             onClick={() => navigate('/login')}
-            sx={{
-              py: 1.5,
-              fontWeight: 'bold',
-              borderRadius: 2,
-              borderColor: 'secondary.main',
-              color: 'secondary.main',
-              '&:hover': {
-                borderColor: 'secondary.dark',
-                backgroundColor: 'rgba(0, 0, 0, 0.04)'
-              }
-            }}
           >
             Ir al Login
           </Button>
         </Box>
       </Container>
-
-    </div>
+    </Box>
   );
 };
 

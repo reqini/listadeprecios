@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import logo from "./assets/logo.png";
@@ -148,18 +149,36 @@ const Login = () => {
 
 
   return (
-    <div className="full-width" style={{ backgroundColor: "#FFEDC4" }}>
-      <Container className="flex justify-center items-center flex-direction" maxWidth="sm" style={{ paddingTop: 80 }}>
-        <img src={logo} alt="logo" height="100" className="mar-b10" />
-        <div style={{ textAlign: 'center', marginBottom: 20 }}>
-          <Typography variant="h6">{frases[slideIndex].icon} {frases[slideIndex].text}</Typography>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={0} className="card">
-            <Grid item xs={12} style={{ margin: "10px 0" }}>
-              <TextField required fullWidth id="filled-required-name" label={"Usuario"} value={username} variant="filled" onChange={handleChangeUsername} style={{ backgroundColor: "white" }} />
-            </Grid>
-            <Grid item xs={12} style={{ margin: "10px 0" }}>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+        px: 2,
+        py: 6,
+      }}
+    >
+      <Container maxWidth="xs" disableGutters>
+        <Box sx={{ textAlign: "center", mb: 3 }}>
+          <img src={logo} alt="logo" height="88" />
+          <Typography variant="h6" sx={{ mt: 1.5, color: "text.secondary" }}>
+            {frases[slideIndex].icon} {frases[slideIndex].text}
+          </Typography>
+        </Box>
+
+        <Paper sx={{ p: 4 }}>
+          <form onSubmit={handleSubmit}>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+              <TextField
+                required
+                fullWidth
+                id="filled-required-name"
+                label="Usuario"
+                value={username}
+                onChange={handleChangeUsername}
+              />
               <TextField
                 required
                 fullWidth
@@ -167,33 +186,21 @@ const Login = () => {
                 id="filled-required-code"
                 label="Contraseña"
                 value={password}
-                variant="filled"
                 onChange={(e) => setPassword(e.target.value)}
-                style={{ backgroundColor: "white" }}
                 InputProps={{
                   endAdornment: (
                     <IconButton onClick={handleClickShowPassword} edge="end">
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
-                  )
+                  ),
                 }}
               />
-            </Grid>
-            <Grid item xs={12} style={{ margin: "10px 0" }}>
               <Button fullWidth type="submit" variant="contained" size="large" disabled={loading}>
                 {loading ? "Cargando..." : "Entrar"}
               </Button>
-            </Grid>
-            <Grid item xs={12} style={{ margin: "10px 0", textAlign: 'center' }}>
-              {/* <Typography fontSize={16} variant="body2">
-                ¿No sos parte aún? <a href="/registro" style={{ color: 'black', fontWeight: 'bold' }}>Registrate</a>
-              </Typography> */}
-              {/* <Typography fontSize={14} variant="body2">
-                o charlemos por <a href="https://wa.me/5491151347453" rel="noopener" style={{ color: 'black' }}>Whatsapp</a>
-              </Typography> */}
-            </Grid>
-          </Grid>
-        </form>
+            </Box>
+          </form>
+        </Paper>
       </Container>
 
       <Dialog open={showModal} onClose={() => setShowModal(false)}>
@@ -216,7 +223,7 @@ const Login = () => {
           ¡Gracias por suscribirte! Ya podés iniciar sesión.
         </MuiAlert>
       </Snackbar>
-    </div>
+    </Box>
   );
 };
 
