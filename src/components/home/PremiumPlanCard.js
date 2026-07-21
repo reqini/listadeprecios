@@ -105,7 +105,7 @@ const PremiumPlanCard = () => {
             Plan Emprendedoras Premium
           </Typography>
 
-          {/* Banner 60 días gratis */}
+          {/* Banner 30 días gratis */}
           <Box
             sx={{
               display: 'flex',
@@ -114,7 +114,7 @@ const PremiumPlanCard = () => {
             }}
           >
             <Chip
-              label="¡60 días GRATIS de prueba!"
+              label="¡30 días GRATIS de prueba!"
               sx={{
                 background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
                 color: 'white',
@@ -213,7 +213,7 @@ const PremiumPlanCard = () => {
               },
             }}
           >
-            {loading ? 'Redirigiendo...' : 'Probar gratis 60 días'}
+            {loading ? 'Redirigiendo...' : 'Probar gratis 30 días'}
           </Button>
 
           {/* Texto informativo */}

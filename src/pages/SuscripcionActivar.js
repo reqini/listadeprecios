@@ -63,7 +63,7 @@ const SuscripcionActivar = () => {
           </Typography>
         </Box>
 
-        {/* Cartel 60 días gratis */}
+        {/* Cartel 30 días gratis */}
         <Box
           className="free-trial-banner"
           sx={{
@@ -76,14 +76,14 @@ const SuscripcionActivar = () => {
             color: '#2e7d32',
           }}
         >
-          🎁 <strong>60 días gratis de prueba</strong> – Usá todas las funciones sin límites durante tu período de prueba.
+          🎁 <strong>30 días gratis de prueba</strong> – Usá todas las funciones sin límites. No se te cobra nada hasta que termine el período de prueba.
         </Box>
 
         <Divider sx={{ my: 4 }} />
 
         <Alert severity="info" sx={{ mb: 4 }}>
           <Typography variant="body2">
-            <strong>Importante:</strong> La suscripción es mensual y se renovará automáticamente. Podés cancelarla en cualquier momento desde Mercado Pago.
+            <strong>Importante:</strong> Después de los 30 días de prueba gratuita, la suscripción se renueva automáticamente por ${SUBSCRIPTION_CONFIG.AMOUNT.toLocaleString('es-AR')}/mes. Podés cancelarla en cualquier momento desde Mercado Pago, incluso antes de que termine la prueba, sin que se te cobre nada.
           </Typography>
         </Alert>
 
@@ -135,7 +135,7 @@ const SuscripcionActivar = () => {
         </Button>
 
         <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 3 }}>
-          Al hacer clic, serás redirigido a Mercado Pago para completar el pago de forma segura
+          Al hacer clic, serás redirigido a Mercado Pago para activar tu prueba gratuita de 30 días de forma segura. No se te cobra nada en este paso.
         </Typography>
       </Paper>
     </Container>

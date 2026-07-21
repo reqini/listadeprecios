@@ -294,7 +294,7 @@ const LandingPage = () => {
                   }
                 }}
               >
-                Probar GRATIS por 60 días
+                Probar GRATIS por 30 días
               </Button>
               <Button 
                 variant="outlined" 
