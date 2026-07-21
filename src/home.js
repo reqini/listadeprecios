@@ -19,9 +19,6 @@ import {
   FormControl,
   Select,
   MenuItem,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Box
 } from "@mui/material";
 import { Link } from "react-router-dom";
@@ -29,10 +26,7 @@ import ModernProductCardAirbnb from "./components/ModernProductCardAirbnb";
 import ModernCartBottomSheet from "./components/ModernCartBottomSheet";
 import { useCart } from "./contexts/CartContext";
 import Navbar from "./components/Navbar";
-import ResponsiveDialog from "./components/dialog";
 import { useAuth } from "./AuthContext";
-import ReviewSlider from "./components/ReviewSlider";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 // ColumnLayoutToggle removido de home - siempre 1 columna en mobile
 import { IS_CHRISTMAS_MODE } from "./config/christmasConfig";
 import { cuotasConfig } from "./config/cuotasConfig";
@@ -82,7 +76,6 @@ const Home = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [rango, setRango] = useState("");
   const { addItem } = useCart();
-  const [openDialog, setOpenDialog] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [bankLogos, setBankLogos] = useState([]); // Logos de bancos para Home
 
@@ -282,11 +275,6 @@ const Home = () => {
     setSnackbarOpen(false);
   };
 
-  // Cerrar modal
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
-
   // Renderizar banner según rango
   const getBannerForRango = () => {
     const rangosGrupo1 = [
@@ -311,13 +299,14 @@ const Home = () => {
     if (!rango || rango.trim() === "" || rangosGrupo1.includes(rango)) {
       return (
         <Link to="/generarPlaca" style={{ textDecoration: "none" }}>
-          <div className="banner card-product mar-b30" style={{ cursor: "pointer" }}>
-            <img
+          <Box className="banner card-product mar-b30" sx={{ cursor: "pointer" }}>
+            <Box
+              component="img"
               src={windowWidth <= 460 ? extras[0]?.banner_mobile : extras[0]?.banner}
               alt="Banner Grupo 1"
-              style={{ width: "100%" }}
+              sx={{ width: "100%" }}
             />
-          </div>
+          </Box>
         </Link>
       );
     } 
@@ -371,26 +360,16 @@ const Home = () => {
 
         {getBannerForRango()}
 
-          <Accordion sx={{ marginBottom: 2, display: 'none' }}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="subtitle1" fontWeight={600}>
-                Desplegar Reseñas
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails sx={{ background: '#e9e9e9' }}>
-              <ReviewSlider />
-            </AccordionDetails>
-          </Accordion>
           <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100">
             {IS_CHRISTMAS_MODE && (
-              <Typography style={{maxWidth: 350, marginTop: 8}} textAlign={'center'} variant="body2" color="text.secondary">
+              <Typography sx={{ maxWidth: 350, mt: 1 }} textAlign={'center'} variant="body2" color="text.secondary">
                 Por este medio podes generar la url y enviar el catálogo que tu cliente quiera
               </Typography>
             )}
           </div>
 
         {/* Sección de catálogos - Acceso libre para todos los usuarios */}
-        <div className="flex flex-direction-mobile align-center justify-center mar-b20 w-100" style={{ gap: 12 }}>
+        <Box className="flex flex-direction-mobile align-center justify-center mar-b20 w-100" sx={{ gap: 1.5 }}>
           <FormControl size="small" sx={{ minWidth: 200, width: '100%', maxWidth: 400, background: 'white' }}>
             <InputLabel>Seleccioná un catálogo</InputLabel>
             <Select
@@ -418,7 +397,7 @@ const Home = () => {
           >
             Copiar URL
           </Button>
-        </div>
+        </Box>
 
         {/* Grid responsive estilo Airbnb - Moderno */}
         {loading ? (
@@ -534,21 +513,18 @@ const Home = () => {
           cuotaKey="tres_sin_interes"
           cuotasTexto="3 cuotas"
         />
-        
-        {/* Modal de promociones bancarias */}
-        <ResponsiveDialog open={openDialog} onClose={handleCloseDialog} style={{display: 'none'}} />
 
         <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose}>
           <Alert onClose={handleSnackbarClose} severity="success">
             Producto agregado al carrito
           </Alert>
         </Snackbar>
-        <section style={{ fontSize: '0.9rem', color: '#666', padding: '2rem 0', width: '100%' }}>
-          <p>
-            Catálogo Simple es una herramienta pensada para <strong>emprendedoras Essen</strong> que buscan simplificar su trabajo. Accedé gratis a la <strong>lista de precios Essen actualizada</strong>, catálogos visuales con cuotas y mucho más. 
+        <Box component="section" sx={{ py: 4, width: '100%' }}>
+          <Typography variant="body2" color="text.secondary">
+            Catálogo Simple es una herramienta pensada para <strong>emprendedoras Essen</strong> que buscan simplificar su trabajo. Accedé gratis a la <strong>lista de precios Essen actualizada</strong>, catálogos visuales con cuotas y mucho más.
             Ideal para quienes venden Essen en Argentina y quieren tener todo en un solo lugar.
-          </p>
-          <Typography fontSize={13} margin={'6px 0 12px 0'} style={{textAlign: 'center'}}>
+          </Typography>
+          <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', my: 1.5 }}>
             <b>Desarrollado por:</b><br></br>
             <b>
               <a href="https://www.instagram.com/cocinatyy" rel="noreferrer">@Cocinatyy </a>
@@ -558,7 +534,7 @@ const Home = () => {
               <a href="https://www.instagram.com/lrecchini/" rel="noreferrer"> Luciano Recchini</a>
             </b>
           </Typography>
-        </section>
+        </Box>
         <Dialog
           open={openThemeDialog}
           onClose={() => setOpenThemeDialog(false)}

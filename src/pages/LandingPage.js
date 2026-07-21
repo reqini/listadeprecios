@@ -12,12 +12,6 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-  // Paper, // No utilizado por ahora
-  Chip,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Divider,
   Avatar,
   Fab,
@@ -34,23 +28,10 @@ import {
 import {
   Menu as MenuIcon,
   Close as CloseIcon,
-  Check as CheckIcon,
-  Star as StarIcon,
-  TrendingUp as TrendingUpIcon,
-  People as PeopleIcon,
   ShoppingCart as ShoppingCartIcon,
-  Palette as PaletteIcon,
   WhatsApp as WhatsAppIcon,
   Instagram as InstagramIcon,
-  // Download as DownloadIcon, // No utilizado por ahora
   GetApp as GetAppIcon,
-  // Security as SecurityIcon, // No utilizado por ahora
-  // Speed as SpeedIcon, // No utilizado por ahora
-  // Support as SupportIcon, // No utilizado por ahora
-  Business as BusinessIcon,
-  Phone as PhoneIcon,
-  Email as EmailIcon,
-  LocationOn as LocationIcon
 } from '@mui/icons-material';
 import logo from '../assets/logo.png';
 import ModernReviewCarousel from '../components/ModernReviewCarousel';
