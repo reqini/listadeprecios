@@ -92,6 +92,23 @@ nombre de la opción, ej. "las 2"), el bot responde con el texto de esa opción 
 no elige nada en 10 minutos, el menú queda sin efecto y el próximo mensaje se procesa normal.
 Esto mismo se puede usar en las reglas de FAQ de grupos (más abajo).
 
+Además del texto numerado, el bot intenta mandar las primeras 3 opciones como **botones
+tocables nativos** de WhatsApp. ⚠️ Con esta conexión no oficial (Baileys) WhatsApp bloquea o
+ignora esos botones muy seguido, así que **no hay que confiar en que aparezcan** — por eso el
+mensaje siempre incluye el menú numerado completo en el cuerpo: si los botones no se ven, la
+persona igual elige escribiendo el número. Cuando sí aparecen y la persona los toca, el bot lo
+interpreta igual que si hubiera escrito ese número.
+
+#### Reglas que envían un archivo (PDF, imagen, etc.)
+
+Al cargar una regla podés tildar "Enviar un archivo" en vez de escribir una respuesta. Subís
+el PDF/imagen una vez desde el dashboard (hasta 16 MB) y opcionalmente un mensaje que lo
+acompañe. Cuando alguien escribe algo que contiene la palabra clave (ej. `lista de precios`),
+el bot manda ese archivo automáticamente. Sirve para "¿me pueden enviar la lista de precios?"
+→ el bot responde con el PDF al toque. Los archivos se guardan por empresa en la carpeta
+`uploads/` del servicio (misma persistencia que las sesiones: sobreviven reinicios, pero un
+deploy que limpie el disco los borra y habría que volver a subirlos).
+
 ### Redirigir mensajes
 
 En "Redirigir mensajes a" podés cargar uno o más números. Cualquier mensaje que le llegue a

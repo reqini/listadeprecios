@@ -7,13 +7,20 @@ const {
   useMultiFileAuthState,
   DisconnectReason,
   fetchLatestBaileysVersion,
+  generateWAMessageFromContent,
+  proto,
 } = require('@whiskeysockets/baileys');
 
 const store = require('./store');
 const { generateAiReply } = require('./ai');
 
 const AUTH_DIR = path.join(__dirname, 'sessions');
+const UPLOADS_DIR = path.join(__dirname, 'uploads');
 const MAX_RECONNECT_DELAY_MS = 30_000;
+
+function uploadPath(envId, fileId) {
+  return path.join(UPLOADS_DIR, envId, fileId);
+}
 
 // runtimeKey (`${envId}::${sessionId}`) -> { sock, status, qrDataUrl, reconnectDelay }
 const runtime = new Map();
@@ -38,6 +45,23 @@ function isStatusBroadcast(jid) {
 function extractText(message) {
   const m = message.message;
   if (!m) return '';
+  // Cuando la persona TOCA un botón / opción de un menú interactivo, WhatsApp no
+  // manda texto sino la selección — la interpretamos como si hubiera escrito ese id
+  // (que nosotros seteamos al número de la opción), así el menú pendiente lo resuelve.
+  if (m.buttonsResponseMessage?.selectedButtonId) return m.buttonsResponseMessage.selectedButtonId;
+  if (m.templateButtonReplyMessage?.selectedId) return m.templateButtonReplyMessage.selectedId;
+  if (m.listResponseMessage?.singleSelectReply?.selectedRowId) {
+    return m.listResponseMessage.singleSelectReply.selectedRowId;
+  }
+  const nativeParams = m.interactiveResponseMessage?.nativeFlowResponseMessage?.paramsJson;
+  if (nativeParams) {
+    try {
+      const parsed = JSON.parse(nativeParams);
+      if (parsed.id) return String(parsed.id);
+    } catch (_) {
+      /* json inesperado: seguimos con el texto normal */
+    }
+  }
   return (
     m.conversation ||
     m.extendedTextMessage?.text ||
@@ -118,15 +142,86 @@ function resolvePendingMenu(key, text) {
   return match ? match.response : null;
 }
 
-// Ejecuta una regla ya matcheada: si es un menú, arma el texto y deja el estado
-// pendiente; si es simple, devuelve el texto de respuesta tal cual.
-function resolveRuleText(rule, pendingKey) {
+// Ejecuta una regla ya matcheada devolviendo una "acción" a enviar. Si es un menú,
+// deja el estado pendiente para interpretar la respuesta; si es archivo, apunta al
+// archivo subido; si es simple, es texto plano.
+function resolveRuleAction(rule, pendingKey, envId) {
   if (!rule) return null;
   if (rule.type === 'menu') {
     pendingMenus.set(pendingKey, { options: rule.options, expiresAt: Date.now() + MENU_TTL_MS });
-    return buildMenuText(rule);
+    return { kind: 'menu', text: buildMenuText(rule), options: rule.options };
   }
-  return rule.response;
+  if (rule.type === 'file') {
+    return {
+      kind: 'file',
+      envId,
+      fileId: rule.fileId,
+      fileName: rule.fileName || 'archivo',
+      mimetype: rule.mimetype || 'application/octet-stream',
+      caption: rule.caption || null,
+    };
+  }
+  return { kind: 'text', text: rule.response };
+}
+
+// Intenta enviar un menú como botones nativos tocables de WhatsApp. OJO: en la
+// conexión no oficial (Baileys) WhatsApp bloquea/ignora estos botones muy seguido,
+// por eso el cuerpo del mensaje ya lleva el menú numerado completo — si los botones
+// no aparecen, la persona igual ve las opciones y contesta con el número. Si el
+// envío interactivo falla, el llamador cae al texto plano.
+async function trySendNativeButtons(sock, jid, bodyText, options) {
+  try {
+    const buttons = options.slice(0, 3).map((o, i) => ({
+      name: 'quick_reply',
+      buttonParamsJson: JSON.stringify({ display_text: o.label.slice(0, 24), id: String(i + 1) }),
+    }));
+    const content = {
+      interactiveMessage: proto.Message.InteractiveMessage.create({
+        body: proto.Message.InteractiveMessage.Body.create({ text: bodyText }),
+        nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({ buttons }),
+      }),
+    };
+    const msg = generateWAMessageFromContent(jid, content, {});
+    await sock.relayMessage(jid, msg.message, { messageId: msg.key.id });
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+// Envía la acción resuelta y devuelve un texto para registrar en el tablero de
+// conversaciones (o null si no había nada que enviar).
+async function sendAction(sock, jid, action) {
+  if (!action) return null;
+
+  if (action.kind === 'file') {
+    const filePath = uploadPath(action.envId, action.fileId);
+    if (!fs.existsSync(filePath)) {
+      // El archivo se perdió (ej. un redeploy que limpió el disco). Mandamos al menos
+      // el texto que lo acompañaba, si había, para no dejar a la persona sin respuesta.
+      if (action.caption) {
+        await sock.sendMessage(jid, { text: action.caption });
+        return action.caption;
+      }
+      throw new Error('el archivo configurado ya no está disponible');
+    }
+    await sock.sendMessage(jid, {
+      document: fs.readFileSync(filePath),
+      fileName: action.fileName,
+      mimetype: action.mimetype,
+      caption: action.caption || undefined,
+    });
+    return action.caption ? `📎 ${action.fileName} — ${action.caption}` : `📎 ${action.fileName}`;
+  }
+
+  if (action.kind === 'menu') {
+    const sent = await trySendNativeButtons(sock, jid, action.text, action.options);
+    if (!sent) await sock.sendMessage(jid, { text: action.text });
+    return action.text;
+  }
+
+  await sock.sendMessage(jid, { text: action.text });
+  return action.text;
 }
 
 async function startSession(envId, sessionId) {
@@ -253,14 +348,13 @@ async function handleIncomingMessages(envId, sessionId, sock, messages, type) {
 
     if (isGroupJid(from)) {
       const key = pendingMenuKey(envId, sessionId, from, senderJid);
-      let reply = resolvePendingMenu(key, text);
-      if (reply === null) {
-        const rule = matchGroupReply(config.groups?.[from], text);
-        reply = resolveRuleText(rule, key);
-      }
-      if (reply) {
+      const pendingText = resolvePendingMenu(key, text);
+      const action = pendingText !== null
+        ? { kind: 'text', text: pendingText }
+        : resolveRuleAction(matchGroupReply(config.groups?.[from], text), key, envId);
+      if (action) {
         try {
-          await sock.sendMessage(from, { text: reply });
+          await sendAction(sock, from, action);
         } catch (err) {
           console.error(`[${envId}/${sessionId}] no se pudo responder en el grupo ${from}:`, err.message);
         }
@@ -271,15 +365,14 @@ async function handleIncomingMessages(envId, sessionId, sock, messages, type) {
     const convId = trackIncoming(envId, sessionId, msg, text);
 
     const key = pendingMenuKey(envId, sessionId, from, null);
-    let reply = resolvePendingMenu(key, text);
-    if (reply === null) {
-      const rule = await computeReply(envId, sessionId, config, text);
-      reply = resolveRuleText(rule, key);
-    }
-    if (reply) {
+    const pendingText = resolvePendingMenu(key, text);
+    const action = pendingText !== null
+      ? { kind: 'text', text: pendingText }
+      : resolveRuleAction(await computeReply(envId, sessionId, config, text), key, envId);
+    if (action) {
       try {
-        await sock.sendMessage(from, { text: reply });
-        store.appendConversationMessage(envId, convId, { from: 'bot', text: reply, at: Date.now() });
+        const logged = await sendAction(sock, from, action);
+        if (logged) store.appendConversationMessage(envId, convId, { from: 'bot', text: logged, at: Date.now() });
       } catch (err) {
         console.error(`[${envId}/${sessionId}] no se pudo responder a ${from}:`, err.message);
       }
@@ -360,4 +453,5 @@ module.exports = {
   restoreAllSessions,
   sendManualReply,
   listGroups,
+  UPLOADS_DIR,
 };

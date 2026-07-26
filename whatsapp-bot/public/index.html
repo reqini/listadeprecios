@@ -145,7 +145,7 @@
       <div class="intro-step">
         <span class="n">3</span>
         <strong>Cargá reglas</strong>
-        <p>Palabra clave → respuesta. También podés armar un menú de opciones o activar IA.</p>
+        <p>Palabra clave → respuesta. También podés armar un menú de opciones, enviar un PDF/archivo automático o activar IA.</p>
       </div>
       <div class="intro-step">
         <span class="n">4</span>
@@ -252,6 +252,10 @@
               <input type="checkbox" class="rule-menuToggle" style="flex:none;" />
               Es un menú de opciones (pregunta y espera que elijan)
             </label>
+            <label class="row" style="cursor:pointer; margin-top:4px;">
+              <input type="checkbox" class="rule-fileToggle" style="flex:none;" />
+              Enviar un archivo (PDF, imagen, etc.)
+            </label>
             <div class="rule-simple" style="margin-top:6px;">
               <div class="row">
                 <input class="rule-response" placeholder="Texto de respuesta" maxlength="1000" />
@@ -261,6 +265,11 @@
               <input class="rule-prompt" placeholder="Pregunta (opcional, ej: ¿Qué lista necesitás?)" maxlength="200" style="width:100%; margin-bottom:6px;" />
               <div class="rule-options"></div>
               <button type="button" class="ghost rule-addOption">+ Agregar opción</button>
+            </div>
+            <div class="rule-file" style="display:none; margin-top:6px;">
+              <input type="file" class="rule-fileInput" style="width:100%;" />
+              <div class="rule-fileStatus hint" style="margin-top:4px;"></div>
+              <input class="rule-caption" placeholder="Mensaje que acompaña al archivo (opcional)" maxlength="1000" style="width:100%; margin-top:6px;" />
             </div>
             <div class="row" style="margin-top:8px;">
               <button class="ghost" type="submit">Agregar</button>
@@ -331,6 +340,10 @@
             <input type="checkbox" class="rule-menuToggle" style="flex:none;" />
             Es un menú de opciones (pregunta y espera que elijan)
           </label>
+          <label class="row" style="cursor:pointer; margin-top:4px;">
+            <input type="checkbox" class="rule-fileToggle" style="flex:none;" />
+            Enviar un archivo (PDF, imagen, etc.)
+          </label>
           <div class="rule-simple" style="margin-top:6px;">
             <div class="row">
               <input class="rule-response" placeholder="Respuesta" maxlength="1000" />
@@ -340,6 +353,11 @@
             <input class="rule-prompt" placeholder="Pregunta (opcional)" maxlength="200" style="width:100%; margin-bottom:6px;" />
             <div class="rule-options"></div>
             <button type="button" class="ghost rule-addOption">+ Agregar opción</button>
+          </div>
+          <div class="rule-file" style="display:none; margin-top:6px;">
+            <input type="file" class="rule-fileInput" style="width:100%;" />
+            <div class="rule-fileStatus hint" style="margin-top:4px;"></div>
+            <input class="rule-caption" placeholder="Mensaje que acompaña al archivo (opcional)" maxlength="1000" style="width:100%; margin-top:6px;" />
           </div>
           <div class="row" style="margin-top:8px;">
             <button class="ghost" type="submit">Agregar FAQ</button>
@@ -431,24 +449,77 @@ function addOptionRow(container) {
   return row;
 }
 
-// Formulario compartido entre "Reglas de respuesta" (DM) y "FAQ" (grupos): una
-// regla simple (palabra clave → texto) o un menú de opciones (palabra clave →
-// pregunta + varias opciones, cada una con su propia respuesta).
+// Sube un archivo crudo (no JSON) al backend y devuelve { fileId, fileName, mimetype }.
+async function uploadFile(file) {
+  const res = await fetch('/api/uploads', {
+    method: 'POST',
+    headers: {
+      'Content-Type': file.type || 'application/octet-stream',
+      'X-File-Name': encodeURIComponent(file.name),
+    },
+    body: file,
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || 'No se pudo subir el archivo');
+  return body;
+}
+
+// Formulario compartido entre "Reglas de respuesta" (DM) y "FAQ" (grupos): una regla
+// simple (palabra clave → texto), un menú de opciones (palabra clave → pregunta +
+// varias opciones) o el envío de un archivo (palabra clave → PDF/imagen + mensaje).
 function setupRuleForm(form, { requireKeyword, errorEl, onSubmit }) {
   const menuToggle = form.querySelector('.rule-menuToggle');
+  const fileToggle = form.querySelector('.rule-fileToggle');
   const simpleBox = form.querySelector('.rule-simple');
   const menuBox = form.querySelector('.rule-menu');
+  const fileBox = form.querySelector('.rule-file');
   const optionsContainer = form.querySelector('.rule-options');
+  const fileInput = form.querySelector('.rule-fileInput');
+  const fileStatus = form.querySelector('.rule-fileStatus');
+
+  let uploadedFile = null; // { fileId, fileName, mimetype }
 
   addOptionRow(optionsContainer);
   addOptionRow(optionsContainer);
 
-  menuToggle.onchange = () => {
-    simpleBox.style.display = menuToggle.checked ? 'none' : 'block';
+  function updateMode() {
+    simpleBox.style.display = !menuToggle.checked && !fileToggle.checked ? 'block' : 'none';
     menuBox.style.display = menuToggle.checked ? 'block' : 'none';
+    fileBox.style.display = fileToggle.checked ? 'block' : 'none';
+  }
+
+  // los dos modos especiales son excluyentes entre sí
+  menuToggle.onchange = () => {
+    if (menuToggle.checked) fileToggle.checked = false;
+    updateMode();
+  };
+  fileToggle.onchange = () => {
+    if (fileToggle.checked) menuToggle.checked = false;
+    updateMode();
   };
 
   form.querySelector('.rule-addOption').onclick = () => addOptionRow(optionsContainer);
+
+  fileInput.onchange = async () => {
+    uploadedFile = null;
+    const file = fileInput.files[0];
+    if (!file) {
+      fileStatus.textContent = '';
+      return;
+    }
+    if (file.size > 16 * 1024 * 1024) {
+      fileStatus.textContent = 'El archivo supera los 16 MB';
+      fileInput.value = '';
+      return;
+    }
+    fileStatus.textContent = 'Subiendo…';
+    try {
+      uploadedFile = await uploadFile(file);
+      fileStatus.textContent = `✓ ${uploadedFile.fileName} listo para enviar`;
+    } catch (err) {
+      fileStatus.textContent = err.message;
+    }
+  };
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -460,7 +531,20 @@ function setupRuleForm(form, { requireKeyword, errorEl, onSubmit }) {
     }
 
     let payload;
-    if (menuToggle.checked) {
+    if (fileToggle.checked) {
+      if (!uploadedFile) {
+        errorEl.textContent = 'Subí un archivo primero';
+        return;
+      }
+      payload = {
+        keyword,
+        type: 'file',
+        fileId: uploadedFile.fileId,
+        fileName: uploadedFile.fileName,
+        mimetype: uploadedFile.mimetype,
+        caption: form.querySelector('.rule-caption').value.trim(),
+      };
+    } else if (menuToggle.checked) {
       const options = [...optionsContainer.querySelectorAll('.rule-option')].map((row) => ({
         label: row.querySelector('.rule-optionLabel').value.trim(),
         response: row.querySelector('.rule-optionResponse').value.trim(),
@@ -487,12 +571,16 @@ function setupRuleForm(form, { requireKeyword, errorEl, onSubmit }) {
         keywordInput.value = '';
         form.querySelector('.rule-response').value = '';
         form.querySelector('.rule-prompt').value = '';
+        form.querySelector('.rule-caption').value = '';
+        fileInput.value = '';
+        fileStatus.textContent = '';
+        uploadedFile = null;
         optionsContainer.innerHTML = '';
         addOptionRow(optionsContainer);
         addOptionRow(optionsContainer);
         menuToggle.checked = false;
-        simpleBox.style.display = 'block';
-        menuBox.style.display = 'none';
+        fileToggle.checked = false;
+        updateMode();
       } catch (err) {
         errorEl.textContent = err.message;
       }
@@ -505,6 +593,10 @@ function formatRuleLabel(rule) {
   if (rule.type === 'menu') {
     const options = rule.options.map((o) => o.label).join(' / ');
     return `${rule.keyword || '(por defecto)'} → menú: ${options}`;
+  }
+  if (rule.type === 'file') {
+    const extra = rule.caption ? ` (“${rule.caption}”)` : '';
+    return `${rule.keyword || '(por defecto)'} → 📎 ${rule.fileName}${extra}`;
   }
   return rule.keyword ? `${rule.keyword} → ${rule.response}` : `(por defecto) → ${rule.response}`;
 }

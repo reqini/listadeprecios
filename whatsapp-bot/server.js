@@ -2,9 +2,13 @@ require('dotenv').config();
 const express = require('express');
 const crypto = require('crypto');
 const path = require('path');
+const fs = require('fs');
 require('./migrate').run();
 const store = require('./store');
 const sessions = require('./sessionManager');
+
+const MAX_UPLOAD_BYTES = 16 * 1024 * 1024; // 16 MB — de sobra para una lista de precios
+const FILE_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
 const app = express();
 app.set('trust proxy', 1); // needed on Render/Vercel-style proxies so req.ip and req.secure are correct
@@ -13,6 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 // respond with JSON instead of an HTML stack trace when the client sends malformed JSON
 app.use((err, req, res, next) => {
   if (err.type === 'entity.parse.failed') return res.status(400).json({ error: 'JSON inválido' });
+  if (err.type === 'entity.too.large') return res.status(413).json({ error: 'El archivo es demasiado grande (máximo 16 MB)' });
   next(err);
 });
 
@@ -277,6 +282,7 @@ app.delete(
     for (const sessionId of Object.keys(env.sessions || {})) {
       await sessions.stopSession(req.params.envId, sessionId).catch(() => {});
     }
+    fs.rmSync(path.join(sessions.UPLOADS_DIR, req.params.envId), { recursive: true, force: true });
     store.deleteEnvironment(req.params.envId);
     res.json({ ok: true });
   })
@@ -346,10 +352,45 @@ app.patch('/api/sessions/:id', requireEnv, validSessionId, (req, res) => {
   res.json(updated);
 });
 
-// Acepta una regla simple ({keyword, response}) o un menú de opciones
-// ({keyword, type:'menu', prompt, options:[{label,response}]}). Lanza si es inválida.
+// Subida de archivos (PDF, imágenes) que después una regla puede mandar sola cuando
+// detecta una palabra clave. El body llega crudo (no JSON) con el content-type del
+// archivo; el nombre viaja en el header X-File-Name. Cada archivo se guarda por entorno.
+app.post(
+  '/api/uploads',
+  requireEnv,
+  express.raw({ type: () => true, limit: MAX_UPLOAD_BYTES }),
+  (req, res) => {
+    const buf = req.body;
+    if (!buf || !buf.length) return res.status(400).json({ error: 'El archivo está vacío' });
+    const rawName = req.headers['x-file-name'] ? decodeURIComponent(req.headers['x-file-name']) : 'archivo';
+    const fileName = rawName.replace(/[\r\n]/g, '').slice(0, 120) || 'archivo';
+    const mimetype = (req.headers['content-type'] || 'application/octet-stream').slice(0, 100);
+    const fileId = crypto.randomUUID();
+    const dir = path.join(sessions.UPLOADS_DIR, req.envId);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, fileId), buf);
+    res.json({ fileId, fileName, mimetype, size: buf.length });
+  }
+);
+
+// Acepta una regla simple ({keyword, response}), un menú de opciones
+// ({keyword, type:'menu', prompt, options:[{label,response}]}) o el envío de un
+// archivo ({keyword, type:'file', fileId, fileName, mimetype, caption}). Lanza si es inválida.
 function validateRulePayload(body) {
   const keyword = body.keyword?.trim() || null;
+
+  if (body.type === 'file') {
+    const fileId = (body.fileId || '').toString().trim();
+    if (!FILE_ID_RE.test(fileId)) throw new Error('Subí un archivo primero');
+    return {
+      keyword,
+      type: 'file',
+      fileId,
+      fileName: (body.fileName || 'archivo').toString().slice(0, 120),
+      mimetype: (body.mimetype || 'application/octet-stream').toString().slice(0, 100),
+      caption: (body.caption || '').toString().trim().slice(0, 1000) || null,
+    };
+  }
 
   if (body.type === 'menu') {
     const options = Array.isArray(body.options) ? body.options : [];
