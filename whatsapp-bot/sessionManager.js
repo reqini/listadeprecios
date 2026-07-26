@@ -71,19 +71,89 @@ function extractText(message) {
   );
 }
 
+// --- Detección inteligente de palabras clave (tolera typos, acentos y variantes) ---
+// En vez de exigir el texto exacto, normalizamos (sin acentos ni puntuación) y
+// comparamos palabra por palabra con tolerancia a errores de tipeo. Así "lista de
+// precios" matchea "quiero lsita", "lñista", "tienen l lsita", etc. Es determinístico,
+// instantáneo y gratis (no llama a la IA en cada mensaje).
+const STOPWORDS = new Set([
+  'de', 'la', 'el', 'los', 'las', 'un', 'una', 'y', 'o', 'a', 'que', 'en', 'del',
+  'al', 'me', 'mi', 'tu', 'su', 'se', 'lo', 'le', 'les', 'por', 'para', 'con', 'sin',
+]);
+
+function normalizeText(s) {
+  return (s || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '') // quita acentos y diéresis
+    .replace(/[^a-z0-9\s]/g, ' ') // quita puntuación/emojis
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Distancia de Damerau-Levenshtein: cuenta inserción, borrado, sustitución y
+// transposición de letras adyacentes como 1 edición (clave para typos tipo "lsita").
+function editDistance(a, b) {
+  const al = a.length;
+  const bl = b.length;
+  if (!al) return bl;
+  if (!bl) return al;
+  const d = Array.from({ length: al + 1 }, () => new Array(bl + 1).fill(0));
+  for (let i = 0; i <= al; i++) d[i][0] = i;
+  for (let j = 0; j <= bl; j++) d[0][j] = j;
+  for (let i = 1; i <= al; i++) {
+    for (let j = 1; j <= bl; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+        d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+      }
+    }
+  }
+  return d[al][bl];
+}
+
+// ¿Dos palabras son "la misma" tolerando typos? La tolerancia crece con el largo.
+function wordFuzzyEqual(a, b) {
+  if (a === b) return true;
+  const maxLen = Math.max(a.length, b.length);
+  if (maxLen < 4) return a === b; // palabras muy cortas: exigimos exacto (evita falsos positivos)
+  const tolerance = maxLen <= 4 ? 1 : maxLen <= 7 ? 2 : 3;
+  return editDistance(a, b) <= tolerance;
+}
+
+// ¿El mensaje del cliente matchea la palabra clave? Match si el texto contiene la
+// frase (ya normalizada) o si al menos la mitad de las palabras significativas de la
+// keyword aparecen con typos tolerados.
+function keywordMatches(text, keyword) {
+  const nText = normalizeText(text);
+  const nKey = normalizeText(keyword);
+  if (!nKey) return false;
+  if (nText.includes(nKey)) return true; // coincidencia directa (ya sin acentos/puntuación)
+
+  const textWords = nText.split(' ').filter(Boolean);
+  const keyWords = nKey.split(' ').filter((w) => w.length >= 3 && !STOPWORDS.has(w));
+  if (keyWords.length === 0) return nText.includes(nKey); // keyword solo con palabras cortas/stopwords
+
+  let matched = 0;
+  for (const kw of keyWords) {
+    if (textWords.some((tw) => wordFuzzyEqual(tw, kw))) matched++;
+  }
+  return matched / keyWords.length >= 0.5;
+}
+
 // Devuelve la REGLA que matchea (no el texto final), porque una regla puede ser
 // de tipo 'menu' — en ese caso el llamador arma el texto del menú y guarda el
 // estado pendiente para interpretar la respuesta del usuario.
 async function computeReply(envId, sessionId, sessionConfig, text) {
   if (!sessionConfig.autoReplyEnabled) return null;
-  const lower = (text || '').toLowerCase();
   let fallback = null;
   for (const rule of sessionConfig.rules || []) {
     if (!rule.keyword) {
       fallback = rule;
       continue;
     }
-    if (lower.includes(rule.keyword.toLowerCase())) return rule;
+    if (keywordMatches(text, rule.keyword)) return rule;
   }
 
   if (sessionConfig.aiEnabled && sessionConfig.aiContext?.trim()) {
@@ -98,13 +168,13 @@ async function computeReply(envId, sessionId, sessionConfig, text) {
   return fallback;
 }
 
-// Grupos: solo respuestas tipo FAQ por palabra clave exacta — nunca hay respuesta
-// "por defecto" para no contestarle a cada mensaje de un grupo lleno de gente.
+// Grupos: solo respuestas tipo FAQ por palabra clave — nunca hay respuesta "por
+// defecto" para no contestarle a cada mensaje de un grupo lleno de gente. Usa la
+// misma detección inteligente (typos/acentos/variantes) que los chats individuales.
 function matchGroupReply(groupConfig, text) {
   if (!groupConfig?.enabled) return null;
-  const lower = (text || '').toLowerCase();
   for (const rule of groupConfig.rules || []) {
-    if (rule.keyword && lower.includes(rule.keyword.toLowerCase())) return rule;
+    if (rule.keyword && keywordMatches(text, rule.keyword)) return rule;
   }
   return null;
 }

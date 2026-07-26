@@ -81,6 +81,19 @@
   .badge-count { background: var(--surface-2); color: var(--text-dim); font-size: 11px; padding: 1px 7px; border-radius: 999px; font-weight: 600; }
   details.section .section-body { margin-top: 10px; }
 
+  /* descripciones y ayudas de claridad */
+  .section-hint { color: var(--text-dim); font-size: 12.5px; margin: 0 0 10px; line-height: 1.45; }
+  .field-label { display: block; font-size: 12.5px; color: var(--text); font-weight: 600; margin: 12px 0 5px; }
+  .field-label:first-child { margin-top: 0; }
+  .rule-hint { color: var(--text-dim); font-size: 12px; margin: 0 0 8px; line-height: 1.4; }
+  /* selector de tipo de respuesta (Texto / Menú / Archivo) */
+  .rule-type-tabs { display: flex; gap: 6px; margin: 0 0 10px; flex-wrap: wrap; }
+  .rule-type-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); font-weight: 600; font-size: 12.5px; padding: 7px 11px; border-radius: 8px; cursor: pointer; }
+  .rule-type-btn:hover { border-color: var(--accent); filter: none; }
+  .rule-type-btn.active { background: var(--accent); color: #04211a; border-color: var(--accent); }
+  .auto-reply-box { background: var(--surface-2); border-radius: 10px; padding: 12px 14px; margin-top: 4px; }
+  .auto-reply-box .section-hint { margin: 6px 0 0; }
+
   /* intro paso a paso */
   #intro { background: linear-gradient(135deg, #16302a, var(--surface)); border: 1px solid #1f4b3c; border-radius: 14px; padding: 22px; margin-bottom: 20px; }
   #intro h2 { margin: 0 0 4px; }
@@ -218,18 +231,22 @@
       <div class="qrBox"></div>
 
       <div class="section">
-        <label class="row" style="cursor:pointer;">
-          <input type="checkbox" class="autoReplyToggle" style="flex:none;" />
-          Respuestas automáticas activadas
-        </label>
+        <div class="auto-reply-box">
+          <label class="row" style="cursor:pointer;">
+            <input type="checkbox" class="autoReplyToggle" style="flex:none;" />
+            <strong>El bot responde solo</strong>
+          </label>
+          <p class="section-hint">Si está activado, el bot contesta automáticamente según las reglas de abajo. Si lo apagás, el bot no responde nada y los mensajes te llegan para que contestes vos a mano.</p>
+        </div>
       </div>
 
       <details class="section">
         <summary>🤖 Respuestas con IA <span class="badge-count aiStatusBadge"></span></summary>
         <div class="section-body">
+          <p class="section-hint">Opcional. Cuando un mensaje no coincide con ninguna regla de arriba, la IA responde sola de forma natural, usando lo que le cuentes acá sobre tu negocio.</p>
           <label class="row" style="cursor:pointer;">
             <input type="checkbox" class="aiToggle" style="flex:none;" />
-            Activar (responde si ninguna regla matchea)
+            <strong>Activar respuestas con IA</strong>
           </label>
           <small class="hint">Contale a la IA sobre tu negocio (productos, precios, horarios, FAQ) para que responda mensajes que no matchean ninguna regla, de forma natural.</small>
           <textarea class="aiContext" rows="3" placeholder="Ej: Somos una verdulería en Córdoba. Horario: 9 a 20hs de lunes a sábado. Hacemos envíos a domicilio con costo según zona..." maxlength="4000" style="margin-top:6px;"></textarea>
@@ -243,36 +260,34 @@
       <details class="section" open>
         <summary>💬 Reglas de respuesta <span class="badge-count rulesCount"></span></summary>
         <div class="section-body">
+          <p class="section-hint">Cuando a este número le escriben, el bot busca una palabra clave y responde solo. Detecta la palabra aunque venga con errores de tipeo o acentos (ej: "lsita", "listá"). Las reglas se evalúan de arriba hacia abajo.</p>
           <ul class="rulesList"></ul>
-          <form class="addRuleForm" style="margin-top:8px;">
-            <div class="row">
-              <input class="rule-keyword" placeholder="Palabra clave (vacío = por defecto)" maxlength="60" />
+          <form class="addRuleForm" style="margin-top:12px;">
+            <span class="field-label">1. ¿Qué palabra la dispara?</span>
+            <input class="rule-keyword" placeholder="Ej: lista de precios  ·  (vacío = respuesta por defecto)" maxlength="60" style="width:100%;" />
+            <span class="field-label">2. ¿Qué responde el bot?</span>
+            <div class="rule-type-tabs">
+              <button type="button" class="rule-type-btn active" data-type="text">💬 Un texto</button>
+              <button type="button" class="rule-type-btn" data-type="menu">📋 Un menú de opciones</button>
+              <button type="button" class="rule-type-btn" data-type="file">📎 Un archivo</button>
             </div>
-            <label class="row" style="cursor:pointer; margin-top:6px;">
-              <input type="checkbox" class="rule-menuToggle" style="flex:none;" />
-              Es un menú de opciones (pregunta y espera que elijan)
-            </label>
-            <label class="row" style="cursor:pointer; margin-top:4px;">
-              <input type="checkbox" class="rule-fileToggle" style="flex:none;" />
-              Enviar un archivo (PDF, imagen, etc.)
-            </label>
-            <div class="rule-simple" style="margin-top:6px;">
-              <div class="row">
-                <input class="rule-response" placeholder="Texto de respuesta" maxlength="1000" />
-              </div>
+            <div class="rule-simple">
+              <input class="rule-response" placeholder="Texto que responde el bot" maxlength="1000" style="width:100%;" />
             </div>
-            <div class="rule-menu" style="display:none; margin-top:6px;">
-              <input class="rule-prompt" placeholder="Pregunta (opcional, ej: ¿Qué lista necesitás?)" maxlength="200" style="width:100%; margin-bottom:6px;" />
+            <div class="rule-menu" style="display:none;">
+              <p class="rule-hint">El bot hace una pregunta y espera que la persona elija una opción (contestando el número o tocando un botón).</p>
+              <input class="rule-prompt" placeholder="Pregunta (ej: ¿Qué lista necesitás?)" maxlength="200" style="width:100%; margin-bottom:6px;" />
               <div class="rule-options"></div>
               <button type="button" class="ghost rule-addOption">+ Agregar opción</button>
             </div>
-            <div class="rule-file" style="display:none; margin-top:6px;">
+            <div class="rule-file" style="display:none;">
+              <p class="rule-hint">Subí un PDF o imagen y el bot lo manda automáticamente cuando detecta la palabra clave.</p>
               <input type="file" class="rule-fileInput" style="width:100%;" />
               <div class="rule-fileStatus hint" style="margin-top:4px;"></div>
               <input class="rule-caption" placeholder="Mensaje que acompaña al archivo (opcional)" maxlength="1000" style="width:100%; margin-top:6px;" />
             </div>
-            <div class="row" style="margin-top:8px;">
-              <button class="ghost" type="submit">Agregar</button>
+            <div class="row" style="margin-top:12px;">
+              <button type="submit">Agregar regla</button>
             </div>
           </form>
           <div class="error-text rulesError"></div>
@@ -282,6 +297,7 @@
       <details class="section">
         <summary>↪️ Redirigir mensajes <span class="badge-count forwardCount"></span></summary>
         <div class="section-body">
+          <p class="section-hint">Copia cada mensaje que entra a este número hacia otro WhatsApp (ej: tu celular personal), para que no se te escape ninguna consulta.</p>
           <ul class="forwardList"></ul>
           <form class="row addForwardForm" style="margin-top:8px;">
             <input class="forwardNumber" placeholder="Número con código de país (549...)" required />
@@ -333,34 +349,31 @@
       <div class="group-body section">
         <ul class="groupRulesList"></ul>
         <form class="addGroupRuleForm" style="margin-top:8px;">
-          <div class="row">
-            <input class="rule-keyword" placeholder="Palabra clave (ej: horario)" maxlength="60" required />
+          <span class="field-label">1. Palabra clave que la dispara</span>
+          <input class="rule-keyword" placeholder="Ej: horario" maxlength="60" required style="width:100%;" />
+          <span class="field-label">2. ¿Qué responde el bot?</span>
+          <div class="rule-type-tabs">
+            <button type="button" class="rule-type-btn active" data-type="text">💬 Un texto</button>
+            <button type="button" class="rule-type-btn" data-type="menu">📋 Un menú</button>
+            <button type="button" class="rule-type-btn" data-type="file">📎 Un archivo</button>
           </div>
-          <label class="row" style="cursor:pointer; margin-top:6px;">
-            <input type="checkbox" class="rule-menuToggle" style="flex:none;" />
-            Es un menú de opciones (pregunta y espera que elijan)
-          </label>
-          <label class="row" style="cursor:pointer; margin-top:4px;">
-            <input type="checkbox" class="rule-fileToggle" style="flex:none;" />
-            Enviar un archivo (PDF, imagen, etc.)
-          </label>
-          <div class="rule-simple" style="margin-top:6px;">
-            <div class="row">
-              <input class="rule-response" placeholder="Respuesta" maxlength="1000" />
-            </div>
+          <div class="rule-simple">
+            <input class="rule-response" placeholder="Respuesta (ej: Abrimos de 9 a 20hs)" maxlength="1000" style="width:100%;" />
           </div>
-          <div class="rule-menu" style="display:none; margin-top:6px;">
+          <div class="rule-menu" style="display:none;">
+            <p class="rule-hint">El bot pregunta y espera que elijan una opción (por número o botón).</p>
             <input class="rule-prompt" placeholder="Pregunta (opcional)" maxlength="200" style="width:100%; margin-bottom:6px;" />
             <div class="rule-options"></div>
             <button type="button" class="ghost rule-addOption">+ Agregar opción</button>
           </div>
-          <div class="rule-file" style="display:none; margin-top:6px;">
+          <div class="rule-file" style="display:none;">
+            <p class="rule-hint">Subí un PDF o imagen y el bot lo manda cuando detecta la palabra clave.</p>
             <input type="file" class="rule-fileInput" style="width:100%;" />
             <div class="rule-fileStatus hint" style="margin-top:4px;"></div>
             <input class="rule-caption" placeholder="Mensaje que acompaña al archivo (opcional)" maxlength="1000" style="width:100%; margin-top:6px;" />
           </div>
-          <div class="row" style="margin-top:8px;">
-            <button class="ghost" type="submit">Agregar FAQ</button>
+          <div class="row" style="margin-top:12px;">
+            <button type="submit">Agregar FAQ</button>
           </div>
         </form>
         <div class="error-text groupRuleError"></div>
@@ -468,8 +481,7 @@ async function uploadFile(file) {
 // simple (palabra clave → texto), un menú de opciones (palabra clave → pregunta +
 // varias opciones) o el envío de un archivo (palabra clave → PDF/imagen + mensaje).
 function setupRuleForm(form, { requireKeyword, errorEl, onSubmit }) {
-  const menuToggle = form.querySelector('.rule-menuToggle');
-  const fileToggle = form.querySelector('.rule-fileToggle');
+  const typeBtns = [...form.querySelectorAll('.rule-type-btn')];
   const simpleBox = form.querySelector('.rule-simple');
   const menuBox = form.querySelector('.rule-menu');
   const fileBox = form.querySelector('.rule-file');
@@ -477,26 +489,22 @@ function setupRuleForm(form, { requireKeyword, errorEl, onSubmit }) {
   const fileInput = form.querySelector('.rule-fileInput');
   const fileStatus = form.querySelector('.rule-fileStatus');
 
+  let currentType = 'text'; // 'text' | 'menu' | 'file'
   let uploadedFile = null; // { fileId, fileName, mimetype }
 
   addOptionRow(optionsContainer);
   addOptionRow(optionsContainer);
 
-  function updateMode() {
-    simpleBox.style.display = !menuToggle.checked && !fileToggle.checked ? 'block' : 'none';
-    menuBox.style.display = menuToggle.checked ? 'block' : 'none';
-    fileBox.style.display = fileToggle.checked ? 'block' : 'none';
+  function setType(type) {
+    currentType = type;
+    typeBtns.forEach((b) => b.classList.toggle('active', b.dataset.type === type));
+    simpleBox.style.display = type === 'text' ? 'block' : 'none';
+    menuBox.style.display = type === 'menu' ? 'block' : 'none';
+    fileBox.style.display = type === 'file' ? 'block' : 'none';
   }
-
-  // los dos modos especiales son excluyentes entre sí
-  menuToggle.onchange = () => {
-    if (menuToggle.checked) fileToggle.checked = false;
-    updateMode();
-  };
-  fileToggle.onchange = () => {
-    if (fileToggle.checked) menuToggle.checked = false;
-    updateMode();
-  };
+  typeBtns.forEach((b) => {
+    b.onclick = () => setType(b.dataset.type);
+  });
 
   form.querySelector('.rule-addOption').onclick = () => addOptionRow(optionsContainer);
 
@@ -531,7 +539,7 @@ function setupRuleForm(form, { requireKeyword, errorEl, onSubmit }) {
     }
 
     let payload;
-    if (fileToggle.checked) {
+    if (currentType === 'file') {
       if (!uploadedFile) {
         errorEl.textContent = 'Subí un archivo primero';
         return;
@@ -544,7 +552,7 @@ function setupRuleForm(form, { requireKeyword, errorEl, onSubmit }) {
         mimetype: uploadedFile.mimetype,
         caption: form.querySelector('.rule-caption').value.trim(),
       };
-    } else if (menuToggle.checked) {
+    } else if (currentType === 'menu') {
       const options = [...optionsContainer.querySelectorAll('.rule-option')].map((row) => ({
         label: row.querySelector('.rule-optionLabel').value.trim(),
         response: row.querySelector('.rule-optionResponse').value.trim(),
@@ -578,9 +586,7 @@ function setupRuleForm(form, { requireKeyword, errorEl, onSubmit }) {
         optionsContainer.innerHTML = '';
         addOptionRow(optionsContainer);
         addOptionRow(optionsContainer);
-        menuToggle.checked = false;
-        fileToggle.checked = false;
-        updateMode();
+        setType('text');
       } catch (err) {
         errorEl.textContent = err.message;
       }
