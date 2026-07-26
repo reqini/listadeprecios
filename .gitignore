@@ -131,3 +131,4 @@ dist
 .pnp.*
 .vercel
 .env*
+!whatsapp-bot/.env.example

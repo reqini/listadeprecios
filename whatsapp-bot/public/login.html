@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Ingresar — Bot de WhatsApp</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: -apple-system, system-ui, sans-serif; background: #0b141a; color: #e9edef; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+  form { background: #202c33; padding: 28px; border-radius: 10px; width: 280px; }
+  h1 { font-size: 18px; margin: 0 0 16px; }
+  input { width: 100%; box-sizing: border-box; font-size: 15px; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #3b4a54; background: #111b21; color: #e9edef; }
+  button { width: 100%; font-size: 15px; padding: 10px; border-radius: 8px; border: none; background: #00a884; color: #04211a; font-weight: 600; cursor: pointer; }
+  .error { color: #f87171; font-size: 13px; margin-bottom: 10px; }
+  .divider { display: flex; align-items: center; gap: 10px; margin: 16px 0; color: #8696a0; font-size: 12px; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #3b4a54; }
+  .google-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; box-sizing: border-box; font-size: 15px; padding: 10px; border-radius: 8px;
+    background: #111b21; color: #e9edef; border: 1px solid #3b4a54; text-decoration: none;
+    font-weight: 600;
+  }
+  .google-btn:hover { border-color: #00a884; }
+</style>
+</head>
+<body>
+  <form method="POST" action="/login">
+    <h1>🤖 Bot de WhatsApp</h1>
+    <div class="error" id="error" style="display:none;">Usuario o clave incorrectos</div>
+    <div class="error" id="errorGoogle" style="display:none;">Esa cuenta de Google no está autorizada para ningún entorno. Pedile al administrador que la habilite.</div>
+    <input name="username" placeholder="Usuario" autocomplete="username" required />
+    <input name="password" type="password" placeholder="Clave" autocomplete="current-password" required />
+    <button type="submit">Ingresar</button>
+    <div class="divider">o</div>
+    <a class="google-btn" href="/auth/google">Iniciar sesión con Google</a>
+  </form>
+  <script>
+    const errorType = new URLSearchParams(location.search).get('error');
+    if (errorType === 'google_not_allowed') {
+      document.getElementById('errorGoogle').style.display = 'block';
+    } else if (errorType) {
+      document.getElementById('error').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

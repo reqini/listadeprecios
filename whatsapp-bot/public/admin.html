@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Administrador — Bot de WhatsApp</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, system-ui, sans-serif; max-width: 780px; margin: 0 auto; padding: 32px 24px; background: #0b141a; color: #e9edef; }
+  h1 { font-size: 24px; margin: 0; }
+  h2 { font-size: 16px; margin: 0 0 4px; }
+  p.sub { color: #8696a0; margin: 6px 0 0; font-size: 14px; }
+  .top-bar { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 24px; }
+  a.logout { color: #8696a0; font-size: 13px; }
+  .card { background: #202c33; border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  input, button { font-size: 15px; padding: 10px 14px; border-radius: 9px; border: 1px solid #3b4a54; background: #111b21; color: #e9edef; }
+  input { flex: 1; min-width: 160px; }
+  input:focus, button:focus-visible { outline: 2px solid #00a884; outline-offset: 1px; }
+  button { background: #00a884; border: none; cursor: pointer; color: #04211a; font-weight: 600; white-space: nowrap; }
+  button:disabled { opacity: 0.6; cursor: default; }
+  button.danger { background: #ef4444; color: #2b0505; }
+  button.ghost { background: transparent; border: 1px solid #3b4a54; color: #e9edef; }
+  .env-list { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+  .env-item { background: #111b21; border-radius: 10px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .env-name { font-weight: 600; }
+  .env-meta { color: #8696a0; font-size: 13px; }
+  .error-text { color: #f87171; font-size: 13px; min-height: 18px; margin-top: 6px; }
+  .empty-state { color: #8696a0; padding: 24px 0; text-align: center; }
+</style>
+</head>
+<body>
+  <div class="top-bar">
+    <div>
+      <h1>🗂️ Panel de administrador</h1>
+      <p class="sub">Acá creás una empresa (entorno) por cada cliente. Cada una tiene su propio usuario y clave, y no puede ver los números ni mensajes de las demás.</p>
+    </div>
+    <a class="logout" href="/logout">Cerrar sesión</a>
+  </div>
+
+  <div class="card">
+    <h2>Nueva empresa</h2>
+    <form id="createForm">
+      <div class="row" style="margin-top:10px;">
+        <input id="envName" placeholder="Nombre de la empresa (ej: Verdulería Don José)" maxlength="60" required />
+      </div>
+      <div class="row" style="margin-top:10px;">
+        <input id="envUsername" placeholder="Usuario para que ellos entren" maxlength="40" required />
+        <input id="envPassword" type="password" placeholder="Clave (mínimo 6 caracteres)" minlength="6" required />
+      </div>
+      <div class="row" style="margin-top:10px;">
+        <input id="envGoogleEmail" type="email" placeholder="Email de Google (opcional, para que entren con Google)" />
+        <button type="submit">Crear</button>
+      </div>
+      <small style="color:#8696a0;">Si cargás un email de Google, recordá agregarlo también como "usuario de prueba" en
+        <a href="https://console.cloud.google.com/auth/audience" target="_blank" style="color:#8696a0;">Google Cloud Console</a>
+        mientras el proyecto esté en modo prueba — si no, Google va a rechazar el login igual.</small>
+      <div class="error-text" id="createError"></div>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Empresas creadas</h2>
+    <div id="loading" class="empty-state">Cargando…</div>
+    <div id="empty" class="empty-state" style="display:none;">Todavía no creaste ninguna empresa.</div>
+    <div id="envList" class="env-list"></div>
+  </div>
+
+<script>
+async function api(path, opts) {
+  const res = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || 'Error inesperado');
+  return body;
+}
+
+function withBusy(button, fn) {
+  return async (...args) => {
+    button.disabled = true;
+    try {
+      await fn(...args);
+    } finally {
+      button.disabled = false;
+    }
+  };
+}
+
+async function refresh() {
+  let list;
+  try {
+    list = await api('/api/environments');
+  } catch (err) {
+    document.getElementById('loading').textContent = `Error: ${err.message}`;
+    return;
+  }
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('empty').style.display = list.length === 0 ? 'block' : 'none';
+
+  const container = document.getElementById('envList');
+  container.innerHTML = '';
+  list
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .forEach((env) => {
+      const item = document.createElement('div');
+      item.className = 'env-item';
+      const date = new Date(env.createdAt).toLocaleDateString('es-AR');
+      item.innerHTML = `
+        <div>
+          <div class="env-name"></div>
+          <div class="env-meta">usuario: <strong></strong> · creada el ${date}</div>
+          <div class="env-meta google-line"></div>
+        </div>
+      `;
+      item.querySelector('.env-name').textContent = env.name;
+      item.querySelector('.env-meta strong').textContent = env.username;
+      item.querySelector('.google-line').textContent = env.googleEmail
+        ? `Google: ${env.googleEmail}`
+        : 'Sin login con Google';
+
+      const actions = document.createElement('div');
+      actions.className = 'row';
+      actions.style.gap = '8px';
+
+      const googleBtn = document.createElement('button');
+      googleBtn.className = 'ghost';
+      googleBtn.type = 'button';
+      googleBtn.textContent = env.googleEmail ? 'Cambiar email de Google' : 'Habilitar login con Google';
+      googleBtn.onclick = async () => {
+        const current = env.googleEmail || '';
+        const next = prompt('Email de Google autorizado para este entorno (vacío para quitarlo):', current);
+        if (next === null) return;
+        try {
+          await api(`/api/environments/${env.id}`, { method: 'PATCH', body: JSON.stringify({ googleEmail: next.trim() }) });
+          refresh();
+        } catch (err) {
+          alert(err.message);
+        }
+      };
+      actions.appendChild(googleBtn);
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'danger';
+      delBtn.type = 'button';
+      delBtn.textContent = 'Eliminar';
+      delBtn.onclick = async () => {
+        if (!confirm(`¿Eliminar "${env.name}"? Se pierden todos sus números, reglas y conversaciones.`)) return;
+        await api(`/api/environments/${env.id}`, { method: 'DELETE' });
+        refresh();
+      };
+      actions.appendChild(delBtn);
+
+      item.appendChild(actions);
+      container.appendChild(item);
+    });
+}
+
+document.getElementById('createForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const name = document.getElementById('envName');
+  const username = document.getElementById('envUsername');
+  const password = document.getElementById('envPassword');
+  const googleEmail = document.getElementById('envGoogleEmail');
+  const errorEl = document.getElementById('createError');
+  const submit = withBusy(e.target.querySelector('button'), async () => {
+    errorEl.textContent = '';
+    try {
+      await api('/api/environments', {
+        method: 'POST',
+        body: JSON.stringify({ name: name.value, username: username.value, password: password.value, googleEmail: googleEmail.value }),
+      });
+      name.value = '';
+      username.value = '';
+      password.value = '';
+      googleEmail.value = '';
+      refresh();
+    } catch (err) {
+      errorEl.textContent = err.message;
+    }
+  });
+  submit();
+});
+
+refresh();
+</script>
+</body>
+</html>

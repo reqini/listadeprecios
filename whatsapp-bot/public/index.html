@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Bot de WhatsApp</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0b141a;
+    --surface: #202c33;
+    --surface-2: #111b21;
+    --surface-3: #17232a;
+    --border: #2f3d45;
+    --text: #e9edef;
+    --text-dim: #8696a0;
+    --accent: #00a884;
+    --accent-strong: #06cf9c;
+    --danger: #ef4444;
+    --warn: #facc15;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    max-width: 980px; margin: 0 auto; padding: 28px 20px 64px;
+    background: var(--bg); color: var(--text); line-height: 1.45;
+  }
+  h1 { font-size: 21px; margin: 0; letter-spacing: -0.01em; }
+  h2 { font-size: 17px; margin: 40px 0 4px; display: flex; align-items: center; gap: 8px; }
+  h3 { font-size: 14px; margin: 0; color: var(--text); font-weight: 600; }
+  .card {
+    background: var(--surface); border-radius: 14px; padding: 20px;
+    margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.04);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .section { margin-top: 14px; }
+  input, button, textarea { font-size: 14.5px; padding: 9px 13px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); }
+  input { flex: 1; min-width: 160px; }
+  input:focus, button:focus-visible, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  button { background: var(--accent); border: none; cursor: pointer; color: #04211a; font-weight: 600; white-space: nowrap; transition: filter 0.1s, transform 0.05s; }
+  button:hover { filter: brightness(1.1); }
+  button:active { transform: scale(0.98); }
+  button:disabled { opacity: 0.55; cursor: default; filter: none; transform: none; }
+  button.danger { background: var(--danger); color: #2b0505; }
+  button.ghost { background: transparent; border: 1px solid var(--border); color: var(--text); font-weight: 500; }
+  button.ghost:hover { border-color: var(--accent); }
+  button.subtle { background: transparent; border: none; color: var(--text-dim); font-weight: 500; padding: 6px 8px; }
+  .status { padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+  .status.connected { background: #16a34a33; color: #4ade80; }
+  .status.qr, .status.connecting { background: #eab30833; color: var(--warn); animation: pulse 1.8s ease-in-out infinite; }
+  .status.disconnected { background: #64748b33; color: #94a3b8; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+  ul { list-style: none; padding: 0; margin: 8px 0 0; }
+  li { padding: 8px 2px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13.5px; }
+  li:last-child { border-bottom: none; }
+  .qrBox { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 12px 0; min-height: 40px; }
+  img.qr { width: 200px; height: 200px; background: #fff; border-radius: 10px; padding: 8px; }
+  small, .hint { color: var(--text-dim); font-size: 13px; }
+  .error-text { color: #f87171; font-size: 13px; min-height: 18px; margin-top: 4px; }
+  .numbers-list { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+  .number-card { flex: 1 1 360px; max-width: 460px; }
+  .empty-state { color: var(--text-dim); padding: 28px 0; text-align: center; }
+  .top-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding-bottom: 4px; }
+  .top-bar-left { display: flex; flex-direction: column; gap: 2px; }
+  .env-badge { color: var(--accent-strong); font-size: 13px; font-weight: 600; }
+  .top-bar-right { display: flex; align-items: center; gap: 14px; }
+  a.logout, a.help-link { color: var(--text-dim); font-size: 13px; cursor: pointer; text-decoration: none; }
+  a.logout:hover, a.help-link:hover { color: var(--text); }
+  textarea { width: 100%; resize: vertical; font-family: inherit; }
+
+  /* secciones colapsables dentro de cada tarjeta de número */
+  details.section { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
+  details.section summary {
+    cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 600; color: var(--text); padding: 2px 0;
+  }
+  details.section summary::-webkit-details-marker { display: none; }
+  details.section summary::before { content: '▸'; color: var(--text-dim); font-size: 12px; transition: transform 0.15s; }
+  details.section[open] summary::before { transform: rotate(90deg); }
+  .badge-count { background: var(--surface-2); color: var(--text-dim); font-size: 11px; padding: 1px 7px; border-radius: 999px; font-weight: 600; }
+  details.section .section-body { margin-top: 10px; }
+
+  /* intro paso a paso */
+  #intro { background: linear-gradient(135deg, #16302a, var(--surface)); border: 1px solid #1f4b3c; border-radius: 14px; padding: 22px; margin-bottom: 20px; }
+  #intro h2 { margin: 0 0 4px; }
+  .intro-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 16px 0; }
+  .intro-step { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 14px; }
+  .intro-step .n { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 999px; background: var(--accent); color: #04211a; font-weight: 700; font-size: 13px; margin-bottom: 8px; }
+  .intro-step p { margin: 0; font-size: 13.5px; color: #cbd5e1; }
+  .intro-step strong { display: block; font-size: 14px; margin-bottom: 4px; }
+
+  h2 { font-size: 18px; }
+  .board { display: flex; gap: 16px; align-items: flex-start; overflow-x: auto; }
+  .board-column { flex: 1 1 260px; min-width: 240px; background: var(--surface-2); border-radius: 12px; padding: 12px; min-height: 80px; }
+  .board-column.dragover { outline: 2px dashed var(--accent); }
+  .board-column h3 { display: flex; justify-content: space-between; }
+  .conv-card { background: var(--surface); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; cursor: grab; border: 1px solid rgba(255,255,255,0.04); }
+  .conv-card:active { cursor: grabbing; }
+  .conv-header { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .conv-number { font-size: 11px; color: var(--text-dim); }
+  .conv-last { font-size: 13px; color: #cbd5e1; margin: 4px 0 8px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .conv-thread { max-height: 220px; overflow-y: auto; background: var(--bg); border-radius: 8px; padding: 8px; margin: 8px 0; font-size: 13px; }
+  .conv-msg { margin-bottom: 6px; }
+  .conv-msg.them { color: var(--text); }
+  .conv-msg.bot { color: #4ade80; }
+  .conv-msg.me { color: #60a5fa; }
+  .conv-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .conv-actions button { font-size: 12px; padding: 5px 8px; }
+  .conv-replyForm { display: flex; gap: 6px; margin-top: 8px; }
+
+  @media (max-width: 520px) {
+    body { padding: 18px 14px 48px; }
+    .numbers-list { gap: 14px; }
+    img.qr { width: 170px; height: 170px; }
+  }
+</style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <h1>🤖 Bot de WhatsApp</h1>
+      <span class="env-badge" id="envBadge"></span>
+    </div>
+    <div class="top-bar-right">
+      <a class="help-link" id="helpLink">¿Cómo funciona?</a>
+      <a class="logout" href="/logout">Cerrar sesión</a>
+    </div>
+  </div>
+
+  <div id="intro" style="display:none;">
+    <h2>👋 Guía rápida</h2>
+    <small>Seguí estos pasos la primera vez. Podés volver a ver esta guía tocando "¿Cómo funciona?" arriba.</small>
+    <div class="intro-steps">
+      <div class="intro-step">
+        <span class="n">1</span>
+        <strong>Agregá un número</strong>
+        <p>Escribí un nombre (ej. "Ventas") y tocá "Agregar número" más abajo.</p>
+      </div>
+      <div class="intro-step">
+        <span class="n">2</span>
+        <strong>Escaneá el QR</strong>
+        <p>Abrí WhatsApp en el celular → Ajustes → Dispositivos vinculados → Vincular un dispositivo.</p>
+      </div>
+      <div class="intro-step">
+        <span class="n">3</span>
+        <strong>Cargá reglas</strong>
+        <p>Palabra clave → respuesta. También podés armar un menú de opciones o activar IA.</p>
+      </div>
+      <div class="intro-step">
+        <span class="n">4</span>
+        <strong>Sumá grupos (opcional)</strong>
+        <p>Activá FAQs en un grupo: el bot responde solo por palabra clave, no a todo.</p>
+      </div>
+      <div class="intro-step">
+        <span class="n">5</span>
+        <strong>Usá el tablero</strong>
+        <p>Cada consulta entra como "Nuevo" — movela a "En proceso" o "Resuelto" a medida que la atendés.</p>
+      </div>
+    </div>
+    <button type="button" class="ghost" id="dismissIntro">Entendido, cerrar guía</button>
+  </div>
+
+  <form id="addForm" class="card" style="margin-top:16px;">
+    <div class="row">
+      <input id="newLabel" placeholder="Nombre del número (ej: Ventas)" maxlength="40" required />
+      <button type="submit">Agregar número</button>
+    </div>
+    <div class="error-text" id="addError"></div>
+  </form>
+
+  <div id="loading" class="empty-state">Cargando…</div>
+  <div id="empty" class="empty-state" style="display:none;">Todavía no agregaste ningún número. Agregalo arriba ☝️</div>
+  <div id="numbers" class="numbers-list"></div>
+
+  <h2>📋 Consultas</h2>
+  <small>Cada conversación entra como "Nuevo". Arrastrá la tarjeta (o usá los botones) para moverla de columna a medida que la atendés.</small>
+  <div class="board" style="margin-top:12px;">
+    <div class="board-column" data-status="nuevo">
+      <h3>Nuevo <span class="count"></span></h3>
+      <div class="board-list" data-status="nuevo"></div>
+    </div>
+    <div class="board-column" data-status="proceso">
+      <h3>En proceso <span class="count"></span></h3>
+      <div class="board-list" data-status="proceso"></div>
+    </div>
+    <div class="board-column" data-status="resuelto">
+      <h3>Resuelto <span class="count"></span></h3>
+      <div class="board-list" data-status="resuelto"></div>
+    </div>
+  </div>
+
+  <template id="conversationTemplate">
+    <div class="conv-card" draggable="true">
+      <div class="conv-header">
+        <strong class="conv-name"></strong>
+        <span class="conv-number"></span>
+      </div>
+      <div class="conv-last"></div>
+      <button type="button" class="ghost conv-toggle">Ver conversación</button>
+      <div class="conv-thread" style="display:none;"></div>
+      <form class="conv-replyForm" style="display:none;">
+        <input class="conv-replyInput" placeholder="Escribir respuesta…" maxlength="2000" />
+        <button type="submit">Enviar</button>
+      </form>
+      <div class="error-text conv-replyError"></div>
+      <div class="conv-actions"></div>
+    </div>
+  </template>
+
+  <template id="numberTemplate">
+    <div class="card number-card">
+      <div class="row" style="justify-content: space-between;">
+        <strong class="label"></strong>
+        <span class="status"></span>
+      </div>
+      <small class="phone"></small>
+      <div class="qrBox"></div>
+
+      <div class="section">
+        <label class="row" style="cursor:pointer;">
+          <input type="checkbox" class="autoReplyToggle" style="flex:none;" />
+          Respuestas automáticas activadas
+        </label>
+      </div>
+
+      <details class="section">
+        <summary>🤖 Respuestas con IA <span class="badge-count aiStatusBadge"></span></summary>
+        <div class="section-body">
+          <label class="row" style="cursor:pointer;">
+            <input type="checkbox" class="aiToggle" style="flex:none;" />
+            Activar (responde si ninguna regla matchea)
+          </label>
+          <small class="hint">Contale a la IA sobre tu negocio (productos, precios, horarios, FAQ) para que responda mensajes que no matchean ninguna regla, de forma natural.</small>
+          <textarea class="aiContext" rows="3" placeholder="Ej: Somos una verdulería en Córdoba. Horario: 9 a 20hs de lunes a sábado. Hacemos envíos a domicilio con costo según zona..." maxlength="4000" style="margin-top:6px;"></textarea>
+          <div class="row" style="margin-top:6px;">
+            <button class="ghost saveAiContext" type="button">Guardar contexto</button>
+          </div>
+          <div class="error-text aiError"></div>
+        </div>
+      </details>
+
+      <details class="section" open>
+        <summary>💬 Reglas de respuesta <span class="badge-count rulesCount"></span></summary>
+        <div class="section-body">
+          <ul class="rulesList"></ul>
+          <form class="addRuleForm" style="margin-top:8px;">
+            <div class="row">
+              <input class="rule-keyword" placeholder="Palabra clave (vacío = por defecto)" maxlength="60" />
+            </div>
+            <label class="row" style="cursor:pointer; margin-top:6px;">
+              <input type="checkbox" class="rule-menuToggle" style="flex:none;" />
+              Es un menú de opciones (pregunta y espera que elijan)
+            </label>
+            <div class="rule-simple" style="margin-top:6px;">
+              <div class="row">
+                <input class="rule-response" placeholder="Texto de respuesta" maxlength="1000" />
+              </div>
+            </div>
+            <div class="rule-menu" style="display:none; margin-top:6px;">
+              <input class="rule-prompt" placeholder="Pregunta (opcional, ej: ¿Qué lista necesitás?)" maxlength="200" style="width:100%; margin-bottom:6px;" />
+              <div class="rule-options"></div>
+              <button type="button" class="ghost rule-addOption">+ Agregar opción</button>
+            </div>
+            <div class="row" style="margin-top:8px;">
+              <button class="ghost" type="submit">Agregar</button>
+            </div>
+          </form>
+          <div class="error-text rulesError"></div>
+        </div>
+      </details>
+
+      <details class="section">
+        <summary>↪️ Redirigir mensajes <span class="badge-count forwardCount"></span></summary>
+        <div class="section-body">
+          <ul class="forwardList"></ul>
+          <form class="row addForwardForm" style="margin-top:8px;">
+            <input class="forwardNumber" placeholder="Número con código de país (549...)" required />
+            <button class="ghost" type="submit">Agregar</button>
+          </form>
+          <div class="error-text forwardError"></div>
+        </div>
+      </details>
+
+      <details class="section">
+        <summary>🚫 Contactos excluidos <span class="badge-count excludedCount"></span></summary>
+        <div class="section-body">
+          <small class="hint">Estos números nunca reciben respuesta automática ni de IA (útil para tus contactos personales).</small>
+          <ul class="excludedList"></ul>
+          <form class="row addExcludedForm" style="margin-top:8px;">
+            <input class="excludedNumber" placeholder="Número con código de país" required />
+            <button class="ghost" type="submit">Agregar</button>
+          </form>
+          <div class="error-text excludedError"></div>
+        </div>
+      </details>
+
+      <details class="section">
+        <summary>👥 Grupos — FAQs</summary>
+        <div class="section-body">
+          <small class="hint">Activá un grupo y cargá preguntas frecuentes: el bot solo responde si el mensaje contiene la palabra clave — no le contesta a todo el grupo.</small>
+          <div class="row" style="margin-top:8px;">
+            <button class="ghost loadGroups" type="button">Actualizar lista de grupos</button>
+          </div>
+          <div class="error-text groupsError"></div>
+          <div class="groupsList"></div>
+        </div>
+      </details>
+
+      <div class="section">
+        <button class="danger removeSession" type="button">Eliminar este número</button>
+      </div>
+    </div>
+  </template>
+
+  <template id="groupTemplate">
+    <div class="card group-item" style="background:#111b21;">
+      <label class="row" style="cursor:pointer; justify-content: space-between;">
+        <span class="row" style="flex:1;">
+          <input type="checkbox" class="groupToggle" style="flex:none;" />
+          <strong class="groupName"></strong>
+        </span>
+      </label>
+      <div class="group-body section">
+        <ul class="groupRulesList"></ul>
+        <form class="addGroupRuleForm" style="margin-top:8px;">
+          <div class="row">
+            <input class="rule-keyword" placeholder="Palabra clave (ej: horario)" maxlength="60" required />
+          </div>
+          <label class="row" style="cursor:pointer; margin-top:6px;">
+            <input type="checkbox" class="rule-menuToggle" style="flex:none;" />
+            Es un menú de opciones (pregunta y espera que elijan)
+          </label>
+          <div class="rule-simple" style="margin-top:6px;">
+            <div class="row">
+              <input class="rule-response" placeholder="Respuesta" maxlength="1000" />
+            </div>
+          </div>
+          <div class="rule-menu" style="display:none; margin-top:6px;">
+            <input class="rule-prompt" placeholder="Pregunta (opcional)" maxlength="200" style="width:100%; margin-bottom:6px;" />
+            <div class="rule-options"></div>
+            <button type="button" class="ghost rule-addOption">+ Agregar opción</button>
+          </div>
+          <div class="row" style="margin-top:8px;">
+            <button class="ghost" type="submit">Agregar FAQ</button>
+          </div>
+        </form>
+        <div class="error-text groupRuleError"></div>
+      </div>
+    </div>
+  </template>
+
+<script>
+const STATUS_LABEL = { connected: 'Conectado', qr: 'Escanear QR', connecting: 'Conectando…', disconnected: 'Desconectado' };
+const cardNodes = new Map(); // sessionId -> DOM node
+const sessionLabels = {}; // sessionId -> label, used by the board
+const conversationNodes = new Map(); // conversationId -> DOM node
+const CONV_STATUS_LABEL = { nuevo: 'Nuevo', proceso: 'En proceso', resuelto: 'Resuelto' };
+const CONV_STATUSES = ['nuevo', 'proceso', 'resuelto'];
+
+function introKey(envId) {
+  return `introDismissed:${envId}`;
+}
+
+function showIntro() {
+  document.getElementById('intro').style.display = 'block';
+}
+
+function hideIntro(envId) {
+  document.getElementById('intro').style.display = 'none';
+  localStorage.setItem(introKey(envId), '1');
+}
+
+async function loadWhoAmI() {
+  let who;
+  try {
+    who = await api('/api/whoami');
+  } catch (err) {
+    return; // si falla, seguimos igual — no es crítico para usar el panel
+  }
+  if (who.type === 'admin') {
+    location.href = '/admin.html';
+    return;
+  }
+  document.getElementById('envBadge').textContent = who.name ? `Empresa: ${who.name}` : '';
+  document.title = who.name ? `${who.name} — Bot de WhatsApp` : 'Bot de WhatsApp';
+
+  const dismissed = localStorage.getItem(introKey(who.envId));
+  if (!dismissed) showIntro();
+
+  document.getElementById('helpLink').onclick = () => showIntro();
+  document.getElementById('dismissIntro').onclick = () => hideIntro(who.envId);
+}
+
+async function api(path, opts) {
+  const res = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || 'Error inesperado');
+  return body;
+}
+
+function withBusy(button, fn) {
+  return async (...args) => {
+    button.disabled = true;
+    try {
+      await fn(...args);
+    } finally {
+      button.disabled = false;
+    }
+  };
+}
+
+function addOptionRow(container) {
+  const row = document.createElement('div');
+  row.className = 'row rule-option';
+  const label = document.createElement('input');
+  label.className = 'rule-optionLabel';
+  label.placeholder = 'Opción (ej: Lista 1)';
+  label.maxLength = 60;
+  const response = document.createElement('input');
+  response.className = 'rule-optionResponse';
+  response.placeholder = 'Respuesta para esta opción';
+  response.maxLength = 1000;
+  const removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.className = 'ghost';
+  removeBtn.textContent = '✕';
+  removeBtn.onclick = () => row.remove();
+  row.append(label, response, removeBtn);
+  container.appendChild(row);
+  return row;
+}
+
+// Formulario compartido entre "Reglas de respuesta" (DM) y "FAQ" (grupos): una
+// regla simple (palabra clave → texto) o un menú de opciones (palabra clave →
+// pregunta + varias opciones, cada una con su propia respuesta).
+function setupRuleForm(form, { requireKeyword, errorEl, onSubmit }) {
+  const menuToggle = form.querySelector('.rule-menuToggle');
+  const simpleBox = form.querySelector('.rule-simple');
+  const menuBox = form.querySelector('.rule-menu');
+  const optionsContainer = form.querySelector('.rule-options');
+
+  addOptionRow(optionsContainer);
+  addOptionRow(optionsContainer);
+
+  menuToggle.onchange = () => {
+    simpleBox.style.display = menuToggle.checked ? 'none' : 'block';
+    menuBox.style.display = menuToggle.checked ? 'block' : 'none';
+  };
+
+  form.querySelector('.rule-addOption').onclick = () => addOptionRow(optionsContainer);
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const keywordInput = form.querySelector('.rule-keyword');
+    const keyword = keywordInput.value.trim();
+    if (requireKeyword && !keyword) {
+      errorEl.textContent = 'Falta la palabra clave';
+      return;
+    }
+
+    let payload;
+    if (menuToggle.checked) {
+      const options = [...optionsContainer.querySelectorAll('.rule-option')].map((row) => ({
+        label: row.querySelector('.rule-optionLabel').value.trim(),
+        response: row.querySelector('.rule-optionResponse').value.trim(),
+      }));
+      const validOptions = options.filter((o) => o.label && o.response);
+      if (validOptions.length < 2) {
+        errorEl.textContent = 'Cargá al menos 2 opciones con etiqueta y respuesta';
+        return;
+      }
+      payload = { keyword, type: 'menu', prompt: form.querySelector('.rule-prompt').value.trim(), options: validOptions };
+    } else {
+      const response = form.querySelector('.rule-response').value.trim();
+      if (!response) {
+        errorEl.textContent = 'Falta el texto de respuesta';
+        return;
+      }
+      payload = { keyword, response };
+    }
+
+    const submit = withBusy(form.querySelector('button[type="submit"]'), async () => {
+      errorEl.textContent = '';
+      try {
+        await onSubmit(payload);
+        keywordInput.value = '';
+        form.querySelector('.rule-response').value = '';
+        form.querySelector('.rule-prompt').value = '';
+        optionsContainer.innerHTML = '';
+        addOptionRow(optionsContainer);
+        addOptionRow(optionsContainer);
+        menuToggle.checked = false;
+        simpleBox.style.display = 'block';
+        menuBox.style.display = 'none';
+      } catch (err) {
+        errorEl.textContent = err.message;
+      }
+    });
+    submit();
+  });
+}
+
+function formatRuleLabel(rule) {
+  if (rule.type === 'menu') {
+    const options = rule.options.map((o) => o.label).join(' / ');
+    return `${rule.keyword || '(por defecto)'} → menú: ${options}`;
+  }
+  return rule.keyword ? `${rule.keyword} → ${rule.response}` : `(por defecto) → ${rule.response}`;
+}
+
+function buildCard(id) {
+  const tpl = document.getElementById('numberTemplate');
+  const node = tpl.content.firstElementChild.cloneNode(true);
+
+  const toggle = node.querySelector('.autoReplyToggle');
+  toggle.onchange = async () => {
+    try {
+      await api(`/api/sessions/${id}`, { method: 'PATCH', body: JSON.stringify({ autoReplyEnabled: toggle.checked }) });
+    } catch (err) {
+      toggle.checked = !toggle.checked; // revert on failure
+      alert(err.message);
+    }
+  };
+
+  const aiToggle = node.querySelector('.aiToggle');
+  const aiError = node.querySelector('.aiError');
+  aiToggle.onchange = async () => {
+    try {
+      aiError.textContent = '';
+      await api(`/api/sessions/${id}`, { method: 'PATCH', body: JSON.stringify({ aiEnabled: aiToggle.checked }) });
+    } catch (err) {
+      aiToggle.checked = !aiToggle.checked;
+      aiError.textContent = err.message;
+    }
+  };
+
+  const aiContext = node.querySelector('.aiContext');
+  node.querySelector('.saveAiContext').onclick = withBusy(node.querySelector('.saveAiContext'), async () => {
+    aiError.textContent = '';
+    try {
+      await api(`/api/sessions/${id}`, { method: 'PATCH', body: JSON.stringify({ aiContext: aiContext.value }) });
+    } catch (err) {
+      aiError.textContent = err.message;
+    }
+  });
+
+  setupRuleForm(node.querySelector('.addRuleForm'), {
+    requireKeyword: false,
+    errorEl: node.querySelector('.rulesError'),
+    onSubmit: async (payload) => {
+      await api(`/api/sessions/${id}/rules`, { method: 'POST', body: JSON.stringify(payload) });
+      refresh();
+    },
+  });
+
+  const forwardForm = node.querySelector('.addForwardForm');
+  const forwardError = node.querySelector('.forwardError');
+  forwardForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const numberInput = forwardForm.querySelector('.forwardNumber');
+    if (!numberInput.value.trim()) return;
+    const submit = withBusy(forwardForm.querySelector('button'), async () => {
+      forwardError.textContent = '';
+      try {
+        await api(`/api/sessions/${id}/forward`, { method: 'POST', body: JSON.stringify({ number: numberInput.value }) });
+        numberInput.value = '';
+        refresh();
+      } catch (err) {
+        forwardError.textContent = err.message;
+      }
+    });
+    submit();
+  });
+
+  const excludedForm = node.querySelector('.addExcludedForm');
+  const excludedError = node.querySelector('.excludedError');
+  excludedForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const numberInput = excludedForm.querySelector('.excludedNumber');
+    if (!numberInput.value.trim()) return;
+    const submit = withBusy(excludedForm.querySelector('button'), async () => {
+      excludedError.textContent = '';
+      try {
+        await api(`/api/sessions/${id}/excluded`, { method: 'POST', body: JSON.stringify({ number: numberInput.value }) });
+        numberInput.value = '';
+        refresh();
+      } catch (err) {
+        excludedError.textContent = err.message;
+      }
+    });
+    submit();
+  });
+
+  const groupsError = node.querySelector('.groupsError');
+  node.querySelector('.loadGroups').onclick = withBusy(node.querySelector('.loadGroups'), async () => {
+    groupsError.textContent = '';
+    try {
+      const groups = await api(`/api/sessions/${id}/groups`);
+      renderGroups(node, id, groups);
+    } catch (err) {
+      groupsError.textContent = err.message;
+    }
+  });
+
+  node.querySelector('.removeSession').onclick = async () => {
+    if (!confirm('¿Eliminar este número? Vas a tener que volver a escanear el QR si lo agregás de nuevo.')) return;
+    await api(`/api/sessions/${id}`, { method: 'DELETE' });
+    cardNodes.delete(id);
+    node.remove();
+    refresh();
+  };
+
+  return node;
+}
+
+function renderList(ul, items, formatLabel, onRemove) {
+  ul.innerHTML = '';
+  items.forEach((item, i) => {
+    const li = document.createElement('li');
+    const span = document.createElement('span');
+    span.textContent = formatLabel(item);
+    const del = document.createElement('button');
+    del.className = 'ghost';
+    del.type = 'button';
+    del.textContent = 'Quitar';
+    del.onclick = () => onRemove(item, i);
+    li.append(span, del);
+    ul.appendChild(li);
+  });
+}
+
+function updateCard(node, s, id) {
+  node.querySelector('.label').textContent = s.label || id;
+  node.querySelector('.phone').textContent = s.phone ? `+${s.phone}` : 'Sin vincular todavía';
+
+  const statusEl = node.querySelector('.status');
+  statusEl.textContent = STATUS_LABEL[s.status] || s.status;
+  statusEl.className = `status ${s.status}`;
+
+  const qrBox = node.querySelector('.qrBox');
+  if (s.status === 'qr' && s.qrDataUrl) {
+    if (qrBox.dataset.src !== s.qrDataUrl) {
+      qrBox.innerHTML = '<img class="qr" alt="Código QR para vincular WhatsApp" />';
+      qrBox.querySelector('img').src = s.qrDataUrl;
+      qrBox.dataset.src = s.qrDataUrl;
+    }
+  } else if (s.status === 'connecting') {
+    qrBox.innerHTML = '<small class="hint">Generando código QR…</small>';
+    qrBox.dataset.src = '';
+  } else {
+    qrBox.innerHTML = '';
+    qrBox.dataset.src = '';
+  }
+
+  const toggle = node.querySelector('.autoReplyToggle');
+  if (document.activeElement !== toggle) toggle.checked = !!s.autoReplyEnabled;
+
+  const aiToggle = node.querySelector('.aiToggle');
+  if (document.activeElement !== aiToggle) aiToggle.checked = !!s.aiEnabled;
+  const aiContext = node.querySelector('.aiContext');
+  if (document.activeElement !== aiContext) aiContext.value = s.aiContext || '';
+
+  sessionLabels[id] = s.label || id;
+
+  renderList(
+    node.querySelector('.rulesList'),
+    s.rules || [],
+    formatRuleLabel,
+    async (_, index) => {
+      await api(`/api/sessions/${id}/rules/${index}`, { method: 'DELETE' });
+      refresh();
+    }
+  );
+
+  renderList(
+    node.querySelector('.forwardList'),
+    s.forwardTo || [],
+    (number) => `+${number}`,
+    async (number) => {
+      await api(`/api/sessions/${id}/forward/${number}`, { method: 'DELETE' });
+      refresh();
+    }
+  );
+
+  renderList(
+    node.querySelector('.excludedList'),
+    s.excludedContacts || [],
+    (number) => `+${number}`,
+    async (number) => {
+      await api(`/api/sessions/${id}/excluded/${number}`, { method: 'DELETE' });
+      refresh();
+    }
+  );
+
+  setBadgeCount(node.querySelector('.rulesCount'), (s.rules || []).length);
+  setBadgeCount(node.querySelector('.forwardCount'), (s.forwardTo || []).length);
+  setBadgeCount(node.querySelector('.excludedCount'), (s.excludedContacts || []).length);
+  const aiBadge = node.querySelector('.aiStatusBadge');
+  aiBadge.textContent = 'ON';
+  aiBadge.style.display = s.aiEnabled ? 'inline-block' : 'none';
+}
+
+function setBadgeCount(el, count) {
+  el.textContent = count || '';
+  el.style.display = count ? 'inline-block' : 'none';
+}
+
+function buildGroupNode(sessionId, group) {
+  const tpl = document.getElementById('groupTemplate');
+  const node = tpl.content.firstElementChild.cloneNode(true);
+
+  const toggle = node.querySelector('.groupToggle');
+  toggle.checked = !!group.enabled;
+  toggle.onchange = async () => {
+    try {
+      await api(`/api/sessions/${sessionId}/groups/${encodeURIComponent(group.jid)}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ enabled: toggle.checked, name: group.name }),
+      });
+    } catch (err) {
+      toggle.checked = !toggle.checked;
+      alert(err.message);
+    }
+  };
+
+  node.querySelector('.groupName').textContent = group.name;
+
+  function renderGroupRules() {
+    renderList(
+      node.querySelector('.groupRulesList'),
+      group.rules || [],
+      formatRuleLabel,
+      async (_, index) => {
+        await api(`/api/sessions/${sessionId}/groups/${encodeURIComponent(group.jid)}/rules/${index}`, { method: 'DELETE' });
+        group.rules = group.rules.filter((_, i) => i !== index);
+        renderGroupRules();
+      }
+    );
+  }
+  renderGroupRules();
+
+  setupRuleForm(node.querySelector('.addGroupRuleForm'), {
+    requireKeyword: true,
+    errorEl: node.querySelector('.groupRuleError'),
+    onSubmit: async (payload) => {
+      const updated = await api(`/api/sessions/${sessionId}/groups/${encodeURIComponent(group.jid)}/rules`, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      group.rules = updated.rules;
+      renderGroupRules();
+    },
+  });
+
+  return node;
+}
+
+function renderGroups(cardNode, sessionId, groups) {
+  const container = cardNode.querySelector('.groupsList');
+  container.innerHTML = '';
+  if (groups.length === 0) {
+    container.innerHTML = '<small class="hint">No se encontraron grupos para este número (o todavía no es miembro de ninguno).</small>';
+    return;
+  }
+  groups.forEach((group) => container.appendChild(buildGroupNode(sessionId, group)));
+}
+
+function buildConversationCard(id) {
+  const tpl = document.getElementById('conversationTemplate');
+  const node = tpl.content.firstElementChild.cloneNode(true);
+  node.dataset.id = id;
+
+  node.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', id);
+  });
+
+  node.querySelector('.conv-toggle').onclick = () => {
+    const thread = node.querySelector('.conv-thread');
+    const replyForm = node.querySelector('.conv-replyForm');
+    const nowOpen = thread.style.display === 'none';
+    thread.style.display = nowOpen ? 'block' : 'none';
+    replyForm.style.display = nowOpen ? 'flex' : 'none';
+    node.querySelector('.conv-toggle').textContent = nowOpen ? 'Ocultar conversación' : 'Ver conversación';
+  };
+
+  const replyForm = node.querySelector('.conv-replyForm');
+  const replyError = node.querySelector('.conv-replyError');
+  replyForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = replyForm.querySelector('.conv-replyInput');
+    if (!input.value.trim()) return;
+    const submit = withBusy(replyForm.querySelector('button'), async () => {
+      replyError.textContent = '';
+      try {
+        await api(`/api/conversations/${encodeURIComponent(id)}/reply`, { method: 'POST', body: JSON.stringify({ text: input.value }) });
+        input.value = '';
+        refreshBoard();
+      } catch (err) {
+        replyError.textContent = err.message;
+      }
+    });
+    submit();
+  });
+
+  return node;
+}
+
+function updateConversationCard(node, conv) {
+  node.querySelector('.conv-name').textContent = conv.name || conv.phone;
+  node.querySelector('.conv-number').textContent = sessionLabels[conv.sessionId] || conv.sessionId;
+  node.querySelector('.conv-last').textContent = conv.lastMessage || '';
+
+  const thread = node.querySelector('.conv-thread');
+  thread.innerHTML = '';
+  (conv.messages || []).forEach((m) => {
+    const div = document.createElement('div');
+    div.className = `conv-msg ${m.from}`;
+    const who = { them: conv.name || conv.phone, bot: 'Bot', me: 'Vos' }[m.from] || m.from;
+    div.textContent = `${who}: ${m.text}`;
+    thread.appendChild(div);
+  });
+  thread.scrollTop = thread.scrollHeight;
+
+  const actions = node.querySelector('.conv-actions');
+  actions.innerHTML = '';
+  CONV_STATUSES.filter((s) => s !== conv.status).forEach((s) => {
+    const btn = document.createElement('button');
+    btn.className = 'ghost';
+    btn.type = 'button';
+    btn.textContent = `→ ${CONV_STATUS_LABEL[s]}`;
+    btn.onclick = async () => {
+      await api(`/api/conversations/${encodeURIComponent(conv.id)}`, { method: 'PATCH', body: JSON.stringify({ status: s }) });
+      refreshBoard();
+    };
+    actions.appendChild(btn);
+  });
+}
+
+async function refreshBoard() {
+  let list;
+  try {
+    list = await api('/api/conversations');
+  } catch (err) {
+    return; // el estado de sesiones ya muestra el error de conexión
+  }
+
+  const seen = new Set();
+  const columnCounts = { nuevo: 0, proceso: 0, resuelto: 0 };
+
+  for (const conv of list) {
+    seen.add(conv.id);
+    columnCounts[conv.status] = (columnCounts[conv.status] || 0) + 1;
+
+    let node = conversationNodes.get(conv.id);
+    if (!node) {
+      node = buildConversationCard(conv.id);
+      conversationNodes.set(conv.id, node);
+    }
+    updateConversationCard(node, conv);
+
+    const column = document.querySelector(`.board-list[data-status="${conv.status}"]`);
+    if (column && node.parentElement !== column) column.appendChild(node);
+  }
+
+  for (const [id, node] of conversationNodes) {
+    if (!seen.has(id)) {
+      node.remove();
+      conversationNodes.delete(id);
+    }
+  }
+
+  document.querySelectorAll('.board-column').forEach((col) => {
+    const status = col.dataset.status;
+    col.querySelector('.count').textContent = columnCounts[status] ? `(${columnCounts[status]})` : '';
+  });
+}
+
+document.querySelectorAll('.board-list').forEach((list) => {
+  list.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    list.closest('.board-column').classList.add('dragover');
+  });
+  list.addEventListener('dragleave', () => {
+    list.closest('.board-column').classList.remove('dragover');
+  });
+  list.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    list.closest('.board-column').classList.remove('dragover');
+    const id = e.dataTransfer.getData('text/plain');
+    if (!id) return;
+    await api(`/api/conversations/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify({ status: list.dataset.status }) });
+    refreshBoard();
+  });
+});
+
+async function refresh() {
+  let list;
+  try {
+    list = await api('/api/sessions');
+  } catch (err) {
+    document.getElementById('loading').textContent = `No se pudo conectar con el servidor: ${err.message}`;
+    document.getElementById('loading').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('empty').style.display = list.length === 0 ? 'block' : 'none';
+
+  const container = document.getElementById('numbers');
+  const seen = new Set();
+
+  for (const s of list) {
+    seen.add(s.id);
+    let node = cardNodes.get(s.id);
+    if (!node) {
+      node = buildCard(s.id);
+      cardNodes.set(s.id, node);
+      container.appendChild(node);
+    }
+    updateCard(node, s, s.id);
+  }
+
+  for (const [id, node] of cardNodes) {
+    if (!seen.has(id)) {
+      node.remove();
+      cardNodes.delete(id);
+    }
+  }
+}
+
+document.getElementById('addForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const input = document.getElementById('newLabel');
+  const errorEl = document.getElementById('addError');
+  if (!input.value.trim()) return;
+  const button = e.target.querySelector('button');
+  const submit = withBusy(button, async () => {
+    errorEl.textContent = '';
+    try {
+      await api('/api/sessions', { method: 'POST', body: JSON.stringify({ label: input.value }) });
+      input.value = '';
+      refresh();
+    } catch (err) {
+      errorEl.textContent = err.message;
+    }
+  });
+  submit();
+});
+
+loadWhoAmI();
+refresh();
+refreshBoard();
+setInterval(refresh, 4000); // refresca estado / QR sin pisar lo que el usuario está escribiendo
+setInterval(refreshBoard, 4000);
+</script>
+</body>
+</html>
