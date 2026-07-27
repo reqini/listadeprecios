@@ -128,6 +128,15 @@
   .conv-actions button { font-size: 12px; padding: 5px 8px; }
   .conv-replyForm { display: flex; gap: 6px; margin-top: 8px; }
 
+  /* navegación por tabs del dashboard */
+  .main-tabs { display: flex; gap: 4px; margin: 18px 0 14px; border-bottom: 1px solid var(--border); }
+  .main-tab { background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-dim); font-weight: 600; font-size: 15px; padding: 10px 16px; cursor: pointer; border-radius: 0; white-space: nowrap; }
+  .main-tab:hover { color: var(--text); filter: none; transform: none; }
+  .main-tab.active { color: var(--accent-strong); border-bottom-color: var(--accent); }
+  .tab-badge { background: var(--accent); color: #04211a; font-size: 11px; padding: 1px 7px; border-radius: 999px; font-weight: 700; margin-left: 2px; }
+  /* Consultas a pantalla completa: rompe el max-width centrado del body */
+  .board-fullscreen { width: 100vw; margin-left: calc(50% - 50vw); padding: 0 clamp(14px, 4vw, 40px); box-sizing: border-box; }
+
   @media (max-width: 520px) {
     body { padding: 18px 14px 48px; }
     .numbers-list { gap: 14px; }
@@ -146,6 +155,13 @@
       <a class="logout" href="/logout">Cerrar sesión</a>
     </div>
   </div>
+
+  <nav class="main-tabs">
+    <button type="button" class="main-tab active" data-view="numbers">📱 Mis números</button>
+    <button type="button" class="main-tab" data-view="consultas">📋 Consultas <span class="tab-badge" id="consultasBadge" style="display:none;"></span></button>
+  </nav>
+
+  <div id="view-numbers" class="view">
 
   <div id="intro" style="display:none;">
     <h2>👋 Guía rápida</h2>
@@ -173,8 +189,8 @@
       </div>
       <div class="intro-step">
         <span class="n">5</span>
-        <strong>Usá el tablero</strong>
-        <p>Cada consulta entra como "Nuevo" — movela a "En proceso" o "Resuelto" a medida que la atendés.</p>
+        <strong>Mirá las consultas</strong>
+        <p>En el tab "📋 Consultas" (arriba) cada mensaje entra como "Nuevo" — movelo a "En proceso" o "Resuelto" a medida que atendés.</p>
       </div>
     </div>
     <button type="button" class="ghost" id="dismissIntro">Entendido, cerrar guía</button>
@@ -192,9 +208,13 @@
   <div id="empty" class="empty-state" style="display:none;">Todavía no agregaste ningún número. Agregalo arriba ☝️</div>
   <div id="numbers" class="numbers-list"></div>
 
-  <h2>📋 Consultas</h2>
-  <small>Cada conversación entra como "Nuevo". Arrastrá la tarjeta (o usá los botones) para moverla de columna a medida que la atendés.</small>
-  <div class="board" style="margin-top:12px;">
+  </div><!-- /view-numbers -->
+
+  <div id="view-consultas" class="view" style="display:none;">
+    <div class="board-fullscreen">
+      <h2 style="margin-top:8px;">📋 Consultas</h2>
+      <p class="section-hint">Cada conversación entra como "Nuevo". Arrastrá la tarjeta (o usá los botones →) para moverla de columna a medida que la atendés.</p>
+      <div class="board" style="margin-top:12px;">
     <div class="board-column" data-status="nuevo">
       <h3>Nuevo <span class="count"></span></h3>
       <div class="board-list" data-status="nuevo"></div>
@@ -207,7 +227,9 @@
       <h3>Resuelto <span class="count"></span></h3>
       <div class="board-list" data-status="resuelto"></div>
     </div>
-  </div>
+      </div>
+    </div><!-- /board-fullscreen -->
+  </div><!-- /view-consultas -->
 
   <template id="conversationTemplate">
     <div class="conv-card" draggable="true">
@@ -1017,6 +1039,12 @@ async function refreshBoard() {
     const status = col.dataset.status;
     col.querySelector('.count').textContent = columnCounts[status] ? `(${columnCounts[status]})` : '';
   });
+
+  // badge en el tab de Consultas: cantidad de consultas nuevas sin atender
+  const nuevos = columnCounts.nuevo || 0;
+  const tabBadge = document.getElementById('consultasBadge');
+  tabBadge.textContent = nuevos || '';
+  tabBadge.style.display = nuevos ? 'inline-block' : 'none';
 }
 
 document.querySelectorAll('.board-list').forEach((list) => {
@@ -1090,6 +1118,18 @@ document.getElementById('addForm').addEventListener('submit', (e) => {
   });
   submit();
 });
+
+// Navegación por tabs: muestra una vista a la vez y recuerda la última elegida.
+function switchTab(view) {
+  document.querySelectorAll('.main-tab').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
+  document.getElementById('view-numbers').style.display = view === 'numbers' ? 'block' : 'none';
+  document.getElementById('view-consultas').style.display = view === 'consultas' ? 'block' : 'none';
+  localStorage.setItem('activeView', view);
+}
+document.querySelectorAll('.main-tab').forEach((b) => {
+  b.onclick = () => switchTab(b.dataset.view);
+});
+switchTab(localStorage.getItem('activeView') || 'numbers');
 
 loadWhoAmI();
 refresh();
