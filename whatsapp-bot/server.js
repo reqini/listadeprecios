@@ -3,7 +3,7 @@ const express = require('express');
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
-require('./migrate').run();
+const sb = require('./supabase');
 const store = require('./store');
 const sessions = require('./sessionManager');
 
@@ -83,6 +83,25 @@ function requireAuth(req, res, next) {
     req.auth = auth;
     return next();
   }
+  // El token no está en memoria (ej: el server se reinició/redeployó). Si Supabase está
+  // configurado, lo buscamos ahí — así un deploy no desloguea a nadie.
+  if (token && sb.enabled) {
+    return sb
+      .kvGet(`token:${token}`)
+      .then((remote) => {
+        if (remote && remote.expiresAt > Date.now()) {
+          activeTokens.set(token, remote);
+          req.auth = remote;
+          return next();
+        }
+        if (req.path.startsWith('/api/')) return res.status(401).json({ error: 'No autenticado' });
+        return res.redirect('/login.html');
+      })
+      .catch(() => {
+        if (req.path.startsWith('/api/')) return res.status(401).json({ error: 'No autenticado' });
+        return res.redirect('/login.html');
+      });
+  }
   if (req.path.startsWith('/api/')) return res.status(401).json({ error: 'No autenticado' });
   return res.redirect('/login.html');
 }
@@ -140,7 +159,9 @@ app.post('/login', (req, res) => {
 
 function issueSession(req, res, auth) {
   const token = crypto.randomBytes(24).toString('hex');
-  activeTokens.set(token, { ...auth, expiresAt: Date.now() + SESSION_TTL_MS });
+  const record = { ...auth, expiresAt: Date.now() + SESSION_TTL_MS };
+  activeTokens.set(token, record);
+  if (sb.enabled) sb.kvSet(`token:${token}`, record).catch(() => {});
   const secure = req.secure || req.headers['x-forwarded-proto'] === 'https' ? '; Secure' : '';
   res.setHeader(
     'Set-Cookie',
@@ -203,7 +224,9 @@ app.get(
 );
 
 app.get('/logout', (req, res) => {
-  activeTokens.delete(parseCookies(req)[COOKIE_NAME]);
+  const token = parseCookies(req)[COOKIE_NAME];
+  activeTokens.delete(token);
+  if (token && sb.enabled) sb.kvDelete(`token:${token}`).catch(() => {});
   res.setHeader('Set-Cookie', `${COOKIE_NAME}=; Path=/; Max-Age=0`);
   res.redirect('/login.html');
 });
@@ -283,6 +306,10 @@ app.delete(
       await sessions.stopSession(req.params.envId, sessionId).catch(() => {});
     }
     fs.rmSync(path.join(sessions.UPLOADS_DIR, req.params.envId), { recursive: true, force: true });
+    if (sb.enabled) {
+      sb.kvDeletePrefix(`session:${req.params.envId}:`).catch(() => {});
+      sb.storageDeletePrefix(req.params.envId).catch(() => {});
+    }
     store.deleteEnvironment(req.params.envId);
     res.json({ ok: true });
   })
@@ -373,6 +400,13 @@ app.post(
     const dir = path.join(sessions.UPLOADS_DIR, req.envId);
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, fileId), buf);
+    // Réplica a Supabase Storage (si está configurado) para que el archivo sobreviva
+    // a deploys. El disco local queda como caché de envío.
+    if (sb.enabled) {
+      sb.storagePut(`${req.envId}/${fileId}`, buf, mimetype).catch((err) =>
+        console.error('[supabase] no se pudo replicar el archivo subido:', err.message)
+      );
+    }
     res.json({ fileId, fileName, mimetype, size: buf.length });
   }
 );
@@ -591,7 +625,29 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`WhatsApp bot escuchando en http://localhost:${PORT}`);
-  sessions.restoreAllSessions();
-});
+
+// Arranque: si Supabase está configurado, primero restauramos el estado guardado
+// (config + luego cada sesión de WhatsApp se restaura al iniciarse). Recién después
+// corre la migración legacy y se empieza a escuchar.
+async function start() {
+  if (sb.enabled) {
+    try {
+      await sb.ensureBucket();
+      await store.syncFromRemote();
+    } catch (err) {
+      console.error('[supabase] no se pudo restaurar el estado (sigo con disco local):', err.message);
+    }
+  } else {
+    console.warn(
+      '[aviso] SUPABASE_URL / SUPABASE_SERVICE_KEY no configuradas: el estado vive solo en disco ' +
+        'local y se pierde en cada deploy si el host tiene disco efímero.'
+    );
+  }
+  require('./migrate').run();
+  app.listen(PORT, () => {
+    console.log(`WhatsApp bot escuchando en http://localhost:${PORT}`);
+    sessions.restoreAllSessions();
+  });
+}
+
+start();

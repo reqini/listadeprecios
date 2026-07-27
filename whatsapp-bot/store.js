@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { CONFIG_PATH } = require('./storagePaths');
+const sb = require('./supabase');
 
 const MAX_MESSAGES_PER_CONVERSATION = 40;
 
@@ -17,6 +18,24 @@ function load() {
 function save(config) {
   fs.mkdirSync(path.dirname(CONFIG_PATH), { recursive: true });
   fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2));
+  // Réplica asincrónica a Supabase (si está configurado): el disco local es la copia
+  // de trabajo, Supabase es la fuente que sobrevive a deploys/reinicios.
+  if (sb.enabled) {
+    sb.kvSet('config', config).catch((err) => console.error('[supabase] no se pudo replicar config:', err.message));
+  }
+}
+
+// Al arrancar: si Supabase está configurado y tiene un config guardado, lo bajamos al
+// disco local antes de que el server empiece a atender. Así, tras un deploy que borró
+// el disco, las empresas/reglas/conversaciones vuelven solas.
+async function syncFromRemote() {
+  if (!sb.enabled) return false;
+  const remote = await sb.kvGet('config');
+  if (!remote || !remote.environments) return false;
+  fs.mkdirSync(path.dirname(CONFIG_PATH), { recursive: true });
+  fs.writeFileSync(CONFIG_PATH, JSON.stringify(remote, null, 2));
+  console.log('[supabase] config restaurado (empresas, reglas y conversaciones).');
+  return true;
 }
 
 // --- Contraseñas (hash + salt, nunca texto plano en disco) ---
@@ -201,6 +220,7 @@ function appendConversationMessage(envId, id, entry) {
 module.exports = {
   load,
   save,
+  syncFromRemote,
   hashPassword,
   verifyPassword,
   listEnvironments,

@@ -192,16 +192,22 @@ Todo el estado del bot vive en disco: las empresas y reglas (`data/config.json`)
 credenciales de cada WhatsApp vinculado (`sessions/`) y los archivos subidos (`uploads/`).
 
 ⚠️ **El plan free de Render usa un disco EFÍMERO: se borra en cada deploy y en cada
-reinicio del servicio.** Eso significa que, tal cual, cada vez que se redeploya o el
-servicio se recicla, **se pierden las empresas, los números vinculados (hay que re-escanear
-el QR) y los archivos subidos**. Para uso real hay que resolver esto de una de dos formas:
+reinicio del servicio.** Sin persistencia externa se pierden las empresas, los números
+vinculados (habría que re-escanear el QR) y los archivos subidos. Soluciones:
 
-1. **Disco persistente de Render (recomendado).** Requiere una instancia paga (~USD 7/mes).
-   En Render: agregás un disco (ej: montado en `/data`) y seteás la variable `DATA_DIR=/data`.
-   Con eso, `config.json`, `sessions/` y `uploads/` se guardan en el disco y sobreviven a
-   deploys y reinicios. El código ya soporta `DATA_DIR` — no hay que tocar nada más.
-2. **Almacenamiento externo** (ej: una base de datos o un bucket). Es más trabajo de
-   desarrollo, pero permite quedarse en el plan free. Consultalo si te interesa esta vía.
+1. **Supabase (GRATIS, recomendada).** El bot replica todo su estado (config, sesiones de
+   WhatsApp, archivos subidos y logins del dashboard) a Supabase y lo restaura solo al
+   arrancar. Para habilitarlo:
+   - Corré la migración `supabase/migrations/0003_whatsapp_bot_kv.sql` en el SQL Editor
+     del proyecto de Supabase (crea la tabla `bot_kv`).
+   - En las variables de entorno del servicio: `SUPABASE_URL` (la URL del proyecto) y
+     `SUPABASE_SERVICE_KEY` (Project Settings → API keys → `service_role` — **nunca** la
+     anon key, y nunca la pongas en un frontend).
+   - El bucket privado `bot-uploads` se crea solo al arrancar.
+   Después de cada deploy, el bot arranca, baja su estado desde Supabase y sigue como si
+   nada: sin re-escanear QRs, sin perder empresas ni archivos, sin desloguear a nadie.
+2. **Disco persistente de Render** (~USD 7/mes): montás un disco en `/data` y seteás
+   `DATA_DIR=/data`. Igual de efectivo, pero pago.
 
-Si no configurás nada de esto y te quedás en free, el bot funciona igual, pero tené presente
-que vas a tener que recrear las empresas / re-vincular los números después de cada deploy.
+Si no configurás ninguna, el bot funciona igual pero el estado es descartable (útil solo
+para pruebas).

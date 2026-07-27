@@ -14,11 +14,55 @@ const {
 const store = require('./store');
 const { generateAiReply } = require('./ai');
 const { SESSIONS_DIR: AUTH_DIR, UPLOADS_DIR } = require('./storagePaths');
+const sb = require('./supabase');
 
 const MAX_RECONNECT_DELAY_MS = 30_000;
 
 function uploadPath(envId, fileId) {
   return path.join(UPLOADS_DIR, envId, fileId);
+}
+
+// --- Persistencia de credenciales de WhatsApp en Supabase ---
+// Baileys guarda las credenciales del número vinculado como archivos en sessions/.
+// En un host con disco efímero eso se pierde en cada deploy (y hay que re-escanear el
+// QR). Si Supabase está configurado, replicamos esos archivos (debounced) y los
+// restauramos al arrancar.
+const sessionSyncTimers = new Map(); // runtimeKey -> timeout
+
+function scheduleSessionSync(envId, sessionId, sessionDir) {
+  if (!sb.enabled) return;
+  const key = runtimeKey(envId, sessionId);
+  clearTimeout(sessionSyncTimers.get(key));
+  sessionSyncTimers.set(
+    key,
+    setTimeout(() => {
+      syncSessionToRemote(envId, sessionId, sessionDir).catch((err) =>
+        console.error(`[${envId}/${sessionId}] no se pudo replicar la sesión a Supabase:`, err.message)
+      );
+    }, 2000)
+  );
+}
+
+async function syncSessionToRemote(envId, sessionId, sessionDir) {
+  if (!fs.existsSync(sessionDir)) return;
+  const files = fs.readdirSync(sessionDir).filter((f) => f.endsWith('.json'));
+  for (const file of files) {
+    const content = fs.readFileSync(path.join(sessionDir, file), 'utf8');
+    await sb.kvSet(`session:${envId}:${sessionId}:${file}`, { b64: Buffer.from(content).toString('base64') });
+  }
+}
+
+async function restoreSessionFromRemote(envId, sessionId, sessionDir) {
+  if (!sb.enabled) return false;
+  const rows = await sb.kvListPrefix(`session:${envId}:${sessionId}:`);
+  if (!rows.length) return false;
+  fs.mkdirSync(sessionDir, { recursive: true });
+  for (const row of rows) {
+    const file = row.k.split(':').pop();
+    fs.writeFileSync(path.join(sessionDir, file), Buffer.from(row.v.b64, 'base64').toString('utf8'));
+  }
+  console.log(`[${envId}/${sessionId}] sesión de WhatsApp restaurada desde Supabase (${rows.length} archivos).`);
+  return true;
 }
 
 // runtimeKey (`${envId}::${sessionId}`) -> { sock, status, qrDataUrl, reconnectDelay }
@@ -265,9 +309,18 @@ async function sendAction(sock, jid, action) {
 
   if (action.kind === 'file') {
     const filePath = uploadPath(action.envId, action.fileId);
+    if (!fs.existsSync(filePath) && sb.enabled) {
+      // El disco local no lo tiene (ej: deploy reciente) — lo bajamos de Supabase
+      // Storage y lo dejamos cacheado en disco para los próximos envíos.
+      const remote = await sb.storageGet(`${action.envId}/${action.fileId}`).catch(() => null);
+      if (remote) {
+        fs.mkdirSync(path.dirname(filePath), { recursive: true });
+        fs.writeFileSync(filePath, remote);
+      }
+    }
     if (!fs.existsSync(filePath)) {
-      // El archivo se perdió (ej. un redeploy que limpió el disco). Mandamos al menos
-      // el texto que lo acompañaba, si había, para no dejar a la persona sin respuesta.
+      // El archivo se perdió de verdad. Mandamos al menos el texto que lo acompañaba,
+      // si había, para no dejar a la persona sin respuesta.
       if (action.caption) {
         await sock.sendMessage(jid, { text: action.caption });
         return action.caption;
@@ -313,6 +366,13 @@ async function startSession(envId, sessionId) {
   runtime.set(key, entry);
 
   try {
+    // Si el disco local está vacío (ej: recién deployado) pero hay una sesión guardada
+    // en Supabase, la restauramos para no tener que volver a escanear el QR.
+    if (!fs.existsSync(path.join(sessionDir, 'creds.json'))) {
+      await restoreSessionFromRemote(envId, sessionId, sessionDir).catch((err) =>
+        console.error(`[${envId}/${sessionId}] no se pudo restaurar la sesión desde Supabase:`, err.message)
+      );
+    }
     fs.mkdirSync(sessionDir, { recursive: true });
     const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
     const { version } = await fetchLatestBaileysVersion();
@@ -325,7 +385,10 @@ async function startSession(envId, sessionId) {
     });
     entry.sock = sock;
 
-    sock.ev.on('creds.update', saveCreds);
+    sock.ev.on('creds.update', async () => {
+      await saveCreds();
+      scheduleSessionSync(envId, sessionId, sessionDir);
+    });
 
     sock.ev.on('connection.update', (update) => {
       handleConnectionUpdate(envId, sessionId, sessionDir, entry, update).catch((err) => {
@@ -378,6 +441,7 @@ async function handleConnectionUpdate(envId, sessionId, sessionDir, entry, updat
     if (loggedOut) {
       runtime.delete(runtimeKey(envId, sessionId));
       fs.rmSync(sessionDir, { recursive: true, force: true });
+      if (sb.enabled) sb.kvDeletePrefix(`session:${envId}:${sessionId}:`).catch(() => {});
     } else {
       scheduleReconnect(envId, sessionId, entry);
     }
@@ -508,7 +572,10 @@ async function stopSession(envId, sessionId) {
     }
     runtime.delete(key);
   }
+  clearTimeout(sessionSyncTimers.get(key));
+  sessionSyncTimers.delete(key);
   fs.rmSync(path.join(AUTH_DIR, envId, sessionId), { recursive: true, force: true });
+  if (sb.enabled) sb.kvDeletePrefix(`session:${envId}:${sessionId}:`).catch(() => {});
   store.removeSession(envId, sessionId);
 }
 
