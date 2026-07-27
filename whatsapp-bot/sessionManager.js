@@ -13,9 +13,8 @@ const {
 
 const store = require('./store');
 const { generateAiReply } = require('./ai');
+const { SESSIONS_DIR: AUTH_DIR, UPLOADS_DIR } = require('./storagePaths');
 
-const AUTH_DIR = path.join(__dirname, 'sessions');
-const UPLOADS_DIR = path.join(__dirname, 'uploads');
 const MAX_RECONNECT_DELAY_MS = 30_000;
 
 function uploadPath(envId, fileId) {
@@ -275,12 +274,21 @@ async function sendAction(sock, jid, action) {
       }
       throw new Error('el archivo configurado ya no está disponible');
     }
-    await sock.sendMessage(jid, {
-      document: fs.readFileSync(filePath),
-      fileName: action.fileName,
-      mimetype: action.mimetype,
-      caption: action.caption || undefined,
-    });
+    const buffer = fs.readFileSync(filePath);
+    const caption = action.caption || undefined;
+    const mt = action.mimetype || 'application/octet-stream';
+    // Imágenes y videos se mandan inline (se ven en el chat); el resto como documento.
+    let content;
+    if (mt.startsWith('image/')) {
+      content = { image: buffer, caption };
+    } else if (mt.startsWith('video/')) {
+      content = { video: buffer, caption };
+    } else if (mt.startsWith('audio/')) {
+      content = { audio: buffer, mimetype: mt };
+    } else {
+      content = { document: buffer, fileName: action.fileName, mimetype: mt, caption };
+    }
+    await sock.sendMessage(jid, content);
     return action.caption ? `📎 ${action.fileName} — ${action.caption}` : `📎 ${action.fileName}`;
   }
 

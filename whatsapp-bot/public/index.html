@@ -93,6 +93,12 @@
   .rule-type-btn.active { background: var(--accent); color: #04211a; border-color: var(--accent); }
   .auto-reply-box { background: var(--surface-2); border-radius: 10px; padding: 12px 14px; margin-top: 4px; }
   .auto-reply-box .section-hint { margin: 6px 0 0; }
+  /* estado de cada grupo */
+  .group-status { font-size: 10.5px; padding: 1px 8px; border-radius: 999px; font-weight: 600; white-space: nowrap; }
+  .group-status.on { background: #16a34a33; color: #4ade80; }
+  .group-status.off { background: #64748b33; color: #94a3b8; }
+  .group-item.is-off .group-body { opacity: 0.5; }
+  .group-inactive-note { color: var(--warn); margin: 6px 0 0; }
 
   /* intro paso a paso */
   #intro { background: linear-gradient(135deg, #16302a, var(--surface)); border: 1px solid #1f4b3c; border-radius: 14px; padding: 22px; margin-bottom: 20px; }
@@ -321,12 +327,13 @@
       </details>
 
       <details class="section">
-        <summary>👥 Grupos — FAQs</summary>
+        <summary>👥 Grupos — FAQs <span class="badge-count groupsCount"></span></summary>
         <div class="section-body">
-          <small class="hint">Activá un grupo y cargá preguntas frecuentes: el bot solo responde si el mensaje contiene la palabra clave — no le contesta a todo el grupo.</small>
-          <div class="row" style="margin-top:8px;">
-            <button class="ghost loadGroups" type="button">Actualizar lista de grupos</button>
+          <p class="section-hint">El bot puede responder dentro de grupos de WhatsApp, pero <strong>solo por palabra clave</strong> — nunca le contesta a todos los mensajes del grupo. Activá un grupo con el tilde y cargale sus preguntas frecuentes.</p>
+          <div class="row" style="margin-top:4px;">
+            <button class="ghost loadGroups" type="button">🔄 Buscar mis grupos de WhatsApp</button>
           </div>
+          <small class="hint">El número tiene que estar conectado. Trae los grupos de los que este WhatsApp ya es miembro.</small>
           <div class="error-text groupsError"></div>
           <div class="groupsList"></div>
         </div>
@@ -340,12 +347,15 @@
 
   <template id="groupTemplate">
     <div class="card group-item" style="background:#111b21;">
-      <label class="row" style="cursor:pointer; justify-content: space-between;">
-        <span class="row" style="flex:1;">
+      <label class="row" style="cursor:pointer; justify-content: space-between; gap:8px;">
+        <span class="row" style="flex:1; gap:8px;">
           <input type="checkbox" class="groupToggle" style="flex:none;" />
           <strong class="groupName"></strong>
+          <span class="group-status off">Inactivo</span>
         </span>
+        <span class="badge-count groupFaqCount"></span>
       </label>
+      <p class="group-inactive-note rule-hint">Grupo inactivo: el bot no responde acá. Activalo con el tilde para que use las FAQs de abajo.</p>
       <div class="group-body section">
         <ul class="groupRulesList"></ul>
         <form class="addGroupRuleForm" style="margin-top:8px;">
@@ -464,11 +474,14 @@ function addOptionRow(container) {
 
 // Sube un archivo crudo (no JSON) al backend y devuelve { fileId, fileName, mimetype }.
 async function uploadFile(file) {
+  // Mandamos el body como octet-stream y el tipo real en un header aparte, así el
+  // parser JSON global del server nunca intercepta el archivo (pasaba con .json, etc.).
   const res = await fetch('/api/uploads', {
     method: 'POST',
     headers: {
-      'Content-Type': file.type || 'application/octet-stream',
+      'Content-Type': 'application/octet-stream',
       'X-File-Name': encodeURIComponent(file.name),
+      'X-File-Type': file.type || 'application/octet-stream',
     },
     body: file,
   });
@@ -695,7 +708,8 @@ function buildCard(id) {
     groupsError.textContent = '';
     try {
       const groups = await api(`/api/sessions/${id}/groups`);
-      renderGroups(node, id, groups);
+      node.dataset.groupsLive = '1'; // ya trajimos la lista en vivo: no la pisamos con el refresh
+      renderGroups(node, id, groups, 'Este WhatsApp todavía no es miembro de ningún grupo. Agregalo a un grupo desde el celular y volvé a tocar "Buscar mis grupos".');
     } catch (err) {
       groupsError.textContent = err.message;
     }
@@ -797,6 +811,19 @@ function updateCard(node, s, id) {
   const aiBadge = node.querySelector('.aiStatusBadge');
   aiBadge.textContent = 'ON';
   aiBadge.style.display = s.aiEnabled ? 'inline-block' : 'none';
+
+  // Grupos: contador de activos (se refresca siempre) + mostrar los ya configurados una
+  // sola vez al cargar, para que persistan sin tener que tocar "Buscar mis grupos". No se
+  // re-renderizan en cada refresh para no pisar lo que el usuario esté escribiendo.
+  const activeGroups = Object.values(s.groups || {}).filter((g) => g.enabled).length;
+  setBadgeCount(node.querySelector('.groupsCount'), activeGroups);
+  if (!node.dataset.groupsInit && node.dataset.groupsLive !== '1') {
+    node.dataset.groupsInit = '1';
+    const configured = Object.entries(s.groups || {})
+      .map(([jid, g]) => ({ jid, name: g.name || jid, enabled: !!g.enabled, rules: g.rules || [] }))
+      .filter((g) => g.enabled || (g.rules && g.rules.length));
+    if (configured.length) renderGroups(node, id, configured);
+  }
 }
 
 function setBadgeCount(el, count) {
@@ -808,21 +835,38 @@ function buildGroupNode(sessionId, group) {
   const tpl = document.getElementById('groupTemplate');
   const node = tpl.content.firstElementChild.cloneNode(true);
 
+  node.querySelector('.groupName').textContent = group.name;
   const toggle = node.querySelector('.groupToggle');
-  toggle.checked = !!group.enabled;
+  const statusPill = node.querySelector('.group-status');
+  const inactiveNote = node.querySelector('.group-inactive-note');
+  const faqBadge = node.querySelector('.groupFaqCount');
+
+  function updateVisual() {
+    const on = !!group.enabled;
+    toggle.checked = on;
+    statusPill.textContent = on ? 'Activo' : 'Inactivo';
+    statusPill.className = `group-status ${on ? 'on' : 'off'}`;
+    node.classList.toggle('is-off', !on);
+    inactiveNote.style.display = on ? 'none' : 'block';
+    const n = (group.rules || []).length;
+    faqBadge.textContent = n ? `${n} FAQ${n === 1 ? '' : 's'}` : '';
+    faqBadge.style.display = n ? 'inline-block' : 'none';
+  }
+
   toggle.onchange = async () => {
+    const desired = toggle.checked;
     try {
       await api(`/api/sessions/${sessionId}/groups/${encodeURIComponent(group.jid)}`, {
         method: 'PATCH',
-        body: JSON.stringify({ enabled: toggle.checked, name: group.name }),
+        body: JSON.stringify({ enabled: desired, name: group.name }),
       });
+      group.enabled = desired;
+      updateVisual();
     } catch (err) {
-      toggle.checked = !toggle.checked;
+      toggle.checked = !desired;
       alert(err.message);
     }
   };
-
-  node.querySelector('.groupName').textContent = group.name;
 
   function renderGroupRules() {
     renderList(
@@ -835,6 +879,7 @@ function buildGroupNode(sessionId, group) {
         renderGroupRules();
       }
     );
+    updateVisual();
   }
   renderGroupRules();
 
@@ -854,11 +899,11 @@ function buildGroupNode(sessionId, group) {
   return node;
 }
 
-function renderGroups(cardNode, sessionId, groups) {
+function renderGroups(cardNode, sessionId, groups, emptyMsg) {
   const container = cardNode.querySelector('.groupsList');
   container.innerHTML = '';
   if (groups.length === 0) {
-    container.innerHTML = '<small class="hint">No se encontraron grupos para este número (o todavía no es miembro de ninguno).</small>';
+    container.innerHTML = `<small class="hint">${emptyMsg || 'No se encontraron grupos para este número (o todavía no es miembro de ninguno).'}</small>`;
     return;
   }
   groups.forEach((group) => container.appendChild(buildGroupNode(sessionId, group)));

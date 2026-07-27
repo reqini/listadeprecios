@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { CONFIG_PATH } = require('./storagePaths');
 
-const CONFIG_PATH = path.join(__dirname, 'data', 'config.json');
 const MAX_MESSAGES_PER_CONVERSATION = 40;
 
 function load() {

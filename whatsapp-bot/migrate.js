@@ -5,9 +5,8 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { CONFIG_PATH, SESSIONS_DIR } = require('./storagePaths');
 
-const CONFIG_PATH = path.join(__dirname, 'data', 'config.json');
-const SESSIONS_DIR = path.join(__dirname, 'sessions');
 const LEGACY_ENV_ID = 'default';
 
 function hashPassword(password) {

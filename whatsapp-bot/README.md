@@ -186,9 +186,22 @@ recibe mensajes hasta que algo lo despierte. Para evitarlo, sin pagar nada:
 Si más adelante querés algo más confiable, el plan pago más chico de Render (~USD 7/mes)
 elimina el sleep por completo.
 
-### Persistencia de las sesiones
+### Persistencia de los datos (IMPORTANTE en el plan free)
 
-Las credenciales de cada número vinculado se guardan en la carpeta `sessions/` dentro del
-propio servicio. Mientras no borres el servicio de Render ni hagas un deploy que limpie el
-disco, la sesión sobrevive a reinicios. Si en algún momento se pierde, simplemente hay que
-volver a escanear el QR desde el dashboard.
+Todo el estado del bot vive en disco: las empresas y reglas (`data/config.json`), las
+credenciales de cada WhatsApp vinculado (`sessions/`) y los archivos subidos (`uploads/`).
+
+⚠️ **El plan free de Render usa un disco EFÍMERO: se borra en cada deploy y en cada
+reinicio del servicio.** Eso significa que, tal cual, cada vez que se redeploya o el
+servicio se recicla, **se pierden las empresas, los números vinculados (hay que re-escanear
+el QR) y los archivos subidos**. Para uso real hay que resolver esto de una de dos formas:
+
+1. **Disco persistente de Render (recomendado).** Requiere una instancia paga (~USD 7/mes).
+   En Render: agregás un disco (ej: montado en `/data`) y seteás la variable `DATA_DIR=/data`.
+   Con eso, `config.json`, `sessions/` y `uploads/` se guardan en el disco y sobreviven a
+   deploys y reinicios. El código ya soporta `DATA_DIR` — no hay que tocar nada más.
+2. **Almacenamiento externo** (ej: una base de datos o un bucket). Es más trabajo de
+   desarrollo, pero permite quedarse en el plan free. Consultalo si te interesa esta vía.
+
+Si no configurás nada de esto y te quedás en free, el bot funciona igual, pero tené presente
+que vas a tener que recrear las empresas / re-vincular los números después de cada deploy.

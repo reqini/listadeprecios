@@ -364,7 +364,11 @@ app.post(
     if (!buf || !buf.length) return res.status(400).json({ error: 'El archivo está vacío' });
     const rawName = req.headers['x-file-name'] ? decodeURIComponent(req.headers['x-file-name']) : 'archivo';
     const fileName = rawName.replace(/[\r\n]/g, '').slice(0, 120) || 'archivo';
-    const mimetype = (req.headers['content-type'] || 'application/octet-stream').slice(0, 100);
+    // El tipo real viaja en X-File-Type (el Content-Type siempre es octet-stream para
+    // que el parser JSON global no intercepte la subida).
+    const mimetype = (req.headers['x-file-type'] || req.headers['content-type'] || 'application/octet-stream')
+      .toString()
+      .slice(0, 100);
     const fileId = crypto.randomUUID();
     const dir = path.join(sessions.UPLOADS_DIR, req.envId);
     fs.mkdirSync(dir, { recursive: true });
