@@ -15,8 +15,13 @@ const enabled = !!(url && serviceKey);
 const BUCKET = 'bot-uploads';
 const KV_TABLE = 'bot_kv';
 
+// transport ws: en Node < 22 no hay WebSocket nativo y supabase-js lanza al crear el
+// cliente si no le pasamos uno (aunque no usemos realtime para nada).
 const client = enabled
-  ? createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } })
+  ? createClient(url, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      realtime: { transport: require('ws') },
+    })
   : null;
 
 // --- Key-Value sobre una tabla simple (bot_kv: k text PK, v jsonb) ---
